@@ -7,7 +7,10 @@ import { PrismaClient } from './prisma/generated/client/client';
 
 //routes
 import { helthPoint } from "./routes/helth";
-//import { addUserRoute } from "./routes/adduser";
+import { addUserRouter } from "./routes/adduser";
+import { loginUserRouter } from "./routes/loginUser";
+import { logoutUserRouter } from "./routes/logoutUser";
+import { createAuthMiddleware } from "./middleware/authRoute";
 
 dotenv.config();
 
@@ -63,8 +66,16 @@ export class Server {
   }
 
     private initializeRoutes(): void {
-      this.app.use(helthPoint(this.db));
-      //this.app.use(addUserRoute(this.db));
+      // Public routes (no auth required)
+      this.app.use('/api',helthPoint(this.db));
+      this.app.use('/api/users', addUserRouter(this.db));
+      this.app.use('/api/users', loginUserRouter(this.db));
+      
+      // Protected routes (auth required)
+      this.app.use('/api/users', logoutUserRouter(this.db));
+      
+      // Note: Add other protected routes here and they will require authentication
+      // Example: this.app.use('/api/complaints', createAuthMiddleware(this.db), complaintRouter(this.db));
     }
 
   public getApp(): Express {
