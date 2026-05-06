@@ -1,6 +1,5 @@
 import { Router } from "express";
 import bcrypt from "bcrypt";
-import { prisma } from "../lib/prisma";
 import { userSignupSchema } from "../lib/validations/validation.user";
 import { UserSignup } from "../lib/types/types";
 import { PrismaClient } from "../prisma/generated/client/client";

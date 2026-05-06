@@ -1,6 +1,7 @@
 import { Server } from "./index";
 import dotenv from "dotenv";
-import {prisma} from "./lib/prisma";
+// import {prisma} from "./lib/prisma";
+import { getPrisma } from "./lib/prisma";
 import { retrieveAndInjectSecrets } from "./middleware/retriveSecrets";
 import { userQueueService } from "./lib/redis/userQueueService";
 import { complaintQueueService } from "./lib/redis/complaintQueueService";
@@ -15,6 +16,9 @@ async function bootstrap() {
     // This will inject secrets into process.env
     await retrieveAndInjectSecrets();
 
+    const prisma = getPrisma();
+    console.log('Prisma client initialized');
+    
     // Initialize Redis queue services
     await userQueueService.connect();
     console.log('User queue service initialized');
@@ -47,12 +51,10 @@ process.on("uncaughtException", (err) => {
 
 process.on("SIGINT", async () => {
   console.log("Received SIGINT. Shutting down gracefully...");
-  await prisma.$disconnect();
   process.exit(0);
 });
 
 process.on("SIGTERM", async () => {
   console.log("Received SIGTERM. Shutting down gracefully...");
-  await prisma.$disconnect();
   process.exit(0);
 });
