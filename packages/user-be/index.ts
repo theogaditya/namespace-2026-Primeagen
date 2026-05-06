@@ -10,6 +10,7 @@ import { helthPoint } from "./routes/helth";
 import { addUserRouter } from "./routes/adduser";
 import { loginUserRouter } from "./routes/loginUser";
 import { logoutUserRouter } from "./routes/logoutUser";
+import { createComplaintRouter } from "./routes/createComplaint";
 import { createAuthMiddleware } from "./middleware/authRoute";
 
 dotenv.config();
@@ -66,6 +67,9 @@ export class Server {
   }
 
     private initializeRoutes(): void {
+      // Auth middleware
+      const authMiddleware = createAuthMiddleware(this.db);
+      
       // Public routes (no auth required)
       this.app.use('/api',helthPoint(this.db));
       this.app.use('/api/users', addUserRouter(this.db));
@@ -73,9 +77,8 @@ export class Server {
       
       // Protected routes (auth required)
       this.app.use('/api/users', logoutUserRouter(this.db));
-      
-      // Note: Add other protected routes here and they will require authentication
-      // Example: this.app.use('/api/complaints', createAuthMiddleware(this.db), complaintRouter(this.db));
+      this.app.use('/api/complaints', authMiddleware, createComplaintRouter(this.db));
+
     }
 
   public getApp(): Express {

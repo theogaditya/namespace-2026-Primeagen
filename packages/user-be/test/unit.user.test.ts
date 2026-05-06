@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeEach, vi } from 'vitest';
+import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import request from 'supertest';
 import express from 'express';
 import prismaMock from "../lib/_mocks_/prisma";
@@ -7,7 +7,7 @@ import jwt from 'jsonwebtoken';
 vi.mock('../lib/prisma', () => ({ prisma: prismaMock }));
 
 // Mock the userQueueService
-vi.mock('../lib/userQueueService', () => ({
+vi.mock('../lib/redis/userQueueService', () => ({
   userQueueService: {
     pushUserToQueue: vi.fn().mockResolvedValue(undefined),
     connect: vi.fn().mockResolvedValue(undefined),
@@ -16,9 +16,20 @@ vi.mock('../lib/userQueueService', () => ({
   }
 }));
 
+// Mock the tokenBlacklistService
+vi.mock('../lib/redis/tokenBlacklistService', () => ({
+  tokenBlacklistService: {
+    blacklistToken: vi.fn().mockResolvedValue(undefined),
+    isBlacklisted: vi.fn().mockResolvedValue(false),
+    connect: vi.fn().mockResolvedValue(undefined),
+    disconnect: vi.fn().mockResolvedValue(undefined),
+  }
+}));
+
 import { addUserRouter } from '../routes/adduser';
 import { loginUserRouter } from '../routes/loginUser';
 import { logoutUserRouter } from '../routes/logoutUser';
+import { tokenBlacklistService } from '../lib/redis/tokenBlacklistService';
 import bcrypt from 'bcrypt';
 
 const JWT_SECRET = "my123";
@@ -32,6 +43,11 @@ beforeEach(() => {
   app.use('/api/users', addUserRouter(prismaMock));
   app.use('/api/users', loginUserRouter(prismaMock));
   app.use('/api/users', logoutUserRouter(prismaMock));
+  vi.clearAllMocks();
+});
+
+afterEach(() => {
+  vi.restoreAllMocks();
 });
 
 describe('Add User routes', () => {
@@ -297,6 +313,13 @@ describe('Logout User routes', () => {
     expect(res.body.message).toContain('Logout successful');
     expect(res.body.data).toHaveProperty('userId', 'uuid-1');
     expect(res.body.data).toHaveProperty('logoutTime');
+    
+    // Verify token was added to blacklist
+    expect(tokenBlacklistService.blacklistToken).toHaveBeenCalledTimes(1);
+    expect(tokenBlacklistService.blacklistToken).toHaveBeenCalledWith(
+      token,
+      expect.any(Number)
+    );
   });
 
   it('returns 401 when no Authorization header is provided', async () => {
@@ -360,5 +383,87 @@ describe('Logout User routes', () => {
     expect(res.status).toBe(403);
     expect(res.body.success).toBe(false);
     expect(res.body.message).toBe('Account is suspended. Please contact support.');
+  });
+
+  it('returns 401 when using a blacklisted token', async () => {
+    const token = jwt.sign(
+      { userId: 'uuid-1', email: 'test@example.com', name: 'Test User' },
+      JWT_SECRET,
+      { expiresIn: '24h' }
+    );
+
+    // Mock token as blacklisted
+    vi.mocked(tokenBlacklistService.isBlacklisted).mockResolvedValueOnce(true);
+
+    const res = await request(app)
+      .post('/api/users/logout')
+      .set('Authorization', `Bearer ${token}`);
+
+    expect(res.status).toBe(401);
+    expect(res.body.success).toBe(false);
+    expect(res.body.message).toBe('Token has been invalidated. Please login again.');
+  });
+
+  it('returns 500 when Redis blacklist fails during logout', async () => {
+    const mockUser = {
+      id: 'uuid-1',
+      email: 'test@example.com',
+      name: 'Test User',
+      status: 'ACTIVE',
+    };
+
+    const token = jwt.sign(
+      { userId: 'uuid-1', email: 'test@example.com', name: 'Test User' },
+      JWT_SECRET,
+      { expiresIn: '24h' }
+    );
+
+    // @ts-ignore
+    prismaMock.user.findUnique.mockResolvedValue(mockUser);
+    
+    // Mock Redis failure
+    vi.mocked(tokenBlacklistService.blacklistToken).mockRejectedValueOnce(
+      new Error('Redis connection failed')
+    );
+
+    const res = await request(app)
+      .post('/api/users/logout')
+      .set('Authorization', `Bearer ${token}`);
+
+    expect(res.status).toBe(500);
+    expect(res.body.success).toBe(false);
+  });
+
+  it('returns 401 when Authorization header missing Bearer prefix', async () => {
+    const token = jwt.sign(
+      { userId: 'uuid-1', email: 'test@example.com', name: 'Test User' },
+      JWT_SECRET,
+      { expiresIn: '24h' }
+    );
+
+    const res = await request(app)
+      .post('/api/users/logout')
+      .set('Authorization', token); // Missing "Bearer " prefix
+
+    expect(res.status).toBe(401);
+    expect(res.body.success).toBe(false);
+    expect(res.body.message).toBe('Authentication required. Please login first.');
+  });
+
+  it('returns 401 when JWT token is expired', async () => {
+    // Create an already expired token
+    const token = jwt.sign(
+      { userId: 'uuid-1', email: 'test@example.com', name: 'Test User' },
+      JWT_SECRET,
+      { expiresIn: '-1h' } // Expired 1 hour ago
+    );
+
+    const res = await request(app)
+      .post('/api/users/logout')
+      .set('Authorization', `Bearer ${token}`);
+
+    expect(res.status).toBe(401);
+    expect(res.body.success).toBe(false);
+    expect(res.body.message).toBe('Invalid or expired token. Please login again.');
   });
 });

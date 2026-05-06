@@ -2,7 +2,8 @@ import { Server } from "./index";
 import dotenv from "dotenv";
 import {prisma} from "./lib/prisma";
 import { retrieveAndInjectSecrets } from "./middleware/retriveSecrets";
-import { userQueueService } from "./lib/userQueueService";
+import { userQueueService } from "./lib/redis/userQueueService";
+import { complaintQueueService } from "./lib/redis/complaintQueueService";
 
 // Load local .env file first (for development)
 dotenv.config();
@@ -14,9 +15,12 @@ async function bootstrap() {
     // This will inject secrets into process.env
     await retrieveAndInjectSecrets();
 
-    // Initialize Redis queue service for blockchain integration
+    // Initialize Redis queue services
     await userQueueService.connect();
     console.log('User queue service initialized');
+    
+    await complaintQueueService.connect();
+    console.log('Complaint queue service initialized');
 
     // Now that secrets are loaded, initialize server
     const server = new Server(prisma);

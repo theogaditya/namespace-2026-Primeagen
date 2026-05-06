@@ -1,10 +1,10 @@
 import { Router } from "express";
 import bcrypt from "bcrypt";
 import { prisma } from "../lib/prisma";
-import { userSignupSchema } from "../lib/validation.user";
-import { UserSignup } from "../lib/types";
+import { userSignupSchema } from "../lib/validations/validation.user";
+import { UserSignup } from "../lib/types/types";
 import { PrismaClient } from "../prisma/generated/client/client";
-import { userQueueService } from "../lib/userQueueService";
+import { userQueueService } from "../lib/redis/userQueueService";
 
 export function addUserRouter(db: PrismaClient) {
   const router = Router();

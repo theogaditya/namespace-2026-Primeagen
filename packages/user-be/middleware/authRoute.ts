@@ -1,6 +1,7 @@
 import { Request, Response, NextFunction } from "express";
 import jwt from "jsonwebtoken";
 import { PrismaClient } from "../prisma/generated/client/client";
+import { tokenBlacklistService } from "../lib/redis/tokenBlacklistService";
 
 const JWT_SECRET = "my123";
 
@@ -34,6 +35,15 @@ export function createAuthMiddleware(db: PrismaClient) {
       }
 
       const token = authHeader.substring(7); // Remove "Bearer " prefix
+
+      // Check if token is blacklisted (logged out)
+      const isBlacklisted = await tokenBlacklistService.isBlacklisted(token);
+      if (isBlacklisted) {
+        return res.status(401).json({
+          success: false,
+          message: "Token has been invalidated. Please login again.",
+        });
+      }
 
       // Verify JWT token
       let decoded: JwtPayload;
@@ -84,4 +94,8 @@ export function createAuthMiddleware(db: PrismaClient) {
       });
     }
   };
+}
+
+export default function createAuthRoute(db: PrismaClient) {
+  return createAuthMiddleware(db);
 }

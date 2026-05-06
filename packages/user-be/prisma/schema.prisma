@@ -24,7 +24,7 @@ model User {
   status                userStatus    @default(ACTIVE)
   // Relationships
   location              UserLocation?
-  complaints            Complaint[]      @relation("ComplainantComplaints")
+  complaints            Complaint[]       @relation("ComplainantComplaints")
   upvotes               Upvote[]
   auditLogsCreated      AuditLog[]       @relation("LogCreator")
 }
@@ -277,17 +277,20 @@ model Complaint {
   complainantId           String    
   categoryId              String
   subCategory             String
-  standardizedSubCategory String?
+  AIstandardizedSubCategory String?
+  AIabusedFlag           Boolean?
   description             String
   urgency                 ComplaintUrgency @default(LOW) 
   attachmentUrl           String?
+  AIimageVarificationStatus Boolean?
   assignedDepartment      String
-  status                  ComplaintStatus @default(UNDER_PROCESSING)
+  status                  ComplaintStatus @default(REGISTERED)
   sla                     String?
   upvoteCount             Int       @default(0)
-  isPublic                Boolean   @default(true)
+  isPublic                Boolean   
   escalationLevel         String?
   dateOfResolution        DateTime?
+  lastUpdated             DateTime  @updatedAt
   
   // Relationships
   complainant             User      @relation("ComplainantComplaints", fields: [complainantId], references: [id])

@@ -7,7 +7,7 @@
     "dev": "bun run bin.ts",
     "build": "bun build bin.ts --outdir ./dist",
     "start": "bun run bin.ts",
-    "test:unit": "vitest test/unit.user.test.ts --run"
+    "test:unit": "vitest test --run"
   },
   "devDependencies": {
     "@types/bcrypt": "^6.0.0",

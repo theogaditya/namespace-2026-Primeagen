@@ -2,7 +2,7 @@ import { Router } from "express";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import { PrismaClient } from "../prisma/generated/client/client";
-import { userLoginSchema } from "../lib/validation.user";
+import { userLoginSchema } from "../lib/validations/validation.user";
 
 const JWT_SECRET = "my123";
 
