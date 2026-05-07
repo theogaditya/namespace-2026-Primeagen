@@ -24,7 +24,6 @@ export const agentSchema = z.object({
   officialEmail: z.string().email(),
   department: DepartmentEnum,
   municipality: z.string(),
-  accessLevel: z.literal('AGENT'),
 });
 
 export const loginSchema = z.object({

@@ -53,7 +53,7 @@ router.post('/login', async (req, res: any) => {
 
 
 // Create Agent
-router.post('/create/agent', async (req, res: any) => {
+router.post('/create/agent', authenticateMunicipalAdmin, async (req, res: any) => {
   const parse = agentSchema.safeParse(req.body);
   if (!parse.success) {
     return res.status(400).json({ 
@@ -69,6 +69,9 @@ router.post('/create/agent', async (req, res: any) => {
   } = parse.data;
 
   try {
+    // attach the creating municipal admin as the manager
+    const managerId = (req as any).user?.id;
+
     const existingAgent = await prisma.agent.findFirst({
       where: {
         OR: [
@@ -80,12 +83,12 @@ router.post('/create/agent', async (req, res: any) => {
 
     if (existingAgent) {
       return res.status(409).json({ 
-        message: 'Agent with this email, official email, or employee ID already exists' 
+        message: 'Agent with this email or official email already exists' 
       });
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);
-    
+
     const agent = await prisma.agent.create({
       data: {
         email,
@@ -95,6 +98,13 @@ router.post('/create/agent', async (req, res: any) => {
         officialEmail,
         department,
         municipality,
+        // enforce schema-driven values regardless of client input
+        accessLevel: 'AGENT',
+        status: 'ACTIVE',
+        // availability and workload defaults are set in schema, but set explicitly for clarity
+        availabilityStatus: 'At Work',
+        // link to the municipal admin who created this agent
+        managedByMunicipalId: managerId || undefined,
       },
       select: {
         id: true,
@@ -106,12 +116,24 @@ router.post('/create/agent', async (req, res: any) => {
         department: true,
         municipality: true,
         accessLevel: true,
+        workloadLimit: true,
+        currentWorkload: true,
+        availabilityStatus: true,
         dateOfCreation: true,
         status: true,
+        managedByMunicipal: {
+          select: {
+            id: true,
+            adminId: true,
+            officialEmail: true,
+            fullName: true
+          }
+        }
       }
     });
 
     res.status(201).json({ 
+      success: true,
       message: 'Agent created successfully', 
       agent 
     });
@@ -120,7 +142,7 @@ router.post('/create/agent', async (req, res: any) => {
     
     if (err.code === 'P2002') {
       return res.status(409).json({ 
-        message: 'Agent with this email, official email, or employee ID already exists' 
+        message: 'Agent with this email or official email already exists' 
       });
     }
     

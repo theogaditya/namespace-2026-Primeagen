@@ -188,8 +188,8 @@ router.get('/profile', authenticateSuperAdmin, async (req, res: any) => {
   }
 });
 
-// ----- 5. Create State Admin -----
-router.post('/create/state-admins', async (req, res: any) => {
+// ----- 5. Create Department State Admin -----
+router.post('/create/state-admins', authenticateSuperAdmin, async (req, res: any) => {
   const parseResult = createStateAdminSchema.safeParse(req.body);
 
   if (!parseResult.success) {
@@ -206,7 +206,7 @@ router.post('/create/state-admins', async (req, res: any) => {
     if (existing) {
       return res.status(409).json({
         success: false,
-        message: 'Admin with given email or ID already exists'
+        message: 'Department State Admin with this email already exists'
       });
     }
 
@@ -220,24 +220,29 @@ router.post('/create/state-admins', async (req, res: any) => {
         password: hashedPassword,
         department: data.department as any,
         state: data.state,
-        managedMunicipalities: data.managedMunicipalities || []
+        managedMunicipalities: data.managedMunicipalities || [],
+        accessLevel: 'DEPT_STATE_ADMIN',
+        status: 'ACTIVE'
+      },
+      select: {
+        id: true,
+        adminId: true,
+        fullName: true,
+        officialEmail: true,
+        phoneNumber: true,
+        department: true,
+        state: true,
+        managedMunicipalities: true,
+        accessLevel: true,
+        status: true,
+        dateOfCreation: true
       }
     });
 
     return res.status(201).json({
       success: true,
-      message: 'State Department Admin created successfully',
-      data: {
-        id: newAdmin.id,
-        fullName: newAdmin.fullName,
-        officialEmail: newAdmin.officialEmail,
-        state: newAdmin.state,
-        department: newAdmin.department,
-        managedMunicipalities: newAdmin.managedMunicipalities,
-        accessLevel: newAdmin.accessLevel,
-        dateOfCreation: newAdmin.dateOfCreation,
-        status: newAdmin.status,
-      }
+      message: 'Department State Admin created successfully',
+      data: newAdmin
     });
 
   } catch (error) {
@@ -246,8 +251,8 @@ router.post('/create/state-admins', async (req, res: any) => {
   }
 });
 
-// ----- 6. Create Municipal Admin -----
-router.post('/create/municipal-admins', async (req, res: any) => {
+// ----- 6. Create Department Municipal Admin -----
+router.post('/create/municipal-admins', authenticateSuperAdmin, async (req, res: any) => {
   const parseResult = createMunicipalAdminSchema.safeParse(req.body);
 
   if (!parseResult.success) {
@@ -258,17 +263,13 @@ router.post('/create/municipal-admins', async (req, res: any) => {
 
   try {
     const existing = await prisma.departmentMunicipalAdmin.findFirst({
-      where: {
-        OR: [
-          { officialEmail: data.officialEmail },
-        ]
-      }
+      where: { officialEmail: data.officialEmail }
     });
 
     if (existing) {
       return res.status(409).json({
         success: false,
-        message: 'Admin with given email or ID already exists'
+        message: 'Department Municipal Admin with this email already exists'
       });
     }
 
@@ -282,19 +283,29 @@ router.post('/create/municipal-admins', async (req, res: any) => {
         password: hashedPassword,
         department: data.department as any,
         municipality: data.municipality,
+        accessLevel: 'DEPT_MUNICIPAL_ADMIN',
+        status: 'ACTIVE'
+      },
+      select: {
+        id: true,
+        adminId: true,
+        fullName: true,
+        officialEmail: true,
+        phoneNumber: true,
+        department: true,
+        municipality: true,
+        accessLevel: true,
+        status: true,
+        workloadLimit: true,
+        currentWorkload: true,
+        dateOfCreation: true
       }
     });
 
     return res.status(201).json({
       success: true,
-      message: 'Municipal Department Admin created successfully',
-      data: {
-        id: newAdmin.id,
-        fullName: newAdmin.fullName,
-        officialEmail: newAdmin.officialEmail,
-        department: newAdmin.department,
-        municipality: newAdmin.municipality
-      }
+      message: 'Department Municipal Admin created successfully',
+      data: newAdmin
     });
   } catch (error) {
     console.error('Create Municipal Admin Error:', error);
@@ -302,7 +313,125 @@ router.post('/create/municipal-admins', async (req, res: any) => {
   }
 });
 
-// ----- 7. Get All Admins -----  
+// ----- 7. Create Super Municipal Admin -----
+router.post('/create/super-municipal-admins', authenticateSuperAdmin, async (req, res: any) => {
+  const { fullName, officialEmail, phoneNumber, password, municipality } = req.body;
+
+  if (!fullName || !officialEmail || !password || !municipality) {
+    return res.status(400).json({ 
+      success: false, 
+      message: 'Missing required fields: fullName, officialEmail, password, municipality' 
+    });
+  }
+
+  try {
+    const existing = await prisma.superMunicipalAdmin.findFirst({
+      where: { officialEmail }
+    });
+
+    if (existing) {
+      return res.status(409).json({
+        success: false,
+        message: 'Super Municipal Admin with this email already exists'
+      });
+    }
+
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    const newAdmin = await prisma.superMunicipalAdmin.create({
+      data: {
+        fullName,
+        officialEmail,
+        phoneNumber,
+        password: hashedPassword,
+        municipality,
+        accessLevel: 'SUPER_MUNICIPAL_ADMIN',
+        status: 'ACTIVE'
+      },
+      select: {
+        id: true,
+        adminId: true,
+        fullName: true,
+        officialEmail: true,
+        phoneNumber: true,
+        municipality: true,
+        accessLevel: true,
+        status: true,
+        dateOfCreation: true
+      }
+    });
+
+    return res.status(201).json({
+      success: true,
+      message: 'Super Municipal Admin created successfully',
+      data: newAdmin
+    });
+  } catch (error) {
+    console.error('Create Super Municipal Admin Error:', error);
+    return res.status(500).json({ success: false, message: 'Server error' });
+  }
+});
+
+// ----- 8. Create Super State Admin -----
+router.post('/create/super-state-admins', authenticateSuperAdmin, async (req, res: any) => {
+  const { fullName, officialEmail, phoneNumber, password, state } = req.body;
+
+  if (!fullName || !officialEmail || !password || !state) {
+    return res.status(400).json({ 
+      success: false, 
+      message: 'Missing required fields: fullName, officialEmail, password, state' 
+    });
+  }
+
+  try {
+    const existing = await prisma.superStateAdmin.findFirst({
+      where: { officialEmail }
+    });
+
+    if (existing) {
+      return res.status(409).json({
+        success: false,
+        message: 'Super State Admin with this email already exists'
+      });
+    }
+
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    const newAdmin = await prisma.superStateAdmin.create({
+      data: {
+        fullName,
+        officialEmail,
+        phoneNumber,
+        password: hashedPassword,
+        state,
+        accessLevel: 'SUPER_STATE_ADMIN',
+        status: 'ACTIVE'
+      },
+      select: {
+        id: true,
+        adminId: true,
+        fullName: true,
+        officialEmail: true,
+        phoneNumber: true,
+        state: true,
+        accessLevel: true,
+        status: true,
+        dateOfCreation: true
+      }
+    });
+
+    return res.status(201).json({
+      success: true,
+      message: 'Super State Admin created successfully',
+      data: newAdmin
+    });
+  } catch (error) {
+    console.error('Create Super State Admin Error:', error);
+    return res.status(500).json({ success: false, message: 'Server error' });
+  }
+});
+
+// ----- 9. Get All Admins -----  
 router.get('/admins', async (req, res) => {
   try {
     const stateAdmins = await prisma.departmentStateAdmin.findMany();
