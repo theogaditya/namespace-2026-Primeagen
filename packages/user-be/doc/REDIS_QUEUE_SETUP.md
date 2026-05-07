@@ -1,229 +1,150 @@
-# Redis Queue Setup for User Registration
+## Redis queues used by user-be
 
-## Overview
-This document explains the Redis queue implementation for pushing new user data to a blockchain processing service.
+This service uses Redis lists as simple FIFO queues. There are currently two application queues implemented in `packages/user-be/lib/redis`:
 
-## Architecture
+- `user:registration:queue` — used to enqueue newly created user objects for downstream processing (blockchain or other async processing).
+- `complaint:registration:queue` — used to enqueue complaint records for asynchronous processing.
 
-### Flow
-1. User signs up via `/api/users/signup` endpoint
-2. User data is saved to the database
-3. User data is pushed to Redis queue (`user:registration:queue`)
-4. External blockchain process (not managed by this service) pops from the queue and processes the data
+The implementation uses the official `@redis/client` and performs RPUSH to add items to a list, and downstream processors are expected to use LPOP/BLPOP to consume items.
 
-### Components
+Files of interest
+- `lib/redis/redisClient.ts` — creates dedicated Redis clients (publish/subscribe, caching, and dedicated clients for each queue).
+- `lib/redis/userQueueService.ts` — singleton service for pushing users to `user:registration:queue` (rPush, lLen, connect, disconnect).
+- `lib/redis/complaintQueueService.ts` — singleton service for pushing complaints to `complaint:registration:queue`.
+- `lib/redis/tokenBlacklistService.ts` — simple key/value usage for token blacklist with a `token_blacklist:` prefix.
 
-#### 1. RedisClientforUserQueue (lib/redisClient.ts)
-- Dedicated Redis client for user queue operations
-- Separate from other Redis clients (publish/subscribe, caching, etc.)
-- Connects to Redis instance specified in `REDIS_URL` environment variable
+Quick architecture summary
+1. API endpoint (e.g., user signup) creates the DB record.
+2. The service pushes a JSON string of the payload to a Redis list via RPUSH.
+3. A downstream worker/process (blockchain processor, complaint processor) consumes items with LPOP/BLPOP and processes them.
 
-#### 2. UserQueueService (lib/userQueueService.ts)
-- Singleton service managing the user queue
-- **Key Methods:**
-  - `connect()`: Establishes connection to Redis
-  - `pushUserToQueue(userData)`: Pushes user data to the queue (RPUSH)
-  - `getQueueLength()`: Returns the current queue length
-  - `disconnect()`: Gracefully closes the connection
+Environment / connection
 
-#### 3. Queue Operations
-- **Queue Name:** `user:registration:queue`
-- **Push Operation:** RPUSH (adds to the end of the list)
-- **Pop Operation:** LPOP (blockchain service pops from the beginning - FIFO)
+Required env var:
 
-### Data Format
-When a user is created, the following data is pushed to the queue:
-```json
-{
-  "id": "user_uuid",
-  "email": "user@example.com",
-  "phoneNumber": "+1234567890",
-  "name": "John Doe",
-  "aadhaarId": "xxxx-xxxx-xxxx",
-  "dateOfCreation": "2025-11-30T...",
-  "location": {
-    "pin": "123456",
-    "district": "District Name",
-    "city": "City Name",
-    "locality": "Locality",
-    "street": "Street Address",
-    "municipal": "Municipal Area",
-    "state": "State Name"
-  }
-}
-```
-
-## Environment Setup
-
-### Required Environment Variable
 ```env
 REDIS_URL=redis://localhost:6379
 ```
 
-For production with authentication:
+For a password-protected instance:
+
 ```env
-REDIS_URL=redis://:password@host:port
+REDIS_URL=redis://:password@hostname:6379
 ```
 
-## Testing the Queue
+Notes from the codebase
 
-### 1. Check Health Endpoint
-```bash
-curl http://localhost:3000/api/helth
+- `bin.ts` connects both `userQueueService` and `complaintQueueService` at startup so those clients are available when the server runs.
+- `tokenBlacklistService` uses the key prefix `token_blacklist:` and `SETEX`/`GET` semantics to store blacklisted JWTs until they expire.
+
+How to push items (examples from services)
+
+User queue (service):
+
+```ts
+// userQueueService.pushUserToQueue(userData)
+await client.rPush('user:registration:queue', JSON.stringify(userData));
 ```
 
-Response includes queue status:
-```json
-{
-  "status": "ok",
-  "database": "ok",
-  "redis": "ok",
-  "queueLength": 5,
-  "message": "All systems operational"
-}
+Complaint queue (service):
+
+```ts
+// complaintQueueService.pushComplaintToQueue(complaintData)
+await client.rPush('complaint:registration:queue', JSON.stringify(complaintData));
 ```
 
-### 2. Create a User and Verify Queue
-```bash
-# Create a user
-curl -X POST http://localhost:3000/api/users/signup \
-  -H "Content-Type: application/json" \
-  -d '{
-    "email": "test@example.com",
-    "phoneNumber": "+1234567890",
-    "name": "Test User",
-    "password": "SecurePass123!",
-    "dateOfBirth": "1990-01-01",
-    "aadhaarId": "1234-5678-9012",
-    "preferredLanguage": "English",
-    "disability": false,
-    "location": {
-      "pin": "123456",
-      "district": "Test District",
-      "city": "Test City",
-      "locality": "Test Locality",
-      "street": "Test Street",
-      "municipal": "Test Municipal",
-      "state": "Test State"
-    }
-  }'
+How to consume items (downstream worker)
 
-# Check if user was added to queue
-redis-cli LLEN user:registration:queue
-```
+Simple blocking pop loop (pseudo/TS):
 
-### 3. Manual Queue Inspection (Redis CLI)
-```bash
-# Connect to Redis
-redis-cli
-
-# Check queue length
-LLEN user:registration:queue
-
-# View items in queue (without removing them)
-LRANGE user:registration:queue 0 -1
-
-# View the first item (what blockchain service will pop next)
-LINDEX user:registration:queue 0
-```
-
-## Error Handling
-
-### Queue Push Failures
-If pushing to the queue fails, the user creation still succeeds. The error is logged, and you can:
-1. Implement a retry mechanism
-2. Store failed pushes in a dead-letter queue
-3. Manually push the user data later using the user ID
-
-### Connection Issues
-The service attempts to auto-connect when pushing data. If Redis is unavailable:
-- Error is logged to console
-- User creation continues (queue operation is non-blocking)
-- Consider implementing a health check monitor
-
-## Monitoring
-
-### Key Metrics to Track
-1. **Queue Length:** Monitor via health endpoint or Redis directly
-2. **Push Success Rate:** Check application logs for failures
-3. **Redis Connection Status:** Monitor in health checks
-
-### Recommended Alerts
-- Queue length exceeds threshold (blockchain service may be down)
-- Redis connection failures
-- Repeated push failures
-
-## Integration with Blockchain Service
-
-The blockchain service should:
-1. Connect to the same Redis instance
-2. Use LPOP or BLPOP to retrieve user data from `user:registration:queue`
-3. Process the user data (blockchain operations)
-4. Handle errors independently
-
-Example blockchain service code:
-```typescript
-// Example for blockchain service (not implemented here)
-const client = redis.createClient({ url: REDIS_URL });
+```ts
+const client = createClient({ url: process.env.REDIS_URL });
 await client.connect();
 
-// Blocking pop with 5 second timeout
 while (true) {
-  const data = await client.blPop('user:registration:queue', 5);
-  if (data) {
-    const userData = JSON.parse(data.element);
-    // Process userData in blockchain
+  // blocks for up to 5 seconds; returns when an element is present
+  const result = await client.blPop('user:registration:queue', 5);
+  if (result) {
+    // result.element contains the JSON payload
+    const payload = JSON.parse(result.element);
+    // process payload...
   }
 }
 ```
 
-## Graceful Shutdown
+Health checks and quick tests
 
-The service properly disconnects from Redis during shutdown:
-- SIGINT (Ctrl+C)
-- SIGTERM (Docker/K8s stop)
+- Health endpoint (`/api/helth`) reports Redis status and queue length. `bin.ts` initializes queue clients at startup.
+- Inspect queue length:
 
-This ensures:
-- No data loss
-- Clean connection closure
-- Proper resource cleanup
+```bash
+redis-cli LLEN user:registration:queue
+redis-cli LLEN complaint:registration:queue
+```
 
-## Development Tips
+- Inspect items (development only):
 
-1. **Local Redis:** Run Redis locally with Docker:
-   ```bash
-   docker run -d -p 6379:6379 redis:alpine
-   ```
+```bash
+redis-cli LRANGE user:registration:queue 0 -1
+```
 
-2. **Monitor Queue in Real-time:**
-   ```bash
-   watch -n 1 'redis-cli LLEN user:registration:queue'
-   ```
+Local Redis for development
 
-3. **Clear Queue (Development Only):**
-   ```bash
-   redis-cli DEL user:registration:queue
-   ```
+```bash
+docker run -d -p 6379:6379 --name local-redis redis:alpine
+```
 
-## Troubleshooting
+Monitoring & alerts
 
-### Issue: Queue not populating
-- Check Redis connection: `redis-cli ping`
-- Verify REDIS_URL in .env
-- Check application logs for errors
+- Monitor queue length and alert if it crosses a threshold (indicates downstream worker backlog).
+- Monitor Redis connection errors in logs.
+- Track push failures (exceptions when rPush fails); consider telemetry/metrics for success/failure counts.
 
-### Issue: Queue growing too large
-- Blockchain service may be down
-- Check blockchain service logs
-- Verify both services connect to same Redis instance
+Errors, retries, and DLQ ideas
 
-### Issue: Duplicate entries
-- Ensure blockchain service properly removes items with LPOP
-- Check for multiple blockchain service instances
+Current behavior in the service:
+- If the push to Redis fails the service currently logs and (in some code paths) rethrows. The HTTP request may still succeed depending on where the call is used. Review call sites to confirm synchronous behavior.
 
-## Security Considerations
+Recommended improvements:
+- Add a small retry with exponential backoff for transient Redis errors when pushing.
+- Implement a dead-letter queue (DLQ) pattern for items that repeatedly fail to be pushed or processed. Example DLQ names:
+  - `user:registration:dlq`
+  - `complaint:registration:dlq`
 
-1. **Redis Authentication:** Use password-protected Redis in production
-2. **Network Security:** Redis should not be exposed to public internet
-3. **Data Sanitization:** Sensitive data (Aadhaar) is included - ensure compliance
-4. **TLS/SSL:** Consider using Redis with TLS for encrypted communication
+Token blacklist service
+
+- Prefix used: `token_blacklist:`
+- Methods: `blacklistToken(token, expiresInSeconds)` stores a key with TTL via `SETEX`, `isBlacklisted(token)` checks existence.
+
+Security & operational notes
+
+- Do not expose Redis directly to the public internet; put it in the same VPC or behind a bastion.
+- Use AUTH / password for production and consider TLS if your Redis provider supports it.
+- Sensitive fields (like Aadhaar) are enqueued as JSON strings — ensure this fits your compliance requirements. Consider minimizing what you push to queues when possible (e.g., push an ID and let the worker rehydrate from DB).
+
+Troubleshooting checklist
+
+1. redis-cli PING -> `PONG`
+2. Confirm `REDIS_URL` in process env used by the service
+3. Check application logs for `Redis Client Error` messages
+4. Check `LLEN` for queue growth
+5. Verify downstream worker is running and reading the same queue name
+
+Quick commands summary
+
+```bash
+# Run Redis locally
+docker run -d -p 6379:6379 --name local-redis redis:alpine
+
+# Check queue lengths
+redis-cli LLEN user:registration:queue
+redis-cli LLEN complaint:registration:queue
+
+# View items (dev only)
+redis-cli LRANGE user:registration:queue 0 -1
+
+# Clear a queue (dev only)
+redis-cli DEL user:registration:queue
+```
+
+
