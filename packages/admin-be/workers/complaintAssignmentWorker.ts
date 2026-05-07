@@ -3,6 +3,7 @@ import { complaintQueueService } from '../lib/redis';
 
 class ComplaintAssignmentWorker {
   private isRunning: boolean = false;
+  private readonly ALLOWED_MUNICIPALITIES = ['Ranchi', 'Dhanbad', 'Jamshedpur'];
 
   async start(): Promise<void> {
     if (this.isRunning) {
@@ -12,6 +13,7 @@ class ComplaintAssignmentWorker {
 
     this.isRunning = true;
     console.log('Complaint Assignment Worker started');
+    console.log('📍 Allowed municipalities:', this.ALLOWED_MUNICIPALITIES.join(', '));
     
     // Main worker loop
     while (this.isRunning) {
@@ -21,18 +23,39 @@ class ComplaintAssignmentWorker {
         const complaint = await complaintQueueService.peekComplaint();
 
         if (complaint) {
-          console.log(`👀 Peeked complaint: ${complaint.id}`);
+          // Validate complaint has required fields
+          const complaintId = complaint.id || complaint.complaintId || complaint._id;
+                    
+          // Extract municipality
+          const municipality = complaint.location?.city || complaint.location?.municipal || complaint.municipality;
+          
+          if (!municipality) {
+            console.error(`❌ Complaint ${complaintId} missing municipality, removing from queue`);
+            await complaintQueueService.removeFirstComplaint();
+            continue;
+          }
+          
+          // Check if municipality is allowed
+          if (!this.ALLOWED_MUNICIPALITIES.includes(municipality)) {
+            console.warn(`⚠️ Complaint ${complaintId} has invalid municipality: ${municipality}`);
+            console.log(`📍 Allowed: ${this.ALLOWED_MUNICIPALITIES.join(', ')}`);
+            console.log('🗑️ Removing from queue');
+            await complaintQueueService.removeFirstComplaint();
+            continue;
+          }
+          
+          console.log(`👀 Peeked complaint: ${complaintId} (${municipality})`);
           
           try {
             // Try to process the complaint
-            await this.assignComplaint(complaint);
+            await this.assignComplaint(complaint, complaintId, municipality);
             
             // Only remove from queue if processing was successful
             await complaintQueueService.removeFirstComplaint();
-            console.log(`✅ Successfully processed and removed complaint: ${complaint.id}`);
+            console.log(`✅ Successfully processed and removed complaint: ${complaintId}`);
           } catch (processingError) {
-            console.error(`❌ Failed to process complaint ${complaint.id}:`, processingError);
-            console.log('⏭️  Complaint remains in queue for retry');
+            console.error(`❌ Failed to process complaint ${complaintId}:`, processingError);
+            console.log('⏭ Complaint remains in queue for retry');
             // Wait longer before retry to avoid hammering the system
             await this.sleep(30000);
           }
@@ -47,12 +70,26 @@ class ComplaintAssignmentWorker {
     }
   }
 
-  private assignComplaint(complaint: any): Promise<void> {
+  private assignComplaint(complaint: any, complaintId: string, municipality: string): Promise<void> {
     return new Promise((resolve, reject) => {
       console.log('Making HTTP request to auto-assign...');
-      console.log(`Complaint municipality: ${complaint.municipality}`);
       
-      const postData = JSON.stringify(complaint);
+      // Extract municipality from complaint.location based on schema
+      const municipality = complaint.location?.city || complaint.location?.municipal || complaint.municipality;
+      
+      if (!municipality) {
+        console.error('No municipality found in complaint');
+        reject(new Error('Municipality not found in complaint data'));
+        return;
+      }
+      
+      console.log(`📍 Complaint municipality: ${municipality}`);
+      
+      const postData = JSON.stringify({
+        id: complaint.id,
+        municipality: municipality,
+        department: complaint.assignedDepartment || complaint.department
+      });
       
       const options = {
         hostname: 'localhost',

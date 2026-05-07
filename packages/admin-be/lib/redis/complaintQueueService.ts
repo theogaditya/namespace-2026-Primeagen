@@ -126,7 +126,7 @@ class ComplaintQueueService {
       const client = redisClient.getClient();
       const len = await client.llen(QUEUE_NAMES.COMPLAINT_REGISTRATION);
       
-      console.log(`📊 Queue length: ${len}`);
+      console.log(`Queue length: ${len}`);
       
       if (!len || len <= 0) {
         return null;

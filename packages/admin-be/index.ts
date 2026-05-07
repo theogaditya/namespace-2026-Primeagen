@@ -3,14 +3,18 @@ import cors from 'cors';
 import express from 'express';
 import type { Express } from 'express';
 import { PrismaClient } from './prisma/generated/client/client';
+import agentRoutes from './routes/agent';
+import municipalAdminRoutes from './routes/municipalAdminRoutes';
+import stateAdminRoutes from './routes/stateAdminRoutes';
+import superAdminRoutes from './routes/superAdminRoutes';
 
 export class Server {
   private app: Express;
-  private prisma: PrismaClient;
+  private db: PrismaClient;
 
-  constructor(prisma: PrismaClient) {
+  constructor(db: PrismaClient) {
     this.app = express();
-    this.prisma = prisma;
+    this.db = db;
     this.setupMiddleware();
     this.setupRoutes();
   }
@@ -45,15 +49,10 @@ export class Server {
   }
 
   private setupRoutes() {
-    const superAdminRoutes = require('./routes/superAdminRoutes').default(this.prisma);
-    const stateAdminRoutes = require('./routes/stateAdminRoutes').default(this.prisma);
-    const municipalAdminRoutes = require('./routes/municipalAdminRoutes').default(this.prisma);
-    const agentRoutes = require('./routes/agent').default(this.prisma);
-
-    this.app.use('/api/super-admin', superAdminRoutes);
-    this.app.use('/api/state-admin', stateAdminRoutes);
-    this.app.use('/api/municipal-admin', municipalAdminRoutes);
-    this.app.use('/api/agent', agentRoutes);
+    this.app.use('/api/super-admin', superAdminRoutes(this.db));
+    this.app.use('/api/state-admin', stateAdminRoutes(this.db));
+    this.app.use('/api/municipal-admin', municipalAdminRoutes(this.db));
+    this.app.use('/api/agent', agentRoutes(this.db));
 
     this.app.get('/health', (req, res) => {
       res.status(200).send('OK');

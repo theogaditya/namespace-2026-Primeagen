@@ -531,7 +531,14 @@ router.put('/me/workload/dec', authenticateAgent, async (req: any, res: any) => 
 router.post('/complaints/auto-assign', async (req: any, res: any) => {
   console.log('🎯 Auto-assign endpoint hit');
   
-  const { id: complaintId, municipality } = req.body;
+  const { id: complaintId, municipality, department } = req.body;
+  
+  if (!complaintId) {
+    return res.status(400).json({
+      success: false,
+      message: 'Complaint ID is required'
+    });
+  }
   
   if (!municipality) {
     console.log('⚠️ No municipality provided in request');
@@ -544,14 +551,17 @@ router.post('/complaints/auto-assign', async (req: any, res: any) => {
   console.log(`📍 Looking for agents in municipality: ${municipality}`);
 
   try {
-    const availableAgents = await prisma.agent.findMany({
-      where: {
-        status: 'ACTIVE',
-        municipality: municipality,
-        currentWorkload: {
-          lt: prisma.agent.fields.workloadLimit
-        }
+    // Build agent filter with municipality and optionally department
+    const agentFilter: any = {
+      status: 'ACTIVE',
+      municipality: municipality,
+      currentWorkload: {
+        lt: prisma.agent.fields.workloadLimit
       }
+    };
+    
+    const availableAgents = await prisma.agent.findMany({
+      where: agentFilter
     });
 
     console.log(`📊 Found ${availableAgents.length} available agents in ${municipality}`);
@@ -576,13 +586,24 @@ router.post('/complaints/auto-assign', async (req: any, res: any) => {
     
     console.log(`🎲 Selected agent: ${randomAgent.fullName} (${randomAgent.id}) from ${randomAgent.municipality}`);
 
-    // Increment agent workload
-    await prisma.agent.update({
-      where: { id: randomAgent.id },
-      data: { currentWorkload: { increment: 1 } }
-    });
+    // Update complaint with assigned agent and increment agent workload in a transaction
+    await prisma.$transaction([
+      prisma.complaint.update({
+        where: { id: complaintId },
+        data: { 
+          assignedAgentId: randomAgent.id,
+          status: 'UNDER_PROCESSING'
+        }
+      }),
+      prisma.agent.update({
+        where: { id: randomAgent.id },
+        data: { currentWorkload: { increment: 1 } }
+      })
+    ]);
     
+    console.log(`✅ Complaint ${complaintId} assigned to agent ${randomAgent.fullName}`);
     console.log(`✅ Workload incremented for agent ${randomAgent.fullName}`);
+    
     res.status(200).json({ 
       success: true,
       message: 'Complaint auto-assigned successfully',
