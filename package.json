@@ -3,13 +3,14 @@
   "module": "index.ts",
   "type": "module",
   "private": true,
-  
   "workspaces": ["packages/*"],
-
   "devDependencies": {
     "@types/bun": "latest"
   },
   "peerDependencies": {
     "typescript": "^5"
+  },
+  "dependencies": {
+    "jest-mock-extended": "2.0.4"
   }
 }
