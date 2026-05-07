@@ -1,32 +1,41 @@
-// apps/api/admin-be/src/workers/complaintAssignmentWorker.ts
-
 import http from 'http';
-import { redisService } from '../services/redisService';
-import { queueNames } from '../config/redis.config';
-
+import { complaintQueueService } from '../lib/redis';
 
 class ComplaintAssignmentWorker {
   private isRunning: boolean = false;
 
   async start(): Promise<void> {
     if (this.isRunning) {
-      console.log('⚠️  Worker is already running');
+      console.log('⚠️Worker is already running');
       return;
     }
 
     this.isRunning = true;
-    console.log('🚀 Complaint Assignment Worker started');
+    console.log('Complaint Assignment Worker started');
+    
     // Main worker loop
     while (this.isRunning) {
       try {
-        console.log('🔎 Polling queue for complaints (non-blocking)...');
+        console.log('🔎 Peeking at queue for complaints...');
 
-        const complaint = await redisService.pollAndPop(queueNames.COMPLAINT_ASSIGNMENT);
+        const complaint = await complaintQueueService.peekComplaint();
 
         if (complaint) {
-          console.log(`📥 Polled & popped complaint: ${complaint.id}`);
-          await this.assignComplaint(complaint);
-          console.log(`✅ Processed complaint: ${complaint.id}`);
+          console.log(`👀 Peeked complaint: ${complaint.id}`);
+          
+          try {
+            // Try to process the complaint
+            await this.assignComplaint(complaint);
+            
+            // Only remove from queue if processing was successful
+            await complaintQueueService.removeFirstComplaint();
+            console.log(`✅ Successfully processed and removed complaint: ${complaint.id}`);
+          } catch (processingError) {
+            console.error(`❌ Failed to process complaint ${complaint.id}:`, processingError);
+            console.log('⏭️  Complaint remains in queue for retry');
+            // Wait longer before retry to avoid hammering the system
+            await this.sleep(30000);
+          }
         } else {
           // nothing to do right now — sleep a bit before polling again
           await this.sleep(10000);
@@ -40,8 +49,8 @@ class ComplaintAssignmentWorker {
 
   private assignComplaint(complaint: any): Promise<void> {
     return new Promise((resolve, reject) => {
-      console.log('🌐 Making HTTP request to auto-assign...');
-      console.log(`📍 Complaint municipality: ${complaint.municipality}`);
+      console.log('Making HTTP request to auto-assign...');
+      console.log(`Complaint municipality: ${complaint.municipality}`);
       
       const postData = JSON.stringify(complaint);
       
@@ -66,7 +75,13 @@ class ComplaintAssignmentWorker {
         res.on('end', () => {
           console.log(`📨 Response status: ${res.statusCode}`);
           console.log(`📨 Response body: ${data}`);
-          resolve();
+          
+          // Only resolve if response was successful (2xx status)
+          if (res.statusCode && res.statusCode >= 200 && res.statusCode < 300) {
+            resolve();
+          } else {
+            reject(new Error(`HTTP ${res.statusCode}: ${data}`));
+          }
         });
       });
 
