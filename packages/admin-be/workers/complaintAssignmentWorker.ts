@@ -1,4 +1,3 @@
-import http from 'http';
 import { complaintQueueService } from '../lib/redis';
 
 class ComplaintAssignmentWorker {
@@ -7,139 +6,135 @@ class ComplaintAssignmentWorker {
 
   async start(): Promise<void> {
     if (this.isRunning) {
-      console.log('⚠️Worker is already running');
+      console.log('Worker is already running');
       return;
     }
 
     this.isRunning = true;
     console.log('Complaint Assignment Worker started');
-    console.log('📍 Allowed municipalities:', this.ALLOWED_MUNICIPALITIES.join(', '));
     
     // Main worker loop
     while (this.isRunning) {
       try {
-        console.log('🔎 Peeking at queue for complaints...');
+        console.log('\nPolling and popping from queue for complaints...');
 
-        const complaint = await complaintQueueService.peekComplaint();
-
+        const complaint = await complaintQueueService.pollAndPop();
         if (complaint) {
-          // Validate complaint has required fields
-          const complaintId = complaint.id || complaint.complaintId || complaint._id;
-                    
-          // Extract municipality
-          const municipality = complaint.location?.city || complaint.location?.municipal || complaint.municipality;
-          
+          // Normalize complaint payload: handle string or nested objects
+          let parsedComplaint: any = complaint;
+          if (typeof complaint === 'string') {
+            try {
+              parsedComplaint = JSON.parse(complaint);
+            } catch (err) {
+              // keep original string if parse fails
+              parsedComplaint = complaint;
+            }
+          }
+
+          const rawComplaintId = parsedComplaint?.id || parsedComplaint?.complaintId || parsedComplaint?._id;
+          const complaintId = rawComplaintId && typeof rawComplaintId === 'object'
+            ? JSON.stringify(rawComplaintId)
+            : rawComplaintId !== undefined && rawComplaintId !== null
+              ? String(rawComplaintId)
+              : undefined;
+
+          try {
+            console.log('Popped complaint from queue:', JSON.stringify(parsedComplaint));
+          } catch (err) {
+            console.log('Popped complaint from queue (non-serializable)');
+          }
+
+          const rawMunicipality = parsedComplaint?.location?.city || parsedComplaint?.location?.municipal || parsedComplaint?.municipality;
+          const municipality = rawMunicipality !== undefined && rawMunicipality !== null
+            ? String(rawMunicipality).trim()
+            : '';
+
           if (!municipality) {
-            console.error(`❌ Complaint ${complaintId} missing municipality, removing from queue`);
-            await complaintQueueService.removeFirstComplaint();
+            console.error(`Complaint ${complaintId || '[no-id]'} missing municipality. Moving to malformed queue`);
+            try {
+              const { redisClient } = await import('../lib/redis/redisClient');
+              const client = redisClient.getClient();
+              await client.lpush('complaint:assignment:malformed', JSON.stringify(parsedComplaint));
+              console.log('Moved malformed complaint to dead-letter queue');
+            } catch (dlqErr) {
+              console.error('Failed to move malformed complaint to dead-letter queue:', dlqErr);
+            }
             continue;
           }
           
           // Check if municipality is allowed
           if (!this.ALLOWED_MUNICIPALITIES.includes(municipality)) {
-            console.warn(`⚠️ Complaint ${complaintId} has invalid municipality: ${municipality}`);
-            console.log(`📍 Allowed: ${this.ALLOWED_MUNICIPALITIES.join(', ')}`);
-            console.log('🗑️ Removing from queue');
-            await complaintQueueService.removeFirstComplaint();
+            console.warn(`Complaint ${complaintId || '[no-id]'} has invalid municipality: ${municipality}`);
+            console.log(`Allowed: ${this.ALLOWED_MUNICIPALITIES.join(', ')}`);
+            console.log('Dropping complaint (invalid municipality)');
             continue;
           }
-          
-          console.log(`👀 Peeked complaint: ${complaintId} (${municipality})`);
-          
+
+          console.log(`👀 Processing complaint: ${complaintId || '[no-id]'} (${municipality})`);
+
           try {
-            // Try to process the complaint
-            await this.assignComplaint(complaint, complaintId, municipality);
-            
-            // Only remove from queue if processing was successful
-            await complaintQueueService.removeFirstComplaint();
-            console.log(`✅ Successfully processed and removed complaint: ${complaintId}`);
+            await this.assignComplaint(municipality);
+            console.log(`Successfully processed complaint: ${complaintId || '[no-id]'}`);
           } catch (processingError) {
-            console.error(`❌ Failed to process complaint ${complaintId}:`, processingError);
-            console.log('⏭ Complaint remains in queue for retry');
-            // Wait longer before retry to avoid hammering the system
+            console.error(`Failed to process complaint ${complaintId || '[no-id]'}:`, processingError);
+            console.log('Re-queueing complaint for retry');
+            try {
+              await complaintQueueService.pushComplaint(parsedComplaint);
+              console.log('Re-queued complaint for retry');
+            } catch (requeueErr) {
+              console.error('Failed to re-queue complaint:', requeueErr);
+              try {
+                const { redisClient } = await import('../lib/redis/redisClient');
+                const client = redisClient.getClient();
+                await client.lpush('complaint:assignment:malformed', JSON.stringify(parsedComplaint));
+                console.log('Moved complaint to dead-letter queue as fallback');
+              } catch (dlqErr) {
+                console.error('Failed to move complaint to dead-letter queue:', dlqErr);
+              }
+            }
+
             await this.sleep(30000);
           }
         } else {
-          // nothing to do right now — sleep a bit before polling again
           await this.sleep(10000);
         }
       } catch (error) {
-        console.error('❌ Error in worker loop:', error);
+        console.error(' Error in worker loop:', error);
         await this.sleep(5000);
       }
     }
   }
 
-  private assignComplaint(complaint: any, complaintId: string, municipality: string): Promise<void> {
-    return new Promise((resolve, reject) => {
-      console.log('Making HTTP request to auto-assign...');
-      
-      // Extract municipality from complaint.location based on schema
-      const municipality = complaint.location?.city || complaint.location?.municipal || complaint.municipality;
-      
-      if (!municipality) {
-        console.error('No municipality found in complaint');
-        reject(new Error('Municipality not found in complaint data'));
-        return;
-      }
-      
-      console.log(`📍 Complaint municipality: ${municipality}`);
-      
-      const postData = JSON.stringify({
-        id: complaint.id,
-        municipality: municipality,
-        department: complaint.assignedDepartment || complaint.department
-      });
-      
-      const options = {
-        hostname: 'localhost',
-        port: 3002,
-        path: '/api/agent/complaints/auto-assign',
+  private async assignComplaint(municipality: string): Promise<void> {
+    const payload = {
+      city: municipality,
+    };
+
+    try {
+      const response = await fetch('http://localhost:3002/api/agent/complaints/auto-assign', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Content-Length': Buffer.byteLength(postData),
         },
-      };
-
-      const req = http.request(options, (res) => {
-        let data = '';
-
-        res.on('data', (chunk) => {
-          data += chunk;
-        });
-
-        res.on('end', () => {
-          console.log(`📨 Response status: ${res.statusCode}`);
-          console.log(`📨 Response body: ${data}`);
-          
-          // Only resolve if response was successful (2xx status)
-          if (res.statusCode && res.statusCode >= 200 && res.statusCode < 300) {
-            resolve();
-          } else {
-            reject(new Error(`HTTP ${res.statusCode}: ${data}`));
-          }
-        });
+        body: JSON.stringify(payload),
       });
 
-      req.on('error', (error) => {
-        console.error('❌ HTTP request error:', error);
-        reject(error);
-      });
+      const data = await response.json();
 
-      req.setTimeout(5000, () => {
-        console.error('❌ Request timeout');
-        req.destroy();
-        reject(new Error('Timeout'));
-      });
+      console.log(`Response status: ${response.status}`);
+      console.log(`Response body:`, JSON.stringify(data));
 
-      req.write(postData);
-      req.end();
-    });
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}: ${JSON.stringify(data)}`);
+      }
+    } catch (error: any) {
+      console.error('❌ HTTP request error:', error.message);
+      throw error;
+    }
   }
 
   async stop(): Promise<void> {
-    console.log('🛑 Stopping worker...');
+    console.log('Stopping worker...');
     this.isRunning = false;
   }
 
@@ -151,13 +146,13 @@ class ComplaintAssignmentWorker {
 export const complaintWorker = new ComplaintAssignmentWorker();
 
 process.on('SIGTERM', async () => {
-  console.log('\n⚠️  SIGTERM received');
+  console.log('\nSIGTERM received');
   await complaintWorker.stop();
   process.exit(0);
 });
 
 process.on('SIGINT', async () => {
-  console.log('\n⚠️  SIGINT received');
+  console.log('\nSIGINT received');
   await complaintWorker.stop();
   process.exit(0);
 });

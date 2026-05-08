@@ -28,7 +28,7 @@ class ComplaintQueueService {
       const client = redisClient.getClient();
       const len = await client.llen(QUEUE_NAMES.COMPLAINT_REGISTRATION);
       
-      console.log(`📊 Queue length: ${len}`);
+      console.log(`Queue length: ${len}`);
       
       if (!len || len <= 0) {
         return null;
@@ -52,15 +52,15 @@ class ComplaintQueueService {
         // Move to dead-letter queue
         try {
           await client.lpush(QUEUE_NAMES.MALFORMED, complaintJson);
-          console.log('📮 Malformed complaint moved to dead-letter queue');
+          console.log('Malformed complaint moved to dead-letter queue');
         } catch (dlqErr) {
-          console.error('❌ Failed to move to dead-letter queue:', dlqErr);
+          console.error('Failed to move to dead-letter queue:', dlqErr);
         }
         
         return null;
       }
     } catch (err: any) {
-      console.error('❌ Redis pollAndPop error:', err?.message || err);
+      console.error('Redis pollAndPop error:', err?.message || err);
       return null;
     }
   }
@@ -88,7 +88,7 @@ class ComplaintQueueService {
           // Move to dead-letter queue
           try {
             await client.lpush(QUEUE_NAMES.MALFORMED, complaintJson);
-            console.log('📮 Malformed complaint moved to dead-letter queue');
+            console.log('Malformed complaint moved to dead-letter queue');
           } catch (dlqErr) {
             console.error('❌ Failed to move to dead-letter queue:', dlqErr);
           }
@@ -152,7 +152,7 @@ class ComplaintQueueService {
         await this.removeFirstComplaint();
         try {
           await client.lpush(QUEUE_NAMES.MALFORMED, complaintJson);
-          console.log('📮 Malformed complaint moved to dead-letter queue');
+          console.log('Malformed complaint moved to dead-letter queue');
         } catch (dlqErr) {
           console.error('❌ Failed to move to dead-letter queue:', dlqErr);
         }
@@ -173,7 +173,7 @@ class ComplaintQueueService {
     try {
       const client = redisClient.getClient();
       await client.lpop(QUEUE_NAMES.COMPLAINT_REGISTRATION);
-      console.log('✅ Complaint removed from queue after successful processing');
+      console.log('Complaint removed from queue after successful processing');
     } catch (err: any) {
       console.error('❌ Redis remove error:', err?.message || err);
       throw err;
