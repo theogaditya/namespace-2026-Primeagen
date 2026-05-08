@@ -42,10 +42,10 @@ export function createComplaintRouter(db: PrismaClient) {
         };
       }
 
-      // Validate input
+      // Validate input - use S3 URL if file was uploaded, otherwise use attachmentUrl from body
       const validationResult = createComplaintSchema.safeParse({
         ...bodyData,
-        attachmentUrl,
+        ...(attachmentUrl && { attachmentUrl }),
       });
 
       if (!validationResult.success) {
