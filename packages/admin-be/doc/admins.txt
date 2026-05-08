@@ -1,0 +1,76 @@
+Super Admin
+abhas@gmail.com
+123123123
+aditya@gmail.com
+12345678
+
+State Admin:{
+    pani@gmail.com
+    123123123
+    "state": "Jharkhand",
+    "managedMunicipalities": [
+        "Dhanbad",
+        "Ranchi",
+        "Jamshedpur"
+    ],
+}
+
+Municipal Admin:{
+    "municipality": "Dhanbad"
+        sourab@gmail.com
+        123123123
+
+        ankit@gmail.com
+        123123123
+
+    "municipality": "Ranchi"
+        aman@gmail.com
+        123123123
+
+        rip@gmail.com
+        123123123
+
+    "municipality": "Jamshedpur"
+        nitin@gmail.com
+        123123123
+
+        vijay@gmail.com
+        123123123
+}
+
+Agent:{
+        "municipality": "Dhanbad"
+        sankalp@gmail.com
+        123123123
+
+        roshan@gmail.com
+        123123123
+        
+        digant@gmail.com
+        123123123
+
+    "municipality": "Ranchi"
+        ankita@gmail.com
+        123123123
+
+        ani@gmail.com
+        123123123
+        
+        priyal@gmail.com
+        123123123
+
+    "municipality": "Jamshedpur"
+        dipu@gmail.com
+        123123123
+
+        prat@gmail.com
+        123123123
+        
+        suman@gmail.com
+        123123123
+}
+
+
+
+export REDIS_URL="redis://127.0.0.1:6379"
+export AWS_PROFILE=friend-profile
