@@ -18,7 +18,7 @@ import {
 } from "./custom-comp";
 import { ArrowLeft, ArrowRight, CheckCircle, Loader2, UserPlus } from "lucide-react";
 
-const GOOGLE_API_KEY = "AIzaSyAt9AyMCdhAuJyWPjflwc57R3b0qYR5jXg";
+const GOOGLE_API_KEY = process.env.NEXT_PUBLIC_GOOGLE_API_KEY || "";
 
 const steps = [
   { id: 1, label: "Personal", description: "Basic info" },
@@ -171,7 +171,7 @@ export default function AddUser() {
             </p>
             <div className="space-y-3">
               <Button
-                onClick={() => window.location.href = "/login"}
+                onClick={() => window.location.href = "/loginUser"}
                 className="w-full bg-blue-600 hover:bg-blue-700"
               >
                 Go to Login
@@ -346,7 +346,7 @@ export default function AddUser() {
         <div className="text-center mt-6">
           <p className="text-sm text-gray-500">
             Already have an account?{" "}
-            <a href="/login" className="text-blue-600 hover:text-blue-700 font-medium">
+            <a href="/loginUser" className="text-blue-600 hover:text-blue-700 font-medium">
               Sign in
             </a>
           </p>

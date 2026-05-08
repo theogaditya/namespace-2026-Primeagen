@@ -3,12 +3,16 @@ import {
   GetSecretValueCommand,
 } from "@aws-sdk/client-secrets-manager";
 
-const SECRET_NAME = "sih-swaraj-user-be";
-const REGION = "ap-south-2";
+const SECRET_NAME = process.env.SECRET_NAME_AWS_USER_BE || "sih-swaraj-user-be";
+const REGION = process.env.AWS_REGION || "ap-south-2";
 
-// Create AWS Secrets Manager client
+// Create AWS Secrets Manager client with explicit credentials
 const client = new SecretsManagerClient({
   region: REGION,
+  credentials: {
+    accessKeyId: process.env.SECRETS_AWS_ACCESS_KEY_ID!,
+    secretAccessKey: process.env.SECRETS_AWS_SECRET_ACCESS_KEY!,
+  },
 });
 
 interface SecretValues {
