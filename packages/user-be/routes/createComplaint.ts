@@ -3,14 +3,50 @@ import { createComplaintSchema } from "../lib/validations/validation.complaint";
 import { CreateComplaint } from "../lib/types/types";
 import { PrismaClient } from "../prisma/generated/client/client";
 import { complaintQueueService } from "../lib/redis/complaintQueueService";
+import { uploadMiddleware } from "../middleware/multerConfig";
+import { uploadComplaintImage } from "../lib/s3/s3Client";
 
 export function createComplaintRouter(db: PrismaClient) {
   const router = Router();
 
-  router.post("/", async (req, res) => {
+  router.post("/", uploadMiddleware.single("image"), async (req, res) => {
     try {
+      // Handle image upload to S3 if file is provided
+      let attachmentUrl: string | undefined;
+
+      if (req.file) {
+        const uploadResult = await uploadComplaintImage(
+          req.file.buffer,
+          req.file.originalname,
+          req.file.mimetype
+        );
+
+        if (!uploadResult.success) {
+          return res.status(500).json({
+            success: false,
+            message: "Failed to upload image",
+            error: uploadResult.error,
+          });
+        }
+
+        attachmentUrl = uploadResult.url;
+      }
+
+      // Parse JSON fields if sent as form-data
+      let bodyData = req.body;
+      if (typeof req.body.location === "string") {
+        bodyData = {
+          ...req.body,
+          location: JSON.parse(req.body.location),
+          isPublic: req.body.isPublic === "true" || req.body.isPublic === true,
+        };
+      }
+
       // Validate input
-      const validationResult = createComplaintSchema.safeParse(req.body);
+      const validationResult = createComplaintSchema.safeParse({
+        ...bodyData,
+        attachmentUrl,
+      });
 
       if (!validationResult.success) {
         return res.status(400).json({
