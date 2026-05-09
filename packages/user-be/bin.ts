@@ -26,6 +26,16 @@ async function bootstrap() {
     await complaintQueueService.connect();
     console.log('Complaint queue service initialized');
 
+    // Helper: non-blocking pop from complaint queue
+    // Use when you need to manually pop a complaint for one-off processing
+    
+    // const client = complaintQueueService['redisClient'].getClient();
+    // // simple non-blocking pop
+    // const raw = await client.lPop('complaint:registration:queue');
+    // if (!raw) return null;
+    // const complaint = JSON.parse(raw);
+    
+
     // Now that secrets are loaded, initialize server
     const server = new Server(prisma);
     const app = server.getApp();
