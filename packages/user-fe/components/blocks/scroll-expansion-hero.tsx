@@ -312,8 +312,9 @@ const ScrollExpandMedia = ({
                   textBlend ? 'mix-blend-difference' : 'mix-blend-normal'
                 }`}
               >
+            {/* increse the size of titile */}
                 <motion.h2
-                  className='text-4xl md:text-5xl lg:text-6xl font-bold text-blue-200 transition-none'
+                  className='text-6xl md:text-7xl lg:text-7xl font-bold text-white transition-none'
                   style={{ transform: `translateX(-${textTranslateX}vw)` }}
                 >
                   {firstWord}

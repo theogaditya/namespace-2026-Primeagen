@@ -66,6 +66,9 @@ export default function LoginUser() {
         localStorage.setItem("authToken", data.data.token);
         localStorage.setItem("userData", JSON.stringify(data.data.user));
         
+        // Dispatch auth change event to update navbar
+        window.dispatchEvent(new Event('authChange'));
+        
         setSubmitSuccess(true);
         
         // Redirect to dashboard after a short delay
