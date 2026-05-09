@@ -92,3 +92,13 @@ export type AuditLog = Prisma.AuditLogModel
  * 
  */
 export type RegionalWorkflow = Prisma.RegionalWorkflowModel
+/**
+ * Model OpratingStates
+ * 
+ */
+export type OpratingStates = Prisma.OpratingStatesModel
+/**
+ * Model OpratingDistricts
+ * 
+ */
+export type OpratingDistricts = Prisma.OpratingDistrictsModel

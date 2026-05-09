@@ -65,7 +65,9 @@ export const ModelName = {
   Upvote: 'Upvote',
   NewsUpdate: 'NewsUpdate',
   AuditLog: 'AuditLog',
-  RegionalWorkflow: 'RegionalWorkflow'
+  RegionalWorkflow: 'RegionalWorkflow',
+  OpratingStates: 'OpratingStates',
+  OpratingDistricts: 'OpratingDistricts'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -129,6 +131,7 @@ export const AgentScalarFieldEnum = {
   officialEmail: 'officialEmail',
   department: 'department',
   municipality: 'municipality',
+  district: 'district',
   accessLevel: 'accessLevel',
   workloadLimit: 'workloadLimit',
   currentWorkload: 'currentWorkload',
@@ -276,10 +279,12 @@ export const ComplaintScalarFieldEnum = {
   complainantId: 'complainantId',
   categoryId: 'categoryId',
   subCategory: 'subCategory',
-  standardizedSubCategory: 'standardizedSubCategory',
+  AIstandardizedSubCategory: 'AIstandardizedSubCategory',
+  AIabusedFlag: 'AIabusedFlag',
   description: 'description',
   urgency: 'urgency',
   attachmentUrl: 'attachmentUrl',
+  AIimageVarificationStatus: 'AIimageVarificationStatus',
   assignedDepartment: 'assignedDepartment',
   status: 'status',
   sla: 'sla',
@@ -287,6 +292,7 @@ export const ComplaintScalarFieldEnum = {
   isPublic: 'isPublic',
   escalationLevel: 'escalationLevel',
   dateOfResolution: 'dateOfResolution',
+  lastUpdated: 'lastUpdated',
   assignedAgentId: 'assignedAgentId',
   managedByMunicipalAdminId: 'managedByMunicipalAdminId',
   moderatedByMunicipalAdminId: 'moderatedByMunicipalAdminId',
@@ -349,7 +355,6 @@ export type AuditLogScalarFieldEnum = (typeof AuditLogScalarFieldEnum)[keyof typ
 
 export const RegionalWorkflowScalarFieldEnum = {
   id: 'id',
-  state: 'state',
   municipality: 'municipality',
   category: 'category',
   sla: 'sla',
@@ -357,6 +362,25 @@ export const RegionalWorkflowScalarFieldEnum = {
 } as const
 
 export type RegionalWorkflowScalarFieldEnum = (typeof RegionalWorkflowScalarFieldEnum)[keyof typeof RegionalWorkflowScalarFieldEnum]
+
+
+export const OpratingStatesScalarFieldEnum = {
+  id: 'id',
+  name: 'name',
+  country: 'country'
+} as const
+
+export type OpratingStatesScalarFieldEnum = (typeof OpratingStatesScalarFieldEnum)[keyof typeof OpratingStatesScalarFieldEnum]
+
+
+export const OpratingDistrictsScalarFieldEnum = {
+  id: 'id',
+  stateId: 'stateId',
+  name: 'name',
+  state: 'state'
+} as const
+
+export type OpratingDistrictsScalarFieldEnum = (typeof OpratingDistrictsScalarFieldEnum)[keyof typeof OpratingDistrictsScalarFieldEnum]
 
 
 export const SortOrder = {

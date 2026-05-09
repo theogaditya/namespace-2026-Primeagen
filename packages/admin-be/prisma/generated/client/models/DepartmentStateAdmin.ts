@@ -312,11 +312,11 @@ export type DepartmentStateAdminWhereInput = {
   escalationCount?: Prisma.IntFilter<"DepartmentStateAdmin"> | number
   managedMunicipalities?: Prisma.StringNullableListFilter<"DepartmentStateAdmin">
   managedBySuperStateId?: Prisma.StringNullableFilter<"DepartmentStateAdmin"> | string | null
-  managedMunicipalAdmins?: Prisma.DepartmentMunicipalAdminListRelationFilter
-  escalatedComplaints?: Prisma.ComplaintListRelationFilter
-  regionalWorkflows?: Prisma.RegionalWorkflowListRelationFilter
   managedCategories?: Prisma.CategoryListRelationFilter
+  escalatedComplaints?: Prisma.ComplaintListRelationFilter
+  managedMunicipalAdmins?: Prisma.DepartmentMunicipalAdminListRelationFilter
   managedBySuperState?: Prisma.XOR<Prisma.SuperStateAdminNullableScalarRelationFilter, Prisma.SuperStateAdminWhereInput> | null
+  regionalWorkflows?: Prisma.RegionalWorkflowListRelationFilter
 }
 
 export type DepartmentStateAdminOrderByWithRelationInput = {
@@ -337,11 +337,11 @@ export type DepartmentStateAdminOrderByWithRelationInput = {
   escalationCount?: Prisma.SortOrder
   managedMunicipalities?: Prisma.SortOrder
   managedBySuperStateId?: Prisma.SortOrderInput | Prisma.SortOrder
-  managedMunicipalAdmins?: Prisma.DepartmentMunicipalAdminOrderByRelationAggregateInput
-  escalatedComplaints?: Prisma.ComplaintOrderByRelationAggregateInput
-  regionalWorkflows?: Prisma.RegionalWorkflowOrderByRelationAggregateInput
   managedCategories?: Prisma.CategoryOrderByRelationAggregateInput
+  escalatedComplaints?: Prisma.ComplaintOrderByRelationAggregateInput
+  managedMunicipalAdmins?: Prisma.DepartmentMunicipalAdminOrderByRelationAggregateInput
   managedBySuperState?: Prisma.SuperStateAdminOrderByWithRelationInput
+  regionalWorkflows?: Prisma.RegionalWorkflowOrderByRelationAggregateInput
 }
 
 export type DepartmentStateAdminWhereUniqueInput = Prisma.AtLeast<{
@@ -365,11 +365,11 @@ export type DepartmentStateAdminWhereUniqueInput = Prisma.AtLeast<{
   escalationCount?: Prisma.IntFilter<"DepartmentStateAdmin"> | number
   managedMunicipalities?: Prisma.StringNullableListFilter<"DepartmentStateAdmin">
   managedBySuperStateId?: Prisma.StringNullableFilter<"DepartmentStateAdmin"> | string | null
-  managedMunicipalAdmins?: Prisma.DepartmentMunicipalAdminListRelationFilter
-  escalatedComplaints?: Prisma.ComplaintListRelationFilter
-  regionalWorkflows?: Prisma.RegionalWorkflowListRelationFilter
   managedCategories?: Prisma.CategoryListRelationFilter
+  escalatedComplaints?: Prisma.ComplaintListRelationFilter
+  managedMunicipalAdmins?: Prisma.DepartmentMunicipalAdminListRelationFilter
   managedBySuperState?: Prisma.XOR<Prisma.SuperStateAdminNullableScalarRelationFilter, Prisma.SuperStateAdminWhereInput> | null
+  regionalWorkflows?: Prisma.RegionalWorkflowListRelationFilter
 }, "id" | "officialEmail">
 
 export type DepartmentStateAdminOrderByWithAggregationInput = {
@@ -437,11 +437,11 @@ export type DepartmentStateAdminCreateInput = {
   stateResolutionRate?: number
   escalationCount?: number
   managedMunicipalities?: Prisma.DepartmentStateAdminCreatemanagedMunicipalitiesInput | string[]
-  managedMunicipalAdmins?: Prisma.DepartmentMunicipalAdminCreateNestedManyWithoutManagedByStateAdminInput
-  escalatedComplaints?: Prisma.ComplaintCreateNestedManyWithoutEscalatedToStateAdminInput
-  regionalWorkflows?: Prisma.RegionalWorkflowCreateNestedManyWithoutCreatedByInput
   managedCategories?: Prisma.CategoryCreateNestedManyWithoutManagedByDeptStateAdminInput
+  escalatedComplaints?: Prisma.ComplaintCreateNestedManyWithoutEscalatedToStateAdminInput
+  managedMunicipalAdmins?: Prisma.DepartmentMunicipalAdminCreateNestedManyWithoutManagedByStateAdminInput
   managedBySuperState?: Prisma.SuperStateAdminCreateNestedOneWithoutManagedDepartmentAdminsInput
+  regionalWorkflows?: Prisma.RegionalWorkflowCreateNestedManyWithoutCreatedByInput
 }
 
 export type DepartmentStateAdminUncheckedCreateInput = {
@@ -462,10 +462,10 @@ export type DepartmentStateAdminUncheckedCreateInput = {
   escalationCount?: number
   managedMunicipalities?: Prisma.DepartmentStateAdminCreatemanagedMunicipalitiesInput | string[]
   managedBySuperStateId?: string | null
-  managedMunicipalAdmins?: Prisma.DepartmentMunicipalAdminUncheckedCreateNestedManyWithoutManagedByStateAdminInput
-  escalatedComplaints?: Prisma.ComplaintUncheckedCreateNestedManyWithoutEscalatedToStateAdminInput
-  regionalWorkflows?: Prisma.RegionalWorkflowUncheckedCreateNestedManyWithoutCreatedByInput
   managedCategories?: Prisma.CategoryUncheckedCreateNestedManyWithoutManagedByDeptStateAdminInput
+  escalatedComplaints?: Prisma.ComplaintUncheckedCreateNestedManyWithoutEscalatedToStateAdminInput
+  managedMunicipalAdmins?: Prisma.DepartmentMunicipalAdminUncheckedCreateNestedManyWithoutManagedByStateAdminInput
+  regionalWorkflows?: Prisma.RegionalWorkflowUncheckedCreateNestedManyWithoutCreatedByInput
 }
 
 export type DepartmentStateAdminUpdateInput = {
@@ -485,11 +485,11 @@ export type DepartmentStateAdminUpdateInput = {
   stateResolutionRate?: Prisma.FloatFieldUpdateOperationsInput | number
   escalationCount?: Prisma.IntFieldUpdateOperationsInput | number
   managedMunicipalities?: Prisma.DepartmentStateAdminUpdatemanagedMunicipalitiesInput | string[]
-  managedMunicipalAdmins?: Prisma.DepartmentMunicipalAdminUpdateManyWithoutManagedByStateAdminNestedInput
-  escalatedComplaints?: Prisma.ComplaintUpdateManyWithoutEscalatedToStateAdminNestedInput
-  regionalWorkflows?: Prisma.RegionalWorkflowUpdateManyWithoutCreatedByNestedInput
   managedCategories?: Prisma.CategoryUpdateManyWithoutManagedByDeptStateAdminNestedInput
+  escalatedComplaints?: Prisma.ComplaintUpdateManyWithoutEscalatedToStateAdminNestedInput
+  managedMunicipalAdmins?: Prisma.DepartmentMunicipalAdminUpdateManyWithoutManagedByStateAdminNestedInput
   managedBySuperState?: Prisma.SuperStateAdminUpdateOneWithoutManagedDepartmentAdminsNestedInput
+  regionalWorkflows?: Prisma.RegionalWorkflowUpdateManyWithoutCreatedByNestedInput
 }
 
 export type DepartmentStateAdminUncheckedUpdateInput = {
@@ -510,10 +510,10 @@ export type DepartmentStateAdminUncheckedUpdateInput = {
   escalationCount?: Prisma.IntFieldUpdateOperationsInput | number
   managedMunicipalities?: Prisma.DepartmentStateAdminUpdatemanagedMunicipalitiesInput | string[]
   managedBySuperStateId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  managedMunicipalAdmins?: Prisma.DepartmentMunicipalAdminUncheckedUpdateManyWithoutManagedByStateAdminNestedInput
-  escalatedComplaints?: Prisma.ComplaintUncheckedUpdateManyWithoutEscalatedToStateAdminNestedInput
-  regionalWorkflows?: Prisma.RegionalWorkflowUncheckedUpdateManyWithoutCreatedByNestedInput
   managedCategories?: Prisma.CategoryUncheckedUpdateManyWithoutManagedByDeptStateAdminNestedInput
+  escalatedComplaints?: Prisma.ComplaintUncheckedUpdateManyWithoutEscalatedToStateAdminNestedInput
+  managedMunicipalAdmins?: Prisma.DepartmentMunicipalAdminUncheckedUpdateManyWithoutManagedByStateAdminNestedInput
+  regionalWorkflows?: Prisma.RegionalWorkflowUncheckedUpdateManyWithoutCreatedByNestedInput
 }
 
 export type DepartmentStateAdminCreateManyInput = {
@@ -801,10 +801,10 @@ export type DepartmentStateAdminCreateWithoutManagedMunicipalAdminsInput = {
   stateResolutionRate?: number
   escalationCount?: number
   managedMunicipalities?: Prisma.DepartmentStateAdminCreatemanagedMunicipalitiesInput | string[]
-  escalatedComplaints?: Prisma.ComplaintCreateNestedManyWithoutEscalatedToStateAdminInput
-  regionalWorkflows?: Prisma.RegionalWorkflowCreateNestedManyWithoutCreatedByInput
   managedCategories?: Prisma.CategoryCreateNestedManyWithoutManagedByDeptStateAdminInput
+  escalatedComplaints?: Prisma.ComplaintCreateNestedManyWithoutEscalatedToStateAdminInput
   managedBySuperState?: Prisma.SuperStateAdminCreateNestedOneWithoutManagedDepartmentAdminsInput
+  regionalWorkflows?: Prisma.RegionalWorkflowCreateNestedManyWithoutCreatedByInput
 }
 
 export type DepartmentStateAdminUncheckedCreateWithoutManagedMunicipalAdminsInput = {
@@ -825,9 +825,9 @@ export type DepartmentStateAdminUncheckedCreateWithoutManagedMunicipalAdminsInpu
   escalationCount?: number
   managedMunicipalities?: Prisma.DepartmentStateAdminCreatemanagedMunicipalitiesInput | string[]
   managedBySuperStateId?: string | null
+  managedCategories?: Prisma.CategoryUncheckedCreateNestedManyWithoutManagedByDeptStateAdminInput
   escalatedComplaints?: Prisma.ComplaintUncheckedCreateNestedManyWithoutEscalatedToStateAdminInput
   regionalWorkflows?: Prisma.RegionalWorkflowUncheckedCreateNestedManyWithoutCreatedByInput
-  managedCategories?: Prisma.CategoryUncheckedCreateNestedManyWithoutManagedByDeptStateAdminInput
 }
 
 export type DepartmentStateAdminCreateOrConnectWithoutManagedMunicipalAdminsInput = {
@@ -863,10 +863,10 @@ export type DepartmentStateAdminUpdateWithoutManagedMunicipalAdminsInput = {
   stateResolutionRate?: Prisma.FloatFieldUpdateOperationsInput | number
   escalationCount?: Prisma.IntFieldUpdateOperationsInput | number
   managedMunicipalities?: Prisma.DepartmentStateAdminUpdatemanagedMunicipalitiesInput | string[]
-  escalatedComplaints?: Prisma.ComplaintUpdateManyWithoutEscalatedToStateAdminNestedInput
-  regionalWorkflows?: Prisma.RegionalWorkflowUpdateManyWithoutCreatedByNestedInput
   managedCategories?: Prisma.CategoryUpdateManyWithoutManagedByDeptStateAdminNestedInput
+  escalatedComplaints?: Prisma.ComplaintUpdateManyWithoutEscalatedToStateAdminNestedInput
   managedBySuperState?: Prisma.SuperStateAdminUpdateOneWithoutManagedDepartmentAdminsNestedInput
+  regionalWorkflows?: Prisma.RegionalWorkflowUpdateManyWithoutCreatedByNestedInput
 }
 
 export type DepartmentStateAdminUncheckedUpdateWithoutManagedMunicipalAdminsInput = {
@@ -887,9 +887,9 @@ export type DepartmentStateAdminUncheckedUpdateWithoutManagedMunicipalAdminsInpu
   escalationCount?: Prisma.IntFieldUpdateOperationsInput | number
   managedMunicipalities?: Prisma.DepartmentStateAdminUpdatemanagedMunicipalitiesInput | string[]
   managedBySuperStateId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  managedCategories?: Prisma.CategoryUncheckedUpdateManyWithoutManagedByDeptStateAdminNestedInput
   escalatedComplaints?: Prisma.ComplaintUncheckedUpdateManyWithoutEscalatedToStateAdminNestedInput
   regionalWorkflows?: Prisma.RegionalWorkflowUncheckedUpdateManyWithoutCreatedByNestedInput
-  managedCategories?: Prisma.CategoryUncheckedUpdateManyWithoutManagedByDeptStateAdminNestedInput
 }
 
 export type DepartmentStateAdminCreateWithoutManagedBySuperStateInput = {
@@ -909,10 +909,10 @@ export type DepartmentStateAdminCreateWithoutManagedBySuperStateInput = {
   stateResolutionRate?: number
   escalationCount?: number
   managedMunicipalities?: Prisma.DepartmentStateAdminCreatemanagedMunicipalitiesInput | string[]
-  managedMunicipalAdmins?: Prisma.DepartmentMunicipalAdminCreateNestedManyWithoutManagedByStateAdminInput
-  escalatedComplaints?: Prisma.ComplaintCreateNestedManyWithoutEscalatedToStateAdminInput
-  regionalWorkflows?: Prisma.RegionalWorkflowCreateNestedManyWithoutCreatedByInput
   managedCategories?: Prisma.CategoryCreateNestedManyWithoutManagedByDeptStateAdminInput
+  escalatedComplaints?: Prisma.ComplaintCreateNestedManyWithoutEscalatedToStateAdminInput
+  managedMunicipalAdmins?: Prisma.DepartmentMunicipalAdminCreateNestedManyWithoutManagedByStateAdminInput
+  regionalWorkflows?: Prisma.RegionalWorkflowCreateNestedManyWithoutCreatedByInput
 }
 
 export type DepartmentStateAdminUncheckedCreateWithoutManagedBySuperStateInput = {
@@ -932,10 +932,10 @@ export type DepartmentStateAdminUncheckedCreateWithoutManagedBySuperStateInput =
   stateResolutionRate?: number
   escalationCount?: number
   managedMunicipalities?: Prisma.DepartmentStateAdminCreatemanagedMunicipalitiesInput | string[]
-  managedMunicipalAdmins?: Prisma.DepartmentMunicipalAdminUncheckedCreateNestedManyWithoutManagedByStateAdminInput
-  escalatedComplaints?: Prisma.ComplaintUncheckedCreateNestedManyWithoutEscalatedToStateAdminInput
-  regionalWorkflows?: Prisma.RegionalWorkflowUncheckedCreateNestedManyWithoutCreatedByInput
   managedCategories?: Prisma.CategoryUncheckedCreateNestedManyWithoutManagedByDeptStateAdminInput
+  escalatedComplaints?: Prisma.ComplaintUncheckedCreateNestedManyWithoutEscalatedToStateAdminInput
+  managedMunicipalAdmins?: Prisma.DepartmentMunicipalAdminUncheckedCreateNestedManyWithoutManagedByStateAdminInput
+  regionalWorkflows?: Prisma.RegionalWorkflowUncheckedCreateNestedManyWithoutCreatedByInput
 }
 
 export type DepartmentStateAdminCreateOrConnectWithoutManagedBySuperStateInput = {
@@ -1004,10 +1004,10 @@ export type DepartmentStateAdminCreateWithoutManagedCategoriesInput = {
   stateResolutionRate?: number
   escalationCount?: number
   managedMunicipalities?: Prisma.DepartmentStateAdminCreatemanagedMunicipalitiesInput | string[]
-  managedMunicipalAdmins?: Prisma.DepartmentMunicipalAdminCreateNestedManyWithoutManagedByStateAdminInput
   escalatedComplaints?: Prisma.ComplaintCreateNestedManyWithoutEscalatedToStateAdminInput
-  regionalWorkflows?: Prisma.RegionalWorkflowCreateNestedManyWithoutCreatedByInput
+  managedMunicipalAdmins?: Prisma.DepartmentMunicipalAdminCreateNestedManyWithoutManagedByStateAdminInput
   managedBySuperState?: Prisma.SuperStateAdminCreateNestedOneWithoutManagedDepartmentAdminsInput
+  regionalWorkflows?: Prisma.RegionalWorkflowCreateNestedManyWithoutCreatedByInput
 }
 
 export type DepartmentStateAdminUncheckedCreateWithoutManagedCategoriesInput = {
@@ -1028,8 +1028,8 @@ export type DepartmentStateAdminUncheckedCreateWithoutManagedCategoriesInput = {
   escalationCount?: number
   managedMunicipalities?: Prisma.DepartmentStateAdminCreatemanagedMunicipalitiesInput | string[]
   managedBySuperStateId?: string | null
-  managedMunicipalAdmins?: Prisma.DepartmentMunicipalAdminUncheckedCreateNestedManyWithoutManagedByStateAdminInput
   escalatedComplaints?: Prisma.ComplaintUncheckedCreateNestedManyWithoutEscalatedToStateAdminInput
+  managedMunicipalAdmins?: Prisma.DepartmentMunicipalAdminUncheckedCreateNestedManyWithoutManagedByStateAdminInput
   regionalWorkflows?: Prisma.RegionalWorkflowUncheckedCreateNestedManyWithoutCreatedByInput
 }
 
@@ -1066,10 +1066,10 @@ export type DepartmentStateAdminUpdateWithoutManagedCategoriesInput = {
   stateResolutionRate?: Prisma.FloatFieldUpdateOperationsInput | number
   escalationCount?: Prisma.IntFieldUpdateOperationsInput | number
   managedMunicipalities?: Prisma.DepartmentStateAdminUpdatemanagedMunicipalitiesInput | string[]
-  managedMunicipalAdmins?: Prisma.DepartmentMunicipalAdminUpdateManyWithoutManagedByStateAdminNestedInput
   escalatedComplaints?: Prisma.ComplaintUpdateManyWithoutEscalatedToStateAdminNestedInput
-  regionalWorkflows?: Prisma.RegionalWorkflowUpdateManyWithoutCreatedByNestedInput
+  managedMunicipalAdmins?: Prisma.DepartmentMunicipalAdminUpdateManyWithoutManagedByStateAdminNestedInput
   managedBySuperState?: Prisma.SuperStateAdminUpdateOneWithoutManagedDepartmentAdminsNestedInput
+  regionalWorkflows?: Prisma.RegionalWorkflowUpdateManyWithoutCreatedByNestedInput
 }
 
 export type DepartmentStateAdminUncheckedUpdateWithoutManagedCategoriesInput = {
@@ -1090,8 +1090,8 @@ export type DepartmentStateAdminUncheckedUpdateWithoutManagedCategoriesInput = {
   escalationCount?: Prisma.IntFieldUpdateOperationsInput | number
   managedMunicipalities?: Prisma.DepartmentStateAdminUpdatemanagedMunicipalitiesInput | string[]
   managedBySuperStateId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  managedMunicipalAdmins?: Prisma.DepartmentMunicipalAdminUncheckedUpdateManyWithoutManagedByStateAdminNestedInput
   escalatedComplaints?: Prisma.ComplaintUncheckedUpdateManyWithoutEscalatedToStateAdminNestedInput
+  managedMunicipalAdmins?: Prisma.DepartmentMunicipalAdminUncheckedUpdateManyWithoutManagedByStateAdminNestedInput
   regionalWorkflows?: Prisma.RegionalWorkflowUncheckedUpdateManyWithoutCreatedByNestedInput
 }
 
@@ -1112,10 +1112,10 @@ export type DepartmentStateAdminCreateWithoutEscalatedComplaintsInput = {
   stateResolutionRate?: number
   escalationCount?: number
   managedMunicipalities?: Prisma.DepartmentStateAdminCreatemanagedMunicipalitiesInput | string[]
-  managedMunicipalAdmins?: Prisma.DepartmentMunicipalAdminCreateNestedManyWithoutManagedByStateAdminInput
-  regionalWorkflows?: Prisma.RegionalWorkflowCreateNestedManyWithoutCreatedByInput
   managedCategories?: Prisma.CategoryCreateNestedManyWithoutManagedByDeptStateAdminInput
+  managedMunicipalAdmins?: Prisma.DepartmentMunicipalAdminCreateNestedManyWithoutManagedByStateAdminInput
   managedBySuperState?: Prisma.SuperStateAdminCreateNestedOneWithoutManagedDepartmentAdminsInput
+  regionalWorkflows?: Prisma.RegionalWorkflowCreateNestedManyWithoutCreatedByInput
 }
 
 export type DepartmentStateAdminUncheckedCreateWithoutEscalatedComplaintsInput = {
@@ -1136,9 +1136,9 @@ export type DepartmentStateAdminUncheckedCreateWithoutEscalatedComplaintsInput =
   escalationCount?: number
   managedMunicipalities?: Prisma.DepartmentStateAdminCreatemanagedMunicipalitiesInput | string[]
   managedBySuperStateId?: string | null
+  managedCategories?: Prisma.CategoryUncheckedCreateNestedManyWithoutManagedByDeptStateAdminInput
   managedMunicipalAdmins?: Prisma.DepartmentMunicipalAdminUncheckedCreateNestedManyWithoutManagedByStateAdminInput
   regionalWorkflows?: Prisma.RegionalWorkflowUncheckedCreateNestedManyWithoutCreatedByInput
-  managedCategories?: Prisma.CategoryUncheckedCreateNestedManyWithoutManagedByDeptStateAdminInput
 }
 
 export type DepartmentStateAdminCreateOrConnectWithoutEscalatedComplaintsInput = {
@@ -1174,10 +1174,10 @@ export type DepartmentStateAdminUpdateWithoutEscalatedComplaintsInput = {
   stateResolutionRate?: Prisma.FloatFieldUpdateOperationsInput | number
   escalationCount?: Prisma.IntFieldUpdateOperationsInput | number
   managedMunicipalities?: Prisma.DepartmentStateAdminUpdatemanagedMunicipalitiesInput | string[]
-  managedMunicipalAdmins?: Prisma.DepartmentMunicipalAdminUpdateManyWithoutManagedByStateAdminNestedInput
-  regionalWorkflows?: Prisma.RegionalWorkflowUpdateManyWithoutCreatedByNestedInput
   managedCategories?: Prisma.CategoryUpdateManyWithoutManagedByDeptStateAdminNestedInput
+  managedMunicipalAdmins?: Prisma.DepartmentMunicipalAdminUpdateManyWithoutManagedByStateAdminNestedInput
   managedBySuperState?: Prisma.SuperStateAdminUpdateOneWithoutManagedDepartmentAdminsNestedInput
+  regionalWorkflows?: Prisma.RegionalWorkflowUpdateManyWithoutCreatedByNestedInput
 }
 
 export type DepartmentStateAdminUncheckedUpdateWithoutEscalatedComplaintsInput = {
@@ -1198,9 +1198,9 @@ export type DepartmentStateAdminUncheckedUpdateWithoutEscalatedComplaintsInput =
   escalationCount?: Prisma.IntFieldUpdateOperationsInput | number
   managedMunicipalities?: Prisma.DepartmentStateAdminUpdatemanagedMunicipalitiesInput | string[]
   managedBySuperStateId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  managedCategories?: Prisma.CategoryUncheckedUpdateManyWithoutManagedByDeptStateAdminNestedInput
   managedMunicipalAdmins?: Prisma.DepartmentMunicipalAdminUncheckedUpdateManyWithoutManagedByStateAdminNestedInput
   regionalWorkflows?: Prisma.RegionalWorkflowUncheckedUpdateManyWithoutCreatedByNestedInput
-  managedCategories?: Prisma.CategoryUncheckedUpdateManyWithoutManagedByDeptStateAdminNestedInput
 }
 
 export type DepartmentStateAdminCreateWithoutRegionalWorkflowsInput = {
@@ -1220,9 +1220,9 @@ export type DepartmentStateAdminCreateWithoutRegionalWorkflowsInput = {
   stateResolutionRate?: number
   escalationCount?: number
   managedMunicipalities?: Prisma.DepartmentStateAdminCreatemanagedMunicipalitiesInput | string[]
-  managedMunicipalAdmins?: Prisma.DepartmentMunicipalAdminCreateNestedManyWithoutManagedByStateAdminInput
-  escalatedComplaints?: Prisma.ComplaintCreateNestedManyWithoutEscalatedToStateAdminInput
   managedCategories?: Prisma.CategoryCreateNestedManyWithoutManagedByDeptStateAdminInput
+  escalatedComplaints?: Prisma.ComplaintCreateNestedManyWithoutEscalatedToStateAdminInput
+  managedMunicipalAdmins?: Prisma.DepartmentMunicipalAdminCreateNestedManyWithoutManagedByStateAdminInput
   managedBySuperState?: Prisma.SuperStateAdminCreateNestedOneWithoutManagedDepartmentAdminsInput
 }
 
@@ -1244,9 +1244,9 @@ export type DepartmentStateAdminUncheckedCreateWithoutRegionalWorkflowsInput = {
   escalationCount?: number
   managedMunicipalities?: Prisma.DepartmentStateAdminCreatemanagedMunicipalitiesInput | string[]
   managedBySuperStateId?: string | null
-  managedMunicipalAdmins?: Prisma.DepartmentMunicipalAdminUncheckedCreateNestedManyWithoutManagedByStateAdminInput
-  escalatedComplaints?: Prisma.ComplaintUncheckedCreateNestedManyWithoutEscalatedToStateAdminInput
   managedCategories?: Prisma.CategoryUncheckedCreateNestedManyWithoutManagedByDeptStateAdminInput
+  escalatedComplaints?: Prisma.ComplaintUncheckedCreateNestedManyWithoutEscalatedToStateAdminInput
+  managedMunicipalAdmins?: Prisma.DepartmentMunicipalAdminUncheckedCreateNestedManyWithoutManagedByStateAdminInput
 }
 
 export type DepartmentStateAdminCreateOrConnectWithoutRegionalWorkflowsInput = {
@@ -1282,9 +1282,9 @@ export type DepartmentStateAdminUpdateWithoutRegionalWorkflowsInput = {
   stateResolutionRate?: Prisma.FloatFieldUpdateOperationsInput | number
   escalationCount?: Prisma.IntFieldUpdateOperationsInput | number
   managedMunicipalities?: Prisma.DepartmentStateAdminUpdatemanagedMunicipalitiesInput | string[]
-  managedMunicipalAdmins?: Prisma.DepartmentMunicipalAdminUpdateManyWithoutManagedByStateAdminNestedInput
-  escalatedComplaints?: Prisma.ComplaintUpdateManyWithoutEscalatedToStateAdminNestedInput
   managedCategories?: Prisma.CategoryUpdateManyWithoutManagedByDeptStateAdminNestedInput
+  escalatedComplaints?: Prisma.ComplaintUpdateManyWithoutEscalatedToStateAdminNestedInput
+  managedMunicipalAdmins?: Prisma.DepartmentMunicipalAdminUpdateManyWithoutManagedByStateAdminNestedInput
   managedBySuperState?: Prisma.SuperStateAdminUpdateOneWithoutManagedDepartmentAdminsNestedInput
 }
 
@@ -1306,9 +1306,9 @@ export type DepartmentStateAdminUncheckedUpdateWithoutRegionalWorkflowsInput = {
   escalationCount?: Prisma.IntFieldUpdateOperationsInput | number
   managedMunicipalities?: Prisma.DepartmentStateAdminUpdatemanagedMunicipalitiesInput | string[]
   managedBySuperStateId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  managedMunicipalAdmins?: Prisma.DepartmentMunicipalAdminUncheckedUpdateManyWithoutManagedByStateAdminNestedInput
-  escalatedComplaints?: Prisma.ComplaintUncheckedUpdateManyWithoutEscalatedToStateAdminNestedInput
   managedCategories?: Prisma.CategoryUncheckedUpdateManyWithoutManagedByDeptStateAdminNestedInput
+  escalatedComplaints?: Prisma.ComplaintUncheckedUpdateManyWithoutEscalatedToStateAdminNestedInput
+  managedMunicipalAdmins?: Prisma.DepartmentMunicipalAdminUncheckedUpdateManyWithoutManagedByStateAdminNestedInput
 }
 
 export type DepartmentStateAdminCreateManyManagedBySuperStateInput = {
@@ -1347,10 +1347,10 @@ export type DepartmentStateAdminUpdateWithoutManagedBySuperStateInput = {
   stateResolutionRate?: Prisma.FloatFieldUpdateOperationsInput | number
   escalationCount?: Prisma.IntFieldUpdateOperationsInput | number
   managedMunicipalities?: Prisma.DepartmentStateAdminUpdatemanagedMunicipalitiesInput | string[]
-  managedMunicipalAdmins?: Prisma.DepartmentMunicipalAdminUpdateManyWithoutManagedByStateAdminNestedInput
-  escalatedComplaints?: Prisma.ComplaintUpdateManyWithoutEscalatedToStateAdminNestedInput
-  regionalWorkflows?: Prisma.RegionalWorkflowUpdateManyWithoutCreatedByNestedInput
   managedCategories?: Prisma.CategoryUpdateManyWithoutManagedByDeptStateAdminNestedInput
+  escalatedComplaints?: Prisma.ComplaintUpdateManyWithoutEscalatedToStateAdminNestedInput
+  managedMunicipalAdmins?: Prisma.DepartmentMunicipalAdminUpdateManyWithoutManagedByStateAdminNestedInput
+  regionalWorkflows?: Prisma.RegionalWorkflowUpdateManyWithoutCreatedByNestedInput
 }
 
 export type DepartmentStateAdminUncheckedUpdateWithoutManagedBySuperStateInput = {
@@ -1370,10 +1370,10 @@ export type DepartmentStateAdminUncheckedUpdateWithoutManagedBySuperStateInput =
   stateResolutionRate?: Prisma.FloatFieldUpdateOperationsInput | number
   escalationCount?: Prisma.IntFieldUpdateOperationsInput | number
   managedMunicipalities?: Prisma.DepartmentStateAdminUpdatemanagedMunicipalitiesInput | string[]
-  managedMunicipalAdmins?: Prisma.DepartmentMunicipalAdminUncheckedUpdateManyWithoutManagedByStateAdminNestedInput
-  escalatedComplaints?: Prisma.ComplaintUncheckedUpdateManyWithoutEscalatedToStateAdminNestedInput
-  regionalWorkflows?: Prisma.RegionalWorkflowUncheckedUpdateManyWithoutCreatedByNestedInput
   managedCategories?: Prisma.CategoryUncheckedUpdateManyWithoutManagedByDeptStateAdminNestedInput
+  escalatedComplaints?: Prisma.ComplaintUncheckedUpdateManyWithoutEscalatedToStateAdminNestedInput
+  managedMunicipalAdmins?: Prisma.DepartmentMunicipalAdminUncheckedUpdateManyWithoutManagedByStateAdminNestedInput
+  regionalWorkflows?: Prisma.RegionalWorkflowUncheckedUpdateManyWithoutCreatedByNestedInput
 }
 
 export type DepartmentStateAdminUncheckedUpdateManyWithoutManagedBySuperStateInput = {
@@ -1401,17 +1401,17 @@ export type DepartmentStateAdminUncheckedUpdateManyWithoutManagedBySuperStateInp
  */
 
 export type DepartmentStateAdminCountOutputType = {
-  managedMunicipalAdmins: number
-  escalatedComplaints: number
-  regionalWorkflows: number
   managedCategories: number
+  escalatedComplaints: number
+  managedMunicipalAdmins: number
+  regionalWorkflows: number
 }
 
 export type DepartmentStateAdminCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  managedMunicipalAdmins?: boolean | DepartmentStateAdminCountOutputTypeCountManagedMunicipalAdminsArgs
-  escalatedComplaints?: boolean | DepartmentStateAdminCountOutputTypeCountEscalatedComplaintsArgs
-  regionalWorkflows?: boolean | DepartmentStateAdminCountOutputTypeCountRegionalWorkflowsArgs
   managedCategories?: boolean | DepartmentStateAdminCountOutputTypeCountManagedCategoriesArgs
+  escalatedComplaints?: boolean | DepartmentStateAdminCountOutputTypeCountEscalatedComplaintsArgs
+  managedMunicipalAdmins?: boolean | DepartmentStateAdminCountOutputTypeCountManagedMunicipalAdminsArgs
+  regionalWorkflows?: boolean | DepartmentStateAdminCountOutputTypeCountRegionalWorkflowsArgs
 }
 
 /**
@@ -1427,8 +1427,8 @@ export type DepartmentStateAdminCountOutputTypeDefaultArgs<ExtArgs extends runti
 /**
  * DepartmentStateAdminCountOutputType without action
  */
-export type DepartmentStateAdminCountOutputTypeCountManagedMunicipalAdminsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  where?: Prisma.DepartmentMunicipalAdminWhereInput
+export type DepartmentStateAdminCountOutputTypeCountManagedCategoriesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.CategoryWhereInput
 }
 
 /**
@@ -1441,15 +1441,15 @@ export type DepartmentStateAdminCountOutputTypeCountEscalatedComplaintsArgs<ExtA
 /**
  * DepartmentStateAdminCountOutputType without action
  */
-export type DepartmentStateAdminCountOutputTypeCountRegionalWorkflowsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  where?: Prisma.RegionalWorkflowWhereInput
+export type DepartmentStateAdminCountOutputTypeCountManagedMunicipalAdminsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.DepartmentMunicipalAdminWhereInput
 }
 
 /**
  * DepartmentStateAdminCountOutputType without action
  */
-export type DepartmentStateAdminCountOutputTypeCountManagedCategoriesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  where?: Prisma.CategoryWhereInput
+export type DepartmentStateAdminCountOutputTypeCountRegionalWorkflowsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.RegionalWorkflowWhereInput
 }
 
 
@@ -1471,11 +1471,11 @@ export type DepartmentStateAdminSelect<ExtArgs extends runtime.Types.Extensions.
   escalationCount?: boolean
   managedMunicipalities?: boolean
   managedBySuperStateId?: boolean
-  managedMunicipalAdmins?: boolean | Prisma.DepartmentStateAdmin$managedMunicipalAdminsArgs<ExtArgs>
-  escalatedComplaints?: boolean | Prisma.DepartmentStateAdmin$escalatedComplaintsArgs<ExtArgs>
-  regionalWorkflows?: boolean | Prisma.DepartmentStateAdmin$regionalWorkflowsArgs<ExtArgs>
   managedCategories?: boolean | Prisma.DepartmentStateAdmin$managedCategoriesArgs<ExtArgs>
+  escalatedComplaints?: boolean | Prisma.DepartmentStateAdmin$escalatedComplaintsArgs<ExtArgs>
+  managedMunicipalAdmins?: boolean | Prisma.DepartmentStateAdmin$managedMunicipalAdminsArgs<ExtArgs>
   managedBySuperState?: boolean | Prisma.DepartmentStateAdmin$managedBySuperStateArgs<ExtArgs>
+  regionalWorkflows?: boolean | Prisma.DepartmentStateAdmin$regionalWorkflowsArgs<ExtArgs>
   _count?: boolean | Prisma.DepartmentStateAdminCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["departmentStateAdmin"]>
 
@@ -1543,11 +1543,11 @@ export type DepartmentStateAdminSelectScalar = {
 
 export type DepartmentStateAdminOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "fullName" | "adminId" | "officialEmail" | "password" | "phoneNumber" | "department" | "state" | "accessLevel" | "dateOfCreation" | "lastUpdated" | "status" | "lastLogin" | "stateResolutionRate" | "escalationCount" | "managedMunicipalities" | "managedBySuperStateId", ExtArgs["result"]["departmentStateAdmin"]>
 export type DepartmentStateAdminInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  managedMunicipalAdmins?: boolean | Prisma.DepartmentStateAdmin$managedMunicipalAdminsArgs<ExtArgs>
-  escalatedComplaints?: boolean | Prisma.DepartmentStateAdmin$escalatedComplaintsArgs<ExtArgs>
-  regionalWorkflows?: boolean | Prisma.DepartmentStateAdmin$regionalWorkflowsArgs<ExtArgs>
   managedCategories?: boolean | Prisma.DepartmentStateAdmin$managedCategoriesArgs<ExtArgs>
+  escalatedComplaints?: boolean | Prisma.DepartmentStateAdmin$escalatedComplaintsArgs<ExtArgs>
+  managedMunicipalAdmins?: boolean | Prisma.DepartmentStateAdmin$managedMunicipalAdminsArgs<ExtArgs>
   managedBySuperState?: boolean | Prisma.DepartmentStateAdmin$managedBySuperStateArgs<ExtArgs>
+  regionalWorkflows?: boolean | Prisma.DepartmentStateAdmin$regionalWorkflowsArgs<ExtArgs>
   _count?: boolean | Prisma.DepartmentStateAdminCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type DepartmentStateAdminIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -1560,11 +1560,11 @@ export type DepartmentStateAdminIncludeUpdateManyAndReturn<ExtArgs extends runti
 export type $DepartmentStateAdminPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   name: "DepartmentStateAdmin"
   objects: {
-    managedMunicipalAdmins: Prisma.$DepartmentMunicipalAdminPayload<ExtArgs>[]
-    escalatedComplaints: Prisma.$ComplaintPayload<ExtArgs>[]
-    regionalWorkflows: Prisma.$RegionalWorkflowPayload<ExtArgs>[]
     managedCategories: Prisma.$CategoryPayload<ExtArgs>[]
+    escalatedComplaints: Prisma.$ComplaintPayload<ExtArgs>[]
+    managedMunicipalAdmins: Prisma.$DepartmentMunicipalAdminPayload<ExtArgs>[]
     managedBySuperState: Prisma.$SuperStateAdminPayload<ExtArgs> | null
+    regionalWorkflows: Prisma.$RegionalWorkflowPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -1978,11 +1978,11 @@ readonly fields: DepartmentStateAdminFieldRefs;
  */
 export interface Prisma__DepartmentStateAdminClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
-  managedMunicipalAdmins<T extends Prisma.DepartmentStateAdmin$managedMunicipalAdminsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.DepartmentStateAdmin$managedMunicipalAdminsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$DepartmentMunicipalAdminPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
-  escalatedComplaints<T extends Prisma.DepartmentStateAdmin$escalatedComplaintsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.DepartmentStateAdmin$escalatedComplaintsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ComplaintPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
-  regionalWorkflows<T extends Prisma.DepartmentStateAdmin$regionalWorkflowsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.DepartmentStateAdmin$regionalWorkflowsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$RegionalWorkflowPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   managedCategories<T extends Prisma.DepartmentStateAdmin$managedCategoriesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.DepartmentStateAdmin$managedCategoriesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$CategoryPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  escalatedComplaints<T extends Prisma.DepartmentStateAdmin$escalatedComplaintsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.DepartmentStateAdmin$escalatedComplaintsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ComplaintPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  managedMunicipalAdmins<T extends Prisma.DepartmentStateAdmin$managedMunicipalAdminsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.DepartmentStateAdmin$managedMunicipalAdminsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$DepartmentMunicipalAdminPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   managedBySuperState<T extends Prisma.DepartmentStateAdmin$managedBySuperStateArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.DepartmentStateAdmin$managedBySuperStateArgs<ExtArgs>>): Prisma.Prisma__SuperStateAdminClient<runtime.Types.Result.GetResult<Prisma.$SuperStateAdminPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+  regionalWorkflows<T extends Prisma.DepartmentStateAdmin$regionalWorkflowsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.DepartmentStateAdmin$regionalWorkflowsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$RegionalWorkflowPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -2425,27 +2425,27 @@ export type DepartmentStateAdminDeleteManyArgs<ExtArgs extends runtime.Types.Ext
 }
 
 /**
- * DepartmentStateAdmin.managedMunicipalAdmins
+ * DepartmentStateAdmin.managedCategories
  */
-export type DepartmentStateAdmin$managedMunicipalAdminsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+export type DepartmentStateAdmin$managedCategoriesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   /**
-   * Select specific fields to fetch from the DepartmentMunicipalAdmin
+   * Select specific fields to fetch from the Category
    */
-  select?: Prisma.DepartmentMunicipalAdminSelect<ExtArgs> | null
+  select?: Prisma.CategorySelect<ExtArgs> | null
   /**
-   * Omit specific fields from the DepartmentMunicipalAdmin
+   * Omit specific fields from the Category
    */
-  omit?: Prisma.DepartmentMunicipalAdminOmit<ExtArgs> | null
+  omit?: Prisma.CategoryOmit<ExtArgs> | null
   /**
    * Choose, which related nodes to fetch as well
    */
-  include?: Prisma.DepartmentMunicipalAdminInclude<ExtArgs> | null
-  where?: Prisma.DepartmentMunicipalAdminWhereInput
-  orderBy?: Prisma.DepartmentMunicipalAdminOrderByWithRelationInput | Prisma.DepartmentMunicipalAdminOrderByWithRelationInput[]
-  cursor?: Prisma.DepartmentMunicipalAdminWhereUniqueInput
+  include?: Prisma.CategoryInclude<ExtArgs> | null
+  where?: Prisma.CategoryWhereInput
+  orderBy?: Prisma.CategoryOrderByWithRelationInput | Prisma.CategoryOrderByWithRelationInput[]
+  cursor?: Prisma.CategoryWhereUniqueInput
   take?: number
   skip?: number
-  distinct?: Prisma.DepartmentMunicipalAdminScalarFieldEnum | Prisma.DepartmentMunicipalAdminScalarFieldEnum[]
+  distinct?: Prisma.CategoryScalarFieldEnum | Prisma.CategoryScalarFieldEnum[]
 }
 
 /**
@@ -2473,6 +2473,49 @@ export type DepartmentStateAdmin$escalatedComplaintsArgs<ExtArgs extends runtime
 }
 
 /**
+ * DepartmentStateAdmin.managedMunicipalAdmins
+ */
+export type DepartmentStateAdmin$managedMunicipalAdminsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the DepartmentMunicipalAdmin
+   */
+  select?: Prisma.DepartmentMunicipalAdminSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the DepartmentMunicipalAdmin
+   */
+  omit?: Prisma.DepartmentMunicipalAdminOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.DepartmentMunicipalAdminInclude<ExtArgs> | null
+  where?: Prisma.DepartmentMunicipalAdminWhereInput
+  orderBy?: Prisma.DepartmentMunicipalAdminOrderByWithRelationInput | Prisma.DepartmentMunicipalAdminOrderByWithRelationInput[]
+  cursor?: Prisma.DepartmentMunicipalAdminWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.DepartmentMunicipalAdminScalarFieldEnum | Prisma.DepartmentMunicipalAdminScalarFieldEnum[]
+}
+
+/**
+ * DepartmentStateAdmin.managedBySuperState
+ */
+export type DepartmentStateAdmin$managedBySuperStateArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the SuperStateAdmin
+   */
+  select?: Prisma.SuperStateAdminSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the SuperStateAdmin
+   */
+  omit?: Prisma.SuperStateAdminOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.SuperStateAdminInclude<ExtArgs> | null
+  where?: Prisma.SuperStateAdminWhereInput
+}
+
+/**
  * DepartmentStateAdmin.regionalWorkflows
  */
 export type DepartmentStateAdmin$regionalWorkflowsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -2494,49 +2537,6 @@ export type DepartmentStateAdmin$regionalWorkflowsArgs<ExtArgs extends runtime.T
   take?: number
   skip?: number
   distinct?: Prisma.RegionalWorkflowScalarFieldEnum | Prisma.RegionalWorkflowScalarFieldEnum[]
-}
-
-/**
- * DepartmentStateAdmin.managedCategories
- */
-export type DepartmentStateAdmin$managedCategoriesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  /**
-   * Select specific fields to fetch from the Category
-   */
-  select?: Prisma.CategorySelect<ExtArgs> | null
-  /**
-   * Omit specific fields from the Category
-   */
-  omit?: Prisma.CategoryOmit<ExtArgs> | null
-  /**
-   * Choose, which related nodes to fetch as well
-   */
-  include?: Prisma.CategoryInclude<ExtArgs> | null
-  where?: Prisma.CategoryWhereInput
-  orderBy?: Prisma.CategoryOrderByWithRelationInput | Prisma.CategoryOrderByWithRelationInput[]
-  cursor?: Prisma.CategoryWhereUniqueInput
-  take?: number
-  skip?: number
-  distinct?: Prisma.CategoryScalarFieldEnum | Prisma.CategoryScalarFieldEnum[]
-}
-
-/**
- * DepartmentStateAdmin.managedBySuperState
- */
-export type DepartmentStateAdmin$managedBySuperStateArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  /**
-   * Select specific fields to fetch from the SuperStateAdmin
-   */
-  select?: Prisma.SuperStateAdminSelect<ExtArgs> | null
-  /**
-   * Omit specific fields from the SuperStateAdmin
-   */
-  omit?: Prisma.SuperStateAdminOmit<ExtArgs> | null
-  /**
-   * Choose, which related nodes to fetch as well
-   */
-  include?: Prisma.SuperStateAdminInclude<ExtArgs> | null
-  where?: Prisma.SuperStateAdminWhereInput
 }
 
 /**

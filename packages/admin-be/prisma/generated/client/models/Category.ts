@@ -206,9 +206,9 @@ export type CategoryWhereInput = {
   lastUpdated?: Prisma.DateTimeFilter<"Category"> | Date | string
   createdBySuperAdminId?: Prisma.StringNullableFilter<"Category"> | string | null
   managedByDeptStateAdminId?: Prisma.StringNullableFilter<"Category"> | string | null
-  complaints?: Prisma.ComplaintListRelationFilter
   createdBySuperAdmin?: Prisma.XOR<Prisma.SuperAdminNullableScalarRelationFilter, Prisma.SuperAdminWhereInput> | null
   managedByDeptStateAdmin?: Prisma.XOR<Prisma.DepartmentStateAdminNullableScalarRelationFilter, Prisma.DepartmentStateAdminWhereInput> | null
+  complaints?: Prisma.ComplaintListRelationFilter
 }
 
 export type CategoryOrderByWithRelationInput = {
@@ -221,9 +221,9 @@ export type CategoryOrderByWithRelationInput = {
   lastUpdated?: Prisma.SortOrder
   createdBySuperAdminId?: Prisma.SortOrderInput | Prisma.SortOrder
   managedByDeptStateAdminId?: Prisma.SortOrderInput | Prisma.SortOrder
-  complaints?: Prisma.ComplaintOrderByRelationAggregateInput
   createdBySuperAdmin?: Prisma.SuperAdminOrderByWithRelationInput
   managedByDeptStateAdmin?: Prisma.DepartmentStateAdminOrderByWithRelationInput
+  complaints?: Prisma.ComplaintOrderByRelationAggregateInput
 }
 
 export type CategoryWhereUniqueInput = Prisma.AtLeast<{
@@ -239,9 +239,9 @@ export type CategoryWhereUniqueInput = Prisma.AtLeast<{
   lastUpdated?: Prisma.DateTimeFilter<"Category"> | Date | string
   createdBySuperAdminId?: Prisma.StringNullableFilter<"Category"> | string | null
   managedByDeptStateAdminId?: Prisma.StringNullableFilter<"Category"> | string | null
-  complaints?: Prisma.ComplaintListRelationFilter
   createdBySuperAdmin?: Prisma.XOR<Prisma.SuperAdminNullableScalarRelationFilter, Prisma.SuperAdminWhereInput> | null
   managedByDeptStateAdmin?: Prisma.XOR<Prisma.DepartmentStateAdminNullableScalarRelationFilter, Prisma.DepartmentStateAdminWhereInput> | null
+  complaints?: Prisma.ComplaintListRelationFilter
 }, "id" | "name">
 
 export type CategoryOrderByWithAggregationInput = {
@@ -282,9 +282,9 @@ export type CategoryCreateInput = {
   assignedDepartment: string
   creationDate?: Date | string
   lastUpdated?: Date | string
-  complaints?: Prisma.ComplaintCreateNestedManyWithoutCategoryInput
   createdBySuperAdmin?: Prisma.SuperAdminCreateNestedOneWithoutManagedCategoriesInput
   managedByDeptStateAdmin?: Prisma.DepartmentStateAdminCreateNestedOneWithoutManagedCategoriesInput
+  complaints?: Prisma.ComplaintCreateNestedManyWithoutCategoryInput
 }
 
 export type CategoryUncheckedCreateInput = {
@@ -308,9 +308,9 @@ export type CategoryUpdateInput = {
   assignedDepartment?: Prisma.StringFieldUpdateOperationsInput | string
   creationDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   lastUpdated?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  complaints?: Prisma.ComplaintUpdateManyWithoutCategoryNestedInput
   createdBySuperAdmin?: Prisma.SuperAdminUpdateOneWithoutManagedCategoriesNestedInput
   managedByDeptStateAdmin?: Prisma.DepartmentStateAdminUpdateOneWithoutManagedCategoriesNestedInput
+  complaints?: Prisma.ComplaintUpdateManyWithoutCategoryNestedInput
 }
 
 export type CategoryUncheckedUpdateInput = {
@@ -531,8 +531,8 @@ export type CategoryCreateWithoutManagedByDeptStateAdminInput = {
   assignedDepartment: string
   creationDate?: Date | string
   lastUpdated?: Date | string
-  complaints?: Prisma.ComplaintCreateNestedManyWithoutCategoryInput
   createdBySuperAdmin?: Prisma.SuperAdminCreateNestedOneWithoutManagedCategoriesInput
+  complaints?: Prisma.ComplaintCreateNestedManyWithoutCategoryInput
 }
 
 export type CategoryUncheckedCreateWithoutManagedByDeptStateAdminInput = {
@@ -596,8 +596,8 @@ export type CategoryCreateWithoutCreatedBySuperAdminInput = {
   assignedDepartment: string
   creationDate?: Date | string
   lastUpdated?: Date | string
-  complaints?: Prisma.ComplaintCreateNestedManyWithoutCategoryInput
   managedByDeptStateAdmin?: Prisma.DepartmentStateAdminCreateNestedOneWithoutManagedCategoriesInput
+  complaints?: Prisma.ComplaintCreateNestedManyWithoutCategoryInput
 }
 
 export type CategoryUncheckedCreateWithoutCreatedBySuperAdminInput = {
@@ -721,8 +721,8 @@ export type CategoryUpdateWithoutManagedByDeptStateAdminInput = {
   assignedDepartment?: Prisma.StringFieldUpdateOperationsInput | string
   creationDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   lastUpdated?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  complaints?: Prisma.ComplaintUpdateManyWithoutCategoryNestedInput
   createdBySuperAdmin?: Prisma.SuperAdminUpdateOneWithoutManagedCategoriesNestedInput
+  complaints?: Prisma.ComplaintUpdateManyWithoutCategoryNestedInput
 }
 
 export type CategoryUncheckedUpdateWithoutManagedByDeptStateAdminInput = {
@@ -767,8 +767,8 @@ export type CategoryUpdateWithoutCreatedBySuperAdminInput = {
   assignedDepartment?: Prisma.StringFieldUpdateOperationsInput | string
   creationDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   lastUpdated?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  complaints?: Prisma.ComplaintUpdateManyWithoutCategoryNestedInput
   managedByDeptStateAdmin?: Prisma.DepartmentStateAdminUpdateOneWithoutManagedCategoriesNestedInput
+  complaints?: Prisma.ComplaintUpdateManyWithoutCategoryNestedInput
 }
 
 export type CategoryUncheckedUpdateWithoutCreatedBySuperAdminInput = {
@@ -835,9 +835,9 @@ export type CategorySelect<ExtArgs extends runtime.Types.Extensions.InternalArgs
   lastUpdated?: boolean
   createdBySuperAdminId?: boolean
   managedByDeptStateAdminId?: boolean
-  complaints?: boolean | Prisma.Category$complaintsArgs<ExtArgs>
   createdBySuperAdmin?: boolean | Prisma.Category$createdBySuperAdminArgs<ExtArgs>
   managedByDeptStateAdmin?: boolean | Prisma.Category$managedByDeptStateAdminArgs<ExtArgs>
+  complaints?: boolean | Prisma.Category$complaintsArgs<ExtArgs>
   _count?: boolean | Prisma.CategoryCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["category"]>
 
@@ -883,9 +883,9 @@ export type CategorySelectScalar = {
 
 export type CategoryOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "name" | "subCategories" | "learnedSubCategories" | "assignedDepartment" | "creationDate" | "lastUpdated" | "createdBySuperAdminId" | "managedByDeptStateAdminId", ExtArgs["result"]["category"]>
 export type CategoryInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  complaints?: boolean | Prisma.Category$complaintsArgs<ExtArgs>
   createdBySuperAdmin?: boolean | Prisma.Category$createdBySuperAdminArgs<ExtArgs>
   managedByDeptStateAdmin?: boolean | Prisma.Category$managedByDeptStateAdminArgs<ExtArgs>
+  complaints?: boolean | Prisma.Category$complaintsArgs<ExtArgs>
   _count?: boolean | Prisma.CategoryCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type CategoryIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -900,9 +900,9 @@ export type CategoryIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Ext
 export type $CategoryPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   name: "Category"
   objects: {
-    complaints: Prisma.$ComplaintPayload<ExtArgs>[]
     createdBySuperAdmin: Prisma.$SuperAdminPayload<ExtArgs> | null
     managedByDeptStateAdmin: Prisma.$DepartmentStateAdminPayload<ExtArgs> | null
+    complaints: Prisma.$ComplaintPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -1308,9 +1308,9 @@ readonly fields: CategoryFieldRefs;
  */
 export interface Prisma__CategoryClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
-  complaints<T extends Prisma.Category$complaintsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Category$complaintsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ComplaintPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   createdBySuperAdmin<T extends Prisma.Category$createdBySuperAdminArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Category$createdBySuperAdminArgs<ExtArgs>>): Prisma.Prisma__SuperAdminClient<runtime.Types.Result.GetResult<Prisma.$SuperAdminPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   managedByDeptStateAdmin<T extends Prisma.Category$managedByDeptStateAdminArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Category$managedByDeptStateAdminArgs<ExtArgs>>): Prisma.Prisma__DepartmentStateAdminClient<runtime.Types.Result.GetResult<Prisma.$DepartmentStateAdminPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+  complaints<T extends Prisma.Category$complaintsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Category$complaintsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ComplaintPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -1745,30 +1745,6 @@ export type CategoryDeleteManyArgs<ExtArgs extends runtime.Types.Extensions.Inte
 }
 
 /**
- * Category.complaints
- */
-export type Category$complaintsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  /**
-   * Select specific fields to fetch from the Complaint
-   */
-  select?: Prisma.ComplaintSelect<ExtArgs> | null
-  /**
-   * Omit specific fields from the Complaint
-   */
-  omit?: Prisma.ComplaintOmit<ExtArgs> | null
-  /**
-   * Choose, which related nodes to fetch as well
-   */
-  include?: Prisma.ComplaintInclude<ExtArgs> | null
-  where?: Prisma.ComplaintWhereInput
-  orderBy?: Prisma.ComplaintOrderByWithRelationInput | Prisma.ComplaintOrderByWithRelationInput[]
-  cursor?: Prisma.ComplaintWhereUniqueInput
-  take?: number
-  skip?: number
-  distinct?: Prisma.ComplaintScalarFieldEnum | Prisma.ComplaintScalarFieldEnum[]
-}
-
-/**
  * Category.createdBySuperAdmin
  */
 export type Category$createdBySuperAdminArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -1804,6 +1780,30 @@ export type Category$managedByDeptStateAdminArgs<ExtArgs extends runtime.Types.E
    */
   include?: Prisma.DepartmentStateAdminInclude<ExtArgs> | null
   where?: Prisma.DepartmentStateAdminWhereInput
+}
+
+/**
+ * Category.complaints
+ */
+export type Category$complaintsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the Complaint
+   */
+  select?: Prisma.ComplaintSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the Complaint
+   */
+  omit?: Prisma.ComplaintOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ComplaintInclude<ExtArgs> | null
+  where?: Prisma.ComplaintWhereInput
+  orderBy?: Prisma.ComplaintOrderByWithRelationInput | Prisma.ComplaintOrderByWithRelationInput[]
+  cursor?: Prisma.ComplaintWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.ComplaintScalarFieldEnum | Prisma.ComplaintScalarFieldEnum[]
 }
 
 /**

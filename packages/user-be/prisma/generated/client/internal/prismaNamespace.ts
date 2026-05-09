@@ -398,7 +398,9 @@ export const ModelName = {
   Upvote: 'Upvote',
   NewsUpdate: 'NewsUpdate',
   AuditLog: 'AuditLog',
-  RegionalWorkflow: 'RegionalWorkflow'
+  RegionalWorkflow: 'RegionalWorkflow',
+  OpratingStates: 'OpratingStates',
+  OpratingDistricts: 'OpratingDistricts'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -414,7 +416,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "user" | "userLocation" | "agent" | "departmentMunicipalAdmin" | "superMunicipalAdmin" | "departmentStateAdmin" | "superStateAdmin" | "superAdmin" | "category" | "complaint" | "complaintLocation" | "upvote" | "newsUpdate" | "auditLog" | "regionalWorkflow"
+    modelProps: "user" | "userLocation" | "agent" | "departmentMunicipalAdmin" | "superMunicipalAdmin" | "departmentStateAdmin" | "superStateAdmin" | "superAdmin" | "category" | "complaint" | "complaintLocation" | "upvote" | "newsUpdate" | "auditLog" | "regionalWorkflow" | "opratingStates" | "opratingDistricts"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -1528,6 +1530,154 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    OpratingStates: {
+      payload: Prisma.$OpratingStatesPayload<ExtArgs>
+      fields: Prisma.OpratingStatesFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.OpratingStatesFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$OpratingStatesPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.OpratingStatesFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$OpratingStatesPayload>
+        }
+        findFirst: {
+          args: Prisma.OpratingStatesFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$OpratingStatesPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.OpratingStatesFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$OpratingStatesPayload>
+        }
+        findMany: {
+          args: Prisma.OpratingStatesFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$OpratingStatesPayload>[]
+        }
+        create: {
+          args: Prisma.OpratingStatesCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$OpratingStatesPayload>
+        }
+        createMany: {
+          args: Prisma.OpratingStatesCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.OpratingStatesCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$OpratingStatesPayload>[]
+        }
+        delete: {
+          args: Prisma.OpratingStatesDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$OpratingStatesPayload>
+        }
+        update: {
+          args: Prisma.OpratingStatesUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$OpratingStatesPayload>
+        }
+        deleteMany: {
+          args: Prisma.OpratingStatesDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.OpratingStatesUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.OpratingStatesUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$OpratingStatesPayload>[]
+        }
+        upsert: {
+          args: Prisma.OpratingStatesUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$OpratingStatesPayload>
+        }
+        aggregate: {
+          args: Prisma.OpratingStatesAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateOpratingStates>
+        }
+        groupBy: {
+          args: Prisma.OpratingStatesGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.OpratingStatesGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.OpratingStatesCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.OpratingStatesCountAggregateOutputType> | number
+        }
+      }
+    }
+    OpratingDistricts: {
+      payload: Prisma.$OpratingDistrictsPayload<ExtArgs>
+      fields: Prisma.OpratingDistrictsFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.OpratingDistrictsFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$OpratingDistrictsPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.OpratingDistrictsFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$OpratingDistrictsPayload>
+        }
+        findFirst: {
+          args: Prisma.OpratingDistrictsFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$OpratingDistrictsPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.OpratingDistrictsFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$OpratingDistrictsPayload>
+        }
+        findMany: {
+          args: Prisma.OpratingDistrictsFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$OpratingDistrictsPayload>[]
+        }
+        create: {
+          args: Prisma.OpratingDistrictsCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$OpratingDistrictsPayload>
+        }
+        createMany: {
+          args: Prisma.OpratingDistrictsCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.OpratingDistrictsCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$OpratingDistrictsPayload>[]
+        }
+        delete: {
+          args: Prisma.OpratingDistrictsDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$OpratingDistrictsPayload>
+        }
+        update: {
+          args: Prisma.OpratingDistrictsUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$OpratingDistrictsPayload>
+        }
+        deleteMany: {
+          args: Prisma.OpratingDistrictsDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.OpratingDistrictsUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.OpratingDistrictsUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$OpratingDistrictsPayload>[]
+        }
+        upsert: {
+          args: Prisma.OpratingDistrictsUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$OpratingDistrictsPayload>
+        }
+        aggregate: {
+          args: Prisma.OpratingDistrictsAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateOpratingDistricts>
+        }
+        groupBy: {
+          args: Prisma.OpratingDistrictsGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.OpratingDistrictsGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.OpratingDistrictsCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.OpratingDistrictsCountAggregateOutputType> | number
+        }
+      }
+    }
   }
 } & {
   other: {
@@ -1612,6 +1762,7 @@ export const AgentScalarFieldEnum = {
   officialEmail: 'officialEmail',
   department: 'department',
   municipality: 'municipality',
+  district: 'district',
   accessLevel: 'accessLevel',
   workloadLimit: 'workloadLimit',
   currentWorkload: 'currentWorkload',
@@ -1759,10 +1910,12 @@ export const ComplaintScalarFieldEnum = {
   complainantId: 'complainantId',
   categoryId: 'categoryId',
   subCategory: 'subCategory',
-  standardizedSubCategory: 'standardizedSubCategory',
+  AIstandardizedSubCategory: 'AIstandardizedSubCategory',
+  AIabusedFlag: 'AIabusedFlag',
   description: 'description',
   urgency: 'urgency',
   attachmentUrl: 'attachmentUrl',
+  AIimageVarificationStatus: 'AIimageVarificationStatus',
   assignedDepartment: 'assignedDepartment',
   status: 'status',
   sla: 'sla',
@@ -1770,6 +1923,7 @@ export const ComplaintScalarFieldEnum = {
   isPublic: 'isPublic',
   escalationLevel: 'escalationLevel',
   dateOfResolution: 'dateOfResolution',
+  lastUpdated: 'lastUpdated',
   assignedAgentId: 'assignedAgentId',
   managedByMunicipalAdminId: 'managedByMunicipalAdminId',
   moderatedByMunicipalAdminId: 'moderatedByMunicipalAdminId',
@@ -1832,7 +1986,6 @@ export type AuditLogScalarFieldEnum = (typeof AuditLogScalarFieldEnum)[keyof typ
 
 export const RegionalWorkflowScalarFieldEnum = {
   id: 'id',
-  state: 'state',
   municipality: 'municipality',
   category: 'category',
   sla: 'sla',
@@ -1840,6 +1993,25 @@ export const RegionalWorkflowScalarFieldEnum = {
 } as const
 
 export type RegionalWorkflowScalarFieldEnum = (typeof RegionalWorkflowScalarFieldEnum)[keyof typeof RegionalWorkflowScalarFieldEnum]
+
+
+export const OpratingStatesScalarFieldEnum = {
+  id: 'id',
+  name: 'name',
+  country: 'country'
+} as const
+
+export type OpratingStatesScalarFieldEnum = (typeof OpratingStatesScalarFieldEnum)[keyof typeof OpratingStatesScalarFieldEnum]
+
+
+export const OpratingDistrictsScalarFieldEnum = {
+  id: 'id',
+  stateId: 'stateId',
+  name: 'name',
+  state: 'state'
+} as const
+
+export type OpratingDistrictsScalarFieldEnum = (typeof OpratingDistrictsScalarFieldEnum)[keyof typeof OpratingDistrictsScalarFieldEnum]
 
 
 export const SortOrder = {
@@ -2112,6 +2284,8 @@ export type GlobalOmitConfig = {
   newsUpdate?: Prisma.NewsUpdateOmit
   auditLog?: Prisma.AuditLogOmit
   regionalWorkflow?: Prisma.RegionalWorkflowOmit
+  opratingStates?: Prisma.OpratingStatesOmit
+  opratingDistricts?: Prisma.OpratingDistrictsOmit
 }
 
 /* Types for Logging */
