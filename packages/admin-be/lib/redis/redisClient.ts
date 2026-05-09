@@ -12,12 +12,10 @@ class RedisClient {
     try {
       const redisUrl = process.env.REDIS_URL || 'redis://localhost:6379';
       
-      console.log('🔌 Connecting to Redis...');
-      console.log(`🌐 Redis URL: ${redisUrl}`);
       this.client = new Redis(redisUrl, {
         retryStrategy: (times: number) => {
           const delay = Math.min(times * 50, 2000);
-          console.log(`⏳ Redis retry attempt ${times}, waiting ${delay}ms`);
+          console.log(`Redis retry attempt ${times}, waiting ${delay}ms`);
           return delay;
         },
         maxRetriesPerRequest: null,
@@ -39,28 +37,26 @@ class RedisClient {
     if (!this.client) return;
 
     this.client.on('ready', () => {
-      console.log('✅ Redis ready');
       this.isConnected = true;
     });
 
     this.client.on('connect', () => {
-      console.log('🔌 Redis connected');
       this.isConnected = true;
     });
 
     this.client.on('error', (err: any) => {
-      console.error('❌ Redis error:', err?.message || err);
+      console.error('Redis error:', err?.message || err);
       this.isConnected = false;
     });
 
     this.client.on('close', () => {
-      console.log('⚠️  Redis connection closed');
+      console.log('Redis connection closed');
       this.isConnected = false;
       setTimeout(() => this.reconnect(), 2000);
     });
 
     this.client.on('end', () => {
-      console.log('ℹ️  Redis connection ended');
+      console.log('ℹRedis connection ended');
       this.isConnected = false;
     });
   }

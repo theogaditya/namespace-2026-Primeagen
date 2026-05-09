@@ -2,7 +2,7 @@ import dotenv from 'dotenv';
 import path from 'path';
 import fs from 'fs';
 import { complaintWorker } from './complaintAssignmentWorker';
-import { redisClient, QUEUE_NAMES } from '../lib/redis';
+import { redisClient, QUEUE_NAMES } from '../../lib/redis';
 
 // Load env file
 const env = process.env.NODE_ENV || 'development';

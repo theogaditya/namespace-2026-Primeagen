@@ -1,4 +1,4 @@
-import { complaintQueueService } from '../lib/redis';
+import { complaintQueueService } from '../../lib/redis';
 
 class ComplaintAssignmentWorker {
   private isRunning: boolean = false;
@@ -52,7 +52,7 @@ class ComplaintAssignmentWorker {
           if (!municipality) {
             console.error(`Complaint ${complaintId || '[no-id]'} missing municipality. Moving to malformed queue`);
             try {
-              const { redisClient } = await import('../lib/redis/redisClient');
+              const { redisClient } = await import('../../lib/redis/redisClient');
               const client = redisClient.getClient();
               await client.lpush('complaint:assignment:malformed', JSON.stringify(parsedComplaint));
               console.log('Moved malformed complaint to dead-letter queue');
@@ -84,7 +84,7 @@ class ComplaintAssignmentWorker {
             } catch (requeueErr) {
               console.error('Failed to re-queue complaint:', requeueErr);
               try {
-                const { redisClient } = await import('../lib/redis/redisClient');
+                const { redisClient } = await import('../../lib/redis/redisClient');
                 const client = redisClient.getClient();
                 await client.lpush('complaint:assignment:malformed', JSON.stringify(parsedComplaint));
                 console.log('Moved complaint to dead-letter queue as fallback');

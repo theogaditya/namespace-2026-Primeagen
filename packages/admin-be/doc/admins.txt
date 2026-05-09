@@ -74,3 +74,75 @@ Agent:{
 
 export REDIS_URL="redis://127.0.0.1:6379"
 export AWS_PROFILE=friend-profile
+
+
+## login user
+curl -X POST http://localhost:3000/api/users/login \
+  -H "Content-Type: application/json" \
+  -d '{
+    "email": "user.nov30.2025@example.com",
+    "password": "Test@12345"
+  }'
+
+## new complaint
+curl -X POST http://localhost:3000/api/complaints  \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI5ZTAzZDcxNC0xYTJmLTRhNDUtOTc0MC05OGYxYTMzMTE1YWIiLCJlbWFpbCI6InVzZXIubm92MzAuMjAyNUBleGFtcGxlLmNvbSIsIm5hbWUiOiJOb3ZlbWJlciBVc2VyIiwiaWF0IjoxNzY0NTM0NzUxLCJleHAiOjE3NjQ2MjExNTF9.CFYzI6Lu6TqNkmUGjK-aO5CnVPhijSwX7j-k8TuD4Pg" \
+  -d '{
+    "complainantId": "9e03d714-1a2f-4a45-9740-98f1a33115ab",
+    "categoryId": "123e4567-e89b-12d3-a456-426614174001",
+    "subCategory": "Water Leakage",
+    "description": "There is a major water leakage on the main road causing traffic issues",
+    "urgency": "HIGH",
+    "assignedDepartment": "WATER_SUPPLY_SANITATION",
+    "isPublic": true,
+    "location": {
+      "pin": "560001",
+      "district": "Ranchi",
+      "city": "Ranchi",
+      "locality": "Lewis Road",
+      "street": "5th Block"
+    }
+  }'
+  
+curl -X POST http://localhost:3000/api/complaints  \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI5ZTAzZDcxNC0xYTJmLTRhNDUtOTc0MC05OGYxYTMzMTE1YWIiLCJlbWFpbCI6InVzZXIubm92MzAuMjAyNUBleGFtcGxlLmNvbSIsIm5hbWUiOiJOb3ZlbWJlciBVc2VyIiwiaWF0IjoxNzY0NTM0NzUxLCJleHAiOjE3NjQ2MjExNTF9.CFYzI6Lu6TqNkmUGjK-aO5CnVPhijSwX7j-k8TuD4Pg" \
+  -d '{
+    "complainantId": "9e03d714-1a2f-4a45-9740-98f1a33115ab",
+    "categoryId": "123e4567-e89b-12d3-a456-426614174001",
+    "subCategory": "Water Leakage",
+    "description": "There is a major water leakage on the main road causing traffic issues",
+    "urgency": "HIGH",
+    "assignedDepartment": "WATER_SUPPLY_SANITATION",
+    "isPublic": true,
+    "location": {
+      "pin": "560001",
+      "district": "Dhanbad",
+      "city": "Dhanbad",
+      "locality": "Lewis Road",
+      "street": "5th Block"
+    }
+  }'
+  
+
+curl -X POST http://localhost:3000/api/complaints  \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI5ZTAzZDcxNC0xYTJmLTRhNDUtOTc0MC05OGYxYTMzMTE1YWIiLCJlbWFpbCI6InVzZXIubm92MzAuMjAyNUBleGFtcGxlLmNvbSIsIm5hbWUiOiJOb3ZlbWJlciBVc2VyIiwiaWF0IjoxNzY0NTM0NzUxLCJleHAiOjE3NjQ2MjExNTF9.CFYzI6Lu6TqNkmUGjK-aO5CnVPhijSwX7j-k8TuD4Pg" \
+  -d '{
+    "complainantId": "9e03d714-1a2f-4a45-9740-98f1a33115ab",
+    "categoryId": "123e4567-e89b-12d3-a456-426614174001",
+    "subCategory": "Water Leakage",
+    "description": "There is a major water leakage on the main road causing traffic issues",
+    "urgency": "HIGH",
+    "assignedDepartment": "WATER_SUPPLY_SANITATION",
+    "isPublic": true,
+    "location": {
+      "pin": "560001",
+      "district": "Jamshedpur",
+      "city": "Jamshedpur",
+      "locality": "Lewis Road",
+      "street": "5th Block"
+    }
+  }'
+  

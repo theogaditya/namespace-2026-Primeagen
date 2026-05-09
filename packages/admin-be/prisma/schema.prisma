@@ -7,55 +7,341 @@ datasource db {
   provider = "postgresql"
 }
 
-// Citizen model
 model User {
-  id                    String    @id @default(uuid())
-  email                 String    @unique
+  id                    String        @id @default(uuid())
+  email                 String        @unique
   name                  String
-  phoneNumber           String    @unique
-  dateOfBirth           DateTime
-  password              String
   aadhaarId             String
-  preferredLanguage     String    @default("English")
-  disability            String?   @default("None")
-  consentDataCollection Boolean   @default(true)
-  dateOfCreation        DateTime  @default(now())
-  lastUpdated           DateTime  @updatedAt
+  consentDataCollection Boolean       @default(true)
+  dateOfBirth           DateTime
+  dateOfCreation        DateTime      @default(now())
+  disability            String?       @default("None")
+  lastUpdated           DateTime      @updatedAt
+  password              String
+  phoneNumber           String        @unique
+  preferredLanguage     String        @default("English")
   status                userStatus    @default(ACTIVE)
-  // Relationships
-  location              UserLocation?
-  complaints            Complaint[]       @relation("ComplainantComplaints")
+  complaints            Complaint[]   @relation("ComplainantComplaints")
+  auditLogsCreated      AuditLog[]    @relation("LogCreator")
   upvotes               Upvote[]
-  auditLogsCreated      AuditLog[]       @relation("LogCreator")
+  location              UserLocation?
 }
-enum userStatus {
-  ACTIVE
-  DELETED
-  SUSPENDED
-}
-// User Location model
+
 model UserLocation {
+  id        String  @id @default(uuid())
+  userId    String  @unique
+  pin       String
+  district  String
+  city      String
+  locality  String
+  street    String?
+  municipal String
+  country   String  @default("India")
+  state     String
+  user      User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("user_locations")
+}
+
+model Agent {
+  id                   String                    @id @default(uuid())
+  email                String                    @unique
+  fullName             String
+  employeeId           String                    @unique @default(uuid())
+  password             String
+  phoneNumber          String
+  officialEmail        String                    @unique
+  department           Department
+  municipality         String?
+  accessLevel          AccessLevel               @default(AGENT)
+  workloadLimit        Int                       @default(10)
+  currentWorkload      Int                       @default(0)
+  availabilityStatus   String                    @default("At Work")
+  dateOfCreation       DateTime                  @default(now())
+  lastUpdated          DateTime                  @updatedAt
+  status               Status                    @default(ACTIVE)
+  lastLogin            DateTime?
+  resolutionRate       Float                     @default(0)
+  avgResolutionTime    String?
+  collaborationMetric  Int                       @default(0)
+  managedByMunicipalId String?
+  district             String?
+  managedByMunicipal   DepartmentMunicipalAdmin? @relation("MunicipalAdminToAgents", fields: [managedByMunicipalId], references: [id])
+  assignedComplaints   Complaint[]               @relation("AssignedAgentComplaints")
+  coAssignedComplaints Complaint[]               @relation("CoAssignedAgentComplaints")
+}
+
+model DepartmentMunicipalAdmin {
+  id                        String                @id @default(uuid())
+  fullName                  String
+  adminId                   String                @default(uuid())
+  officialEmail             String                @unique
+  phoneNumber               String
+  password                  String
+  department                Department
+  municipality              String
+  accessLevel               AccessLevel           @default(DEPT_MUNICIPAL_ADMIN)
+  dateOfCreation            DateTime              @default(now())
+  lastUpdated               DateTime              @updatedAt
+  status                    Status                @default(ACTIVE)
+  lastLogin                 DateTime?
+  workloadLimit             Int                   @default(10)
+  currentWorkload           Int                   @default(0)
+  resolutionRate            Float                 @default(0)
+  slaComplianceRate         Float?                @default(0)
+  escalationCount           Int                   @default(0)
+  managedByStateAdminId     String?
+  managedBySuperMunicipalId String?
+  managedAgents             Agent[]               @relation("MunicipalAdminToAgents")
+  managedComplaints         Complaint[]           @relation("MunicipalAdminToComplaints")
+  communityModeration       Complaint[]           @relation("MunicipalAdminModeratedComplaints")
+  managedByStateAdmin       DepartmentStateAdmin? @relation("StateAdminToMunicipalAdmin", fields: [managedByStateAdminId], references: [id])
+  managedBySuperMunicipal   SuperMunicipalAdmin?  @relation("SuperMunicipalToDepAdmin", fields: [managedBySuperMunicipalId], references: [id])
+  newsUpdates               NewsUpdate[]
+
+  @@map("department_municipal_admins")
+}
+
+model SuperMunicipalAdmin {
+  id                         String                     @id @default(uuid())
+  fullName                   String
+  adminId                    String                     @default(uuid())
+  officialEmail              String                     @unique
+  password                   String
+  phoneNumber                String?
+  municipality               String
+  accessLevel                AccessLevel                @default(SUPER_MUNICIPAL_ADMIN)
+  dateOfCreation             DateTime                   @default(now())
+  lastUpdated                DateTime                   @updatedAt
+  status                     Status                     @default(ACTIVE)
+  lastLogin                  DateTime?
+  municipalityResolutionRate Float                      @default(0)
+  crossDepartmentSuccess     Int                        @default(0)
+  managedBySuperStateId      String?
+  crossDepartmentIssues      Complaint[]                @relation("SuperMunicipalToCrossDeptIssues")
+  managedDepartmentAdmins    DepartmentMunicipalAdmin[] @relation("SuperMunicipalToDepAdmin")
+  managedBySuperState        SuperStateAdmin?           @relation("SuperStateToSuperMunicipal", fields: [managedBySuperStateId], references: [id])
+
+  @@map("super_municipal_admins")
+}
+
+model DepartmentStateAdmin {
+  id                     String                     @id @default(uuid())
+  fullName               String
+  adminId                String                     @default(uuid())
+  officialEmail          String                     @unique
+  password               String
+  phoneNumber            String?
+  department             Department
+  state                  String
+  accessLevel            AccessLevel                @default(DEPT_STATE_ADMIN)
+  dateOfCreation         DateTime                   @default(now())
+  lastUpdated            DateTime                   @updatedAt
+  status                 Status                     @default(ACTIVE)
+  lastLogin              DateTime?
+  stateResolutionRate    Float                      @default(0)
+  escalationCount        Int                        @default(0)
+  managedMunicipalities  String[]                   @default([])
+  managedBySuperStateId  String?
+  managedCategories      Category[]
+  escalatedComplaints    Complaint[]                @relation("StateAdminToEscalatedComplaints")
+  managedMunicipalAdmins DepartmentMunicipalAdmin[] @relation("StateAdminToMunicipalAdmin")
+  managedBySuperState    SuperStateAdmin?           @relation("SuperStateToStateAdmin", fields: [managedBySuperStateId], references: [id])
+  regionalWorkflows      RegionalWorkflow[]
+
+  @@map("department_state_admins")
+}
+
+model SuperStateAdmin {
+  id                          String                 @id @default(uuid())
+  fullName                    String
+  adminId                     String                 @default(uuid())
+  officialEmail               String                 @unique
+  phoneNumber                 String?
+  password                    String
+  state                       String
+  accessLevel                 AccessLevel            @default(SUPER_STATE_ADMIN)
+  dateOfCreation              DateTime               @default(now())
+  lastUpdated                 DateTime               @updatedAt
+  status                      Status                 @default(ACTIVE)
+  lastLogin                   DateTime?
+  stateResolutionRate         Float                  @default(0)
+  crossDepartmentSuccess      Int                    @default(0)
+  managedBySuperAdminId       String?
+  escalatedComplaints         Complaint[]            @relation("SuperStateToEscalatedComplaints")
+  managedDepartmentAdmins     DepartmentStateAdmin[] @relation("SuperStateToStateAdmin")
+  managedSuperMunicipalAdmins SuperMunicipalAdmin[]  @relation("SuperStateToSuperMunicipal")
+  managedBySuperAdmin         SuperAdmin?            @relation("SuperAdminToSuperState", fields: [managedBySuperAdminId], references: [id])
+
+  @@map("super_state_admins")
+}
+
+model SuperAdmin {
+  id                      String            @id @default(uuid())
+  fullName                String
+  adminId                 String            @default(uuid())
+  officialEmail           String            @unique
+  phoneNumber             String?
+  password                String
+  accessLevel             AccessLevel       @default(SUPER_ADMIN)
+  dateOfCreation          DateTime          @default(now())
+  lastUpdated             DateTime          @updatedAt
+  status                  Status            @default(ACTIVE)
+  lastLogin               DateTime?
+  managedCategories       Category[]
+  managedComplaints       Complaint[]
+  managedSuperStateAdmins SuperStateAdmin[] @relation("SuperAdminToSuperState")
+
+  @@map("super_admins")
+}
+
+model Category {
+  id                        String                @id @default(uuid())
+  name                      String                @unique
+  subCategories             String[]
+  learnedSubCategories      String[]
+  assignedDepartment        String
+  creationDate              DateTime              @default(now())
+  lastUpdated               DateTime              @updatedAt
+  createdBySuperAdminId     String?
+  managedByDeptStateAdminId String?
+  createdBySuperAdmin       SuperAdmin?           @relation(fields: [createdBySuperAdminId], references: [id])
+  managedByDeptStateAdmin   DepartmentStateAdmin? @relation(fields: [managedByDeptStateAdminId], references: [id])
+  complaints                Complaint[]
+}
+
+model Complaint {
+  id                             String                    @id @default(uuid())
+  submissionDate                 DateTime                  @default(now())
+  complainantId                  String
+  subCategory                    String
+  description                    String
+  urgency                        ComplaintUrgency          @default(LOW)
+  attachmentUrl                  String?
+  status                         ComplaintStatus           @default(REGISTERED)
+  upvoteCount                    Int                       @default(0)
+  isPublic                       Boolean
+  assignedAgentId                String?
+  assignedDepartment             String
+  categoryId                     String
+  crossDeptIssueSuperMunicipalId String?
+  dateOfResolution               DateTime?
+  escalatedToStateAdminId        String?
+  escalatedToSuperStateAdminId   String?
+  escalationLevel                String?
+  managedByMunicipalAdminId      String?
+  managedBySuperAdminId          String?
+  moderatedByMunicipalAdminId    String?
+  seq                            Int                       @unique @default(autoincrement())
+  sla                            String?
+  AIabusedFlag                   Boolean?
+  AIimageVarificationStatus      Boolean?
+  AIstandardizedSubCategory      String?
+  lastUpdated                    DateTime                  @updatedAt
+  assignedAgent                  Agent?                    @relation("AssignedAgentComplaints", fields: [assignedAgentId], references: [id])
+  category                       Category                  @relation(fields: [categoryId], references: [id])
+  complainant                    User                      @relation("ComplainantComplaints", fields: [complainantId], references: [id])
+  crossDeptIssueSuperMunicipal   SuperMunicipalAdmin?      @relation("SuperMunicipalToCrossDeptIssues", fields: [crossDeptIssueSuperMunicipalId], references: [id])
+  escalatedToStateAdmin          DepartmentStateAdmin?     @relation("StateAdminToEscalatedComplaints", fields: [escalatedToStateAdminId], references: [id])
+  escalatedToSuperStateAdmin     SuperStateAdmin?          @relation("SuperStateToEscalatedComplaints", fields: [escalatedToSuperStateAdminId], references: [id])
+  managedByMunicipalAdmin        DepartmentMunicipalAdmin? @relation("MunicipalAdminToComplaints", fields: [managedByMunicipalAdminId], references: [id])
+  managedBySuperAdmin            SuperAdmin?               @relation(fields: [managedBySuperAdminId], references: [id])
+  moderatedByMunicipalAdmin      DepartmentMunicipalAdmin? @relation("MunicipalAdminModeratedComplaints", fields: [moderatedByMunicipalAdminId], references: [id])
+  auditLogs                      AuditLog[]
+  location                       ComplaintLocation?
+  upvotes                        Upvote[]
+  coAssignedAgents               Agent[]                   @relation("CoAssignedAgentComplaints")
+}
+
+model ComplaintLocation {
   id          String    @id @default(uuid())
-  userId      String    @unique
+  complaintId String    @unique
   pin         String
   district    String
   city        String
   locality    String
   street      String?
-  municipal   String
-  state       String
-  country     String    @default("India")
-  
-  // Relationships
-  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
-  
-  @@map("user_locations")
+  latitude    Float?
+  longitude   Float?
+  complaint   Complaint @relation(fields: [complaintId], references: [id], onDelete: Cascade)
+
+  @@map("complaint_locations")
 }
-enum Status{
+
+model Upvote {
+  id          String    @id @default(uuid())
+  userId      String
+  complaintId String
+  timestamp   DateTime  @default(now())
+  complaint   Complaint @relation(fields: [complaintId], references: [id], onDelete: Cascade)
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, complaintId])
+  @@map("upvotes")
+}
+
+model NewsUpdate {
+  id          String                   @id @default(uuid())
+  title       String
+  content     String
+  date        DateTime                 @default(now())
+  createdById String
+  createdBy   DepartmentMunicipalAdmin @relation(fields: [createdById], references: [id])
+
+  @@map("news_updates")
+}
+
+model AuditLog {
+  id          String     @id @default(uuid())
+  action      String
+  userId      String
+  complaintId String?
+  timestamp   DateTime   @default(now())
+  details     String?
+  complaint   Complaint? @relation(fields: [complaintId], references: [id])
+  user        User       @relation("LogCreator", fields: [userId], references: [id])
+
+  @@map("audit_logs")
+}
+
+model RegionalWorkflow {
+  id           String               @id @default(uuid())
+  municipality String?
+  category     String
+  sla          String
+  createdById  String
+  createdBy    DepartmentStateAdmin @relation(fields: [createdById], references: [id])
+
+  @@map("regional_workflows")
+}
+
+model operating_states {
+  id                  String                @id
+  name                String
+  country             String                @default("India")
+  operating_districts operating_districts[]
+}
+
+model operating_districts {
+  id               String           @id
+  stateId          String
+  name             String
+  state            String
+  operating_states operating_states @relation(fields: [stateId], references: [id], onDelete: Cascade)
+}
+
+enum userStatus {
+  ACTIVE
+  DELETED
+  SUSPENDED
+}
+
+enum Status {
   ACTIVE
   INACTIVE
   SUSPENDED
 }
+
 enum AccessLevel {
   SUPER_ADMIN
   SUPER_MUNICIPAL_ADMIN
@@ -64,6 +350,7 @@ enum AccessLevel {
   DEPT_STATE_ADMIN
   AGENT
 }
+
 enum Department {
   INFRASTRUCTURE
   EDUCATION
@@ -79,247 +366,7 @@ enum Department {
   SOCIAL_WELFARE
   PUBLIC_GRIEVANCES
 }
-// Agent model
-model Agent {
-  id                 String    @id @default(uuid())
-  email              String    @unique
-  fullName           String
-  employeeId         String    @default(uuid()) @unique
-  password           String
-  phoneNumber        String
-  officialEmail      String    @unique
-  department         Department
-  municipality       String
-  accessLevel        AccessLevel @default(AGENT)
-  workloadLimit      Int       @default(10)
-  currentWorkload    Int       @default(0)
-  availabilityStatus String    @default("At Work")
-  dateOfCreation     DateTime  @default(now())
-  lastUpdated        DateTime  @updatedAt
-  status             Status    @default(ACTIVE)
-  lastLogin          DateTime?
-  // Performance metrics
-  resolutionRate     Float     @default(0)
-  avgResolutionTime  String?
-  collaborationMetric Int      @default(0)
-  
-  // Relationships
-  assignedComplaints    Complaint[]  @relation("AssignedAgentComplaints")
-  coAssignedComplaints  Complaint[]  @relation("CoAssignedAgentComplaints")
-  managedByMunicipal    DepartmentMunicipalAdmin? @relation("MunicipalAdminToAgents", fields: [managedByMunicipalId], references: [id])
-  managedByMunicipalId  String?
-}
-// Department Municipal Admin model
-model DepartmentMunicipalAdmin {
-  id                String    @id @default(uuid())
-  fullName          String
-  adminId           String    @default(uuid())
-  officialEmail     String    @unique
-  phoneNumber       String
-  password          String
-  department        Department
-  municipality      String
-  accessLevel       AccessLevel @default(DEPT_MUNICIPAL_ADMIN)
-  dateOfCreation    DateTime  @default(now())
-  lastUpdated       DateTime  @updatedAt
-  status            Status    @default(ACTIVE)
-  lastLogin         DateTime?
-  workloadLimit      Int       @default(10)
-  currentWorkload    Int       @default(0)
-  
-  // Performance metrics
-  resolutionRate    Float     @default(0)
-  slaComplianceRate Float?    @default(0)
-  escalationCount   Int       @default(0)
-  
-  // Relationships
-  managedAgents        Agent[]        @relation("MunicipalAdminToAgents")
-  managedComplaints    Complaint[]    @relation("MunicipalAdminToComplaints")
-  communityModeration  Complaint[]    @relation("MunicipalAdminModeratedComplaints")
-  newsUpdates          NewsUpdate[]
-  managedByStateAdmin  DepartmentStateAdmin? @relation("StateAdminToMunicipalAdmin", fields: [managedByStateAdminId], references: [id])
-  managedByStateAdminId String?
-  managedBySuperMunicipal SuperMunicipalAdmin? @relation("SuperMunicipalToDepAdmin", fields: [managedBySuperMunicipalId], references: [id])
-  managedBySuperMunicipalId String?
-  
-  @@map("department_municipal_admins")
-}
-// Super Municipal Admin model
-model SuperMunicipalAdmin {
-  id                 String    @id @default(uuid())
-  fullName           String
-  adminId            String    @default(uuid())
-  officialEmail      String    @unique
-  password           String
-  phoneNumber        String?
-  municipality       String
-  accessLevel        AccessLevel @default(SUPER_MUNICIPAL_ADMIN)
-  dateOfCreation     DateTime  @default(now())
-  lastUpdated        DateTime  @updatedAt
-  status             Status    @default(ACTIVE)
-  lastLogin          DateTime?
-  
-  // Performance metrics
-  municipalityResolutionRate Float @default(0)
-  crossDepartmentSuccess     Int   @default(0)
-  
-  // Relationships
-  managedDepartmentAdmins DepartmentMunicipalAdmin[] @relation("SuperMunicipalToDepAdmin")
-  crossDepartmentIssues   Complaint[]                @relation("SuperMunicipalToCrossDeptIssues")
-  managedBySuperState     SuperStateAdmin?           @relation("SuperStateToSuperMunicipal", fields: [managedBySuperStateId], references: [id])
-  managedBySuperStateId   String?
-  
-  @@map("super_municipal_admins")
-}
-// Department State Admin model
-model DepartmentStateAdmin {
-  id                  String    @id @default(uuid())
-  fullName            String
-  adminId             String    @default(uuid())
-  officialEmail       String    @unique
-  password            String
-  phoneNumber         String?
-  department          Department
-  state               String
-  accessLevel         AccessLevel @default(DEPT_STATE_ADMIN)
-  dateOfCreation      DateTime  @default(now())
-  lastUpdated         DateTime  @updatedAt
-  status              Status    @default(ACTIVE)
-  lastLogin           DateTime?
-  
-  // Performance metrics
-  stateResolutionRate    Float  @default(0)
-  escalationCount     Int  @default(0)
-  
-  // Relationships
-  managedMunicipalities  String[]  @default([])
-  managedMunicipalAdmins DepartmentMunicipalAdmin[] @relation("StateAdminToMunicipalAdmin")
-  escalatedComplaints    Complaint[]                @relation("StateAdminToEscalatedComplaints")
-  regionalWorkflows      RegionalWorkflow[]
-  managedCategories      Category[]
-  managedBySuperState    SuperStateAdmin?           @relation("SuperStateToStateAdmin", fields: [managedBySuperStateId], references: [id])
-  managedBySuperStateId  String?
-  
-  @@map("department_state_admins")
-}
-// Super State Admin model
-model SuperStateAdmin {
-  id                 String    @id @default(uuid())
-  fullName           String
-  adminId            String    @default(uuid())
-  officialEmail      String    @unique
-  phoneNumber        String?
-  password           String
-  state              String
-  accessLevel        AccessLevel @default(SUPER_STATE_ADMIN)
-  dateOfCreation     DateTime  @default(now())
-  lastUpdated        DateTime  @updatedAt
-  status             Status    @default(ACTIVE)
-  lastLogin          DateTime?
-  
-  // Performance metrics
-  stateResolutionRate    Float  @default(0)
-  crossDepartmentSuccess Int    @default(0)
-  
-  // Relationships
-  managedDepartmentAdmins DepartmentStateAdmin[]    @relation("SuperStateToStateAdmin")
-  managedSuperMunicipalAdmins SuperMunicipalAdmin[] @relation("SuperStateToSuperMunicipal")
-  escalatedComplaints     Complaint[]               @relation("SuperStateToEscalatedComplaints")
-  managedBySuperAdmin     SuperAdmin?               @relation("SuperAdminToSuperState", fields: [managedBySuperAdminId], references: [id])
-  managedBySuperAdminId   String?
-  
-  @@map("super_state_admins")
-}
-// Super Admin model
-model SuperAdmin {
-  id                String    @id @default(uuid())
-  fullName          String
-  adminId           String    @default(uuid())
-  officialEmail     String    @unique
-  phoneNumber       String?
-  password          String
-  accessLevel       AccessLevel @default(SUPER_ADMIN)
-  dateOfCreation    DateTime  @default(now())
-  lastUpdated       DateTime  @updatedAt
-  status            Status    @default(ACTIVE)
-  lastLogin         DateTime?
-  
-  // Relationships
-  managedCategories     Category[]
-  managedSuperStateAdmins SuperStateAdmin[]    @relation("SuperAdminToSuperState")
-  managedComplaints     Complaint[]
-  
-  @@map("super_admins")
-}
-// Category models and relationships
-model Category {
-  id                  String    @id @default(uuid())
-  name                String    @unique
-  subCategories       String[]
-  learnedSubCategories String[]
-  assignedDepartment  String
-  creationDate        DateTime  @default(now())
-  lastUpdated         DateTime  @updatedAt
-  
-  // Relationships
-  complaints          Complaint[]
-  createdBySuperAdmin SuperAdmin?  @relation(fields: [createdBySuperAdminId], references: [id])
-  createdBySuperAdminId String?
-  managedByDeptStateAdmin DepartmentStateAdmin? @relation(fields: [managedByDeptStateAdminId], references: [id])
-  managedByDeptStateAdminId String?
-  
-}
-// Complaints
-model Complaint {
-  id                      String    @id @default(uuid())
-  submissionDate          DateTime  @default(now())
-  seq                     Int       @unique @default(autoincrement())
-  complainantId           String    
-  categoryId              String
-  subCategory             String
-  AIstandardizedSubCategory String?
-  AIabusedFlag           Boolean?
-  description             String
-  urgency                 ComplaintUrgency @default(LOW) 
-  attachmentUrl           String?
-  AIimageVarificationStatus Boolean?
-  assignedDepartment      String
-  status                  ComplaintStatus @default(REGISTERED)
-  sla                     String?
-  upvoteCount             Int       @default(0)
-  isPublic                Boolean   
-  escalationLevel         String?
-  dateOfResolution        DateTime?
-  lastUpdated             DateTime  @updatedAt
-  
-  // Relationships
-  complainant             User      @relation("ComplainantComplaints", fields: [complainantId], references: [id])
-  category                Category  @relation(fields: [categoryId], references: [id])
-  location                ComplaintLocation?
-  
-  // Agent relationships
-  assignedAgent           Agent?    @relation("AssignedAgentComplaints", fields: [assignedAgentId], references: [id])
-  assignedAgentId         String?
-  coAssignedAgents        Agent[]   @relation("CoAssignedAgentComplaints")
-  
-  // Admin relationships
-  managedByMunicipalAdmin DepartmentMunicipalAdmin? @relation("MunicipalAdminToComplaints", fields: [managedByMunicipalAdminId], references: [id])
-  managedByMunicipalAdminId String?
-  moderatedByMunicipalAdmin DepartmentMunicipalAdmin? @relation("MunicipalAdminModeratedComplaints", fields: [moderatedByMunicipalAdminId], references: [id])
-  moderatedByMunicipalAdminId String?
-  crossDeptIssueSuperMunicipal SuperMunicipalAdmin? @relation("SuperMunicipalToCrossDeptIssues", fields: [crossDeptIssueSuperMunicipalId], references: [id])
-  crossDeptIssueSuperMunicipalId String?
-  escalatedToStateAdmin DepartmentStateAdmin? @relation("StateAdminToEscalatedComplaints", fields: [escalatedToStateAdminId], references: [id])
-  escalatedToStateAdminId String?
-  escalatedToSuperStateAdmin SuperStateAdmin? @relation("SuperStateToEscalatedComplaints", fields: [escalatedToSuperStateAdminId], references: [id])
-  escalatedToSuperStateAdminId String?
-  managedBySuperAdmin SuperAdmin? @relation(fields: [managedBySuperAdminId], references: [id])
-  managedBySuperAdminId String?
-  
-  // Other relationships
-  upvotes                 Upvote[]
-  auditLogs               AuditLog[]
-}
+
 enum ComplaintStatus {
   REGISTERED
   UNDER_PROCESSING
@@ -327,8 +374,8 @@ enum ComplaintStatus {
   ON_HOLD
   COMPLETED
   REJECTED
-  ESCALATED_TO_MUNICIPAL_LEVEL 
-  ESCALATED_TO_STATE_LEVEL 
+  ESCALATED_TO_MUNICIPAL_LEVEL
+  ESCALATED_TO_STATE_LEVEL
   DELETED
 }
 
@@ -337,77 +384,4 @@ enum ComplaintUrgency {
   MEDIUM
   HIGH
   CRITICAL
-}
-// Complaint Location model 
-model ComplaintLocation {
-  id          String    @id @default(uuid())
-  complaintId String    @unique
-  pin         String
-  district    String
-  city        String
-  locality    String
-  street      String?
-  latitude    Float?
-  longitude   Float?
-  
-  // Relationships
-  complaint   Complaint @relation(fields: [complaintId], references: [id], onDelete: Cascade)
-  
-  @@map("complaint_locations")
-}
-// Upvotes for complaints
-model Upvote {
-  id          String    @id @default(uuid())
-  userId      String
-  complaintId String
-  timestamp   DateTime  @default(now())
-  
-  // Relationships
-  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
-  complaint   Complaint @relation(fields: [complaintId], references: [id], onDelete: Cascade)
-  
-  @@unique([userId, complaintId])
-  @@map("upvotes")
-}
-// News Updates 
-model NewsUpdate {
-  id          String    @id @default(uuid())
-  title       String
-  content     String
-  date        DateTime  @default(now())
-  createdById String
-  
-  // Relationships
-  createdBy   DepartmentMunicipalAdmin @relation(fields: [createdById], references: [id])
-  
-  @@map("news_updates")
-}
-// Audit Log 
-model AuditLog {
-  id          String    @id @default(uuid())
-  action      String    //Enum Reassingment and Escalation
-  userId      String
-  complaintId String?
-  timestamp   DateTime  @default(now())
-  details     String?
-  
-  // Relationships
-  user        User      @relation("LogCreator", fields: [userId], references: [id])
-  complaint   Complaint? @relation(fields: [complaintId], references: [id])
-  
-  @@map("audit_logs")
-}
-// Regional Workflows a.k.a. sla definitions 
-model RegionalWorkflow {
-  id          String    @id @default(uuid())
-  state       String
-  municipality String?
-  category    String
-  sla         String
-  
-  // Relationships
-  createdBy   DepartmentStateAdmin @relation(fields: [createdById], references: [id])
-  createdById String
-  
-  @@map("regional_workflows")
 }

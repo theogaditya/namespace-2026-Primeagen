@@ -300,8 +300,8 @@ export type SuperMunicipalAdminWhereInput = {
   municipalityResolutionRate?: Prisma.FloatFilter<"SuperMunicipalAdmin"> | number
   crossDepartmentSuccess?: Prisma.IntFilter<"SuperMunicipalAdmin"> | number
   managedBySuperStateId?: Prisma.StringNullableFilter<"SuperMunicipalAdmin"> | string | null
-  managedDepartmentAdmins?: Prisma.DepartmentMunicipalAdminListRelationFilter
   crossDepartmentIssues?: Prisma.ComplaintListRelationFilter
+  managedDepartmentAdmins?: Prisma.DepartmentMunicipalAdminListRelationFilter
   managedBySuperState?: Prisma.XOR<Prisma.SuperStateAdminNullableScalarRelationFilter, Prisma.SuperStateAdminWhereInput> | null
 }
 
@@ -321,8 +321,8 @@ export type SuperMunicipalAdminOrderByWithRelationInput = {
   municipalityResolutionRate?: Prisma.SortOrder
   crossDepartmentSuccess?: Prisma.SortOrder
   managedBySuperStateId?: Prisma.SortOrderInput | Prisma.SortOrder
-  managedDepartmentAdmins?: Prisma.DepartmentMunicipalAdminOrderByRelationAggregateInput
   crossDepartmentIssues?: Prisma.ComplaintOrderByRelationAggregateInput
+  managedDepartmentAdmins?: Prisma.DepartmentMunicipalAdminOrderByRelationAggregateInput
   managedBySuperState?: Prisma.SuperStateAdminOrderByWithRelationInput
 }
 
@@ -345,8 +345,8 @@ export type SuperMunicipalAdminWhereUniqueInput = Prisma.AtLeast<{
   municipalityResolutionRate?: Prisma.FloatFilter<"SuperMunicipalAdmin"> | number
   crossDepartmentSuccess?: Prisma.IntFilter<"SuperMunicipalAdmin"> | number
   managedBySuperStateId?: Prisma.StringNullableFilter<"SuperMunicipalAdmin"> | string | null
-  managedDepartmentAdmins?: Prisma.DepartmentMunicipalAdminListRelationFilter
   crossDepartmentIssues?: Prisma.ComplaintListRelationFilter
+  managedDepartmentAdmins?: Prisma.DepartmentMunicipalAdminListRelationFilter
   managedBySuperState?: Prisma.XOR<Prisma.SuperStateAdminNullableScalarRelationFilter, Prisma.SuperStateAdminWhereInput> | null
 }, "id" | "officialEmail">
 
@@ -409,8 +409,8 @@ export type SuperMunicipalAdminCreateInput = {
   lastLogin?: Date | string | null
   municipalityResolutionRate?: number
   crossDepartmentSuccess?: number
-  managedDepartmentAdmins?: Prisma.DepartmentMunicipalAdminCreateNestedManyWithoutManagedBySuperMunicipalInput
   crossDepartmentIssues?: Prisma.ComplaintCreateNestedManyWithoutCrossDeptIssueSuperMunicipalInput
+  managedDepartmentAdmins?: Prisma.DepartmentMunicipalAdminCreateNestedManyWithoutManagedBySuperMunicipalInput
   managedBySuperState?: Prisma.SuperStateAdminCreateNestedOneWithoutManagedSuperMunicipalAdminsInput
 }
 
@@ -430,8 +430,8 @@ export type SuperMunicipalAdminUncheckedCreateInput = {
   municipalityResolutionRate?: number
   crossDepartmentSuccess?: number
   managedBySuperStateId?: string | null
-  managedDepartmentAdmins?: Prisma.DepartmentMunicipalAdminUncheckedCreateNestedManyWithoutManagedBySuperMunicipalInput
   crossDepartmentIssues?: Prisma.ComplaintUncheckedCreateNestedManyWithoutCrossDeptIssueSuperMunicipalInput
+  managedDepartmentAdmins?: Prisma.DepartmentMunicipalAdminUncheckedCreateNestedManyWithoutManagedBySuperMunicipalInput
 }
 
 export type SuperMunicipalAdminUpdateInput = {
@@ -449,8 +449,8 @@ export type SuperMunicipalAdminUpdateInput = {
   lastLogin?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   municipalityResolutionRate?: Prisma.FloatFieldUpdateOperationsInput | number
   crossDepartmentSuccess?: Prisma.IntFieldUpdateOperationsInput | number
-  managedDepartmentAdmins?: Prisma.DepartmentMunicipalAdminUpdateManyWithoutManagedBySuperMunicipalNestedInput
   crossDepartmentIssues?: Prisma.ComplaintUpdateManyWithoutCrossDeptIssueSuperMunicipalNestedInput
+  managedDepartmentAdmins?: Prisma.DepartmentMunicipalAdminUpdateManyWithoutManagedBySuperMunicipalNestedInput
   managedBySuperState?: Prisma.SuperStateAdminUpdateOneWithoutManagedSuperMunicipalAdminsNestedInput
 }
 
@@ -470,8 +470,8 @@ export type SuperMunicipalAdminUncheckedUpdateInput = {
   municipalityResolutionRate?: Prisma.FloatFieldUpdateOperationsInput | number
   crossDepartmentSuccess?: Prisma.IntFieldUpdateOperationsInput | number
   managedBySuperStateId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  managedDepartmentAdmins?: Prisma.DepartmentMunicipalAdminUncheckedUpdateManyWithoutManagedBySuperMunicipalNestedInput
   crossDepartmentIssues?: Prisma.ComplaintUncheckedUpdateManyWithoutCrossDeptIssueSuperMunicipalNestedInput
+  managedDepartmentAdmins?: Prisma.DepartmentMunicipalAdminUncheckedUpdateManyWithoutManagedBySuperMunicipalNestedInput
 }
 
 export type SuperMunicipalAdminCreateManyInput = {
@@ -787,8 +787,8 @@ export type SuperMunicipalAdminCreateWithoutManagedBySuperStateInput = {
   lastLogin?: Date | string | null
   municipalityResolutionRate?: number
   crossDepartmentSuccess?: number
-  managedDepartmentAdmins?: Prisma.DepartmentMunicipalAdminCreateNestedManyWithoutManagedBySuperMunicipalInput
   crossDepartmentIssues?: Prisma.ComplaintCreateNestedManyWithoutCrossDeptIssueSuperMunicipalInput
+  managedDepartmentAdmins?: Prisma.DepartmentMunicipalAdminCreateNestedManyWithoutManagedBySuperMunicipalInput
 }
 
 export type SuperMunicipalAdminUncheckedCreateWithoutManagedBySuperStateInput = {
@@ -806,8 +806,8 @@ export type SuperMunicipalAdminUncheckedCreateWithoutManagedBySuperStateInput = 
   lastLogin?: Date | string | null
   municipalityResolutionRate?: number
   crossDepartmentSuccess?: number
-  managedDepartmentAdmins?: Prisma.DepartmentMunicipalAdminUncheckedCreateNestedManyWithoutManagedBySuperMunicipalInput
   crossDepartmentIssues?: Prisma.ComplaintUncheckedCreateNestedManyWithoutCrossDeptIssueSuperMunicipalInput
+  managedDepartmentAdmins?: Prisma.DepartmentMunicipalAdminUncheckedCreateNestedManyWithoutManagedBySuperMunicipalInput
 }
 
 export type SuperMunicipalAdminCreateOrConnectWithoutManagedBySuperStateInput = {
@@ -981,8 +981,8 @@ export type SuperMunicipalAdminUpdateWithoutManagedBySuperStateInput = {
   lastLogin?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   municipalityResolutionRate?: Prisma.FloatFieldUpdateOperationsInput | number
   crossDepartmentSuccess?: Prisma.IntFieldUpdateOperationsInput | number
-  managedDepartmentAdmins?: Prisma.DepartmentMunicipalAdminUpdateManyWithoutManagedBySuperMunicipalNestedInput
   crossDepartmentIssues?: Prisma.ComplaintUpdateManyWithoutCrossDeptIssueSuperMunicipalNestedInput
+  managedDepartmentAdmins?: Prisma.DepartmentMunicipalAdminUpdateManyWithoutManagedBySuperMunicipalNestedInput
 }
 
 export type SuperMunicipalAdminUncheckedUpdateWithoutManagedBySuperStateInput = {
@@ -1000,8 +1000,8 @@ export type SuperMunicipalAdminUncheckedUpdateWithoutManagedBySuperStateInput = 
   lastLogin?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   municipalityResolutionRate?: Prisma.FloatFieldUpdateOperationsInput | number
   crossDepartmentSuccess?: Prisma.IntFieldUpdateOperationsInput | number
-  managedDepartmentAdmins?: Prisma.DepartmentMunicipalAdminUncheckedUpdateManyWithoutManagedBySuperMunicipalNestedInput
   crossDepartmentIssues?: Prisma.ComplaintUncheckedUpdateManyWithoutCrossDeptIssueSuperMunicipalNestedInput
+  managedDepartmentAdmins?: Prisma.DepartmentMunicipalAdminUncheckedUpdateManyWithoutManagedBySuperMunicipalNestedInput
 }
 
 export type SuperMunicipalAdminUncheckedUpdateManyWithoutManagedBySuperStateInput = {
@@ -1027,13 +1027,13 @@ export type SuperMunicipalAdminUncheckedUpdateManyWithoutManagedBySuperStateInpu
  */
 
 export type SuperMunicipalAdminCountOutputType = {
-  managedDepartmentAdmins: number
   crossDepartmentIssues: number
+  managedDepartmentAdmins: number
 }
 
 export type SuperMunicipalAdminCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  managedDepartmentAdmins?: boolean | SuperMunicipalAdminCountOutputTypeCountManagedDepartmentAdminsArgs
   crossDepartmentIssues?: boolean | SuperMunicipalAdminCountOutputTypeCountCrossDepartmentIssuesArgs
+  managedDepartmentAdmins?: boolean | SuperMunicipalAdminCountOutputTypeCountManagedDepartmentAdminsArgs
 }
 
 /**
@@ -1049,15 +1049,15 @@ export type SuperMunicipalAdminCountOutputTypeDefaultArgs<ExtArgs extends runtim
 /**
  * SuperMunicipalAdminCountOutputType without action
  */
-export type SuperMunicipalAdminCountOutputTypeCountManagedDepartmentAdminsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  where?: Prisma.DepartmentMunicipalAdminWhereInput
+export type SuperMunicipalAdminCountOutputTypeCountCrossDepartmentIssuesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.ComplaintWhereInput
 }
 
 /**
  * SuperMunicipalAdminCountOutputType without action
  */
-export type SuperMunicipalAdminCountOutputTypeCountCrossDepartmentIssuesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  where?: Prisma.ComplaintWhereInput
+export type SuperMunicipalAdminCountOutputTypeCountManagedDepartmentAdminsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.DepartmentMunicipalAdminWhereInput
 }
 
 
@@ -1077,8 +1077,8 @@ export type SuperMunicipalAdminSelect<ExtArgs extends runtime.Types.Extensions.I
   municipalityResolutionRate?: boolean
   crossDepartmentSuccess?: boolean
   managedBySuperStateId?: boolean
-  managedDepartmentAdmins?: boolean | Prisma.SuperMunicipalAdmin$managedDepartmentAdminsArgs<ExtArgs>
   crossDepartmentIssues?: boolean | Prisma.SuperMunicipalAdmin$crossDepartmentIssuesArgs<ExtArgs>
+  managedDepartmentAdmins?: boolean | Prisma.SuperMunicipalAdmin$managedDepartmentAdminsArgs<ExtArgs>
   managedBySuperState?: boolean | Prisma.SuperMunicipalAdmin$managedBySuperStateArgs<ExtArgs>
   _count?: boolean | Prisma.SuperMunicipalAdminCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["superMunicipalAdmin"]>
@@ -1141,8 +1141,8 @@ export type SuperMunicipalAdminSelectScalar = {
 
 export type SuperMunicipalAdminOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "fullName" | "adminId" | "officialEmail" | "password" | "phoneNumber" | "municipality" | "accessLevel" | "dateOfCreation" | "lastUpdated" | "status" | "lastLogin" | "municipalityResolutionRate" | "crossDepartmentSuccess" | "managedBySuperStateId", ExtArgs["result"]["superMunicipalAdmin"]>
 export type SuperMunicipalAdminInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  managedDepartmentAdmins?: boolean | Prisma.SuperMunicipalAdmin$managedDepartmentAdminsArgs<ExtArgs>
   crossDepartmentIssues?: boolean | Prisma.SuperMunicipalAdmin$crossDepartmentIssuesArgs<ExtArgs>
+  managedDepartmentAdmins?: boolean | Prisma.SuperMunicipalAdmin$managedDepartmentAdminsArgs<ExtArgs>
   managedBySuperState?: boolean | Prisma.SuperMunicipalAdmin$managedBySuperStateArgs<ExtArgs>
   _count?: boolean | Prisma.SuperMunicipalAdminCountOutputTypeDefaultArgs<ExtArgs>
 }
@@ -1156,8 +1156,8 @@ export type SuperMunicipalAdminIncludeUpdateManyAndReturn<ExtArgs extends runtim
 export type $SuperMunicipalAdminPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   name: "SuperMunicipalAdmin"
   objects: {
-    managedDepartmentAdmins: Prisma.$DepartmentMunicipalAdminPayload<ExtArgs>[]
     crossDepartmentIssues: Prisma.$ComplaintPayload<ExtArgs>[]
+    managedDepartmentAdmins: Prisma.$DepartmentMunicipalAdminPayload<ExtArgs>[]
     managedBySuperState: Prisma.$SuperStateAdminPayload<ExtArgs> | null
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
@@ -1570,8 +1570,8 @@ readonly fields: SuperMunicipalAdminFieldRefs;
  */
 export interface Prisma__SuperMunicipalAdminClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
-  managedDepartmentAdmins<T extends Prisma.SuperMunicipalAdmin$managedDepartmentAdminsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.SuperMunicipalAdmin$managedDepartmentAdminsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$DepartmentMunicipalAdminPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   crossDepartmentIssues<T extends Prisma.SuperMunicipalAdmin$crossDepartmentIssuesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.SuperMunicipalAdmin$crossDepartmentIssuesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ComplaintPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  managedDepartmentAdmins<T extends Prisma.SuperMunicipalAdmin$managedDepartmentAdminsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.SuperMunicipalAdmin$managedDepartmentAdminsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$DepartmentMunicipalAdminPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   managedBySuperState<T extends Prisma.SuperMunicipalAdmin$managedBySuperStateArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.SuperMunicipalAdmin$managedBySuperStateArgs<ExtArgs>>): Prisma.Prisma__SuperStateAdminClient<runtime.Types.Result.GetResult<Prisma.$SuperStateAdminPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
@@ -2013,30 +2013,6 @@ export type SuperMunicipalAdminDeleteManyArgs<ExtArgs extends runtime.Types.Exte
 }
 
 /**
- * SuperMunicipalAdmin.managedDepartmentAdmins
- */
-export type SuperMunicipalAdmin$managedDepartmentAdminsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  /**
-   * Select specific fields to fetch from the DepartmentMunicipalAdmin
-   */
-  select?: Prisma.DepartmentMunicipalAdminSelect<ExtArgs> | null
-  /**
-   * Omit specific fields from the DepartmentMunicipalAdmin
-   */
-  omit?: Prisma.DepartmentMunicipalAdminOmit<ExtArgs> | null
-  /**
-   * Choose, which related nodes to fetch as well
-   */
-  include?: Prisma.DepartmentMunicipalAdminInclude<ExtArgs> | null
-  where?: Prisma.DepartmentMunicipalAdminWhereInput
-  orderBy?: Prisma.DepartmentMunicipalAdminOrderByWithRelationInput | Prisma.DepartmentMunicipalAdminOrderByWithRelationInput[]
-  cursor?: Prisma.DepartmentMunicipalAdminWhereUniqueInput
-  take?: number
-  skip?: number
-  distinct?: Prisma.DepartmentMunicipalAdminScalarFieldEnum | Prisma.DepartmentMunicipalAdminScalarFieldEnum[]
-}
-
-/**
  * SuperMunicipalAdmin.crossDepartmentIssues
  */
 export type SuperMunicipalAdmin$crossDepartmentIssuesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -2058,6 +2034,30 @@ export type SuperMunicipalAdmin$crossDepartmentIssuesArgs<ExtArgs extends runtim
   take?: number
   skip?: number
   distinct?: Prisma.ComplaintScalarFieldEnum | Prisma.ComplaintScalarFieldEnum[]
+}
+
+/**
+ * SuperMunicipalAdmin.managedDepartmentAdmins
+ */
+export type SuperMunicipalAdmin$managedDepartmentAdminsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the DepartmentMunicipalAdmin
+   */
+  select?: Prisma.DepartmentMunicipalAdminSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the DepartmentMunicipalAdmin
+   */
+  omit?: Prisma.DepartmentMunicipalAdminOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.DepartmentMunicipalAdminInclude<ExtArgs> | null
+  where?: Prisma.DepartmentMunicipalAdminWhereInput
+  orderBy?: Prisma.DepartmentMunicipalAdminOrderByWithRelationInput | Prisma.DepartmentMunicipalAdminOrderByWithRelationInput[]
+  cursor?: Prisma.DepartmentMunicipalAdminWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.DepartmentMunicipalAdminScalarFieldEnum | Prisma.DepartmentMunicipalAdminScalarFieldEnum[]
 }
 
 /**

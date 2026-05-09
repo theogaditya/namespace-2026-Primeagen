@@ -529,32 +529,33 @@ router.put('/me/workload/dec', authenticateAgent, async (req: any, res: any) => 
 
 // ---------- Auto-assign complaint to available agent --------
 router.post('/complaints/auto-assign', async (req: any, res: any) => {
-  console.log('🎯 Auto-assign endpoint hit');
+  console.log('Auto-assign endpoint hit');
   
-  const { id: complaintId, municipality } = req.body;
-  
-  if (!municipality) {
-    console.log('⚠️ No municipality provided in request');
+  const { id: complaintId, city } = req.body;
+
+  if (!city) {
     return res.status(400).json({
       success: false,
-      message: 'Municipality is required for auto-assignment'
+      message: 'City is required'
     });
   }
 
-  console.log(`📍 Looking for agents in municipality: ${municipality}`);
-
   try {
-    const availableAgents = await prisma.agent.findMany({
-      where: {
-        status: 'ACTIVE',
-        municipality: municipality,
-        currentWorkload: {
-          lt: prisma.agent.fields.workloadLimit
-        }
+    const municipality = city;
+
+    const agentFilter: any = {
+      status: 'ACTIVE',
+      municipality: municipality,
+      currentWorkload: {
+        lt: prisma.agent.fields.workloadLimit
       }
+    };
+    
+    const availableAgents = await prisma.agent.findMany({
+      where: agentFilter
     });
 
-    console.log(`📊 Found ${availableAgents.length} available agents in ${municipality}`);
+    console.log(`Found ${availableAgents.length} available agents in ${municipality}`);
 
     if (availableAgents.length === 0) {
       console.log(`⚠️ No agents available in ${municipality}`);
@@ -564,7 +565,6 @@ router.post('/complaints/auto-assign', async (req: any, res: any) => {
       });
     }
 
-    // Pick a random agent for uniform distribution
     const randomAgent = availableAgents[Math.floor(Math.random() * availableAgents.length)];
     
     if (!randomAgent) {
@@ -574,15 +574,13 @@ router.post('/complaints/auto-assign', async (req: any, res: any) => {
       });
     }
     
-    console.log(`🎲 Selected agent: ${randomAgent.fullName} (${randomAgent.id}) from ${randomAgent.municipality}`);
-
-    // Increment agent workload
     await prisma.agent.update({
       where: { id: randomAgent.id },
       data: { currentWorkload: { increment: 1 } }
     });
     
-    console.log(`✅ Workload incremented for agent ${randomAgent.fullName}`);
+    console.log(`Complaint ${complaintId} assigned to agent ${randomAgent.fullName}`);
+    
     res.status(200).json({ 
       success: true,
       message: 'Complaint auto-assigned successfully',

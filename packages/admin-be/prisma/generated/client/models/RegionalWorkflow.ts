@@ -26,7 +26,6 @@ export type AggregateRegionalWorkflow = {
 
 export type RegionalWorkflowMinAggregateOutputType = {
   id: string | null
-  state: string | null
   municipality: string | null
   category: string | null
   sla: string | null
@@ -35,7 +34,6 @@ export type RegionalWorkflowMinAggregateOutputType = {
 
 export type RegionalWorkflowMaxAggregateOutputType = {
   id: string | null
-  state: string | null
   municipality: string | null
   category: string | null
   sla: string | null
@@ -44,7 +42,6 @@ export type RegionalWorkflowMaxAggregateOutputType = {
 
 export type RegionalWorkflowCountAggregateOutputType = {
   id: number
-  state: number
   municipality: number
   category: number
   sla: number
@@ -55,7 +52,6 @@ export type RegionalWorkflowCountAggregateOutputType = {
 
 export type RegionalWorkflowMinAggregateInputType = {
   id?: true
-  state?: true
   municipality?: true
   category?: true
   sla?: true
@@ -64,7 +60,6 @@ export type RegionalWorkflowMinAggregateInputType = {
 
 export type RegionalWorkflowMaxAggregateInputType = {
   id?: true
-  state?: true
   municipality?: true
   category?: true
   sla?: true
@@ -73,7 +68,6 @@ export type RegionalWorkflowMaxAggregateInputType = {
 
 export type RegionalWorkflowCountAggregateInputType = {
   id?: true
-  state?: true
   municipality?: true
   category?: true
   sla?: true
@@ -155,7 +149,6 @@ export type RegionalWorkflowGroupByArgs<ExtArgs extends runtime.Types.Extensions
 
 export type RegionalWorkflowGroupByOutputType = {
   id: string
-  state: string
   municipality: string | null
   category: string
   sla: string
@@ -185,7 +178,6 @@ export type RegionalWorkflowWhereInput = {
   OR?: Prisma.RegionalWorkflowWhereInput[]
   NOT?: Prisma.RegionalWorkflowWhereInput | Prisma.RegionalWorkflowWhereInput[]
   id?: Prisma.StringFilter<"RegionalWorkflow"> | string
-  state?: Prisma.StringFilter<"RegionalWorkflow"> | string
   municipality?: Prisma.StringNullableFilter<"RegionalWorkflow"> | string | null
   category?: Prisma.StringFilter<"RegionalWorkflow"> | string
   sla?: Prisma.StringFilter<"RegionalWorkflow"> | string
@@ -195,7 +187,6 @@ export type RegionalWorkflowWhereInput = {
 
 export type RegionalWorkflowOrderByWithRelationInput = {
   id?: Prisma.SortOrder
-  state?: Prisma.SortOrder
   municipality?: Prisma.SortOrderInput | Prisma.SortOrder
   category?: Prisma.SortOrder
   sla?: Prisma.SortOrder
@@ -208,7 +199,6 @@ export type RegionalWorkflowWhereUniqueInput = Prisma.AtLeast<{
   AND?: Prisma.RegionalWorkflowWhereInput | Prisma.RegionalWorkflowWhereInput[]
   OR?: Prisma.RegionalWorkflowWhereInput[]
   NOT?: Prisma.RegionalWorkflowWhereInput | Prisma.RegionalWorkflowWhereInput[]
-  state?: Prisma.StringFilter<"RegionalWorkflow"> | string
   municipality?: Prisma.StringNullableFilter<"RegionalWorkflow"> | string | null
   category?: Prisma.StringFilter<"RegionalWorkflow"> | string
   sla?: Prisma.StringFilter<"RegionalWorkflow"> | string
@@ -218,7 +208,6 @@ export type RegionalWorkflowWhereUniqueInput = Prisma.AtLeast<{
 
 export type RegionalWorkflowOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
-  state?: Prisma.SortOrder
   municipality?: Prisma.SortOrderInput | Prisma.SortOrder
   category?: Prisma.SortOrder
   sla?: Prisma.SortOrder
@@ -233,7 +222,6 @@ export type RegionalWorkflowScalarWhereWithAggregatesInput = {
   OR?: Prisma.RegionalWorkflowScalarWhereWithAggregatesInput[]
   NOT?: Prisma.RegionalWorkflowScalarWhereWithAggregatesInput | Prisma.RegionalWorkflowScalarWhereWithAggregatesInput[]
   id?: Prisma.StringWithAggregatesFilter<"RegionalWorkflow"> | string
-  state?: Prisma.StringWithAggregatesFilter<"RegionalWorkflow"> | string
   municipality?: Prisma.StringNullableWithAggregatesFilter<"RegionalWorkflow"> | string | null
   category?: Prisma.StringWithAggregatesFilter<"RegionalWorkflow"> | string
   sla?: Prisma.StringWithAggregatesFilter<"RegionalWorkflow"> | string
@@ -242,7 +230,6 @@ export type RegionalWorkflowScalarWhereWithAggregatesInput = {
 
 export type RegionalWorkflowCreateInput = {
   id?: string
-  state: string
   municipality?: string | null
   category: string
   sla: string
@@ -251,7 +238,6 @@ export type RegionalWorkflowCreateInput = {
 
 export type RegionalWorkflowUncheckedCreateInput = {
   id?: string
-  state: string
   municipality?: string | null
   category: string
   sla: string
@@ -260,7 +246,6 @@ export type RegionalWorkflowUncheckedCreateInput = {
 
 export type RegionalWorkflowUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  state?: Prisma.StringFieldUpdateOperationsInput | string
   municipality?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   category?: Prisma.StringFieldUpdateOperationsInput | string
   sla?: Prisma.StringFieldUpdateOperationsInput | string
@@ -269,7 +254,6 @@ export type RegionalWorkflowUpdateInput = {
 
 export type RegionalWorkflowUncheckedUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  state?: Prisma.StringFieldUpdateOperationsInput | string
   municipality?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   category?: Prisma.StringFieldUpdateOperationsInput | string
   sla?: Prisma.StringFieldUpdateOperationsInput | string
@@ -278,7 +262,6 @@ export type RegionalWorkflowUncheckedUpdateInput = {
 
 export type RegionalWorkflowCreateManyInput = {
   id?: string
-  state: string
   municipality?: string | null
   category: string
   sla: string
@@ -287,7 +270,6 @@ export type RegionalWorkflowCreateManyInput = {
 
 export type RegionalWorkflowUpdateManyMutationInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  state?: Prisma.StringFieldUpdateOperationsInput | string
   municipality?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   category?: Prisma.StringFieldUpdateOperationsInput | string
   sla?: Prisma.StringFieldUpdateOperationsInput | string
@@ -295,7 +277,6 @@ export type RegionalWorkflowUpdateManyMutationInput = {
 
 export type RegionalWorkflowUncheckedUpdateManyInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  state?: Prisma.StringFieldUpdateOperationsInput | string
   municipality?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   category?: Prisma.StringFieldUpdateOperationsInput | string
   sla?: Prisma.StringFieldUpdateOperationsInput | string
@@ -314,7 +295,6 @@ export type RegionalWorkflowOrderByRelationAggregateInput = {
 
 export type RegionalWorkflowCountOrderByAggregateInput = {
   id?: Prisma.SortOrder
-  state?: Prisma.SortOrder
   municipality?: Prisma.SortOrder
   category?: Prisma.SortOrder
   sla?: Prisma.SortOrder
@@ -323,7 +303,6 @@ export type RegionalWorkflowCountOrderByAggregateInput = {
 
 export type RegionalWorkflowMaxOrderByAggregateInput = {
   id?: Prisma.SortOrder
-  state?: Prisma.SortOrder
   municipality?: Prisma.SortOrder
   category?: Prisma.SortOrder
   sla?: Prisma.SortOrder
@@ -332,7 +311,6 @@ export type RegionalWorkflowMaxOrderByAggregateInput = {
 
 export type RegionalWorkflowMinOrderByAggregateInput = {
   id?: Prisma.SortOrder
-  state?: Prisma.SortOrder
   municipality?: Prisma.SortOrder
   category?: Prisma.SortOrder
   sla?: Prisma.SortOrder
@@ -383,7 +361,6 @@ export type RegionalWorkflowUncheckedUpdateManyWithoutCreatedByNestedInput = {
 
 export type RegionalWorkflowCreateWithoutCreatedByInput = {
   id?: string
-  state: string
   municipality?: string | null
   category: string
   sla: string
@@ -391,7 +368,6 @@ export type RegionalWorkflowCreateWithoutCreatedByInput = {
 
 export type RegionalWorkflowUncheckedCreateWithoutCreatedByInput = {
   id?: string
-  state: string
   municipality?: string | null
   category: string
   sla: string
@@ -428,7 +404,6 @@ export type RegionalWorkflowScalarWhereInput = {
   OR?: Prisma.RegionalWorkflowScalarWhereInput[]
   NOT?: Prisma.RegionalWorkflowScalarWhereInput | Prisma.RegionalWorkflowScalarWhereInput[]
   id?: Prisma.StringFilter<"RegionalWorkflow"> | string
-  state?: Prisma.StringFilter<"RegionalWorkflow"> | string
   municipality?: Prisma.StringNullableFilter<"RegionalWorkflow"> | string | null
   category?: Prisma.StringFilter<"RegionalWorkflow"> | string
   sla?: Prisma.StringFilter<"RegionalWorkflow"> | string
@@ -437,7 +412,6 @@ export type RegionalWorkflowScalarWhereInput = {
 
 export type RegionalWorkflowCreateManyCreatedByInput = {
   id?: string
-  state: string
   municipality?: string | null
   category: string
   sla: string
@@ -445,7 +419,6 @@ export type RegionalWorkflowCreateManyCreatedByInput = {
 
 export type RegionalWorkflowUpdateWithoutCreatedByInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  state?: Prisma.StringFieldUpdateOperationsInput | string
   municipality?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   category?: Prisma.StringFieldUpdateOperationsInput | string
   sla?: Prisma.StringFieldUpdateOperationsInput | string
@@ -453,7 +426,6 @@ export type RegionalWorkflowUpdateWithoutCreatedByInput = {
 
 export type RegionalWorkflowUncheckedUpdateWithoutCreatedByInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  state?: Prisma.StringFieldUpdateOperationsInput | string
   municipality?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   category?: Prisma.StringFieldUpdateOperationsInput | string
   sla?: Prisma.StringFieldUpdateOperationsInput | string
@@ -461,7 +433,6 @@ export type RegionalWorkflowUncheckedUpdateWithoutCreatedByInput = {
 
 export type RegionalWorkflowUncheckedUpdateManyWithoutCreatedByInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  state?: Prisma.StringFieldUpdateOperationsInput | string
   municipality?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   category?: Prisma.StringFieldUpdateOperationsInput | string
   sla?: Prisma.StringFieldUpdateOperationsInput | string
@@ -471,7 +442,6 @@ export type RegionalWorkflowUncheckedUpdateManyWithoutCreatedByInput = {
 
 export type RegionalWorkflowSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
-  state?: boolean
   municipality?: boolean
   category?: boolean
   sla?: boolean
@@ -481,7 +451,6 @@ export type RegionalWorkflowSelect<ExtArgs extends runtime.Types.Extensions.Inte
 
 export type RegionalWorkflowSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
-  state?: boolean
   municipality?: boolean
   category?: boolean
   sla?: boolean
@@ -491,7 +460,6 @@ export type RegionalWorkflowSelectCreateManyAndReturn<ExtArgs extends runtime.Ty
 
 export type RegionalWorkflowSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
-  state?: boolean
   municipality?: boolean
   category?: boolean
   sla?: boolean
@@ -501,14 +469,13 @@ export type RegionalWorkflowSelectUpdateManyAndReturn<ExtArgs extends runtime.Ty
 
 export type RegionalWorkflowSelectScalar = {
   id?: boolean
-  state?: boolean
   municipality?: boolean
   category?: boolean
   sla?: boolean
   createdById?: boolean
 }
 
-export type RegionalWorkflowOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "state" | "municipality" | "category" | "sla" | "createdById", ExtArgs["result"]["regionalWorkflow"]>
+export type RegionalWorkflowOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "municipality" | "category" | "sla" | "createdById", ExtArgs["result"]["regionalWorkflow"]>
 export type RegionalWorkflowInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   createdBy?: boolean | Prisma.DepartmentStateAdminDefaultArgs<ExtArgs>
 }
@@ -526,7 +493,6 @@ export type $RegionalWorkflowPayload<ExtArgs extends runtime.Types.Extensions.In
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
-    state: string
     municipality: string | null
     category: string
     sla: string
@@ -956,7 +922,6 @@ export interface Prisma__RegionalWorkflowClient<T, Null = never, ExtArgs extends
  */
 export interface RegionalWorkflowFieldRefs {
   readonly id: Prisma.FieldRef<"RegionalWorkflow", 'String'>
-  readonly state: Prisma.FieldRef<"RegionalWorkflow", 'String'>
   readonly municipality: Prisma.FieldRef<"RegionalWorkflow", 'String'>
   readonly category: Prisma.FieldRef<"RegionalWorkflow", 'String'>
   readonly sla: Prisma.FieldRef<"RegionalWorkflow", 'String'>

@@ -174,8 +174,8 @@ export type UpvoteWhereInput = {
   userId?: Prisma.StringFilter<"Upvote"> | string
   complaintId?: Prisma.StringFilter<"Upvote"> | string
   timestamp?: Prisma.DateTimeFilter<"Upvote"> | Date | string
-  user?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
   complaint?: Prisma.XOR<Prisma.ComplaintScalarRelationFilter, Prisma.ComplaintWhereInput>
+  user?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
 }
 
 export type UpvoteOrderByWithRelationInput = {
@@ -183,8 +183,8 @@ export type UpvoteOrderByWithRelationInput = {
   userId?: Prisma.SortOrder
   complaintId?: Prisma.SortOrder
   timestamp?: Prisma.SortOrder
-  user?: Prisma.UserOrderByWithRelationInput
   complaint?: Prisma.ComplaintOrderByWithRelationInput
+  user?: Prisma.UserOrderByWithRelationInput
 }
 
 export type UpvoteWhereUniqueInput = Prisma.AtLeast<{
@@ -196,8 +196,8 @@ export type UpvoteWhereUniqueInput = Prisma.AtLeast<{
   userId?: Prisma.StringFilter<"Upvote"> | string
   complaintId?: Prisma.StringFilter<"Upvote"> | string
   timestamp?: Prisma.DateTimeFilter<"Upvote"> | Date | string
-  user?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
   complaint?: Prisma.XOR<Prisma.ComplaintScalarRelationFilter, Prisma.ComplaintWhereInput>
+  user?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
 }, "id" | "userId_complaintId">
 
 export type UpvoteOrderByWithAggregationInput = {
@@ -223,8 +223,8 @@ export type UpvoteScalarWhereWithAggregatesInput = {
 export type UpvoteCreateInput = {
   id?: string
   timestamp?: Date | string
-  user: Prisma.UserCreateNestedOneWithoutUpvotesInput
   complaint: Prisma.ComplaintCreateNestedOneWithoutUpvotesInput
+  user: Prisma.UserCreateNestedOneWithoutUpvotesInput
 }
 
 export type UpvoteUncheckedCreateInput = {
@@ -237,8 +237,8 @@ export type UpvoteUncheckedCreateInput = {
 export type UpvoteUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   timestamp?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  user?: Prisma.UserUpdateOneRequiredWithoutUpvotesNestedInput
   complaint?: Prisma.ComplaintUpdateOneRequiredWithoutUpvotesNestedInput
+  user?: Prisma.UserUpdateOneRequiredWithoutUpvotesNestedInput
 }
 
 export type UpvoteUncheckedUpdateInput = {
@@ -528,8 +528,8 @@ export type UpvoteSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs =
   userId?: boolean
   complaintId?: boolean
   timestamp?: boolean
-  user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   complaint?: boolean | Prisma.ComplaintDefaultArgs<ExtArgs>
+  user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["upvote"]>
 
 export type UpvoteSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -537,8 +537,8 @@ export type UpvoteSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extens
   userId?: boolean
   complaintId?: boolean
   timestamp?: boolean
-  user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   complaint?: boolean | Prisma.ComplaintDefaultArgs<ExtArgs>
+  user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["upvote"]>
 
 export type UpvoteSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -546,8 +546,8 @@ export type UpvoteSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extens
   userId?: boolean
   complaintId?: boolean
   timestamp?: boolean
-  user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   complaint?: boolean | Prisma.ComplaintDefaultArgs<ExtArgs>
+  user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["upvote"]>
 
 export type UpvoteSelectScalar = {
@@ -559,23 +559,23 @@ export type UpvoteSelectScalar = {
 
 export type UpvoteOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "userId" | "complaintId" | "timestamp", ExtArgs["result"]["upvote"]>
 export type UpvoteInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   complaint?: boolean | Prisma.ComplaintDefaultArgs<ExtArgs>
+  user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
 }
 export type UpvoteIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   complaint?: boolean | Prisma.ComplaintDefaultArgs<ExtArgs>
+  user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
 }
 export type UpvoteIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   complaint?: boolean | Prisma.ComplaintDefaultArgs<ExtArgs>
+  user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
 }
 
 export type $UpvotePayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   name: "Upvote"
   objects: {
-    user: Prisma.$UserPayload<ExtArgs>
     complaint: Prisma.$ComplaintPayload<ExtArgs>
+    user: Prisma.$UserPayload<ExtArgs>
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -976,8 +976,8 @@ readonly fields: UpvoteFieldRefs;
  */
 export interface Prisma__UpvoteClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
-  user<T extends Prisma.UserDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.UserDefaultArgs<ExtArgs>>): Prisma.Prisma__UserClient<runtime.Types.Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   complaint<T extends Prisma.ComplaintDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.ComplaintDefaultArgs<ExtArgs>>): Prisma.Prisma__ComplaintClient<runtime.Types.Result.GetResult<Prisma.$ComplaintPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+  user<T extends Prisma.UserDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.UserDefaultArgs<ExtArgs>>): Prisma.Prisma__UserClient<runtime.Types.Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.

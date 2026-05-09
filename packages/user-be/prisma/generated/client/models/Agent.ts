@@ -50,6 +50,7 @@ export type AgentMinAggregateOutputType = {
   officialEmail: string | null
   department: $Enums.Department | null
   municipality: string | null
+  district: string | null
   accessLevel: $Enums.AccessLevel | null
   workloadLimit: number | null
   currentWorkload: number | null
@@ -74,6 +75,7 @@ export type AgentMaxAggregateOutputType = {
   officialEmail: string | null
   department: $Enums.Department | null
   municipality: string | null
+  district: string | null
   accessLevel: $Enums.AccessLevel | null
   workloadLimit: number | null
   currentWorkload: number | null
@@ -98,6 +100,7 @@ export type AgentCountAggregateOutputType = {
   officialEmail: number
   department: number
   municipality: number
+  district: number
   accessLevel: number
   workloadLimit: number
   currentWorkload: number
@@ -138,6 +141,7 @@ export type AgentMinAggregateInputType = {
   officialEmail?: true
   department?: true
   municipality?: true
+  district?: true
   accessLevel?: true
   workloadLimit?: true
   currentWorkload?: true
@@ -162,6 +166,7 @@ export type AgentMaxAggregateInputType = {
   officialEmail?: true
   department?: true
   municipality?: true
+  district?: true
   accessLevel?: true
   workloadLimit?: true
   currentWorkload?: true
@@ -186,6 +191,7 @@ export type AgentCountAggregateInputType = {
   officialEmail?: true
   department?: true
   municipality?: true
+  district?: true
   accessLevel?: true
   workloadLimit?: true
   currentWorkload?: true
@@ -296,7 +302,8 @@ export type AgentGroupByOutputType = {
   phoneNumber: string
   officialEmail: string
   department: $Enums.Department
-  municipality: string
+  municipality: string | null
+  district: string | null
   accessLevel: $Enums.AccessLevel
   workloadLimit: number
   currentWorkload: number
@@ -343,7 +350,8 @@ export type AgentWhereInput = {
   phoneNumber?: Prisma.StringFilter<"Agent"> | string
   officialEmail?: Prisma.StringFilter<"Agent"> | string
   department?: Prisma.EnumDepartmentFilter<"Agent"> | $Enums.Department
-  municipality?: Prisma.StringFilter<"Agent"> | string
+  municipality?: Prisma.StringNullableFilter<"Agent"> | string | null
+  district?: Prisma.StringNullableFilter<"Agent"> | string | null
   accessLevel?: Prisma.EnumAccessLevelFilter<"Agent"> | $Enums.AccessLevel
   workloadLimit?: Prisma.IntFilter<"Agent"> | number
   currentWorkload?: Prisma.IntFilter<"Agent"> | number
@@ -370,7 +378,8 @@ export type AgentOrderByWithRelationInput = {
   phoneNumber?: Prisma.SortOrder
   officialEmail?: Prisma.SortOrder
   department?: Prisma.SortOrder
-  municipality?: Prisma.SortOrder
+  municipality?: Prisma.SortOrderInput | Prisma.SortOrder
+  district?: Prisma.SortOrderInput | Prisma.SortOrder
   accessLevel?: Prisma.SortOrder
   workloadLimit?: Prisma.SortOrder
   currentWorkload?: Prisma.SortOrder
@@ -400,7 +409,8 @@ export type AgentWhereUniqueInput = Prisma.AtLeast<{
   password?: Prisma.StringFilter<"Agent"> | string
   phoneNumber?: Prisma.StringFilter<"Agent"> | string
   department?: Prisma.EnumDepartmentFilter<"Agent"> | $Enums.Department
-  municipality?: Prisma.StringFilter<"Agent"> | string
+  municipality?: Prisma.StringNullableFilter<"Agent"> | string | null
+  district?: Prisma.StringNullableFilter<"Agent"> | string | null
   accessLevel?: Prisma.EnumAccessLevelFilter<"Agent"> | $Enums.AccessLevel
   workloadLimit?: Prisma.IntFilter<"Agent"> | number
   currentWorkload?: Prisma.IntFilter<"Agent"> | number
@@ -427,7 +437,8 @@ export type AgentOrderByWithAggregationInput = {
   phoneNumber?: Prisma.SortOrder
   officialEmail?: Prisma.SortOrder
   department?: Prisma.SortOrder
-  municipality?: Prisma.SortOrder
+  municipality?: Prisma.SortOrderInput | Prisma.SortOrder
+  district?: Prisma.SortOrderInput | Prisma.SortOrder
   accessLevel?: Prisma.SortOrder
   workloadLimit?: Prisma.SortOrder
   currentWorkload?: Prisma.SortOrder
@@ -459,7 +470,8 @@ export type AgentScalarWhereWithAggregatesInput = {
   phoneNumber?: Prisma.StringWithAggregatesFilter<"Agent"> | string
   officialEmail?: Prisma.StringWithAggregatesFilter<"Agent"> | string
   department?: Prisma.EnumDepartmentWithAggregatesFilter<"Agent"> | $Enums.Department
-  municipality?: Prisma.StringWithAggregatesFilter<"Agent"> | string
+  municipality?: Prisma.StringNullableWithAggregatesFilter<"Agent"> | string | null
+  district?: Prisma.StringNullableWithAggregatesFilter<"Agent"> | string | null
   accessLevel?: Prisma.EnumAccessLevelWithAggregatesFilter<"Agent"> | $Enums.AccessLevel
   workloadLimit?: Prisma.IntWithAggregatesFilter<"Agent"> | number
   currentWorkload?: Prisma.IntWithAggregatesFilter<"Agent"> | number
@@ -483,7 +495,8 @@ export type AgentCreateInput = {
   phoneNumber: string
   officialEmail: string
   department: $Enums.Department
-  municipality: string
+  municipality?: string | null
+  district?: string | null
   accessLevel?: $Enums.AccessLevel
   workloadLimit?: number
   currentWorkload?: number
@@ -509,7 +522,8 @@ export type AgentUncheckedCreateInput = {
   phoneNumber: string
   officialEmail: string
   department: $Enums.Department
-  municipality: string
+  municipality?: string | null
+  district?: string | null
   accessLevel?: $Enums.AccessLevel
   workloadLimit?: number
   currentWorkload?: number
@@ -535,7 +549,8 @@ export type AgentUpdateInput = {
   phoneNumber?: Prisma.StringFieldUpdateOperationsInput | string
   officialEmail?: Prisma.StringFieldUpdateOperationsInput | string
   department?: Prisma.EnumDepartmentFieldUpdateOperationsInput | $Enums.Department
-  municipality?: Prisma.StringFieldUpdateOperationsInput | string
+  municipality?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  district?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   accessLevel?: Prisma.EnumAccessLevelFieldUpdateOperationsInput | $Enums.AccessLevel
   workloadLimit?: Prisma.IntFieldUpdateOperationsInput | number
   currentWorkload?: Prisma.IntFieldUpdateOperationsInput | number
@@ -561,7 +576,8 @@ export type AgentUncheckedUpdateInput = {
   phoneNumber?: Prisma.StringFieldUpdateOperationsInput | string
   officialEmail?: Prisma.StringFieldUpdateOperationsInput | string
   department?: Prisma.EnumDepartmentFieldUpdateOperationsInput | $Enums.Department
-  municipality?: Prisma.StringFieldUpdateOperationsInput | string
+  municipality?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  district?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   accessLevel?: Prisma.EnumAccessLevelFieldUpdateOperationsInput | $Enums.AccessLevel
   workloadLimit?: Prisma.IntFieldUpdateOperationsInput | number
   currentWorkload?: Prisma.IntFieldUpdateOperationsInput | number
@@ -587,7 +603,8 @@ export type AgentCreateManyInput = {
   phoneNumber: string
   officialEmail: string
   department: $Enums.Department
-  municipality: string
+  municipality?: string | null
+  district?: string | null
   accessLevel?: $Enums.AccessLevel
   workloadLimit?: number
   currentWorkload?: number
@@ -611,7 +628,8 @@ export type AgentUpdateManyMutationInput = {
   phoneNumber?: Prisma.StringFieldUpdateOperationsInput | string
   officialEmail?: Prisma.StringFieldUpdateOperationsInput | string
   department?: Prisma.EnumDepartmentFieldUpdateOperationsInput | $Enums.Department
-  municipality?: Prisma.StringFieldUpdateOperationsInput | string
+  municipality?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  district?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   accessLevel?: Prisma.EnumAccessLevelFieldUpdateOperationsInput | $Enums.AccessLevel
   workloadLimit?: Prisma.IntFieldUpdateOperationsInput | number
   currentWorkload?: Prisma.IntFieldUpdateOperationsInput | number
@@ -634,7 +652,8 @@ export type AgentUncheckedUpdateManyInput = {
   phoneNumber?: Prisma.StringFieldUpdateOperationsInput | string
   officialEmail?: Prisma.StringFieldUpdateOperationsInput | string
   department?: Prisma.EnumDepartmentFieldUpdateOperationsInput | $Enums.Department
-  municipality?: Prisma.StringFieldUpdateOperationsInput | string
+  municipality?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  district?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   accessLevel?: Prisma.EnumAccessLevelFieldUpdateOperationsInput | $Enums.AccessLevel
   workloadLimit?: Prisma.IntFieldUpdateOperationsInput | number
   currentWorkload?: Prisma.IntFieldUpdateOperationsInput | number
@@ -659,6 +678,7 @@ export type AgentCountOrderByAggregateInput = {
   officialEmail?: Prisma.SortOrder
   department?: Prisma.SortOrder
   municipality?: Prisma.SortOrder
+  district?: Prisma.SortOrder
   accessLevel?: Prisma.SortOrder
   workloadLimit?: Prisma.SortOrder
   currentWorkload?: Prisma.SortOrder
@@ -690,6 +710,7 @@ export type AgentMaxOrderByAggregateInput = {
   officialEmail?: Prisma.SortOrder
   department?: Prisma.SortOrder
   municipality?: Prisma.SortOrder
+  district?: Prisma.SortOrder
   accessLevel?: Prisma.SortOrder
   workloadLimit?: Prisma.SortOrder
   currentWorkload?: Prisma.SortOrder
@@ -714,6 +735,7 @@ export type AgentMinOrderByAggregateInput = {
   officialEmail?: Prisma.SortOrder
   department?: Prisma.SortOrder
   municipality?: Prisma.SortOrder
+  district?: Prisma.SortOrder
   accessLevel?: Prisma.SortOrder
   workloadLimit?: Prisma.SortOrder
   currentWorkload?: Prisma.SortOrder
@@ -887,7 +909,8 @@ export type AgentCreateWithoutManagedByMunicipalInput = {
   phoneNumber: string
   officialEmail: string
   department: $Enums.Department
-  municipality: string
+  municipality?: string | null
+  district?: string | null
   accessLevel?: $Enums.AccessLevel
   workloadLimit?: number
   currentWorkload?: number
@@ -912,7 +935,8 @@ export type AgentUncheckedCreateWithoutManagedByMunicipalInput = {
   phoneNumber: string
   officialEmail: string
   department: $Enums.Department
-  municipality: string
+  municipality?: string | null
+  district?: string | null
   accessLevel?: $Enums.AccessLevel
   workloadLimit?: number
   currentWorkload?: number
@@ -966,7 +990,8 @@ export type AgentScalarWhereInput = {
   phoneNumber?: Prisma.StringFilter<"Agent"> | string
   officialEmail?: Prisma.StringFilter<"Agent"> | string
   department?: Prisma.EnumDepartmentFilter<"Agent"> | $Enums.Department
-  municipality?: Prisma.StringFilter<"Agent"> | string
+  municipality?: Prisma.StringNullableFilter<"Agent"> | string | null
+  district?: Prisma.StringNullableFilter<"Agent"> | string | null
   accessLevel?: Prisma.EnumAccessLevelFilter<"Agent"> | $Enums.AccessLevel
   workloadLimit?: Prisma.IntFilter<"Agent"> | number
   currentWorkload?: Prisma.IntFilter<"Agent"> | number
@@ -990,7 +1015,8 @@ export type AgentCreateWithoutAssignedComplaintsInput = {
   phoneNumber: string
   officialEmail: string
   department: $Enums.Department
-  municipality: string
+  municipality?: string | null
+  district?: string | null
   accessLevel?: $Enums.AccessLevel
   workloadLimit?: number
   currentWorkload?: number
@@ -1015,7 +1041,8 @@ export type AgentUncheckedCreateWithoutAssignedComplaintsInput = {
   phoneNumber: string
   officialEmail: string
   department: $Enums.Department
-  municipality: string
+  municipality?: string | null
+  district?: string | null
   accessLevel?: $Enums.AccessLevel
   workloadLimit?: number
   currentWorkload?: number
@@ -1045,7 +1072,8 @@ export type AgentCreateWithoutCoAssignedComplaintsInput = {
   phoneNumber: string
   officialEmail: string
   department: $Enums.Department
-  municipality: string
+  municipality?: string | null
+  district?: string | null
   accessLevel?: $Enums.AccessLevel
   workloadLimit?: number
   currentWorkload?: number
@@ -1070,7 +1098,8 @@ export type AgentUncheckedCreateWithoutCoAssignedComplaintsInput = {
   phoneNumber: string
   officialEmail: string
   department: $Enums.Department
-  municipality: string
+  municipality?: string | null
+  district?: string | null
   accessLevel?: $Enums.AccessLevel
   workloadLimit?: number
   currentWorkload?: number
@@ -1111,7 +1140,8 @@ export type AgentUpdateWithoutAssignedComplaintsInput = {
   phoneNumber?: Prisma.StringFieldUpdateOperationsInput | string
   officialEmail?: Prisma.StringFieldUpdateOperationsInput | string
   department?: Prisma.EnumDepartmentFieldUpdateOperationsInput | $Enums.Department
-  municipality?: Prisma.StringFieldUpdateOperationsInput | string
+  municipality?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  district?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   accessLevel?: Prisma.EnumAccessLevelFieldUpdateOperationsInput | $Enums.AccessLevel
   workloadLimit?: Prisma.IntFieldUpdateOperationsInput | number
   currentWorkload?: Prisma.IntFieldUpdateOperationsInput | number
@@ -1136,7 +1166,8 @@ export type AgentUncheckedUpdateWithoutAssignedComplaintsInput = {
   phoneNumber?: Prisma.StringFieldUpdateOperationsInput | string
   officialEmail?: Prisma.StringFieldUpdateOperationsInput | string
   department?: Prisma.EnumDepartmentFieldUpdateOperationsInput | $Enums.Department
-  municipality?: Prisma.StringFieldUpdateOperationsInput | string
+  municipality?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  district?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   accessLevel?: Prisma.EnumAccessLevelFieldUpdateOperationsInput | $Enums.AccessLevel
   workloadLimit?: Prisma.IntFieldUpdateOperationsInput | number
   currentWorkload?: Prisma.IntFieldUpdateOperationsInput | number
@@ -1177,7 +1208,8 @@ export type AgentCreateManyManagedByMunicipalInput = {
   phoneNumber: string
   officialEmail: string
   department: $Enums.Department
-  municipality: string
+  municipality?: string | null
+  district?: string | null
   accessLevel?: $Enums.AccessLevel
   workloadLimit?: number
   currentWorkload?: number
@@ -1200,7 +1232,8 @@ export type AgentUpdateWithoutManagedByMunicipalInput = {
   phoneNumber?: Prisma.StringFieldUpdateOperationsInput | string
   officialEmail?: Prisma.StringFieldUpdateOperationsInput | string
   department?: Prisma.EnumDepartmentFieldUpdateOperationsInput | $Enums.Department
-  municipality?: Prisma.StringFieldUpdateOperationsInput | string
+  municipality?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  district?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   accessLevel?: Prisma.EnumAccessLevelFieldUpdateOperationsInput | $Enums.AccessLevel
   workloadLimit?: Prisma.IntFieldUpdateOperationsInput | number
   currentWorkload?: Prisma.IntFieldUpdateOperationsInput | number
@@ -1225,7 +1258,8 @@ export type AgentUncheckedUpdateWithoutManagedByMunicipalInput = {
   phoneNumber?: Prisma.StringFieldUpdateOperationsInput | string
   officialEmail?: Prisma.StringFieldUpdateOperationsInput | string
   department?: Prisma.EnumDepartmentFieldUpdateOperationsInput | $Enums.Department
-  municipality?: Prisma.StringFieldUpdateOperationsInput | string
+  municipality?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  district?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   accessLevel?: Prisma.EnumAccessLevelFieldUpdateOperationsInput | $Enums.AccessLevel
   workloadLimit?: Prisma.IntFieldUpdateOperationsInput | number
   currentWorkload?: Prisma.IntFieldUpdateOperationsInput | number
@@ -1250,7 +1284,8 @@ export type AgentUncheckedUpdateManyWithoutManagedByMunicipalInput = {
   phoneNumber?: Prisma.StringFieldUpdateOperationsInput | string
   officialEmail?: Prisma.StringFieldUpdateOperationsInput | string
   department?: Prisma.EnumDepartmentFieldUpdateOperationsInput | $Enums.Department
-  municipality?: Prisma.StringFieldUpdateOperationsInput | string
+  municipality?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  district?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   accessLevel?: Prisma.EnumAccessLevelFieldUpdateOperationsInput | $Enums.AccessLevel
   workloadLimit?: Prisma.IntFieldUpdateOperationsInput | number
   currentWorkload?: Prisma.IntFieldUpdateOperationsInput | number
@@ -1273,7 +1308,8 @@ export type AgentUpdateWithoutCoAssignedComplaintsInput = {
   phoneNumber?: Prisma.StringFieldUpdateOperationsInput | string
   officialEmail?: Prisma.StringFieldUpdateOperationsInput | string
   department?: Prisma.EnumDepartmentFieldUpdateOperationsInput | $Enums.Department
-  municipality?: Prisma.StringFieldUpdateOperationsInput | string
+  municipality?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  district?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   accessLevel?: Prisma.EnumAccessLevelFieldUpdateOperationsInput | $Enums.AccessLevel
   workloadLimit?: Prisma.IntFieldUpdateOperationsInput | number
   currentWorkload?: Prisma.IntFieldUpdateOperationsInput | number
@@ -1298,7 +1334,8 @@ export type AgentUncheckedUpdateWithoutCoAssignedComplaintsInput = {
   phoneNumber?: Prisma.StringFieldUpdateOperationsInput | string
   officialEmail?: Prisma.StringFieldUpdateOperationsInput | string
   department?: Prisma.EnumDepartmentFieldUpdateOperationsInput | $Enums.Department
-  municipality?: Prisma.StringFieldUpdateOperationsInput | string
+  municipality?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  district?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   accessLevel?: Prisma.EnumAccessLevelFieldUpdateOperationsInput | $Enums.AccessLevel
   workloadLimit?: Prisma.IntFieldUpdateOperationsInput | number
   currentWorkload?: Prisma.IntFieldUpdateOperationsInput | number
@@ -1323,7 +1360,8 @@ export type AgentUncheckedUpdateManyWithoutCoAssignedComplaintsInput = {
   phoneNumber?: Prisma.StringFieldUpdateOperationsInput | string
   officialEmail?: Prisma.StringFieldUpdateOperationsInput | string
   department?: Prisma.EnumDepartmentFieldUpdateOperationsInput | $Enums.Department
-  municipality?: Prisma.StringFieldUpdateOperationsInput | string
+  municipality?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  district?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   accessLevel?: Prisma.EnumAccessLevelFieldUpdateOperationsInput | $Enums.AccessLevel
   workloadLimit?: Prisma.IntFieldUpdateOperationsInput | number
   currentWorkload?: Prisma.IntFieldUpdateOperationsInput | number
@@ -1388,6 +1426,7 @@ export type AgentSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = 
   officialEmail?: boolean
   department?: boolean
   municipality?: boolean
+  district?: boolean
   accessLevel?: boolean
   workloadLimit?: boolean
   currentWorkload?: boolean
@@ -1416,6 +1455,7 @@ export type AgentSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensi
   officialEmail?: boolean
   department?: boolean
   municipality?: boolean
+  district?: boolean
   accessLevel?: boolean
   workloadLimit?: boolean
   currentWorkload?: boolean
@@ -1441,6 +1481,7 @@ export type AgentSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensi
   officialEmail?: boolean
   department?: boolean
   municipality?: boolean
+  district?: boolean
   accessLevel?: boolean
   workloadLimit?: boolean
   currentWorkload?: boolean
@@ -1466,6 +1507,7 @@ export type AgentSelectScalar = {
   officialEmail?: boolean
   department?: boolean
   municipality?: boolean
+  district?: boolean
   accessLevel?: boolean
   workloadLimit?: boolean
   currentWorkload?: boolean
@@ -1480,7 +1522,7 @@ export type AgentSelectScalar = {
   managedByMunicipalId?: boolean
 }
 
-export type AgentOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "email" | "fullName" | "employeeId" | "password" | "phoneNumber" | "officialEmail" | "department" | "municipality" | "accessLevel" | "workloadLimit" | "currentWorkload" | "availabilityStatus" | "dateOfCreation" | "lastUpdated" | "status" | "lastLogin" | "resolutionRate" | "avgResolutionTime" | "collaborationMetric" | "managedByMunicipalId", ExtArgs["result"]["agent"]>
+export type AgentOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "email" | "fullName" | "employeeId" | "password" | "phoneNumber" | "officialEmail" | "department" | "municipality" | "district" | "accessLevel" | "workloadLimit" | "currentWorkload" | "availabilityStatus" | "dateOfCreation" | "lastUpdated" | "status" | "lastLogin" | "resolutionRate" | "avgResolutionTime" | "collaborationMetric" | "managedByMunicipalId", ExtArgs["result"]["agent"]>
 export type AgentInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   assignedComplaints?: boolean | Prisma.Agent$assignedComplaintsArgs<ExtArgs>
   coAssignedComplaints?: boolean | Prisma.Agent$coAssignedComplaintsArgs<ExtArgs>
@@ -1510,7 +1552,8 @@ export type $AgentPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs 
     phoneNumber: string
     officialEmail: string
     department: $Enums.Department
-    municipality: string
+    municipality: string | null
+    district: string | null
     accessLevel: $Enums.AccessLevel
     workloadLimit: number
     currentWorkload: number
@@ -1958,6 +2001,7 @@ export interface AgentFieldRefs {
   readonly officialEmail: Prisma.FieldRef<"Agent", 'String'>
   readonly department: Prisma.FieldRef<"Agent", 'Department'>
   readonly municipality: Prisma.FieldRef<"Agent", 'String'>
+  readonly district: Prisma.FieldRef<"Agent", 'String'>
   readonly accessLevel: Prisma.FieldRef<"Agent", 'AccessLevel'>
   readonly workloadLimit: Prisma.FieldRef<"Agent", 'Int'>
   readonly currentWorkload: Prisma.FieldRef<"Agent", 'Int'>

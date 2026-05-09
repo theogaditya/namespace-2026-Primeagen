@@ -43,10 +43,12 @@ export type ComplaintMinAggregateOutputType = {
   complainantId: string | null
   categoryId: string | null
   subCategory: string | null
-  standardizedSubCategory: string | null
+  AIstandardizedSubCategory: string | null
+  AIabusedFlag: boolean | null
   description: string | null
   urgency: $Enums.ComplaintUrgency | null
   attachmentUrl: string | null
+  AIimageVarificationStatus: boolean | null
   assignedDepartment: string | null
   status: $Enums.ComplaintStatus | null
   sla: string | null
@@ -54,6 +56,7 @@ export type ComplaintMinAggregateOutputType = {
   isPublic: boolean | null
   escalationLevel: string | null
   dateOfResolution: Date | null
+  lastUpdated: Date | null
   assignedAgentId: string | null
   managedByMunicipalAdminId: string | null
   moderatedByMunicipalAdminId: string | null
@@ -70,10 +73,12 @@ export type ComplaintMaxAggregateOutputType = {
   complainantId: string | null
   categoryId: string | null
   subCategory: string | null
-  standardizedSubCategory: string | null
+  AIstandardizedSubCategory: string | null
+  AIabusedFlag: boolean | null
   description: string | null
   urgency: $Enums.ComplaintUrgency | null
   attachmentUrl: string | null
+  AIimageVarificationStatus: boolean | null
   assignedDepartment: string | null
   status: $Enums.ComplaintStatus | null
   sla: string | null
@@ -81,6 +86,7 @@ export type ComplaintMaxAggregateOutputType = {
   isPublic: boolean | null
   escalationLevel: string | null
   dateOfResolution: Date | null
+  lastUpdated: Date | null
   assignedAgentId: string | null
   managedByMunicipalAdminId: string | null
   moderatedByMunicipalAdminId: string | null
@@ -97,10 +103,12 @@ export type ComplaintCountAggregateOutputType = {
   complainantId: number
   categoryId: number
   subCategory: number
-  standardizedSubCategory: number
+  AIstandardizedSubCategory: number
+  AIabusedFlag: number
   description: number
   urgency: number
   attachmentUrl: number
+  AIimageVarificationStatus: number
   assignedDepartment: number
   status: number
   sla: number
@@ -108,6 +116,7 @@ export type ComplaintCountAggregateOutputType = {
   isPublic: number
   escalationLevel: number
   dateOfResolution: number
+  lastUpdated: number
   assignedAgentId: number
   managedByMunicipalAdminId: number
   moderatedByMunicipalAdminId: number
@@ -136,10 +145,12 @@ export type ComplaintMinAggregateInputType = {
   complainantId?: true
   categoryId?: true
   subCategory?: true
-  standardizedSubCategory?: true
+  AIstandardizedSubCategory?: true
+  AIabusedFlag?: true
   description?: true
   urgency?: true
   attachmentUrl?: true
+  AIimageVarificationStatus?: true
   assignedDepartment?: true
   status?: true
   sla?: true
@@ -147,6 +158,7 @@ export type ComplaintMinAggregateInputType = {
   isPublic?: true
   escalationLevel?: true
   dateOfResolution?: true
+  lastUpdated?: true
   assignedAgentId?: true
   managedByMunicipalAdminId?: true
   moderatedByMunicipalAdminId?: true
@@ -163,10 +175,12 @@ export type ComplaintMaxAggregateInputType = {
   complainantId?: true
   categoryId?: true
   subCategory?: true
-  standardizedSubCategory?: true
+  AIstandardizedSubCategory?: true
+  AIabusedFlag?: true
   description?: true
   urgency?: true
   attachmentUrl?: true
+  AIimageVarificationStatus?: true
   assignedDepartment?: true
   status?: true
   sla?: true
@@ -174,6 +188,7 @@ export type ComplaintMaxAggregateInputType = {
   isPublic?: true
   escalationLevel?: true
   dateOfResolution?: true
+  lastUpdated?: true
   assignedAgentId?: true
   managedByMunicipalAdminId?: true
   moderatedByMunicipalAdminId?: true
@@ -190,10 +205,12 @@ export type ComplaintCountAggregateInputType = {
   complainantId?: true
   categoryId?: true
   subCategory?: true
-  standardizedSubCategory?: true
+  AIstandardizedSubCategory?: true
+  AIabusedFlag?: true
   description?: true
   urgency?: true
   attachmentUrl?: true
+  AIimageVarificationStatus?: true
   assignedDepartment?: true
   status?: true
   sla?: true
@@ -201,6 +218,7 @@ export type ComplaintCountAggregateInputType = {
   isPublic?: true
   escalationLevel?: true
   dateOfResolution?: true
+  lastUpdated?: true
   assignedAgentId?: true
   managedByMunicipalAdminId?: true
   moderatedByMunicipalAdminId?: true
@@ -304,10 +322,12 @@ export type ComplaintGroupByOutputType = {
   complainantId: string
   categoryId: string
   subCategory: string
-  standardizedSubCategory: string | null
+  AIstandardizedSubCategory: string | null
+  AIabusedFlag: boolean | null
   description: string
   urgency: $Enums.ComplaintUrgency
   attachmentUrl: string | null
+  AIimageVarificationStatus: boolean | null
   assignedDepartment: string
   status: $Enums.ComplaintStatus
   sla: string | null
@@ -315,6 +335,7 @@ export type ComplaintGroupByOutputType = {
   isPublic: boolean
   escalationLevel: string | null
   dateOfResolution: Date | null
+  lastUpdated: Date
   assignedAgentId: string | null
   managedByMunicipalAdminId: string | null
   moderatedByMunicipalAdminId: string | null
@@ -354,10 +375,12 @@ export type ComplaintWhereInput = {
   complainantId?: Prisma.StringFilter<"Complaint"> | string
   categoryId?: Prisma.StringFilter<"Complaint"> | string
   subCategory?: Prisma.StringFilter<"Complaint"> | string
-  standardizedSubCategory?: Prisma.StringNullableFilter<"Complaint"> | string | null
+  AIstandardizedSubCategory?: Prisma.StringNullableFilter<"Complaint"> | string | null
+  AIabusedFlag?: Prisma.BoolNullableFilter<"Complaint"> | boolean | null
   description?: Prisma.StringFilter<"Complaint"> | string
   urgency?: Prisma.EnumComplaintUrgencyFilter<"Complaint"> | $Enums.ComplaintUrgency
   attachmentUrl?: Prisma.StringNullableFilter<"Complaint"> | string | null
+  AIimageVarificationStatus?: Prisma.BoolNullableFilter<"Complaint"> | boolean | null
   assignedDepartment?: Prisma.StringFilter<"Complaint"> | string
   status?: Prisma.EnumComplaintStatusFilter<"Complaint"> | $Enums.ComplaintStatus
   sla?: Prisma.StringNullableFilter<"Complaint"> | string | null
@@ -365,6 +388,7 @@ export type ComplaintWhereInput = {
   isPublic?: Prisma.BoolFilter<"Complaint"> | boolean
   escalationLevel?: Prisma.StringNullableFilter<"Complaint"> | string | null
   dateOfResolution?: Prisma.DateTimeNullableFilter<"Complaint"> | Date | string | null
+  lastUpdated?: Prisma.DateTimeFilter<"Complaint"> | Date | string
   assignedAgentId?: Prisma.StringNullableFilter<"Complaint"> | string | null
   managedByMunicipalAdminId?: Prisma.StringNullableFilter<"Complaint"> | string | null
   moderatedByMunicipalAdminId?: Prisma.StringNullableFilter<"Complaint"> | string | null
@@ -394,10 +418,12 @@ export type ComplaintOrderByWithRelationInput = {
   complainantId?: Prisma.SortOrder
   categoryId?: Prisma.SortOrder
   subCategory?: Prisma.SortOrder
-  standardizedSubCategory?: Prisma.SortOrderInput | Prisma.SortOrder
+  AIstandardizedSubCategory?: Prisma.SortOrderInput | Prisma.SortOrder
+  AIabusedFlag?: Prisma.SortOrderInput | Prisma.SortOrder
   description?: Prisma.SortOrder
   urgency?: Prisma.SortOrder
   attachmentUrl?: Prisma.SortOrderInput | Prisma.SortOrder
+  AIimageVarificationStatus?: Prisma.SortOrderInput | Prisma.SortOrder
   assignedDepartment?: Prisma.SortOrder
   status?: Prisma.SortOrder
   sla?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -405,6 +431,7 @@ export type ComplaintOrderByWithRelationInput = {
   isPublic?: Prisma.SortOrder
   escalationLevel?: Prisma.SortOrderInput | Prisma.SortOrder
   dateOfResolution?: Prisma.SortOrderInput | Prisma.SortOrder
+  lastUpdated?: Prisma.SortOrder
   assignedAgentId?: Prisma.SortOrderInput | Prisma.SortOrder
   managedByMunicipalAdminId?: Prisma.SortOrderInput | Prisma.SortOrder
   moderatedByMunicipalAdminId?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -437,10 +464,12 @@ export type ComplaintWhereUniqueInput = Prisma.AtLeast<{
   complainantId?: Prisma.StringFilter<"Complaint"> | string
   categoryId?: Prisma.StringFilter<"Complaint"> | string
   subCategory?: Prisma.StringFilter<"Complaint"> | string
-  standardizedSubCategory?: Prisma.StringNullableFilter<"Complaint"> | string | null
+  AIstandardizedSubCategory?: Prisma.StringNullableFilter<"Complaint"> | string | null
+  AIabusedFlag?: Prisma.BoolNullableFilter<"Complaint"> | boolean | null
   description?: Prisma.StringFilter<"Complaint"> | string
   urgency?: Prisma.EnumComplaintUrgencyFilter<"Complaint"> | $Enums.ComplaintUrgency
   attachmentUrl?: Prisma.StringNullableFilter<"Complaint"> | string | null
+  AIimageVarificationStatus?: Prisma.BoolNullableFilter<"Complaint"> | boolean | null
   assignedDepartment?: Prisma.StringFilter<"Complaint"> | string
   status?: Prisma.EnumComplaintStatusFilter<"Complaint"> | $Enums.ComplaintStatus
   sla?: Prisma.StringNullableFilter<"Complaint"> | string | null
@@ -448,6 +477,7 @@ export type ComplaintWhereUniqueInput = Prisma.AtLeast<{
   isPublic?: Prisma.BoolFilter<"Complaint"> | boolean
   escalationLevel?: Prisma.StringNullableFilter<"Complaint"> | string | null
   dateOfResolution?: Prisma.DateTimeNullableFilter<"Complaint"> | Date | string | null
+  lastUpdated?: Prisma.DateTimeFilter<"Complaint"> | Date | string
   assignedAgentId?: Prisma.StringNullableFilter<"Complaint"> | string | null
   managedByMunicipalAdminId?: Prisma.StringNullableFilter<"Complaint"> | string | null
   moderatedByMunicipalAdminId?: Prisma.StringNullableFilter<"Complaint"> | string | null
@@ -477,10 +507,12 @@ export type ComplaintOrderByWithAggregationInput = {
   complainantId?: Prisma.SortOrder
   categoryId?: Prisma.SortOrder
   subCategory?: Prisma.SortOrder
-  standardizedSubCategory?: Prisma.SortOrderInput | Prisma.SortOrder
+  AIstandardizedSubCategory?: Prisma.SortOrderInput | Prisma.SortOrder
+  AIabusedFlag?: Prisma.SortOrderInput | Prisma.SortOrder
   description?: Prisma.SortOrder
   urgency?: Prisma.SortOrder
   attachmentUrl?: Prisma.SortOrderInput | Prisma.SortOrder
+  AIimageVarificationStatus?: Prisma.SortOrderInput | Prisma.SortOrder
   assignedDepartment?: Prisma.SortOrder
   status?: Prisma.SortOrder
   sla?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -488,6 +520,7 @@ export type ComplaintOrderByWithAggregationInput = {
   isPublic?: Prisma.SortOrder
   escalationLevel?: Prisma.SortOrderInput | Prisma.SortOrder
   dateOfResolution?: Prisma.SortOrderInput | Prisma.SortOrder
+  lastUpdated?: Prisma.SortOrder
   assignedAgentId?: Prisma.SortOrderInput | Prisma.SortOrder
   managedByMunicipalAdminId?: Prisma.SortOrderInput | Prisma.SortOrder
   moderatedByMunicipalAdminId?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -512,10 +545,12 @@ export type ComplaintScalarWhereWithAggregatesInput = {
   complainantId?: Prisma.StringWithAggregatesFilter<"Complaint"> | string
   categoryId?: Prisma.StringWithAggregatesFilter<"Complaint"> | string
   subCategory?: Prisma.StringWithAggregatesFilter<"Complaint"> | string
-  standardizedSubCategory?: Prisma.StringNullableWithAggregatesFilter<"Complaint"> | string | null
+  AIstandardizedSubCategory?: Prisma.StringNullableWithAggregatesFilter<"Complaint"> | string | null
+  AIabusedFlag?: Prisma.BoolNullableWithAggregatesFilter<"Complaint"> | boolean | null
   description?: Prisma.StringWithAggregatesFilter<"Complaint"> | string
   urgency?: Prisma.EnumComplaintUrgencyWithAggregatesFilter<"Complaint"> | $Enums.ComplaintUrgency
   attachmentUrl?: Prisma.StringNullableWithAggregatesFilter<"Complaint"> | string | null
+  AIimageVarificationStatus?: Prisma.BoolNullableWithAggregatesFilter<"Complaint"> | boolean | null
   assignedDepartment?: Prisma.StringWithAggregatesFilter<"Complaint"> | string
   status?: Prisma.EnumComplaintStatusWithAggregatesFilter<"Complaint"> | $Enums.ComplaintStatus
   sla?: Prisma.StringNullableWithAggregatesFilter<"Complaint"> | string | null
@@ -523,6 +558,7 @@ export type ComplaintScalarWhereWithAggregatesInput = {
   isPublic?: Prisma.BoolWithAggregatesFilter<"Complaint"> | boolean
   escalationLevel?: Prisma.StringNullableWithAggregatesFilter<"Complaint"> | string | null
   dateOfResolution?: Prisma.DateTimeNullableWithAggregatesFilter<"Complaint"> | Date | string | null
+  lastUpdated?: Prisma.DateTimeWithAggregatesFilter<"Complaint"> | Date | string
   assignedAgentId?: Prisma.StringNullableWithAggregatesFilter<"Complaint"> | string | null
   managedByMunicipalAdminId?: Prisma.StringNullableWithAggregatesFilter<"Complaint"> | string | null
   moderatedByMunicipalAdminId?: Prisma.StringNullableWithAggregatesFilter<"Complaint"> | string | null
@@ -537,17 +573,20 @@ export type ComplaintCreateInput = {
   submissionDate?: Date | string
   seq?: number
   subCategory: string
-  standardizedSubCategory?: string | null
+  AIstandardizedSubCategory?: string | null
+  AIabusedFlag?: boolean | null
   description: string
   urgency?: $Enums.ComplaintUrgency
   attachmentUrl?: string | null
+  AIimageVarificationStatus?: boolean | null
   assignedDepartment: string
   status?: $Enums.ComplaintStatus
   sla?: string | null
   upvoteCount?: number
-  isPublic?: boolean
+  isPublic: boolean
   escalationLevel?: string | null
   dateOfResolution?: Date | string | null
+  lastUpdated?: Date | string
   complainant: Prisma.UserCreateNestedOneWithoutComplaintsInput
   category: Prisma.CategoryCreateNestedOneWithoutComplaintsInput
   location?: Prisma.ComplaintLocationCreateNestedOneWithoutComplaintInput
@@ -570,17 +609,20 @@ export type ComplaintUncheckedCreateInput = {
   complainantId: string
   categoryId: string
   subCategory: string
-  standardizedSubCategory?: string | null
+  AIstandardizedSubCategory?: string | null
+  AIabusedFlag?: boolean | null
   description: string
   urgency?: $Enums.ComplaintUrgency
   attachmentUrl?: string | null
+  AIimageVarificationStatus?: boolean | null
   assignedDepartment: string
   status?: $Enums.ComplaintStatus
   sla?: string | null
   upvoteCount?: number
-  isPublic?: boolean
+  isPublic: boolean
   escalationLevel?: string | null
   dateOfResolution?: Date | string | null
+  lastUpdated?: Date | string
   assignedAgentId?: string | null
   managedByMunicipalAdminId?: string | null
   moderatedByMunicipalAdminId?: string | null
@@ -598,10 +640,12 @@ export type ComplaintUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   submissionDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   subCategory?: Prisma.StringFieldUpdateOperationsInput | string
-  standardizedSubCategory?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  AIstandardizedSubCategory?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  AIabusedFlag?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   description?: Prisma.StringFieldUpdateOperationsInput | string
   urgency?: Prisma.EnumComplaintUrgencyFieldUpdateOperationsInput | $Enums.ComplaintUrgency
   attachmentUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  AIimageVarificationStatus?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   assignedDepartment?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumComplaintStatusFieldUpdateOperationsInput | $Enums.ComplaintStatus
   sla?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -609,6 +653,7 @@ export type ComplaintUpdateInput = {
   isPublic?: Prisma.BoolFieldUpdateOperationsInput | boolean
   escalationLevel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   dateOfResolution?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  lastUpdated?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   complainant?: Prisma.UserUpdateOneRequiredWithoutComplaintsNestedInput
   category?: Prisma.CategoryUpdateOneRequiredWithoutComplaintsNestedInput
   location?: Prisma.ComplaintLocationUpdateOneWithoutComplaintNestedInput
@@ -631,10 +676,12 @@ export type ComplaintUncheckedUpdateInput = {
   complainantId?: Prisma.StringFieldUpdateOperationsInput | string
   categoryId?: Prisma.StringFieldUpdateOperationsInput | string
   subCategory?: Prisma.StringFieldUpdateOperationsInput | string
-  standardizedSubCategory?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  AIstandardizedSubCategory?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  AIabusedFlag?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   description?: Prisma.StringFieldUpdateOperationsInput | string
   urgency?: Prisma.EnumComplaintUrgencyFieldUpdateOperationsInput | $Enums.ComplaintUrgency
   attachmentUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  AIimageVarificationStatus?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   assignedDepartment?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumComplaintStatusFieldUpdateOperationsInput | $Enums.ComplaintStatus
   sla?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -642,6 +689,7 @@ export type ComplaintUncheckedUpdateInput = {
   isPublic?: Prisma.BoolFieldUpdateOperationsInput | boolean
   escalationLevel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   dateOfResolution?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  lastUpdated?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   assignedAgentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   managedByMunicipalAdminId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   moderatedByMunicipalAdminId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -662,17 +710,20 @@ export type ComplaintCreateManyInput = {
   complainantId: string
   categoryId: string
   subCategory: string
-  standardizedSubCategory?: string | null
+  AIstandardizedSubCategory?: string | null
+  AIabusedFlag?: boolean | null
   description: string
   urgency?: $Enums.ComplaintUrgency
   attachmentUrl?: string | null
+  AIimageVarificationStatus?: boolean | null
   assignedDepartment: string
   status?: $Enums.ComplaintStatus
   sla?: string | null
   upvoteCount?: number
-  isPublic?: boolean
+  isPublic: boolean
   escalationLevel?: string | null
   dateOfResolution?: Date | string | null
+  lastUpdated?: Date | string
   assignedAgentId?: string | null
   managedByMunicipalAdminId?: string | null
   moderatedByMunicipalAdminId?: string | null
@@ -686,10 +737,12 @@ export type ComplaintUpdateManyMutationInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   submissionDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   subCategory?: Prisma.StringFieldUpdateOperationsInput | string
-  standardizedSubCategory?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  AIstandardizedSubCategory?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  AIabusedFlag?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   description?: Prisma.StringFieldUpdateOperationsInput | string
   urgency?: Prisma.EnumComplaintUrgencyFieldUpdateOperationsInput | $Enums.ComplaintUrgency
   attachmentUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  AIimageVarificationStatus?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   assignedDepartment?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumComplaintStatusFieldUpdateOperationsInput | $Enums.ComplaintStatus
   sla?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -697,6 +750,7 @@ export type ComplaintUpdateManyMutationInput = {
   isPublic?: Prisma.BoolFieldUpdateOperationsInput | boolean
   escalationLevel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   dateOfResolution?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  lastUpdated?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
 export type ComplaintUncheckedUpdateManyInput = {
@@ -706,10 +760,12 @@ export type ComplaintUncheckedUpdateManyInput = {
   complainantId?: Prisma.StringFieldUpdateOperationsInput | string
   categoryId?: Prisma.StringFieldUpdateOperationsInput | string
   subCategory?: Prisma.StringFieldUpdateOperationsInput | string
-  standardizedSubCategory?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  AIstandardizedSubCategory?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  AIabusedFlag?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   description?: Prisma.StringFieldUpdateOperationsInput | string
   urgency?: Prisma.EnumComplaintUrgencyFieldUpdateOperationsInput | $Enums.ComplaintUrgency
   attachmentUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  AIimageVarificationStatus?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   assignedDepartment?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumComplaintStatusFieldUpdateOperationsInput | $Enums.ComplaintStatus
   sla?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -717,6 +773,7 @@ export type ComplaintUncheckedUpdateManyInput = {
   isPublic?: Prisma.BoolFieldUpdateOperationsInput | boolean
   escalationLevel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   dateOfResolution?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  lastUpdated?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   assignedAgentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   managedByMunicipalAdminId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   moderatedByMunicipalAdminId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -743,10 +800,12 @@ export type ComplaintCountOrderByAggregateInput = {
   complainantId?: Prisma.SortOrder
   categoryId?: Prisma.SortOrder
   subCategory?: Prisma.SortOrder
-  standardizedSubCategory?: Prisma.SortOrder
+  AIstandardizedSubCategory?: Prisma.SortOrder
+  AIabusedFlag?: Prisma.SortOrder
   description?: Prisma.SortOrder
   urgency?: Prisma.SortOrder
   attachmentUrl?: Prisma.SortOrder
+  AIimageVarificationStatus?: Prisma.SortOrder
   assignedDepartment?: Prisma.SortOrder
   status?: Prisma.SortOrder
   sla?: Prisma.SortOrder
@@ -754,6 +813,7 @@ export type ComplaintCountOrderByAggregateInput = {
   isPublic?: Prisma.SortOrder
   escalationLevel?: Prisma.SortOrder
   dateOfResolution?: Prisma.SortOrder
+  lastUpdated?: Prisma.SortOrder
   assignedAgentId?: Prisma.SortOrder
   managedByMunicipalAdminId?: Prisma.SortOrder
   moderatedByMunicipalAdminId?: Prisma.SortOrder
@@ -775,10 +835,12 @@ export type ComplaintMaxOrderByAggregateInput = {
   complainantId?: Prisma.SortOrder
   categoryId?: Prisma.SortOrder
   subCategory?: Prisma.SortOrder
-  standardizedSubCategory?: Prisma.SortOrder
+  AIstandardizedSubCategory?: Prisma.SortOrder
+  AIabusedFlag?: Prisma.SortOrder
   description?: Prisma.SortOrder
   urgency?: Prisma.SortOrder
   attachmentUrl?: Prisma.SortOrder
+  AIimageVarificationStatus?: Prisma.SortOrder
   assignedDepartment?: Prisma.SortOrder
   status?: Prisma.SortOrder
   sla?: Prisma.SortOrder
@@ -786,6 +848,7 @@ export type ComplaintMaxOrderByAggregateInput = {
   isPublic?: Prisma.SortOrder
   escalationLevel?: Prisma.SortOrder
   dateOfResolution?: Prisma.SortOrder
+  lastUpdated?: Prisma.SortOrder
   assignedAgentId?: Prisma.SortOrder
   managedByMunicipalAdminId?: Prisma.SortOrder
   moderatedByMunicipalAdminId?: Prisma.SortOrder
@@ -802,10 +865,12 @@ export type ComplaintMinOrderByAggregateInput = {
   complainantId?: Prisma.SortOrder
   categoryId?: Prisma.SortOrder
   subCategory?: Prisma.SortOrder
-  standardizedSubCategory?: Prisma.SortOrder
+  AIstandardizedSubCategory?: Prisma.SortOrder
+  AIabusedFlag?: Prisma.SortOrder
   description?: Prisma.SortOrder
   urgency?: Prisma.SortOrder
   attachmentUrl?: Prisma.SortOrder
+  AIimageVarificationStatus?: Prisma.SortOrder
   assignedDepartment?: Prisma.SortOrder
   status?: Prisma.SortOrder
   sla?: Prisma.SortOrder
@@ -813,6 +878,7 @@ export type ComplaintMinOrderByAggregateInput = {
   isPublic?: Prisma.SortOrder
   escalationLevel?: Prisma.SortOrder
   dateOfResolution?: Prisma.SortOrder
+  lastUpdated?: Prisma.SortOrder
   assignedAgentId?: Prisma.SortOrder
   managedByMunicipalAdminId?: Prisma.SortOrder
   moderatedByMunicipalAdminId?: Prisma.SortOrder
@@ -1253,6 +1319,10 @@ export type ComplaintUncheckedUpdateManyWithoutCategoryNestedInput = {
   deleteMany?: Prisma.ComplaintScalarWhereInput | Prisma.ComplaintScalarWhereInput[]
 }
 
+export type NullableBoolFieldUpdateOperationsInput = {
+  set?: boolean | null
+}
+
 export type EnumComplaintUrgencyFieldUpdateOperationsInput = {
   set?: $Enums.ComplaintUrgency
 }
@@ -1310,17 +1380,20 @@ export type ComplaintCreateWithoutComplainantInput = {
   submissionDate?: Date | string
   seq?: number
   subCategory: string
-  standardizedSubCategory?: string | null
+  AIstandardizedSubCategory?: string | null
+  AIabusedFlag?: boolean | null
   description: string
   urgency?: $Enums.ComplaintUrgency
   attachmentUrl?: string | null
+  AIimageVarificationStatus?: boolean | null
   assignedDepartment: string
   status?: $Enums.ComplaintStatus
   sla?: string | null
   upvoteCount?: number
-  isPublic?: boolean
+  isPublic: boolean
   escalationLevel?: string | null
   dateOfResolution?: Date | string | null
+  lastUpdated?: Date | string
   category: Prisma.CategoryCreateNestedOneWithoutComplaintsInput
   location?: Prisma.ComplaintLocationCreateNestedOneWithoutComplaintInput
   assignedAgent?: Prisma.AgentCreateNestedOneWithoutAssignedComplaintsInput
@@ -1341,17 +1414,20 @@ export type ComplaintUncheckedCreateWithoutComplainantInput = {
   seq?: number
   categoryId: string
   subCategory: string
-  standardizedSubCategory?: string | null
+  AIstandardizedSubCategory?: string | null
+  AIabusedFlag?: boolean | null
   description: string
   urgency?: $Enums.ComplaintUrgency
   attachmentUrl?: string | null
+  AIimageVarificationStatus?: boolean | null
   assignedDepartment: string
   status?: $Enums.ComplaintStatus
   sla?: string | null
   upvoteCount?: number
-  isPublic?: boolean
+  isPublic: boolean
   escalationLevel?: string | null
   dateOfResolution?: Date | string | null
+  lastUpdated?: Date | string
   assignedAgentId?: string | null
   managedByMunicipalAdminId?: string | null
   moderatedByMunicipalAdminId?: string | null
@@ -1401,10 +1477,12 @@ export type ComplaintScalarWhereInput = {
   complainantId?: Prisma.StringFilter<"Complaint"> | string
   categoryId?: Prisma.StringFilter<"Complaint"> | string
   subCategory?: Prisma.StringFilter<"Complaint"> | string
-  standardizedSubCategory?: Prisma.StringNullableFilter<"Complaint"> | string | null
+  AIstandardizedSubCategory?: Prisma.StringNullableFilter<"Complaint"> | string | null
+  AIabusedFlag?: Prisma.BoolNullableFilter<"Complaint"> | boolean | null
   description?: Prisma.StringFilter<"Complaint"> | string
   urgency?: Prisma.EnumComplaintUrgencyFilter<"Complaint"> | $Enums.ComplaintUrgency
   attachmentUrl?: Prisma.StringNullableFilter<"Complaint"> | string | null
+  AIimageVarificationStatus?: Prisma.BoolNullableFilter<"Complaint"> | boolean | null
   assignedDepartment?: Prisma.StringFilter<"Complaint"> | string
   status?: Prisma.EnumComplaintStatusFilter<"Complaint"> | $Enums.ComplaintStatus
   sla?: Prisma.StringNullableFilter<"Complaint"> | string | null
@@ -1412,6 +1490,7 @@ export type ComplaintScalarWhereInput = {
   isPublic?: Prisma.BoolFilter<"Complaint"> | boolean
   escalationLevel?: Prisma.StringNullableFilter<"Complaint"> | string | null
   dateOfResolution?: Prisma.DateTimeNullableFilter<"Complaint"> | Date | string | null
+  lastUpdated?: Prisma.DateTimeFilter<"Complaint"> | Date | string
   assignedAgentId?: Prisma.StringNullableFilter<"Complaint"> | string | null
   managedByMunicipalAdminId?: Prisma.StringNullableFilter<"Complaint"> | string | null
   moderatedByMunicipalAdminId?: Prisma.StringNullableFilter<"Complaint"> | string | null
@@ -1426,17 +1505,20 @@ export type ComplaintCreateWithoutAssignedAgentInput = {
   submissionDate?: Date | string
   seq?: number
   subCategory: string
-  standardizedSubCategory?: string | null
+  AIstandardizedSubCategory?: string | null
+  AIabusedFlag?: boolean | null
   description: string
   urgency?: $Enums.ComplaintUrgency
   attachmentUrl?: string | null
+  AIimageVarificationStatus?: boolean | null
   assignedDepartment: string
   status?: $Enums.ComplaintStatus
   sla?: string | null
   upvoteCount?: number
-  isPublic?: boolean
+  isPublic: boolean
   escalationLevel?: string | null
   dateOfResolution?: Date | string | null
+  lastUpdated?: Date | string
   complainant: Prisma.UserCreateNestedOneWithoutComplaintsInput
   category: Prisma.CategoryCreateNestedOneWithoutComplaintsInput
   location?: Prisma.ComplaintLocationCreateNestedOneWithoutComplaintInput
@@ -1458,17 +1540,20 @@ export type ComplaintUncheckedCreateWithoutAssignedAgentInput = {
   complainantId: string
   categoryId: string
   subCategory: string
-  standardizedSubCategory?: string | null
+  AIstandardizedSubCategory?: string | null
+  AIabusedFlag?: boolean | null
   description: string
   urgency?: $Enums.ComplaintUrgency
   attachmentUrl?: string | null
+  AIimageVarificationStatus?: boolean | null
   assignedDepartment: string
   status?: $Enums.ComplaintStatus
   sla?: string | null
   upvoteCount?: number
-  isPublic?: boolean
+  isPublic: boolean
   escalationLevel?: string | null
   dateOfResolution?: Date | string | null
+  lastUpdated?: Date | string
   managedByMunicipalAdminId?: string | null
   moderatedByMunicipalAdminId?: string | null
   crossDeptIssueSuperMunicipalId?: string | null
@@ -1496,17 +1581,20 @@ export type ComplaintCreateWithoutCoAssignedAgentsInput = {
   submissionDate?: Date | string
   seq?: number
   subCategory: string
-  standardizedSubCategory?: string | null
+  AIstandardizedSubCategory?: string | null
+  AIabusedFlag?: boolean | null
   description: string
   urgency?: $Enums.ComplaintUrgency
   attachmentUrl?: string | null
+  AIimageVarificationStatus?: boolean | null
   assignedDepartment: string
   status?: $Enums.ComplaintStatus
   sla?: string | null
   upvoteCount?: number
-  isPublic?: boolean
+  isPublic: boolean
   escalationLevel?: string | null
   dateOfResolution?: Date | string | null
+  lastUpdated?: Date | string
   complainant: Prisma.UserCreateNestedOneWithoutComplaintsInput
   category: Prisma.CategoryCreateNestedOneWithoutComplaintsInput
   location?: Prisma.ComplaintLocationCreateNestedOneWithoutComplaintInput
@@ -1528,17 +1616,20 @@ export type ComplaintUncheckedCreateWithoutCoAssignedAgentsInput = {
   complainantId: string
   categoryId: string
   subCategory: string
-  standardizedSubCategory?: string | null
+  AIstandardizedSubCategory?: string | null
+  AIabusedFlag?: boolean | null
   description: string
   urgency?: $Enums.ComplaintUrgency
   attachmentUrl?: string | null
+  AIimageVarificationStatus?: boolean | null
   assignedDepartment: string
   status?: $Enums.ComplaintStatus
   sla?: string | null
   upvoteCount?: number
-  isPublic?: boolean
+  isPublic: boolean
   escalationLevel?: string | null
   dateOfResolution?: Date | string | null
+  lastUpdated?: Date | string
   assignedAgentId?: string | null
   managedByMunicipalAdminId?: string | null
   moderatedByMunicipalAdminId?: string | null
@@ -1593,17 +1684,20 @@ export type ComplaintCreateWithoutManagedByMunicipalAdminInput = {
   submissionDate?: Date | string
   seq?: number
   subCategory: string
-  standardizedSubCategory?: string | null
+  AIstandardizedSubCategory?: string | null
+  AIabusedFlag?: boolean | null
   description: string
   urgency?: $Enums.ComplaintUrgency
   attachmentUrl?: string | null
+  AIimageVarificationStatus?: boolean | null
   assignedDepartment: string
   status?: $Enums.ComplaintStatus
   sla?: string | null
   upvoteCount?: number
-  isPublic?: boolean
+  isPublic: boolean
   escalationLevel?: string | null
   dateOfResolution?: Date | string | null
+  lastUpdated?: Date | string
   complainant: Prisma.UserCreateNestedOneWithoutComplaintsInput
   category: Prisma.CategoryCreateNestedOneWithoutComplaintsInput
   location?: Prisma.ComplaintLocationCreateNestedOneWithoutComplaintInput
@@ -1625,17 +1719,20 @@ export type ComplaintUncheckedCreateWithoutManagedByMunicipalAdminInput = {
   complainantId: string
   categoryId: string
   subCategory: string
-  standardizedSubCategory?: string | null
+  AIstandardizedSubCategory?: string | null
+  AIabusedFlag?: boolean | null
   description: string
   urgency?: $Enums.ComplaintUrgency
   attachmentUrl?: string | null
+  AIimageVarificationStatus?: boolean | null
   assignedDepartment: string
   status?: $Enums.ComplaintStatus
   sla?: string | null
   upvoteCount?: number
-  isPublic?: boolean
+  isPublic: boolean
   escalationLevel?: string | null
   dateOfResolution?: Date | string | null
+  lastUpdated?: Date | string
   assignedAgentId?: string | null
   moderatedByMunicipalAdminId?: string | null
   crossDeptIssueSuperMunicipalId?: string | null
@@ -1663,17 +1760,20 @@ export type ComplaintCreateWithoutModeratedByMunicipalAdminInput = {
   submissionDate?: Date | string
   seq?: number
   subCategory: string
-  standardizedSubCategory?: string | null
+  AIstandardizedSubCategory?: string | null
+  AIabusedFlag?: boolean | null
   description: string
   urgency?: $Enums.ComplaintUrgency
   attachmentUrl?: string | null
+  AIimageVarificationStatus?: boolean | null
   assignedDepartment: string
   status?: $Enums.ComplaintStatus
   sla?: string | null
   upvoteCount?: number
-  isPublic?: boolean
+  isPublic: boolean
   escalationLevel?: string | null
   dateOfResolution?: Date | string | null
+  lastUpdated?: Date | string
   complainant: Prisma.UserCreateNestedOneWithoutComplaintsInput
   category: Prisma.CategoryCreateNestedOneWithoutComplaintsInput
   location?: Prisma.ComplaintLocationCreateNestedOneWithoutComplaintInput
@@ -1695,17 +1795,20 @@ export type ComplaintUncheckedCreateWithoutModeratedByMunicipalAdminInput = {
   complainantId: string
   categoryId: string
   subCategory: string
-  standardizedSubCategory?: string | null
+  AIstandardizedSubCategory?: string | null
+  AIabusedFlag?: boolean | null
   description: string
   urgency?: $Enums.ComplaintUrgency
   attachmentUrl?: string | null
+  AIimageVarificationStatus?: boolean | null
   assignedDepartment: string
   status?: $Enums.ComplaintStatus
   sla?: string | null
   upvoteCount?: number
-  isPublic?: boolean
+  isPublic: boolean
   escalationLevel?: string | null
   dateOfResolution?: Date | string | null
+  lastUpdated?: Date | string
   assignedAgentId?: string | null
   managedByMunicipalAdminId?: string | null
   crossDeptIssueSuperMunicipalId?: string | null
@@ -1765,17 +1868,20 @@ export type ComplaintCreateWithoutCrossDeptIssueSuperMunicipalInput = {
   submissionDate?: Date | string
   seq?: number
   subCategory: string
-  standardizedSubCategory?: string | null
+  AIstandardizedSubCategory?: string | null
+  AIabusedFlag?: boolean | null
   description: string
   urgency?: $Enums.ComplaintUrgency
   attachmentUrl?: string | null
+  AIimageVarificationStatus?: boolean | null
   assignedDepartment: string
   status?: $Enums.ComplaintStatus
   sla?: string | null
   upvoteCount?: number
-  isPublic?: boolean
+  isPublic: boolean
   escalationLevel?: string | null
   dateOfResolution?: Date | string | null
+  lastUpdated?: Date | string
   complainant: Prisma.UserCreateNestedOneWithoutComplaintsInput
   category: Prisma.CategoryCreateNestedOneWithoutComplaintsInput
   location?: Prisma.ComplaintLocationCreateNestedOneWithoutComplaintInput
@@ -1797,17 +1903,20 @@ export type ComplaintUncheckedCreateWithoutCrossDeptIssueSuperMunicipalInput = {
   complainantId: string
   categoryId: string
   subCategory: string
-  standardizedSubCategory?: string | null
+  AIstandardizedSubCategory?: string | null
+  AIabusedFlag?: boolean | null
   description: string
   urgency?: $Enums.ComplaintUrgency
   attachmentUrl?: string | null
+  AIimageVarificationStatus?: boolean | null
   assignedDepartment: string
   status?: $Enums.ComplaintStatus
   sla?: string | null
   upvoteCount?: number
-  isPublic?: boolean
+  isPublic: boolean
   escalationLevel?: string | null
   dateOfResolution?: Date | string | null
+  lastUpdated?: Date | string
   assignedAgentId?: string | null
   managedByMunicipalAdminId?: string | null
   moderatedByMunicipalAdminId?: string | null
@@ -1851,17 +1960,20 @@ export type ComplaintCreateWithoutEscalatedToStateAdminInput = {
   submissionDate?: Date | string
   seq?: number
   subCategory: string
-  standardizedSubCategory?: string | null
+  AIstandardizedSubCategory?: string | null
+  AIabusedFlag?: boolean | null
   description: string
   urgency?: $Enums.ComplaintUrgency
   attachmentUrl?: string | null
+  AIimageVarificationStatus?: boolean | null
   assignedDepartment: string
   status?: $Enums.ComplaintStatus
   sla?: string | null
   upvoteCount?: number
-  isPublic?: boolean
+  isPublic: boolean
   escalationLevel?: string | null
   dateOfResolution?: Date | string | null
+  lastUpdated?: Date | string
   complainant: Prisma.UserCreateNestedOneWithoutComplaintsInput
   category: Prisma.CategoryCreateNestedOneWithoutComplaintsInput
   location?: Prisma.ComplaintLocationCreateNestedOneWithoutComplaintInput
@@ -1883,17 +1995,20 @@ export type ComplaintUncheckedCreateWithoutEscalatedToStateAdminInput = {
   complainantId: string
   categoryId: string
   subCategory: string
-  standardizedSubCategory?: string | null
+  AIstandardizedSubCategory?: string | null
+  AIabusedFlag?: boolean | null
   description: string
   urgency?: $Enums.ComplaintUrgency
   attachmentUrl?: string | null
+  AIimageVarificationStatus?: boolean | null
   assignedDepartment: string
   status?: $Enums.ComplaintStatus
   sla?: string | null
   upvoteCount?: number
-  isPublic?: boolean
+  isPublic: boolean
   escalationLevel?: string | null
   dateOfResolution?: Date | string | null
+  lastUpdated?: Date | string
   assignedAgentId?: string | null
   managedByMunicipalAdminId?: string | null
   moderatedByMunicipalAdminId?: string | null
@@ -1937,17 +2052,20 @@ export type ComplaintCreateWithoutEscalatedToSuperStateAdminInput = {
   submissionDate?: Date | string
   seq?: number
   subCategory: string
-  standardizedSubCategory?: string | null
+  AIstandardizedSubCategory?: string | null
+  AIabusedFlag?: boolean | null
   description: string
   urgency?: $Enums.ComplaintUrgency
   attachmentUrl?: string | null
+  AIimageVarificationStatus?: boolean | null
   assignedDepartment: string
   status?: $Enums.ComplaintStatus
   sla?: string | null
   upvoteCount?: number
-  isPublic?: boolean
+  isPublic: boolean
   escalationLevel?: string | null
   dateOfResolution?: Date | string | null
+  lastUpdated?: Date | string
   complainant: Prisma.UserCreateNestedOneWithoutComplaintsInput
   category: Prisma.CategoryCreateNestedOneWithoutComplaintsInput
   location?: Prisma.ComplaintLocationCreateNestedOneWithoutComplaintInput
@@ -1969,17 +2087,20 @@ export type ComplaintUncheckedCreateWithoutEscalatedToSuperStateAdminInput = {
   complainantId: string
   categoryId: string
   subCategory: string
-  standardizedSubCategory?: string | null
+  AIstandardizedSubCategory?: string | null
+  AIabusedFlag?: boolean | null
   description: string
   urgency?: $Enums.ComplaintUrgency
   attachmentUrl?: string | null
+  AIimageVarificationStatus?: boolean | null
   assignedDepartment: string
   status?: $Enums.ComplaintStatus
   sla?: string | null
   upvoteCount?: number
-  isPublic?: boolean
+  isPublic: boolean
   escalationLevel?: string | null
   dateOfResolution?: Date | string | null
+  lastUpdated?: Date | string
   assignedAgentId?: string | null
   managedByMunicipalAdminId?: string | null
   moderatedByMunicipalAdminId?: string | null
@@ -2023,17 +2144,20 @@ export type ComplaintCreateWithoutManagedBySuperAdminInput = {
   submissionDate?: Date | string
   seq?: number
   subCategory: string
-  standardizedSubCategory?: string | null
+  AIstandardizedSubCategory?: string | null
+  AIabusedFlag?: boolean | null
   description: string
   urgency?: $Enums.ComplaintUrgency
   attachmentUrl?: string | null
+  AIimageVarificationStatus?: boolean | null
   assignedDepartment: string
   status?: $Enums.ComplaintStatus
   sla?: string | null
   upvoteCount?: number
-  isPublic?: boolean
+  isPublic: boolean
   escalationLevel?: string | null
   dateOfResolution?: Date | string | null
+  lastUpdated?: Date | string
   complainant: Prisma.UserCreateNestedOneWithoutComplaintsInput
   category: Prisma.CategoryCreateNestedOneWithoutComplaintsInput
   location?: Prisma.ComplaintLocationCreateNestedOneWithoutComplaintInput
@@ -2055,17 +2179,20 @@ export type ComplaintUncheckedCreateWithoutManagedBySuperAdminInput = {
   complainantId: string
   categoryId: string
   subCategory: string
-  standardizedSubCategory?: string | null
+  AIstandardizedSubCategory?: string | null
+  AIabusedFlag?: boolean | null
   description: string
   urgency?: $Enums.ComplaintUrgency
   attachmentUrl?: string | null
+  AIimageVarificationStatus?: boolean | null
   assignedDepartment: string
   status?: $Enums.ComplaintStatus
   sla?: string | null
   upvoteCount?: number
-  isPublic?: boolean
+  isPublic: boolean
   escalationLevel?: string | null
   dateOfResolution?: Date | string | null
+  lastUpdated?: Date | string
   assignedAgentId?: string | null
   managedByMunicipalAdminId?: string | null
   moderatedByMunicipalAdminId?: string | null
@@ -2109,17 +2236,20 @@ export type ComplaintCreateWithoutCategoryInput = {
   submissionDate?: Date | string
   seq?: number
   subCategory: string
-  standardizedSubCategory?: string | null
+  AIstandardizedSubCategory?: string | null
+  AIabusedFlag?: boolean | null
   description: string
   urgency?: $Enums.ComplaintUrgency
   attachmentUrl?: string | null
+  AIimageVarificationStatus?: boolean | null
   assignedDepartment: string
   status?: $Enums.ComplaintStatus
   sla?: string | null
   upvoteCount?: number
-  isPublic?: boolean
+  isPublic: boolean
   escalationLevel?: string | null
   dateOfResolution?: Date | string | null
+  lastUpdated?: Date | string
   complainant: Prisma.UserCreateNestedOneWithoutComplaintsInput
   location?: Prisma.ComplaintLocationCreateNestedOneWithoutComplaintInput
   assignedAgent?: Prisma.AgentCreateNestedOneWithoutAssignedComplaintsInput
@@ -2140,17 +2270,20 @@ export type ComplaintUncheckedCreateWithoutCategoryInput = {
   seq?: number
   complainantId: string
   subCategory: string
-  standardizedSubCategory?: string | null
+  AIstandardizedSubCategory?: string | null
+  AIabusedFlag?: boolean | null
   description: string
   urgency?: $Enums.ComplaintUrgency
   attachmentUrl?: string | null
+  AIimageVarificationStatus?: boolean | null
   assignedDepartment: string
   status?: $Enums.ComplaintStatus
   sla?: string | null
   upvoteCount?: number
-  isPublic?: boolean
+  isPublic: boolean
   escalationLevel?: string | null
   dateOfResolution?: Date | string | null
+  lastUpdated?: Date | string
   assignedAgentId?: string | null
   managedByMunicipalAdminId?: string | null
   moderatedByMunicipalAdminId?: string | null
@@ -2195,17 +2328,20 @@ export type ComplaintCreateWithoutLocationInput = {
   submissionDate?: Date | string
   seq?: number
   subCategory: string
-  standardizedSubCategory?: string | null
+  AIstandardizedSubCategory?: string | null
+  AIabusedFlag?: boolean | null
   description: string
   urgency?: $Enums.ComplaintUrgency
   attachmentUrl?: string | null
+  AIimageVarificationStatus?: boolean | null
   assignedDepartment: string
   status?: $Enums.ComplaintStatus
   sla?: string | null
   upvoteCount?: number
-  isPublic?: boolean
+  isPublic: boolean
   escalationLevel?: string | null
   dateOfResolution?: Date | string | null
+  lastUpdated?: Date | string
   complainant: Prisma.UserCreateNestedOneWithoutComplaintsInput
   category: Prisma.CategoryCreateNestedOneWithoutComplaintsInput
   assignedAgent?: Prisma.AgentCreateNestedOneWithoutAssignedComplaintsInput
@@ -2227,17 +2363,20 @@ export type ComplaintUncheckedCreateWithoutLocationInput = {
   complainantId: string
   categoryId: string
   subCategory: string
-  standardizedSubCategory?: string | null
+  AIstandardizedSubCategory?: string | null
+  AIabusedFlag?: boolean | null
   description: string
   urgency?: $Enums.ComplaintUrgency
   attachmentUrl?: string | null
+  AIimageVarificationStatus?: boolean | null
   assignedDepartment: string
   status?: $Enums.ComplaintStatus
   sla?: string | null
   upvoteCount?: number
-  isPublic?: boolean
+  isPublic: boolean
   escalationLevel?: string | null
   dateOfResolution?: Date | string | null
+  lastUpdated?: Date | string
   assignedAgentId?: string | null
   managedByMunicipalAdminId?: string | null
   moderatedByMunicipalAdminId?: string | null
@@ -2270,10 +2409,12 @@ export type ComplaintUpdateWithoutLocationInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   submissionDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   subCategory?: Prisma.StringFieldUpdateOperationsInput | string
-  standardizedSubCategory?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  AIstandardizedSubCategory?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  AIabusedFlag?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   description?: Prisma.StringFieldUpdateOperationsInput | string
   urgency?: Prisma.EnumComplaintUrgencyFieldUpdateOperationsInput | $Enums.ComplaintUrgency
   attachmentUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  AIimageVarificationStatus?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   assignedDepartment?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumComplaintStatusFieldUpdateOperationsInput | $Enums.ComplaintStatus
   sla?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -2281,6 +2422,7 @@ export type ComplaintUpdateWithoutLocationInput = {
   isPublic?: Prisma.BoolFieldUpdateOperationsInput | boolean
   escalationLevel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   dateOfResolution?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  lastUpdated?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   complainant?: Prisma.UserUpdateOneRequiredWithoutComplaintsNestedInput
   category?: Prisma.CategoryUpdateOneRequiredWithoutComplaintsNestedInput
   assignedAgent?: Prisma.AgentUpdateOneWithoutAssignedComplaintsNestedInput
@@ -2302,10 +2444,12 @@ export type ComplaintUncheckedUpdateWithoutLocationInput = {
   complainantId?: Prisma.StringFieldUpdateOperationsInput | string
   categoryId?: Prisma.StringFieldUpdateOperationsInput | string
   subCategory?: Prisma.StringFieldUpdateOperationsInput | string
-  standardizedSubCategory?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  AIstandardizedSubCategory?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  AIabusedFlag?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   description?: Prisma.StringFieldUpdateOperationsInput | string
   urgency?: Prisma.EnumComplaintUrgencyFieldUpdateOperationsInput | $Enums.ComplaintUrgency
   attachmentUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  AIimageVarificationStatus?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   assignedDepartment?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumComplaintStatusFieldUpdateOperationsInput | $Enums.ComplaintStatus
   sla?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -2313,6 +2457,7 @@ export type ComplaintUncheckedUpdateWithoutLocationInput = {
   isPublic?: Prisma.BoolFieldUpdateOperationsInput | boolean
   escalationLevel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   dateOfResolution?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  lastUpdated?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   assignedAgentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   managedByMunicipalAdminId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   moderatedByMunicipalAdminId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -2330,17 +2475,20 @@ export type ComplaintCreateWithoutUpvotesInput = {
   submissionDate?: Date | string
   seq?: number
   subCategory: string
-  standardizedSubCategory?: string | null
+  AIstandardizedSubCategory?: string | null
+  AIabusedFlag?: boolean | null
   description: string
   urgency?: $Enums.ComplaintUrgency
   attachmentUrl?: string | null
+  AIimageVarificationStatus?: boolean | null
   assignedDepartment: string
   status?: $Enums.ComplaintStatus
   sla?: string | null
   upvoteCount?: number
-  isPublic?: boolean
+  isPublic: boolean
   escalationLevel?: string | null
   dateOfResolution?: Date | string | null
+  lastUpdated?: Date | string
   complainant: Prisma.UserCreateNestedOneWithoutComplaintsInput
   category: Prisma.CategoryCreateNestedOneWithoutComplaintsInput
   location?: Prisma.ComplaintLocationCreateNestedOneWithoutComplaintInput
@@ -2362,17 +2510,20 @@ export type ComplaintUncheckedCreateWithoutUpvotesInput = {
   complainantId: string
   categoryId: string
   subCategory: string
-  standardizedSubCategory?: string | null
+  AIstandardizedSubCategory?: string | null
+  AIabusedFlag?: boolean | null
   description: string
   urgency?: $Enums.ComplaintUrgency
   attachmentUrl?: string | null
+  AIimageVarificationStatus?: boolean | null
   assignedDepartment: string
   status?: $Enums.ComplaintStatus
   sla?: string | null
   upvoteCount?: number
-  isPublic?: boolean
+  isPublic: boolean
   escalationLevel?: string | null
   dateOfResolution?: Date | string | null
+  lastUpdated?: Date | string
   assignedAgentId?: string | null
   managedByMunicipalAdminId?: string | null
   moderatedByMunicipalAdminId?: string | null
@@ -2405,10 +2556,12 @@ export type ComplaintUpdateWithoutUpvotesInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   submissionDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   subCategory?: Prisma.StringFieldUpdateOperationsInput | string
-  standardizedSubCategory?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  AIstandardizedSubCategory?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  AIabusedFlag?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   description?: Prisma.StringFieldUpdateOperationsInput | string
   urgency?: Prisma.EnumComplaintUrgencyFieldUpdateOperationsInput | $Enums.ComplaintUrgency
   attachmentUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  AIimageVarificationStatus?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   assignedDepartment?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumComplaintStatusFieldUpdateOperationsInput | $Enums.ComplaintStatus
   sla?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -2416,6 +2569,7 @@ export type ComplaintUpdateWithoutUpvotesInput = {
   isPublic?: Prisma.BoolFieldUpdateOperationsInput | boolean
   escalationLevel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   dateOfResolution?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  lastUpdated?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   complainant?: Prisma.UserUpdateOneRequiredWithoutComplaintsNestedInput
   category?: Prisma.CategoryUpdateOneRequiredWithoutComplaintsNestedInput
   location?: Prisma.ComplaintLocationUpdateOneWithoutComplaintNestedInput
@@ -2437,10 +2591,12 @@ export type ComplaintUncheckedUpdateWithoutUpvotesInput = {
   complainantId?: Prisma.StringFieldUpdateOperationsInput | string
   categoryId?: Prisma.StringFieldUpdateOperationsInput | string
   subCategory?: Prisma.StringFieldUpdateOperationsInput | string
-  standardizedSubCategory?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  AIstandardizedSubCategory?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  AIabusedFlag?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   description?: Prisma.StringFieldUpdateOperationsInput | string
   urgency?: Prisma.EnumComplaintUrgencyFieldUpdateOperationsInput | $Enums.ComplaintUrgency
   attachmentUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  AIimageVarificationStatus?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   assignedDepartment?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumComplaintStatusFieldUpdateOperationsInput | $Enums.ComplaintStatus
   sla?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -2448,6 +2604,7 @@ export type ComplaintUncheckedUpdateWithoutUpvotesInput = {
   isPublic?: Prisma.BoolFieldUpdateOperationsInput | boolean
   escalationLevel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   dateOfResolution?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  lastUpdated?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   assignedAgentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   managedByMunicipalAdminId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   moderatedByMunicipalAdminId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -2465,17 +2622,20 @@ export type ComplaintCreateWithoutAuditLogsInput = {
   submissionDate?: Date | string
   seq?: number
   subCategory: string
-  standardizedSubCategory?: string | null
+  AIstandardizedSubCategory?: string | null
+  AIabusedFlag?: boolean | null
   description: string
   urgency?: $Enums.ComplaintUrgency
   attachmentUrl?: string | null
+  AIimageVarificationStatus?: boolean | null
   assignedDepartment: string
   status?: $Enums.ComplaintStatus
   sla?: string | null
   upvoteCount?: number
-  isPublic?: boolean
+  isPublic: boolean
   escalationLevel?: string | null
   dateOfResolution?: Date | string | null
+  lastUpdated?: Date | string
   complainant: Prisma.UserCreateNestedOneWithoutComplaintsInput
   category: Prisma.CategoryCreateNestedOneWithoutComplaintsInput
   location?: Prisma.ComplaintLocationCreateNestedOneWithoutComplaintInput
@@ -2497,17 +2657,20 @@ export type ComplaintUncheckedCreateWithoutAuditLogsInput = {
   complainantId: string
   categoryId: string
   subCategory: string
-  standardizedSubCategory?: string | null
+  AIstandardizedSubCategory?: string | null
+  AIabusedFlag?: boolean | null
   description: string
   urgency?: $Enums.ComplaintUrgency
   attachmentUrl?: string | null
+  AIimageVarificationStatus?: boolean | null
   assignedDepartment: string
   status?: $Enums.ComplaintStatus
   sla?: string | null
   upvoteCount?: number
-  isPublic?: boolean
+  isPublic: boolean
   escalationLevel?: string | null
   dateOfResolution?: Date | string | null
+  lastUpdated?: Date | string
   assignedAgentId?: string | null
   managedByMunicipalAdminId?: string | null
   moderatedByMunicipalAdminId?: string | null
@@ -2540,10 +2703,12 @@ export type ComplaintUpdateWithoutAuditLogsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   submissionDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   subCategory?: Prisma.StringFieldUpdateOperationsInput | string
-  standardizedSubCategory?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  AIstandardizedSubCategory?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  AIabusedFlag?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   description?: Prisma.StringFieldUpdateOperationsInput | string
   urgency?: Prisma.EnumComplaintUrgencyFieldUpdateOperationsInput | $Enums.ComplaintUrgency
   attachmentUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  AIimageVarificationStatus?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   assignedDepartment?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumComplaintStatusFieldUpdateOperationsInput | $Enums.ComplaintStatus
   sla?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -2551,6 +2716,7 @@ export type ComplaintUpdateWithoutAuditLogsInput = {
   isPublic?: Prisma.BoolFieldUpdateOperationsInput | boolean
   escalationLevel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   dateOfResolution?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  lastUpdated?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   complainant?: Prisma.UserUpdateOneRequiredWithoutComplaintsNestedInput
   category?: Prisma.CategoryUpdateOneRequiredWithoutComplaintsNestedInput
   location?: Prisma.ComplaintLocationUpdateOneWithoutComplaintNestedInput
@@ -2572,10 +2738,12 @@ export type ComplaintUncheckedUpdateWithoutAuditLogsInput = {
   complainantId?: Prisma.StringFieldUpdateOperationsInput | string
   categoryId?: Prisma.StringFieldUpdateOperationsInput | string
   subCategory?: Prisma.StringFieldUpdateOperationsInput | string
-  standardizedSubCategory?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  AIstandardizedSubCategory?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  AIabusedFlag?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   description?: Prisma.StringFieldUpdateOperationsInput | string
   urgency?: Prisma.EnumComplaintUrgencyFieldUpdateOperationsInput | $Enums.ComplaintUrgency
   attachmentUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  AIimageVarificationStatus?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   assignedDepartment?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumComplaintStatusFieldUpdateOperationsInput | $Enums.ComplaintStatus
   sla?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -2583,6 +2751,7 @@ export type ComplaintUncheckedUpdateWithoutAuditLogsInput = {
   isPublic?: Prisma.BoolFieldUpdateOperationsInput | boolean
   escalationLevel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   dateOfResolution?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  lastUpdated?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   assignedAgentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   managedByMunicipalAdminId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   moderatedByMunicipalAdminId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -2601,17 +2770,20 @@ export type ComplaintCreateManyComplainantInput = {
   seq?: number
   categoryId: string
   subCategory: string
-  standardizedSubCategory?: string | null
+  AIstandardizedSubCategory?: string | null
+  AIabusedFlag?: boolean | null
   description: string
   urgency?: $Enums.ComplaintUrgency
   attachmentUrl?: string | null
+  AIimageVarificationStatus?: boolean | null
   assignedDepartment: string
   status?: $Enums.ComplaintStatus
   sla?: string | null
   upvoteCount?: number
-  isPublic?: boolean
+  isPublic: boolean
   escalationLevel?: string | null
   dateOfResolution?: Date | string | null
+  lastUpdated?: Date | string
   assignedAgentId?: string | null
   managedByMunicipalAdminId?: string | null
   moderatedByMunicipalAdminId?: string | null
@@ -2625,10 +2797,12 @@ export type ComplaintUpdateWithoutComplainantInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   submissionDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   subCategory?: Prisma.StringFieldUpdateOperationsInput | string
-  standardizedSubCategory?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  AIstandardizedSubCategory?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  AIabusedFlag?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   description?: Prisma.StringFieldUpdateOperationsInput | string
   urgency?: Prisma.EnumComplaintUrgencyFieldUpdateOperationsInput | $Enums.ComplaintUrgency
   attachmentUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  AIimageVarificationStatus?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   assignedDepartment?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumComplaintStatusFieldUpdateOperationsInput | $Enums.ComplaintStatus
   sla?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -2636,6 +2810,7 @@ export type ComplaintUpdateWithoutComplainantInput = {
   isPublic?: Prisma.BoolFieldUpdateOperationsInput | boolean
   escalationLevel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   dateOfResolution?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  lastUpdated?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   category?: Prisma.CategoryUpdateOneRequiredWithoutComplaintsNestedInput
   location?: Prisma.ComplaintLocationUpdateOneWithoutComplaintNestedInput
   assignedAgent?: Prisma.AgentUpdateOneWithoutAssignedComplaintsNestedInput
@@ -2656,10 +2831,12 @@ export type ComplaintUncheckedUpdateWithoutComplainantInput = {
   seq?: Prisma.IntFieldUpdateOperationsInput | number
   categoryId?: Prisma.StringFieldUpdateOperationsInput | string
   subCategory?: Prisma.StringFieldUpdateOperationsInput | string
-  standardizedSubCategory?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  AIstandardizedSubCategory?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  AIabusedFlag?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   description?: Prisma.StringFieldUpdateOperationsInput | string
   urgency?: Prisma.EnumComplaintUrgencyFieldUpdateOperationsInput | $Enums.ComplaintUrgency
   attachmentUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  AIimageVarificationStatus?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   assignedDepartment?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumComplaintStatusFieldUpdateOperationsInput | $Enums.ComplaintStatus
   sla?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -2667,6 +2844,7 @@ export type ComplaintUncheckedUpdateWithoutComplainantInput = {
   isPublic?: Prisma.BoolFieldUpdateOperationsInput | boolean
   escalationLevel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   dateOfResolution?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  lastUpdated?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   assignedAgentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   managedByMunicipalAdminId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   moderatedByMunicipalAdminId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -2686,10 +2864,12 @@ export type ComplaintUncheckedUpdateManyWithoutComplainantInput = {
   seq?: Prisma.IntFieldUpdateOperationsInput | number
   categoryId?: Prisma.StringFieldUpdateOperationsInput | string
   subCategory?: Prisma.StringFieldUpdateOperationsInput | string
-  standardizedSubCategory?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  AIstandardizedSubCategory?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  AIabusedFlag?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   description?: Prisma.StringFieldUpdateOperationsInput | string
   urgency?: Prisma.EnumComplaintUrgencyFieldUpdateOperationsInput | $Enums.ComplaintUrgency
   attachmentUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  AIimageVarificationStatus?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   assignedDepartment?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumComplaintStatusFieldUpdateOperationsInput | $Enums.ComplaintStatus
   sla?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -2697,6 +2877,7 @@ export type ComplaintUncheckedUpdateManyWithoutComplainantInput = {
   isPublic?: Prisma.BoolFieldUpdateOperationsInput | boolean
   escalationLevel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   dateOfResolution?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  lastUpdated?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   assignedAgentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   managedByMunicipalAdminId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   moderatedByMunicipalAdminId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -2713,17 +2894,20 @@ export type ComplaintCreateManyAssignedAgentInput = {
   complainantId: string
   categoryId: string
   subCategory: string
-  standardizedSubCategory?: string | null
+  AIstandardizedSubCategory?: string | null
+  AIabusedFlag?: boolean | null
   description: string
   urgency?: $Enums.ComplaintUrgency
   attachmentUrl?: string | null
+  AIimageVarificationStatus?: boolean | null
   assignedDepartment: string
   status?: $Enums.ComplaintStatus
   sla?: string | null
   upvoteCount?: number
-  isPublic?: boolean
+  isPublic: boolean
   escalationLevel?: string | null
   dateOfResolution?: Date | string | null
+  lastUpdated?: Date | string
   managedByMunicipalAdminId?: string | null
   moderatedByMunicipalAdminId?: string | null
   crossDeptIssueSuperMunicipalId?: string | null
@@ -2736,10 +2920,12 @@ export type ComplaintUpdateWithoutAssignedAgentInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   submissionDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   subCategory?: Prisma.StringFieldUpdateOperationsInput | string
-  standardizedSubCategory?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  AIstandardizedSubCategory?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  AIabusedFlag?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   description?: Prisma.StringFieldUpdateOperationsInput | string
   urgency?: Prisma.EnumComplaintUrgencyFieldUpdateOperationsInput | $Enums.ComplaintUrgency
   attachmentUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  AIimageVarificationStatus?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   assignedDepartment?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumComplaintStatusFieldUpdateOperationsInput | $Enums.ComplaintStatus
   sla?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -2747,6 +2933,7 @@ export type ComplaintUpdateWithoutAssignedAgentInput = {
   isPublic?: Prisma.BoolFieldUpdateOperationsInput | boolean
   escalationLevel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   dateOfResolution?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  lastUpdated?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   complainant?: Prisma.UserUpdateOneRequiredWithoutComplaintsNestedInput
   category?: Prisma.CategoryUpdateOneRequiredWithoutComplaintsNestedInput
   location?: Prisma.ComplaintLocationUpdateOneWithoutComplaintNestedInput
@@ -2768,10 +2955,12 @@ export type ComplaintUncheckedUpdateWithoutAssignedAgentInput = {
   complainantId?: Prisma.StringFieldUpdateOperationsInput | string
   categoryId?: Prisma.StringFieldUpdateOperationsInput | string
   subCategory?: Prisma.StringFieldUpdateOperationsInput | string
-  standardizedSubCategory?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  AIstandardizedSubCategory?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  AIabusedFlag?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   description?: Prisma.StringFieldUpdateOperationsInput | string
   urgency?: Prisma.EnumComplaintUrgencyFieldUpdateOperationsInput | $Enums.ComplaintUrgency
   attachmentUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  AIimageVarificationStatus?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   assignedDepartment?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumComplaintStatusFieldUpdateOperationsInput | $Enums.ComplaintStatus
   sla?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -2779,6 +2968,7 @@ export type ComplaintUncheckedUpdateWithoutAssignedAgentInput = {
   isPublic?: Prisma.BoolFieldUpdateOperationsInput | boolean
   escalationLevel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   dateOfResolution?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  lastUpdated?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   managedByMunicipalAdminId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   moderatedByMunicipalAdminId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   crossDeptIssueSuperMunicipalId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -2798,10 +2988,12 @@ export type ComplaintUncheckedUpdateManyWithoutAssignedAgentInput = {
   complainantId?: Prisma.StringFieldUpdateOperationsInput | string
   categoryId?: Prisma.StringFieldUpdateOperationsInput | string
   subCategory?: Prisma.StringFieldUpdateOperationsInput | string
-  standardizedSubCategory?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  AIstandardizedSubCategory?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  AIabusedFlag?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   description?: Prisma.StringFieldUpdateOperationsInput | string
   urgency?: Prisma.EnumComplaintUrgencyFieldUpdateOperationsInput | $Enums.ComplaintUrgency
   attachmentUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  AIimageVarificationStatus?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   assignedDepartment?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumComplaintStatusFieldUpdateOperationsInput | $Enums.ComplaintStatus
   sla?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -2809,6 +3001,7 @@ export type ComplaintUncheckedUpdateManyWithoutAssignedAgentInput = {
   isPublic?: Prisma.BoolFieldUpdateOperationsInput | boolean
   escalationLevel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   dateOfResolution?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  lastUpdated?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   managedByMunicipalAdminId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   moderatedByMunicipalAdminId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   crossDeptIssueSuperMunicipalId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -2821,10 +3014,12 @@ export type ComplaintUpdateWithoutCoAssignedAgentsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   submissionDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   subCategory?: Prisma.StringFieldUpdateOperationsInput | string
-  standardizedSubCategory?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  AIstandardizedSubCategory?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  AIabusedFlag?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   description?: Prisma.StringFieldUpdateOperationsInput | string
   urgency?: Prisma.EnumComplaintUrgencyFieldUpdateOperationsInput | $Enums.ComplaintUrgency
   attachmentUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  AIimageVarificationStatus?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   assignedDepartment?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumComplaintStatusFieldUpdateOperationsInput | $Enums.ComplaintStatus
   sla?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -2832,6 +3027,7 @@ export type ComplaintUpdateWithoutCoAssignedAgentsInput = {
   isPublic?: Prisma.BoolFieldUpdateOperationsInput | boolean
   escalationLevel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   dateOfResolution?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  lastUpdated?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   complainant?: Prisma.UserUpdateOneRequiredWithoutComplaintsNestedInput
   category?: Prisma.CategoryUpdateOneRequiredWithoutComplaintsNestedInput
   location?: Prisma.ComplaintLocationUpdateOneWithoutComplaintNestedInput
@@ -2853,10 +3049,12 @@ export type ComplaintUncheckedUpdateWithoutCoAssignedAgentsInput = {
   complainantId?: Prisma.StringFieldUpdateOperationsInput | string
   categoryId?: Prisma.StringFieldUpdateOperationsInput | string
   subCategory?: Prisma.StringFieldUpdateOperationsInput | string
-  standardizedSubCategory?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  AIstandardizedSubCategory?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  AIabusedFlag?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   description?: Prisma.StringFieldUpdateOperationsInput | string
   urgency?: Prisma.EnumComplaintUrgencyFieldUpdateOperationsInput | $Enums.ComplaintUrgency
   attachmentUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  AIimageVarificationStatus?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   assignedDepartment?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumComplaintStatusFieldUpdateOperationsInput | $Enums.ComplaintStatus
   sla?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -2864,6 +3062,7 @@ export type ComplaintUncheckedUpdateWithoutCoAssignedAgentsInput = {
   isPublic?: Prisma.BoolFieldUpdateOperationsInput | boolean
   escalationLevel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   dateOfResolution?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  lastUpdated?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   assignedAgentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   managedByMunicipalAdminId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   moderatedByMunicipalAdminId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -2883,10 +3082,12 @@ export type ComplaintUncheckedUpdateManyWithoutCoAssignedAgentsInput = {
   complainantId?: Prisma.StringFieldUpdateOperationsInput | string
   categoryId?: Prisma.StringFieldUpdateOperationsInput | string
   subCategory?: Prisma.StringFieldUpdateOperationsInput | string
-  standardizedSubCategory?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  AIstandardizedSubCategory?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  AIabusedFlag?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   description?: Prisma.StringFieldUpdateOperationsInput | string
   urgency?: Prisma.EnumComplaintUrgencyFieldUpdateOperationsInput | $Enums.ComplaintUrgency
   attachmentUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  AIimageVarificationStatus?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   assignedDepartment?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumComplaintStatusFieldUpdateOperationsInput | $Enums.ComplaintStatus
   sla?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -2894,6 +3095,7 @@ export type ComplaintUncheckedUpdateManyWithoutCoAssignedAgentsInput = {
   isPublic?: Prisma.BoolFieldUpdateOperationsInput | boolean
   escalationLevel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   dateOfResolution?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  lastUpdated?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   assignedAgentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   managedByMunicipalAdminId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   moderatedByMunicipalAdminId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -2910,17 +3112,20 @@ export type ComplaintCreateManyManagedByMunicipalAdminInput = {
   complainantId: string
   categoryId: string
   subCategory: string
-  standardizedSubCategory?: string | null
+  AIstandardizedSubCategory?: string | null
+  AIabusedFlag?: boolean | null
   description: string
   urgency?: $Enums.ComplaintUrgency
   attachmentUrl?: string | null
+  AIimageVarificationStatus?: boolean | null
   assignedDepartment: string
   status?: $Enums.ComplaintStatus
   sla?: string | null
   upvoteCount?: number
-  isPublic?: boolean
+  isPublic: boolean
   escalationLevel?: string | null
   dateOfResolution?: Date | string | null
+  lastUpdated?: Date | string
   assignedAgentId?: string | null
   moderatedByMunicipalAdminId?: string | null
   crossDeptIssueSuperMunicipalId?: string | null
@@ -2936,17 +3141,20 @@ export type ComplaintCreateManyModeratedByMunicipalAdminInput = {
   complainantId: string
   categoryId: string
   subCategory: string
-  standardizedSubCategory?: string | null
+  AIstandardizedSubCategory?: string | null
+  AIabusedFlag?: boolean | null
   description: string
   urgency?: $Enums.ComplaintUrgency
   attachmentUrl?: string | null
+  AIimageVarificationStatus?: boolean | null
   assignedDepartment: string
   status?: $Enums.ComplaintStatus
   sla?: string | null
   upvoteCount?: number
-  isPublic?: boolean
+  isPublic: boolean
   escalationLevel?: string | null
   dateOfResolution?: Date | string | null
+  lastUpdated?: Date | string
   assignedAgentId?: string | null
   managedByMunicipalAdminId?: string | null
   crossDeptIssueSuperMunicipalId?: string | null
@@ -2959,10 +3167,12 @@ export type ComplaintUpdateWithoutManagedByMunicipalAdminInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   submissionDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   subCategory?: Prisma.StringFieldUpdateOperationsInput | string
-  standardizedSubCategory?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  AIstandardizedSubCategory?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  AIabusedFlag?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   description?: Prisma.StringFieldUpdateOperationsInput | string
   urgency?: Prisma.EnumComplaintUrgencyFieldUpdateOperationsInput | $Enums.ComplaintUrgency
   attachmentUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  AIimageVarificationStatus?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   assignedDepartment?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumComplaintStatusFieldUpdateOperationsInput | $Enums.ComplaintStatus
   sla?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -2970,6 +3180,7 @@ export type ComplaintUpdateWithoutManagedByMunicipalAdminInput = {
   isPublic?: Prisma.BoolFieldUpdateOperationsInput | boolean
   escalationLevel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   dateOfResolution?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  lastUpdated?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   complainant?: Prisma.UserUpdateOneRequiredWithoutComplaintsNestedInput
   category?: Prisma.CategoryUpdateOneRequiredWithoutComplaintsNestedInput
   location?: Prisma.ComplaintLocationUpdateOneWithoutComplaintNestedInput
@@ -2991,10 +3202,12 @@ export type ComplaintUncheckedUpdateWithoutManagedByMunicipalAdminInput = {
   complainantId?: Prisma.StringFieldUpdateOperationsInput | string
   categoryId?: Prisma.StringFieldUpdateOperationsInput | string
   subCategory?: Prisma.StringFieldUpdateOperationsInput | string
-  standardizedSubCategory?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  AIstandardizedSubCategory?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  AIabusedFlag?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   description?: Prisma.StringFieldUpdateOperationsInput | string
   urgency?: Prisma.EnumComplaintUrgencyFieldUpdateOperationsInput | $Enums.ComplaintUrgency
   attachmentUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  AIimageVarificationStatus?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   assignedDepartment?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumComplaintStatusFieldUpdateOperationsInput | $Enums.ComplaintStatus
   sla?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -3002,6 +3215,7 @@ export type ComplaintUncheckedUpdateWithoutManagedByMunicipalAdminInput = {
   isPublic?: Prisma.BoolFieldUpdateOperationsInput | boolean
   escalationLevel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   dateOfResolution?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  lastUpdated?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   assignedAgentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   moderatedByMunicipalAdminId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   crossDeptIssueSuperMunicipalId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -3021,10 +3235,12 @@ export type ComplaintUncheckedUpdateManyWithoutManagedByMunicipalAdminInput = {
   complainantId?: Prisma.StringFieldUpdateOperationsInput | string
   categoryId?: Prisma.StringFieldUpdateOperationsInput | string
   subCategory?: Prisma.StringFieldUpdateOperationsInput | string
-  standardizedSubCategory?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  AIstandardizedSubCategory?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  AIabusedFlag?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   description?: Prisma.StringFieldUpdateOperationsInput | string
   urgency?: Prisma.EnumComplaintUrgencyFieldUpdateOperationsInput | $Enums.ComplaintUrgency
   attachmentUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  AIimageVarificationStatus?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   assignedDepartment?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumComplaintStatusFieldUpdateOperationsInput | $Enums.ComplaintStatus
   sla?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -3032,6 +3248,7 @@ export type ComplaintUncheckedUpdateManyWithoutManagedByMunicipalAdminInput = {
   isPublic?: Prisma.BoolFieldUpdateOperationsInput | boolean
   escalationLevel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   dateOfResolution?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  lastUpdated?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   assignedAgentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   moderatedByMunicipalAdminId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   crossDeptIssueSuperMunicipalId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -3044,10 +3261,12 @@ export type ComplaintUpdateWithoutModeratedByMunicipalAdminInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   submissionDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   subCategory?: Prisma.StringFieldUpdateOperationsInput | string
-  standardizedSubCategory?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  AIstandardizedSubCategory?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  AIabusedFlag?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   description?: Prisma.StringFieldUpdateOperationsInput | string
   urgency?: Prisma.EnumComplaintUrgencyFieldUpdateOperationsInput | $Enums.ComplaintUrgency
   attachmentUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  AIimageVarificationStatus?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   assignedDepartment?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumComplaintStatusFieldUpdateOperationsInput | $Enums.ComplaintStatus
   sla?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -3055,6 +3274,7 @@ export type ComplaintUpdateWithoutModeratedByMunicipalAdminInput = {
   isPublic?: Prisma.BoolFieldUpdateOperationsInput | boolean
   escalationLevel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   dateOfResolution?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  lastUpdated?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   complainant?: Prisma.UserUpdateOneRequiredWithoutComplaintsNestedInput
   category?: Prisma.CategoryUpdateOneRequiredWithoutComplaintsNestedInput
   location?: Prisma.ComplaintLocationUpdateOneWithoutComplaintNestedInput
@@ -3076,10 +3296,12 @@ export type ComplaintUncheckedUpdateWithoutModeratedByMunicipalAdminInput = {
   complainantId?: Prisma.StringFieldUpdateOperationsInput | string
   categoryId?: Prisma.StringFieldUpdateOperationsInput | string
   subCategory?: Prisma.StringFieldUpdateOperationsInput | string
-  standardizedSubCategory?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  AIstandardizedSubCategory?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  AIabusedFlag?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   description?: Prisma.StringFieldUpdateOperationsInput | string
   urgency?: Prisma.EnumComplaintUrgencyFieldUpdateOperationsInput | $Enums.ComplaintUrgency
   attachmentUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  AIimageVarificationStatus?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   assignedDepartment?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumComplaintStatusFieldUpdateOperationsInput | $Enums.ComplaintStatus
   sla?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -3087,6 +3309,7 @@ export type ComplaintUncheckedUpdateWithoutModeratedByMunicipalAdminInput = {
   isPublic?: Prisma.BoolFieldUpdateOperationsInput | boolean
   escalationLevel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   dateOfResolution?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  lastUpdated?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   assignedAgentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   managedByMunicipalAdminId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   crossDeptIssueSuperMunicipalId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -3106,10 +3329,12 @@ export type ComplaintUncheckedUpdateManyWithoutModeratedByMunicipalAdminInput = 
   complainantId?: Prisma.StringFieldUpdateOperationsInput | string
   categoryId?: Prisma.StringFieldUpdateOperationsInput | string
   subCategory?: Prisma.StringFieldUpdateOperationsInput | string
-  standardizedSubCategory?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  AIstandardizedSubCategory?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  AIabusedFlag?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   description?: Prisma.StringFieldUpdateOperationsInput | string
   urgency?: Prisma.EnumComplaintUrgencyFieldUpdateOperationsInput | $Enums.ComplaintUrgency
   attachmentUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  AIimageVarificationStatus?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   assignedDepartment?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumComplaintStatusFieldUpdateOperationsInput | $Enums.ComplaintStatus
   sla?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -3117,6 +3342,7 @@ export type ComplaintUncheckedUpdateManyWithoutModeratedByMunicipalAdminInput = 
   isPublic?: Prisma.BoolFieldUpdateOperationsInput | boolean
   escalationLevel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   dateOfResolution?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  lastUpdated?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   assignedAgentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   managedByMunicipalAdminId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   crossDeptIssueSuperMunicipalId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -3132,17 +3358,20 @@ export type ComplaintCreateManyCrossDeptIssueSuperMunicipalInput = {
   complainantId: string
   categoryId: string
   subCategory: string
-  standardizedSubCategory?: string | null
+  AIstandardizedSubCategory?: string | null
+  AIabusedFlag?: boolean | null
   description: string
   urgency?: $Enums.ComplaintUrgency
   attachmentUrl?: string | null
+  AIimageVarificationStatus?: boolean | null
   assignedDepartment: string
   status?: $Enums.ComplaintStatus
   sla?: string | null
   upvoteCount?: number
-  isPublic?: boolean
+  isPublic: boolean
   escalationLevel?: string | null
   dateOfResolution?: Date | string | null
+  lastUpdated?: Date | string
   assignedAgentId?: string | null
   managedByMunicipalAdminId?: string | null
   moderatedByMunicipalAdminId?: string | null
@@ -3155,10 +3384,12 @@ export type ComplaintUpdateWithoutCrossDeptIssueSuperMunicipalInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   submissionDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   subCategory?: Prisma.StringFieldUpdateOperationsInput | string
-  standardizedSubCategory?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  AIstandardizedSubCategory?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  AIabusedFlag?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   description?: Prisma.StringFieldUpdateOperationsInput | string
   urgency?: Prisma.EnumComplaintUrgencyFieldUpdateOperationsInput | $Enums.ComplaintUrgency
   attachmentUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  AIimageVarificationStatus?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   assignedDepartment?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumComplaintStatusFieldUpdateOperationsInput | $Enums.ComplaintStatus
   sla?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -3166,6 +3397,7 @@ export type ComplaintUpdateWithoutCrossDeptIssueSuperMunicipalInput = {
   isPublic?: Prisma.BoolFieldUpdateOperationsInput | boolean
   escalationLevel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   dateOfResolution?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  lastUpdated?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   complainant?: Prisma.UserUpdateOneRequiredWithoutComplaintsNestedInput
   category?: Prisma.CategoryUpdateOneRequiredWithoutComplaintsNestedInput
   location?: Prisma.ComplaintLocationUpdateOneWithoutComplaintNestedInput
@@ -3187,10 +3419,12 @@ export type ComplaintUncheckedUpdateWithoutCrossDeptIssueSuperMunicipalInput = {
   complainantId?: Prisma.StringFieldUpdateOperationsInput | string
   categoryId?: Prisma.StringFieldUpdateOperationsInput | string
   subCategory?: Prisma.StringFieldUpdateOperationsInput | string
-  standardizedSubCategory?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  AIstandardizedSubCategory?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  AIabusedFlag?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   description?: Prisma.StringFieldUpdateOperationsInput | string
   urgency?: Prisma.EnumComplaintUrgencyFieldUpdateOperationsInput | $Enums.ComplaintUrgency
   attachmentUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  AIimageVarificationStatus?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   assignedDepartment?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumComplaintStatusFieldUpdateOperationsInput | $Enums.ComplaintStatus
   sla?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -3198,6 +3432,7 @@ export type ComplaintUncheckedUpdateWithoutCrossDeptIssueSuperMunicipalInput = {
   isPublic?: Prisma.BoolFieldUpdateOperationsInput | boolean
   escalationLevel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   dateOfResolution?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  lastUpdated?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   assignedAgentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   managedByMunicipalAdminId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   moderatedByMunicipalAdminId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -3217,10 +3452,12 @@ export type ComplaintUncheckedUpdateManyWithoutCrossDeptIssueSuperMunicipalInput
   complainantId?: Prisma.StringFieldUpdateOperationsInput | string
   categoryId?: Prisma.StringFieldUpdateOperationsInput | string
   subCategory?: Prisma.StringFieldUpdateOperationsInput | string
-  standardizedSubCategory?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  AIstandardizedSubCategory?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  AIabusedFlag?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   description?: Prisma.StringFieldUpdateOperationsInput | string
   urgency?: Prisma.EnumComplaintUrgencyFieldUpdateOperationsInput | $Enums.ComplaintUrgency
   attachmentUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  AIimageVarificationStatus?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   assignedDepartment?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumComplaintStatusFieldUpdateOperationsInput | $Enums.ComplaintStatus
   sla?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -3228,6 +3465,7 @@ export type ComplaintUncheckedUpdateManyWithoutCrossDeptIssueSuperMunicipalInput
   isPublic?: Prisma.BoolFieldUpdateOperationsInput | boolean
   escalationLevel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   dateOfResolution?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  lastUpdated?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   assignedAgentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   managedByMunicipalAdminId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   moderatedByMunicipalAdminId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -3243,17 +3481,20 @@ export type ComplaintCreateManyEscalatedToStateAdminInput = {
   complainantId: string
   categoryId: string
   subCategory: string
-  standardizedSubCategory?: string | null
+  AIstandardizedSubCategory?: string | null
+  AIabusedFlag?: boolean | null
   description: string
   urgency?: $Enums.ComplaintUrgency
   attachmentUrl?: string | null
+  AIimageVarificationStatus?: boolean | null
   assignedDepartment: string
   status?: $Enums.ComplaintStatus
   sla?: string | null
   upvoteCount?: number
-  isPublic?: boolean
+  isPublic: boolean
   escalationLevel?: string | null
   dateOfResolution?: Date | string | null
+  lastUpdated?: Date | string
   assignedAgentId?: string | null
   managedByMunicipalAdminId?: string | null
   moderatedByMunicipalAdminId?: string | null
@@ -3266,10 +3507,12 @@ export type ComplaintUpdateWithoutEscalatedToStateAdminInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   submissionDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   subCategory?: Prisma.StringFieldUpdateOperationsInput | string
-  standardizedSubCategory?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  AIstandardizedSubCategory?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  AIabusedFlag?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   description?: Prisma.StringFieldUpdateOperationsInput | string
   urgency?: Prisma.EnumComplaintUrgencyFieldUpdateOperationsInput | $Enums.ComplaintUrgency
   attachmentUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  AIimageVarificationStatus?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   assignedDepartment?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumComplaintStatusFieldUpdateOperationsInput | $Enums.ComplaintStatus
   sla?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -3277,6 +3520,7 @@ export type ComplaintUpdateWithoutEscalatedToStateAdminInput = {
   isPublic?: Prisma.BoolFieldUpdateOperationsInput | boolean
   escalationLevel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   dateOfResolution?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  lastUpdated?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   complainant?: Prisma.UserUpdateOneRequiredWithoutComplaintsNestedInput
   category?: Prisma.CategoryUpdateOneRequiredWithoutComplaintsNestedInput
   location?: Prisma.ComplaintLocationUpdateOneWithoutComplaintNestedInput
@@ -3298,10 +3542,12 @@ export type ComplaintUncheckedUpdateWithoutEscalatedToStateAdminInput = {
   complainantId?: Prisma.StringFieldUpdateOperationsInput | string
   categoryId?: Prisma.StringFieldUpdateOperationsInput | string
   subCategory?: Prisma.StringFieldUpdateOperationsInput | string
-  standardizedSubCategory?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  AIstandardizedSubCategory?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  AIabusedFlag?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   description?: Prisma.StringFieldUpdateOperationsInput | string
   urgency?: Prisma.EnumComplaintUrgencyFieldUpdateOperationsInput | $Enums.ComplaintUrgency
   attachmentUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  AIimageVarificationStatus?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   assignedDepartment?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumComplaintStatusFieldUpdateOperationsInput | $Enums.ComplaintStatus
   sla?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -3309,6 +3555,7 @@ export type ComplaintUncheckedUpdateWithoutEscalatedToStateAdminInput = {
   isPublic?: Prisma.BoolFieldUpdateOperationsInput | boolean
   escalationLevel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   dateOfResolution?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  lastUpdated?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   assignedAgentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   managedByMunicipalAdminId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   moderatedByMunicipalAdminId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -3328,10 +3575,12 @@ export type ComplaintUncheckedUpdateManyWithoutEscalatedToStateAdminInput = {
   complainantId?: Prisma.StringFieldUpdateOperationsInput | string
   categoryId?: Prisma.StringFieldUpdateOperationsInput | string
   subCategory?: Prisma.StringFieldUpdateOperationsInput | string
-  standardizedSubCategory?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  AIstandardizedSubCategory?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  AIabusedFlag?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   description?: Prisma.StringFieldUpdateOperationsInput | string
   urgency?: Prisma.EnumComplaintUrgencyFieldUpdateOperationsInput | $Enums.ComplaintUrgency
   attachmentUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  AIimageVarificationStatus?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   assignedDepartment?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumComplaintStatusFieldUpdateOperationsInput | $Enums.ComplaintStatus
   sla?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -3339,6 +3588,7 @@ export type ComplaintUncheckedUpdateManyWithoutEscalatedToStateAdminInput = {
   isPublic?: Prisma.BoolFieldUpdateOperationsInput | boolean
   escalationLevel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   dateOfResolution?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  lastUpdated?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   assignedAgentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   managedByMunicipalAdminId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   moderatedByMunicipalAdminId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -3354,17 +3604,20 @@ export type ComplaintCreateManyEscalatedToSuperStateAdminInput = {
   complainantId: string
   categoryId: string
   subCategory: string
-  standardizedSubCategory?: string | null
+  AIstandardizedSubCategory?: string | null
+  AIabusedFlag?: boolean | null
   description: string
   urgency?: $Enums.ComplaintUrgency
   attachmentUrl?: string | null
+  AIimageVarificationStatus?: boolean | null
   assignedDepartment: string
   status?: $Enums.ComplaintStatus
   sla?: string | null
   upvoteCount?: number
-  isPublic?: boolean
+  isPublic: boolean
   escalationLevel?: string | null
   dateOfResolution?: Date | string | null
+  lastUpdated?: Date | string
   assignedAgentId?: string | null
   managedByMunicipalAdminId?: string | null
   moderatedByMunicipalAdminId?: string | null
@@ -3377,10 +3630,12 @@ export type ComplaintUpdateWithoutEscalatedToSuperStateAdminInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   submissionDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   subCategory?: Prisma.StringFieldUpdateOperationsInput | string
-  standardizedSubCategory?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  AIstandardizedSubCategory?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  AIabusedFlag?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   description?: Prisma.StringFieldUpdateOperationsInput | string
   urgency?: Prisma.EnumComplaintUrgencyFieldUpdateOperationsInput | $Enums.ComplaintUrgency
   attachmentUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  AIimageVarificationStatus?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   assignedDepartment?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumComplaintStatusFieldUpdateOperationsInput | $Enums.ComplaintStatus
   sla?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -3388,6 +3643,7 @@ export type ComplaintUpdateWithoutEscalatedToSuperStateAdminInput = {
   isPublic?: Prisma.BoolFieldUpdateOperationsInput | boolean
   escalationLevel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   dateOfResolution?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  lastUpdated?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   complainant?: Prisma.UserUpdateOneRequiredWithoutComplaintsNestedInput
   category?: Prisma.CategoryUpdateOneRequiredWithoutComplaintsNestedInput
   location?: Prisma.ComplaintLocationUpdateOneWithoutComplaintNestedInput
@@ -3409,10 +3665,12 @@ export type ComplaintUncheckedUpdateWithoutEscalatedToSuperStateAdminInput = {
   complainantId?: Prisma.StringFieldUpdateOperationsInput | string
   categoryId?: Prisma.StringFieldUpdateOperationsInput | string
   subCategory?: Prisma.StringFieldUpdateOperationsInput | string
-  standardizedSubCategory?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  AIstandardizedSubCategory?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  AIabusedFlag?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   description?: Prisma.StringFieldUpdateOperationsInput | string
   urgency?: Prisma.EnumComplaintUrgencyFieldUpdateOperationsInput | $Enums.ComplaintUrgency
   attachmentUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  AIimageVarificationStatus?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   assignedDepartment?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumComplaintStatusFieldUpdateOperationsInput | $Enums.ComplaintStatus
   sla?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -3420,6 +3678,7 @@ export type ComplaintUncheckedUpdateWithoutEscalatedToSuperStateAdminInput = {
   isPublic?: Prisma.BoolFieldUpdateOperationsInput | boolean
   escalationLevel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   dateOfResolution?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  lastUpdated?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   assignedAgentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   managedByMunicipalAdminId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   moderatedByMunicipalAdminId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -3439,10 +3698,12 @@ export type ComplaintUncheckedUpdateManyWithoutEscalatedToSuperStateAdminInput =
   complainantId?: Prisma.StringFieldUpdateOperationsInput | string
   categoryId?: Prisma.StringFieldUpdateOperationsInput | string
   subCategory?: Prisma.StringFieldUpdateOperationsInput | string
-  standardizedSubCategory?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  AIstandardizedSubCategory?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  AIabusedFlag?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   description?: Prisma.StringFieldUpdateOperationsInput | string
   urgency?: Prisma.EnumComplaintUrgencyFieldUpdateOperationsInput | $Enums.ComplaintUrgency
   attachmentUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  AIimageVarificationStatus?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   assignedDepartment?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumComplaintStatusFieldUpdateOperationsInput | $Enums.ComplaintStatus
   sla?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -3450,6 +3711,7 @@ export type ComplaintUncheckedUpdateManyWithoutEscalatedToSuperStateAdminInput =
   isPublic?: Prisma.BoolFieldUpdateOperationsInput | boolean
   escalationLevel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   dateOfResolution?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  lastUpdated?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   assignedAgentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   managedByMunicipalAdminId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   moderatedByMunicipalAdminId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -3465,17 +3727,20 @@ export type ComplaintCreateManyManagedBySuperAdminInput = {
   complainantId: string
   categoryId: string
   subCategory: string
-  standardizedSubCategory?: string | null
+  AIstandardizedSubCategory?: string | null
+  AIabusedFlag?: boolean | null
   description: string
   urgency?: $Enums.ComplaintUrgency
   attachmentUrl?: string | null
+  AIimageVarificationStatus?: boolean | null
   assignedDepartment: string
   status?: $Enums.ComplaintStatus
   sla?: string | null
   upvoteCount?: number
-  isPublic?: boolean
+  isPublic: boolean
   escalationLevel?: string | null
   dateOfResolution?: Date | string | null
+  lastUpdated?: Date | string
   assignedAgentId?: string | null
   managedByMunicipalAdminId?: string | null
   moderatedByMunicipalAdminId?: string | null
@@ -3488,10 +3753,12 @@ export type ComplaintUpdateWithoutManagedBySuperAdminInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   submissionDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   subCategory?: Prisma.StringFieldUpdateOperationsInput | string
-  standardizedSubCategory?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  AIstandardizedSubCategory?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  AIabusedFlag?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   description?: Prisma.StringFieldUpdateOperationsInput | string
   urgency?: Prisma.EnumComplaintUrgencyFieldUpdateOperationsInput | $Enums.ComplaintUrgency
   attachmentUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  AIimageVarificationStatus?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   assignedDepartment?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumComplaintStatusFieldUpdateOperationsInput | $Enums.ComplaintStatus
   sla?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -3499,6 +3766,7 @@ export type ComplaintUpdateWithoutManagedBySuperAdminInput = {
   isPublic?: Prisma.BoolFieldUpdateOperationsInput | boolean
   escalationLevel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   dateOfResolution?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  lastUpdated?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   complainant?: Prisma.UserUpdateOneRequiredWithoutComplaintsNestedInput
   category?: Prisma.CategoryUpdateOneRequiredWithoutComplaintsNestedInput
   location?: Prisma.ComplaintLocationUpdateOneWithoutComplaintNestedInput
@@ -3520,10 +3788,12 @@ export type ComplaintUncheckedUpdateWithoutManagedBySuperAdminInput = {
   complainantId?: Prisma.StringFieldUpdateOperationsInput | string
   categoryId?: Prisma.StringFieldUpdateOperationsInput | string
   subCategory?: Prisma.StringFieldUpdateOperationsInput | string
-  standardizedSubCategory?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  AIstandardizedSubCategory?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  AIabusedFlag?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   description?: Prisma.StringFieldUpdateOperationsInput | string
   urgency?: Prisma.EnumComplaintUrgencyFieldUpdateOperationsInput | $Enums.ComplaintUrgency
   attachmentUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  AIimageVarificationStatus?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   assignedDepartment?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumComplaintStatusFieldUpdateOperationsInput | $Enums.ComplaintStatus
   sla?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -3531,6 +3801,7 @@ export type ComplaintUncheckedUpdateWithoutManagedBySuperAdminInput = {
   isPublic?: Prisma.BoolFieldUpdateOperationsInput | boolean
   escalationLevel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   dateOfResolution?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  lastUpdated?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   assignedAgentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   managedByMunicipalAdminId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   moderatedByMunicipalAdminId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -3550,10 +3821,12 @@ export type ComplaintUncheckedUpdateManyWithoutManagedBySuperAdminInput = {
   complainantId?: Prisma.StringFieldUpdateOperationsInput | string
   categoryId?: Prisma.StringFieldUpdateOperationsInput | string
   subCategory?: Prisma.StringFieldUpdateOperationsInput | string
-  standardizedSubCategory?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  AIstandardizedSubCategory?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  AIabusedFlag?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   description?: Prisma.StringFieldUpdateOperationsInput | string
   urgency?: Prisma.EnumComplaintUrgencyFieldUpdateOperationsInput | $Enums.ComplaintUrgency
   attachmentUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  AIimageVarificationStatus?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   assignedDepartment?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumComplaintStatusFieldUpdateOperationsInput | $Enums.ComplaintStatus
   sla?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -3561,6 +3834,7 @@ export type ComplaintUncheckedUpdateManyWithoutManagedBySuperAdminInput = {
   isPublic?: Prisma.BoolFieldUpdateOperationsInput | boolean
   escalationLevel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   dateOfResolution?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  lastUpdated?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   assignedAgentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   managedByMunicipalAdminId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   moderatedByMunicipalAdminId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -3575,17 +3849,20 @@ export type ComplaintCreateManyCategoryInput = {
   seq?: number
   complainantId: string
   subCategory: string
-  standardizedSubCategory?: string | null
+  AIstandardizedSubCategory?: string | null
+  AIabusedFlag?: boolean | null
   description: string
   urgency?: $Enums.ComplaintUrgency
   attachmentUrl?: string | null
+  AIimageVarificationStatus?: boolean | null
   assignedDepartment: string
   status?: $Enums.ComplaintStatus
   sla?: string | null
   upvoteCount?: number
-  isPublic?: boolean
+  isPublic: boolean
   escalationLevel?: string | null
   dateOfResolution?: Date | string | null
+  lastUpdated?: Date | string
   assignedAgentId?: string | null
   managedByMunicipalAdminId?: string | null
   moderatedByMunicipalAdminId?: string | null
@@ -3599,10 +3876,12 @@ export type ComplaintUpdateWithoutCategoryInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   submissionDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   subCategory?: Prisma.StringFieldUpdateOperationsInput | string
-  standardizedSubCategory?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  AIstandardizedSubCategory?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  AIabusedFlag?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   description?: Prisma.StringFieldUpdateOperationsInput | string
   urgency?: Prisma.EnumComplaintUrgencyFieldUpdateOperationsInput | $Enums.ComplaintUrgency
   attachmentUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  AIimageVarificationStatus?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   assignedDepartment?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumComplaintStatusFieldUpdateOperationsInput | $Enums.ComplaintStatus
   sla?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -3610,6 +3889,7 @@ export type ComplaintUpdateWithoutCategoryInput = {
   isPublic?: Prisma.BoolFieldUpdateOperationsInput | boolean
   escalationLevel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   dateOfResolution?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  lastUpdated?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   complainant?: Prisma.UserUpdateOneRequiredWithoutComplaintsNestedInput
   location?: Prisma.ComplaintLocationUpdateOneWithoutComplaintNestedInput
   assignedAgent?: Prisma.AgentUpdateOneWithoutAssignedComplaintsNestedInput
@@ -3630,10 +3910,12 @@ export type ComplaintUncheckedUpdateWithoutCategoryInput = {
   seq?: Prisma.IntFieldUpdateOperationsInput | number
   complainantId?: Prisma.StringFieldUpdateOperationsInput | string
   subCategory?: Prisma.StringFieldUpdateOperationsInput | string
-  standardizedSubCategory?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  AIstandardizedSubCategory?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  AIabusedFlag?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   description?: Prisma.StringFieldUpdateOperationsInput | string
   urgency?: Prisma.EnumComplaintUrgencyFieldUpdateOperationsInput | $Enums.ComplaintUrgency
   attachmentUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  AIimageVarificationStatus?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   assignedDepartment?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumComplaintStatusFieldUpdateOperationsInput | $Enums.ComplaintStatus
   sla?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -3641,6 +3923,7 @@ export type ComplaintUncheckedUpdateWithoutCategoryInput = {
   isPublic?: Prisma.BoolFieldUpdateOperationsInput | boolean
   escalationLevel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   dateOfResolution?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  lastUpdated?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   assignedAgentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   managedByMunicipalAdminId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   moderatedByMunicipalAdminId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -3660,10 +3943,12 @@ export type ComplaintUncheckedUpdateManyWithoutCategoryInput = {
   seq?: Prisma.IntFieldUpdateOperationsInput | number
   complainantId?: Prisma.StringFieldUpdateOperationsInput | string
   subCategory?: Prisma.StringFieldUpdateOperationsInput | string
-  standardizedSubCategory?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  AIstandardizedSubCategory?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  AIabusedFlag?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   description?: Prisma.StringFieldUpdateOperationsInput | string
   urgency?: Prisma.EnumComplaintUrgencyFieldUpdateOperationsInput | $Enums.ComplaintUrgency
   attachmentUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  AIimageVarificationStatus?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   assignedDepartment?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumComplaintStatusFieldUpdateOperationsInput | $Enums.ComplaintStatus
   sla?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -3671,6 +3956,7 @@ export type ComplaintUncheckedUpdateManyWithoutCategoryInput = {
   isPublic?: Prisma.BoolFieldUpdateOperationsInput | boolean
   escalationLevel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   dateOfResolution?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  lastUpdated?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   assignedAgentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   managedByMunicipalAdminId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   moderatedByMunicipalAdminId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -3736,10 +4022,12 @@ export type ComplaintSelect<ExtArgs extends runtime.Types.Extensions.InternalArg
   complainantId?: boolean
   categoryId?: boolean
   subCategory?: boolean
-  standardizedSubCategory?: boolean
+  AIstandardizedSubCategory?: boolean
+  AIabusedFlag?: boolean
   description?: boolean
   urgency?: boolean
   attachmentUrl?: boolean
+  AIimageVarificationStatus?: boolean
   assignedDepartment?: boolean
   status?: boolean
   sla?: boolean
@@ -3747,6 +4035,7 @@ export type ComplaintSelect<ExtArgs extends runtime.Types.Extensions.InternalArg
   isPublic?: boolean
   escalationLevel?: boolean
   dateOfResolution?: boolean
+  lastUpdated?: boolean
   assignedAgentId?: boolean
   managedByMunicipalAdminId?: boolean
   moderatedByMunicipalAdminId?: boolean
@@ -3777,10 +4066,12 @@ export type ComplaintSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Ext
   complainantId?: boolean
   categoryId?: boolean
   subCategory?: boolean
-  standardizedSubCategory?: boolean
+  AIstandardizedSubCategory?: boolean
+  AIabusedFlag?: boolean
   description?: boolean
   urgency?: boolean
   attachmentUrl?: boolean
+  AIimageVarificationStatus?: boolean
   assignedDepartment?: boolean
   status?: boolean
   sla?: boolean
@@ -3788,6 +4079,7 @@ export type ComplaintSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Ext
   isPublic?: boolean
   escalationLevel?: boolean
   dateOfResolution?: boolean
+  lastUpdated?: boolean
   assignedAgentId?: boolean
   managedByMunicipalAdminId?: boolean
   moderatedByMunicipalAdminId?: boolean
@@ -3813,10 +4105,12 @@ export type ComplaintSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Ext
   complainantId?: boolean
   categoryId?: boolean
   subCategory?: boolean
-  standardizedSubCategory?: boolean
+  AIstandardizedSubCategory?: boolean
+  AIabusedFlag?: boolean
   description?: boolean
   urgency?: boolean
   attachmentUrl?: boolean
+  AIimageVarificationStatus?: boolean
   assignedDepartment?: boolean
   status?: boolean
   sla?: boolean
@@ -3824,6 +4118,7 @@ export type ComplaintSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Ext
   isPublic?: boolean
   escalationLevel?: boolean
   dateOfResolution?: boolean
+  lastUpdated?: boolean
   assignedAgentId?: boolean
   managedByMunicipalAdminId?: boolean
   moderatedByMunicipalAdminId?: boolean
@@ -3849,10 +4144,12 @@ export type ComplaintSelectScalar = {
   complainantId?: boolean
   categoryId?: boolean
   subCategory?: boolean
-  standardizedSubCategory?: boolean
+  AIstandardizedSubCategory?: boolean
+  AIabusedFlag?: boolean
   description?: boolean
   urgency?: boolean
   attachmentUrl?: boolean
+  AIimageVarificationStatus?: boolean
   assignedDepartment?: boolean
   status?: boolean
   sla?: boolean
@@ -3860,6 +4157,7 @@ export type ComplaintSelectScalar = {
   isPublic?: boolean
   escalationLevel?: boolean
   dateOfResolution?: boolean
+  lastUpdated?: boolean
   assignedAgentId?: boolean
   managedByMunicipalAdminId?: boolean
   moderatedByMunicipalAdminId?: boolean
@@ -3869,7 +4167,7 @@ export type ComplaintSelectScalar = {
   managedBySuperAdminId?: boolean
 }
 
-export type ComplaintOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "submissionDate" | "seq" | "complainantId" | "categoryId" | "subCategory" | "standardizedSubCategory" | "description" | "urgency" | "attachmentUrl" | "assignedDepartment" | "status" | "sla" | "upvoteCount" | "isPublic" | "escalationLevel" | "dateOfResolution" | "assignedAgentId" | "managedByMunicipalAdminId" | "moderatedByMunicipalAdminId" | "crossDeptIssueSuperMunicipalId" | "escalatedToStateAdminId" | "escalatedToSuperStateAdminId" | "managedBySuperAdminId", ExtArgs["result"]["complaint"]>
+export type ComplaintOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "submissionDate" | "seq" | "complainantId" | "categoryId" | "subCategory" | "AIstandardizedSubCategory" | "AIabusedFlag" | "description" | "urgency" | "attachmentUrl" | "AIimageVarificationStatus" | "assignedDepartment" | "status" | "sla" | "upvoteCount" | "isPublic" | "escalationLevel" | "dateOfResolution" | "lastUpdated" | "assignedAgentId" | "managedByMunicipalAdminId" | "moderatedByMunicipalAdminId" | "crossDeptIssueSuperMunicipalId" | "escalatedToStateAdminId" | "escalatedToSuperStateAdminId" | "managedBySuperAdminId", ExtArgs["result"]["complaint"]>
 export type ComplaintInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   complainant?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   category?: boolean | Prisma.CategoryDefaultArgs<ExtArgs>
@@ -3933,10 +4231,12 @@ export type $ComplaintPayload<ExtArgs extends runtime.Types.Extensions.InternalA
     complainantId: string
     categoryId: string
     subCategory: string
-    standardizedSubCategory: string | null
+    AIstandardizedSubCategory: string | null
+    AIabusedFlag: boolean | null
     description: string
     urgency: $Enums.ComplaintUrgency
     attachmentUrl: string | null
+    AIimageVarificationStatus: boolean | null
     assignedDepartment: string
     status: $Enums.ComplaintStatus
     sla: string | null
@@ -3944,6 +4244,7 @@ export type $ComplaintPayload<ExtArgs extends runtime.Types.Extensions.InternalA
     isPublic: boolean
     escalationLevel: string | null
     dateOfResolution: Date | null
+    lastUpdated: Date
     assignedAgentId: string | null
     managedByMunicipalAdminId: string | null
     moderatedByMunicipalAdminId: string | null
@@ -4393,10 +4694,12 @@ export interface ComplaintFieldRefs {
   readonly complainantId: Prisma.FieldRef<"Complaint", 'String'>
   readonly categoryId: Prisma.FieldRef<"Complaint", 'String'>
   readonly subCategory: Prisma.FieldRef<"Complaint", 'String'>
-  readonly standardizedSubCategory: Prisma.FieldRef<"Complaint", 'String'>
+  readonly AIstandardizedSubCategory: Prisma.FieldRef<"Complaint", 'String'>
+  readonly AIabusedFlag: Prisma.FieldRef<"Complaint", 'Boolean'>
   readonly description: Prisma.FieldRef<"Complaint", 'String'>
   readonly urgency: Prisma.FieldRef<"Complaint", 'ComplaintUrgency'>
   readonly attachmentUrl: Prisma.FieldRef<"Complaint", 'String'>
+  readonly AIimageVarificationStatus: Prisma.FieldRef<"Complaint", 'Boolean'>
   readonly assignedDepartment: Prisma.FieldRef<"Complaint", 'String'>
   readonly status: Prisma.FieldRef<"Complaint", 'ComplaintStatus'>
   readonly sla: Prisma.FieldRef<"Complaint", 'String'>
@@ -4404,6 +4707,7 @@ export interface ComplaintFieldRefs {
   readonly isPublic: Prisma.FieldRef<"Complaint", 'Boolean'>
   readonly escalationLevel: Prisma.FieldRef<"Complaint", 'String'>
   readonly dateOfResolution: Prisma.FieldRef<"Complaint", 'DateTime'>
+  readonly lastUpdated: Prisma.FieldRef<"Complaint", 'DateTime'>
   readonly assignedAgentId: Prisma.FieldRef<"Complaint", 'String'>
   readonly managedByMunicipalAdminId: Prisma.FieldRef<"Complaint", 'String'>
   readonly moderatedByMunicipalAdminId: Prisma.FieldRef<"Complaint", 'String'>
