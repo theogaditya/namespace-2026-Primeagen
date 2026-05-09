@@ -89,7 +89,8 @@ model Agent {
   phoneNumber        String
   officialEmail      String    @unique
   department         Department
-  municipality       String
+  municipality       String?
+  district           String?
   accessLevel        AccessLevel @default(AGENT)
   workloadLimit      Int       @default(10)
   currentWorkload    Int       @default(0)
@@ -400,7 +401,6 @@ model AuditLog {
 // Regional Workflows a.k.a. sla definitions 
 model RegionalWorkflow {
   id          String    @id @default(uuid())
-  state       String
   municipality String?
   category    String
   sla         String
@@ -410,4 +410,21 @@ model RegionalWorkflow {
   createdById String
   
   @@map("regional_workflows")
+}
+model OpratingStates {
+  id          String    @id @default(uuid())
+  name        String
+  country     String    @default("India")
+  districts   OpratingDistricts[]
+  @@map("operating_states")
+} 
+model OpratingDistricts {
+  id          String    @id @default(uuid())
+  stateId     String
+  name        String
+  state       String
+
+  stateRel    OpratingStates @relation(fields: [stateId], references: [id], onDelete: Cascade)
+  
+  @@map("operating_districts")
 }
