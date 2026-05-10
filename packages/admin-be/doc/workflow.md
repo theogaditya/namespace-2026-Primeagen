@@ -17,7 +17,7 @@ This document explains how the Redis queues work in `user-be` for complaint inge
 ```bash
 curl -X POST 'http://localhost:3000/api/complaints' \
 	-H 'Content-Type: application/json' \
-	-H 'Authorization: Bearer <YOUR_BEARER_TOKEN>' \
+	-H 'Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI5ZTAzZDcxNC0xYTJmLTRhNDUtOTc0MC05OGYxYTMzMTE1YWIiLCJlbWFpbCI6InVzZXIubm92MzAuMjAyNUBleGFtcGxlLmNvbSIsIm5hbWUiOiJOb3ZlbWJlciBVc2VyIiwiaWF0IjoxNzY0NjA3MzE5LCJleHAiOjE3NjQ2OTM3MTl9.kB7ENj0zHUIr1tikJT3rynoHhPYpsKwgm7WV5ofSuWA' \
 	-d '{
 		"complainantId": "9e03d714-1a2f-4a45-9740-98f1a33115ab",
 		"categoryId": "c953f48a-9c65-4560-a9af-0771d46e8166",

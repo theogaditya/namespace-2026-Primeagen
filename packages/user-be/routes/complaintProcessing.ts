@@ -11,7 +11,7 @@ dotenv.config();
 let isPolling = false;
 let pollingInterval: NodeJS.Timeout | null = null;
 
-async function processNextComplaint(db: PrismaClient): Promise<{ processed: boolean; result?: any; error?: string }> {
+export async function processNextComplaint(db: PrismaClient): Promise<{ processed: boolean; result?: any; error?: string }> {
   try {
     await complaintQueueService.connect();
     const client = complaintQueueService['redisClient'].getClient();
