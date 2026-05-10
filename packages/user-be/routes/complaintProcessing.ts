@@ -2,6 +2,10 @@ import { Router } from "express";
 import { complaintQueueService } from "../lib/redis/complaintQueueService";
 import { PrismaClient } from "../prisma/generated/client/client";
 import { complaintProcessingSchema } from "../lib/validations/validation.complaint.processing";
+import { standardizeSubCategory } from "../lib/gcp/gcp";
+import dotenv from "dotenv";
+
+dotenv.config();
 
 let isPolling = false;
 let pollingInterval: NodeJS.Timeout | null = null;
@@ -25,8 +29,12 @@ async function processNextComplaint(db: PrismaClient): Promise<{ processed: bool
     }
 
     const complaintData = validationResult.data;
+    
+    // // Placeholder for AI standardized sub-category
     const AIstandardizedSubCategory = "dev";
-    // Placeholder for AI standardized sub-category
+
+    // // Standardize sub-category using GCP Vertex AI
+    // const AIstandardizedSubCategory = await standardizeSubCategory(complaintData.subCategory);
 
     const result = await db.$transaction(async (tx) => {
       const complaint = await tx.complaint.create({
