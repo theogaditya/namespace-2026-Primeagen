@@ -190,8 +190,8 @@ export type AuditLogWhereInput = {
   complaintId?: Prisma.StringNullableFilter<"AuditLog"> | string | null
   timestamp?: Prisma.DateTimeFilter<"AuditLog"> | Date | string
   details?: Prisma.StringNullableFilter<"AuditLog"> | string | null
-  user?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
   complaint?: Prisma.XOR<Prisma.ComplaintNullableScalarRelationFilter, Prisma.ComplaintWhereInput> | null
+  user?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
 }
 
 export type AuditLogOrderByWithRelationInput = {
@@ -201,8 +201,8 @@ export type AuditLogOrderByWithRelationInput = {
   complaintId?: Prisma.SortOrderInput | Prisma.SortOrder
   timestamp?: Prisma.SortOrder
   details?: Prisma.SortOrderInput | Prisma.SortOrder
-  user?: Prisma.UserOrderByWithRelationInput
   complaint?: Prisma.ComplaintOrderByWithRelationInput
+  user?: Prisma.UserOrderByWithRelationInput
 }
 
 export type AuditLogWhereUniqueInput = Prisma.AtLeast<{
@@ -215,8 +215,8 @@ export type AuditLogWhereUniqueInput = Prisma.AtLeast<{
   complaintId?: Prisma.StringNullableFilter<"AuditLog"> | string | null
   timestamp?: Prisma.DateTimeFilter<"AuditLog"> | Date | string
   details?: Prisma.StringNullableFilter<"AuditLog"> | string | null
-  user?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
   complaint?: Prisma.XOR<Prisma.ComplaintNullableScalarRelationFilter, Prisma.ComplaintWhereInput> | null
+  user?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
 }, "id">
 
 export type AuditLogOrderByWithAggregationInput = {
@@ -248,8 +248,8 @@ export type AuditLogCreateInput = {
   action: string
   timestamp?: Date | string
   details?: string | null
-  user: Prisma.UserCreateNestedOneWithoutAuditLogsCreatedInput
   complaint?: Prisma.ComplaintCreateNestedOneWithoutAuditLogsInput
+  user: Prisma.UserCreateNestedOneWithoutAuditLogsCreatedInput
 }
 
 export type AuditLogUncheckedCreateInput = {
@@ -266,8 +266,8 @@ export type AuditLogUpdateInput = {
   action?: Prisma.StringFieldUpdateOperationsInput | string
   timestamp?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   details?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  user?: Prisma.UserUpdateOneRequiredWithoutAuditLogsCreatedNestedInput
   complaint?: Prisma.ComplaintUpdateOneWithoutAuditLogsNestedInput
+  user?: Prisma.UserUpdateOneRequiredWithoutAuditLogsCreatedNestedInput
 }
 
 export type AuditLogUncheckedUpdateInput = {
@@ -594,8 +594,8 @@ export type AuditLogSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs
   complaintId?: boolean
   timestamp?: boolean
   details?: boolean
-  user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   complaint?: boolean | Prisma.AuditLog$complaintArgs<ExtArgs>
+  user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["auditLog"]>
 
 export type AuditLogSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -605,8 +605,8 @@ export type AuditLogSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Exte
   complaintId?: boolean
   timestamp?: boolean
   details?: boolean
-  user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   complaint?: boolean | Prisma.AuditLog$complaintArgs<ExtArgs>
+  user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["auditLog"]>
 
 export type AuditLogSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -616,8 +616,8 @@ export type AuditLogSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Exte
   complaintId?: boolean
   timestamp?: boolean
   details?: boolean
-  user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   complaint?: boolean | Prisma.AuditLog$complaintArgs<ExtArgs>
+  user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["auditLog"]>
 
 export type AuditLogSelectScalar = {
@@ -631,23 +631,23 @@ export type AuditLogSelectScalar = {
 
 export type AuditLogOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "action" | "userId" | "complaintId" | "timestamp" | "details", ExtArgs["result"]["auditLog"]>
 export type AuditLogInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   complaint?: boolean | Prisma.AuditLog$complaintArgs<ExtArgs>
+  user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
 }
 export type AuditLogIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   complaint?: boolean | Prisma.AuditLog$complaintArgs<ExtArgs>
+  user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
 }
 export type AuditLogIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   complaint?: boolean | Prisma.AuditLog$complaintArgs<ExtArgs>
+  user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
 }
 
 export type $AuditLogPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   name: "AuditLog"
   objects: {
-    user: Prisma.$UserPayload<ExtArgs>
     complaint: Prisma.$ComplaintPayload<ExtArgs> | null
+    user: Prisma.$UserPayload<ExtArgs>
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -1050,8 +1050,8 @@ readonly fields: AuditLogFieldRefs;
  */
 export interface Prisma__AuditLogClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
-  user<T extends Prisma.UserDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.UserDefaultArgs<ExtArgs>>): Prisma.Prisma__UserClient<runtime.Types.Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   complaint<T extends Prisma.AuditLog$complaintArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.AuditLog$complaintArgs<ExtArgs>>): Prisma.Prisma__ComplaintClient<runtime.Types.Result.GetResult<Prisma.$ComplaintPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+  user<T extends Prisma.UserDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.UserDefaultArgs<ExtArgs>>): Prisma.Prisma__UserClient<runtime.Types.Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.

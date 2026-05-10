@@ -33,8 +33,8 @@ export type UserLocationMinAggregateOutputType = {
   locality: string | null
   street: string | null
   municipal: string | null
-  state: string | null
   country: string | null
+  state: string | null
 }
 
 export type UserLocationMaxAggregateOutputType = {
@@ -46,8 +46,8 @@ export type UserLocationMaxAggregateOutputType = {
   locality: string | null
   street: string | null
   municipal: string | null
-  state: string | null
   country: string | null
+  state: string | null
 }
 
 export type UserLocationCountAggregateOutputType = {
@@ -59,8 +59,8 @@ export type UserLocationCountAggregateOutputType = {
   locality: number
   street: number
   municipal: number
-  state: number
   country: number
+  state: number
   _all: number
 }
 
@@ -74,8 +74,8 @@ export type UserLocationMinAggregateInputType = {
   locality?: true
   street?: true
   municipal?: true
-  state?: true
   country?: true
+  state?: true
 }
 
 export type UserLocationMaxAggregateInputType = {
@@ -87,8 +87,8 @@ export type UserLocationMaxAggregateInputType = {
   locality?: true
   street?: true
   municipal?: true
-  state?: true
   country?: true
+  state?: true
 }
 
 export type UserLocationCountAggregateInputType = {
@@ -100,8 +100,8 @@ export type UserLocationCountAggregateInputType = {
   locality?: true
   street?: true
   municipal?: true
-  state?: true
   country?: true
+  state?: true
   _all?: true
 }
 
@@ -186,8 +186,8 @@ export type UserLocationGroupByOutputType = {
   locality: string
   street: string | null
   municipal: string
-  state: string
   country: string
+  state: string
   _count: UserLocationCountAggregateOutputType | null
   _min: UserLocationMinAggregateOutputType | null
   _max: UserLocationMaxAggregateOutputType | null
@@ -220,8 +220,8 @@ export type UserLocationWhereInput = {
   locality?: Prisma.StringFilter<"UserLocation"> | string
   street?: Prisma.StringNullableFilter<"UserLocation"> | string | null
   municipal?: Prisma.StringFilter<"UserLocation"> | string
-  state?: Prisma.StringFilter<"UserLocation"> | string
   country?: Prisma.StringFilter<"UserLocation"> | string
+  state?: Prisma.StringFilter<"UserLocation"> | string
   user?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
 }
 
@@ -234,8 +234,8 @@ export type UserLocationOrderByWithRelationInput = {
   locality?: Prisma.SortOrder
   street?: Prisma.SortOrderInput | Prisma.SortOrder
   municipal?: Prisma.SortOrder
-  state?: Prisma.SortOrder
   country?: Prisma.SortOrder
+  state?: Prisma.SortOrder
   user?: Prisma.UserOrderByWithRelationInput
 }
 
@@ -251,8 +251,8 @@ export type UserLocationWhereUniqueInput = Prisma.AtLeast<{
   locality?: Prisma.StringFilter<"UserLocation"> | string
   street?: Prisma.StringNullableFilter<"UserLocation"> | string | null
   municipal?: Prisma.StringFilter<"UserLocation"> | string
-  state?: Prisma.StringFilter<"UserLocation"> | string
   country?: Prisma.StringFilter<"UserLocation"> | string
+  state?: Prisma.StringFilter<"UserLocation"> | string
   user?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
 }, "id" | "userId">
 
@@ -265,8 +265,8 @@ export type UserLocationOrderByWithAggregationInput = {
   locality?: Prisma.SortOrder
   street?: Prisma.SortOrderInput | Prisma.SortOrder
   municipal?: Prisma.SortOrder
-  state?: Prisma.SortOrder
   country?: Prisma.SortOrder
+  state?: Prisma.SortOrder
   _count?: Prisma.UserLocationCountOrderByAggregateInput
   _max?: Prisma.UserLocationMaxOrderByAggregateInput
   _min?: Prisma.UserLocationMinOrderByAggregateInput
@@ -284,8 +284,8 @@ export type UserLocationScalarWhereWithAggregatesInput = {
   locality?: Prisma.StringWithAggregatesFilter<"UserLocation"> | string
   street?: Prisma.StringNullableWithAggregatesFilter<"UserLocation"> | string | null
   municipal?: Prisma.StringWithAggregatesFilter<"UserLocation"> | string
-  state?: Prisma.StringWithAggregatesFilter<"UserLocation"> | string
   country?: Prisma.StringWithAggregatesFilter<"UserLocation"> | string
+  state?: Prisma.StringWithAggregatesFilter<"UserLocation"> | string
 }
 
 export type UserLocationCreateInput = {
@@ -296,8 +296,8 @@ export type UserLocationCreateInput = {
   locality: string
   street?: string | null
   municipal: string
-  state: string
   country?: string
+  state: string
   user: Prisma.UserCreateNestedOneWithoutLocationInput
 }
 
@@ -310,8 +310,8 @@ export type UserLocationUncheckedCreateInput = {
   locality: string
   street?: string | null
   municipal: string
-  state: string
   country?: string
+  state: string
 }
 
 export type UserLocationUpdateInput = {
@@ -322,8 +322,8 @@ export type UserLocationUpdateInput = {
   locality?: Prisma.StringFieldUpdateOperationsInput | string
   street?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   municipal?: Prisma.StringFieldUpdateOperationsInput | string
-  state?: Prisma.StringFieldUpdateOperationsInput | string
   country?: Prisma.StringFieldUpdateOperationsInput | string
+  state?: Prisma.StringFieldUpdateOperationsInput | string
   user?: Prisma.UserUpdateOneRequiredWithoutLocationNestedInput
 }
 
@@ -336,8 +336,8 @@ export type UserLocationUncheckedUpdateInput = {
   locality?: Prisma.StringFieldUpdateOperationsInput | string
   street?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   municipal?: Prisma.StringFieldUpdateOperationsInput | string
-  state?: Prisma.StringFieldUpdateOperationsInput | string
   country?: Prisma.StringFieldUpdateOperationsInput | string
+  state?: Prisma.StringFieldUpdateOperationsInput | string
 }
 
 export type UserLocationCreateManyInput = {
@@ -349,8 +349,8 @@ export type UserLocationCreateManyInput = {
   locality: string
   street?: string | null
   municipal: string
-  state: string
   country?: string
+  state: string
 }
 
 export type UserLocationUpdateManyMutationInput = {
@@ -361,8 +361,8 @@ export type UserLocationUpdateManyMutationInput = {
   locality?: Prisma.StringFieldUpdateOperationsInput | string
   street?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   municipal?: Prisma.StringFieldUpdateOperationsInput | string
-  state?: Prisma.StringFieldUpdateOperationsInput | string
   country?: Prisma.StringFieldUpdateOperationsInput | string
+  state?: Prisma.StringFieldUpdateOperationsInput | string
 }
 
 export type UserLocationUncheckedUpdateManyInput = {
@@ -374,8 +374,8 @@ export type UserLocationUncheckedUpdateManyInput = {
   locality?: Prisma.StringFieldUpdateOperationsInput | string
   street?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   municipal?: Prisma.StringFieldUpdateOperationsInput | string
-  state?: Prisma.StringFieldUpdateOperationsInput | string
   country?: Prisma.StringFieldUpdateOperationsInput | string
+  state?: Prisma.StringFieldUpdateOperationsInput | string
 }
 
 export type UserLocationNullableScalarRelationFilter = {
@@ -392,8 +392,8 @@ export type UserLocationCountOrderByAggregateInput = {
   locality?: Prisma.SortOrder
   street?: Prisma.SortOrder
   municipal?: Prisma.SortOrder
-  state?: Prisma.SortOrder
   country?: Prisma.SortOrder
+  state?: Prisma.SortOrder
 }
 
 export type UserLocationMaxOrderByAggregateInput = {
@@ -405,8 +405,8 @@ export type UserLocationMaxOrderByAggregateInput = {
   locality?: Prisma.SortOrder
   street?: Prisma.SortOrder
   municipal?: Prisma.SortOrder
-  state?: Prisma.SortOrder
   country?: Prisma.SortOrder
+  state?: Prisma.SortOrder
 }
 
 export type UserLocationMinOrderByAggregateInput = {
@@ -418,8 +418,8 @@ export type UserLocationMinOrderByAggregateInput = {
   locality?: Prisma.SortOrder
   street?: Prisma.SortOrder
   municipal?: Prisma.SortOrder
-  state?: Prisma.SortOrder
   country?: Prisma.SortOrder
+  state?: Prisma.SortOrder
 }
 
 export type UserLocationCreateNestedOneWithoutUserInput = {
@@ -462,8 +462,8 @@ export type UserLocationCreateWithoutUserInput = {
   locality: string
   street?: string | null
   municipal: string
-  state: string
   country?: string
+  state: string
 }
 
 export type UserLocationUncheckedCreateWithoutUserInput = {
@@ -474,8 +474,8 @@ export type UserLocationUncheckedCreateWithoutUserInput = {
   locality: string
   street?: string | null
   municipal: string
-  state: string
   country?: string
+  state: string
 }
 
 export type UserLocationCreateOrConnectWithoutUserInput = {
@@ -502,8 +502,8 @@ export type UserLocationUpdateWithoutUserInput = {
   locality?: Prisma.StringFieldUpdateOperationsInput | string
   street?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   municipal?: Prisma.StringFieldUpdateOperationsInput | string
-  state?: Prisma.StringFieldUpdateOperationsInput | string
   country?: Prisma.StringFieldUpdateOperationsInput | string
+  state?: Prisma.StringFieldUpdateOperationsInput | string
 }
 
 export type UserLocationUncheckedUpdateWithoutUserInput = {
@@ -514,8 +514,8 @@ export type UserLocationUncheckedUpdateWithoutUserInput = {
   locality?: Prisma.StringFieldUpdateOperationsInput | string
   street?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   municipal?: Prisma.StringFieldUpdateOperationsInput | string
-  state?: Prisma.StringFieldUpdateOperationsInput | string
   country?: Prisma.StringFieldUpdateOperationsInput | string
+  state?: Prisma.StringFieldUpdateOperationsInput | string
 }
 
 
@@ -529,8 +529,8 @@ export type UserLocationSelect<ExtArgs extends runtime.Types.Extensions.Internal
   locality?: boolean
   street?: boolean
   municipal?: boolean
-  state?: boolean
   country?: boolean
+  state?: boolean
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["userLocation"]>
 
@@ -543,8 +543,8 @@ export type UserLocationSelectCreateManyAndReturn<ExtArgs extends runtime.Types.
   locality?: boolean
   street?: boolean
   municipal?: boolean
-  state?: boolean
   country?: boolean
+  state?: boolean
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["userLocation"]>
 
@@ -557,8 +557,8 @@ export type UserLocationSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.
   locality?: boolean
   street?: boolean
   municipal?: boolean
-  state?: boolean
   country?: boolean
+  state?: boolean
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["userLocation"]>
 
@@ -571,11 +571,11 @@ export type UserLocationSelectScalar = {
   locality?: boolean
   street?: boolean
   municipal?: boolean
-  state?: boolean
   country?: boolean
+  state?: boolean
 }
 
-export type UserLocationOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "userId" | "pin" | "district" | "city" | "locality" | "street" | "municipal" | "state" | "country", ExtArgs["result"]["userLocation"]>
+export type UserLocationOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "userId" | "pin" | "district" | "city" | "locality" | "street" | "municipal" | "country" | "state", ExtArgs["result"]["userLocation"]>
 export type UserLocationInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
 }
@@ -600,8 +600,8 @@ export type $UserLocationPayload<ExtArgs extends runtime.Types.Extensions.Intern
     locality: string
     street: string | null
     municipal: string
-    state: string
     country: string
+    state: string
   }, ExtArgs["result"]["userLocation"]>
   composites: {}
 }
@@ -1034,8 +1034,8 @@ export interface UserLocationFieldRefs {
   readonly locality: Prisma.FieldRef<"UserLocation", 'String'>
   readonly street: Prisma.FieldRef<"UserLocation", 'String'>
   readonly municipal: Prisma.FieldRef<"UserLocation", 'String'>
-  readonly state: Prisma.FieldRef<"UserLocation", 'String'>
   readonly country: Prisma.FieldRef<"UserLocation", 'String'>
+  readonly state: Prisma.FieldRef<"UserLocation", 'String'>
 }
     
 

@@ -12,7 +12,7 @@ dotenv.config();
 
 // Main async function to handle secrets retrieval
 async function bootstrap() {
-  try {
+  try {   
     // Retrieve secrets from AWS Secrets Manager
     // This will inject secrets into process.env
     await retrieveAndInjectSecrets();
@@ -27,22 +27,17 @@ async function bootstrap() {
     await complaintQueueService.connect();
     console.log('Complaint queue service initialized');
 
-    // Initialize GCP Vertex AI client
-    const gcpConfig = await initializeGCP();
-    console.log('GCP Vertex AI client initialized');
-    console.log(`  Project: ${gcpConfig.projectId}`);
-    console.log(`  Location: ${gcpConfig.location}`);
-    console.log(`  Endpoint: ${gcpConfig.endpointId}`);
-
-    // Helper: non-blocking pop from complaint queue
-    // Use when you need to manually pop a complaint for one-off processing
-    
+    // // Helper: non-blocking pop from complaint queue
     // const client = complaintQueueService['redisClient'].getClient();
     // // simple non-blocking pop
     // const raw = await client.lPop('complaint:registration:queue');
     // if (!raw) return null;
     // const complaint = JSON.parse(raw);
-    
+
+    // Initialize GCP Vertex AI client
+    const gcpConfig = await initializeGCP();
+    console.log('GCP Vertex AI client initialized');
+    console.log(`  Endpoint: ${gcpConfig.endpointId}`);
 
     // Now that secrets are loaded, initialize server
     const server = new Server(prisma);

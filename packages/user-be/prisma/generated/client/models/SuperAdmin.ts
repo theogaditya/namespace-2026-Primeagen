@@ -231,8 +231,8 @@ export type SuperAdminWhereInput = {
   status?: Prisma.EnumStatusFilter<"SuperAdmin"> | $Enums.Status
   lastLogin?: Prisma.DateTimeNullableFilter<"SuperAdmin"> | Date | string | null
   managedCategories?: Prisma.CategoryListRelationFilter
-  managedSuperStateAdmins?: Prisma.SuperStateAdminListRelationFilter
   managedComplaints?: Prisma.ComplaintListRelationFilter
+  managedSuperStateAdmins?: Prisma.SuperStateAdminListRelationFilter
 }
 
 export type SuperAdminOrderByWithRelationInput = {
@@ -248,8 +248,8 @@ export type SuperAdminOrderByWithRelationInput = {
   status?: Prisma.SortOrder
   lastLogin?: Prisma.SortOrderInput | Prisma.SortOrder
   managedCategories?: Prisma.CategoryOrderByRelationAggregateInput
-  managedSuperStateAdmins?: Prisma.SuperStateAdminOrderByRelationAggregateInput
   managedComplaints?: Prisma.ComplaintOrderByRelationAggregateInput
+  managedSuperStateAdmins?: Prisma.SuperStateAdminOrderByRelationAggregateInput
 }
 
 export type SuperAdminWhereUniqueInput = Prisma.AtLeast<{
@@ -268,8 +268,8 @@ export type SuperAdminWhereUniqueInput = Prisma.AtLeast<{
   status?: Prisma.EnumStatusFilter<"SuperAdmin"> | $Enums.Status
   lastLogin?: Prisma.DateTimeNullableFilter<"SuperAdmin"> | Date | string | null
   managedCategories?: Prisma.CategoryListRelationFilter
-  managedSuperStateAdmins?: Prisma.SuperStateAdminListRelationFilter
   managedComplaints?: Prisma.ComplaintListRelationFilter
+  managedSuperStateAdmins?: Prisma.SuperStateAdminListRelationFilter
 }, "id" | "officialEmail">
 
 export type SuperAdminOrderByWithAggregationInput = {
@@ -319,8 +319,8 @@ export type SuperAdminCreateInput = {
   status?: $Enums.Status
   lastLogin?: Date | string | null
   managedCategories?: Prisma.CategoryCreateNestedManyWithoutCreatedBySuperAdminInput
-  managedSuperStateAdmins?: Prisma.SuperStateAdminCreateNestedManyWithoutManagedBySuperAdminInput
   managedComplaints?: Prisma.ComplaintCreateNestedManyWithoutManagedBySuperAdminInput
+  managedSuperStateAdmins?: Prisma.SuperStateAdminCreateNestedManyWithoutManagedBySuperAdminInput
 }
 
 export type SuperAdminUncheckedCreateInput = {
@@ -336,8 +336,8 @@ export type SuperAdminUncheckedCreateInput = {
   status?: $Enums.Status
   lastLogin?: Date | string | null
   managedCategories?: Prisma.CategoryUncheckedCreateNestedManyWithoutCreatedBySuperAdminInput
-  managedSuperStateAdmins?: Prisma.SuperStateAdminUncheckedCreateNestedManyWithoutManagedBySuperAdminInput
   managedComplaints?: Prisma.ComplaintUncheckedCreateNestedManyWithoutManagedBySuperAdminInput
+  managedSuperStateAdmins?: Prisma.SuperStateAdminUncheckedCreateNestedManyWithoutManagedBySuperAdminInput
 }
 
 export type SuperAdminUpdateInput = {
@@ -353,8 +353,8 @@ export type SuperAdminUpdateInput = {
   status?: Prisma.EnumStatusFieldUpdateOperationsInput | $Enums.Status
   lastLogin?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   managedCategories?: Prisma.CategoryUpdateManyWithoutCreatedBySuperAdminNestedInput
-  managedSuperStateAdmins?: Prisma.SuperStateAdminUpdateManyWithoutManagedBySuperAdminNestedInput
   managedComplaints?: Prisma.ComplaintUpdateManyWithoutManagedBySuperAdminNestedInput
+  managedSuperStateAdmins?: Prisma.SuperStateAdminUpdateManyWithoutManagedBySuperAdminNestedInput
 }
 
 export type SuperAdminUncheckedUpdateInput = {
@@ -370,8 +370,8 @@ export type SuperAdminUncheckedUpdateInput = {
   status?: Prisma.EnumStatusFieldUpdateOperationsInput | $Enums.Status
   lastLogin?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   managedCategories?: Prisma.CategoryUncheckedUpdateManyWithoutCreatedBySuperAdminNestedInput
-  managedSuperStateAdmins?: Prisma.SuperStateAdminUncheckedUpdateManyWithoutManagedBySuperAdminNestedInput
   managedComplaints?: Prisma.ComplaintUncheckedUpdateManyWithoutManagedBySuperAdminNestedInput
+  managedSuperStateAdmins?: Prisma.SuperStateAdminUncheckedUpdateManyWithoutManagedBySuperAdminNestedInput
 }
 
 export type SuperAdminCreateManyInput = {
@@ -603,8 +603,8 @@ export type SuperAdminCreateWithoutManagedCategoriesInput = {
   lastUpdated?: Date | string
   status?: $Enums.Status
   lastLogin?: Date | string | null
-  managedSuperStateAdmins?: Prisma.SuperStateAdminCreateNestedManyWithoutManagedBySuperAdminInput
   managedComplaints?: Prisma.ComplaintCreateNestedManyWithoutManagedBySuperAdminInput
+  managedSuperStateAdmins?: Prisma.SuperStateAdminCreateNestedManyWithoutManagedBySuperAdminInput
 }
 
 export type SuperAdminUncheckedCreateWithoutManagedCategoriesInput = {
@@ -619,8 +619,8 @@ export type SuperAdminUncheckedCreateWithoutManagedCategoriesInput = {
   lastUpdated?: Date | string
   status?: $Enums.Status
   lastLogin?: Date | string | null
-  managedSuperStateAdmins?: Prisma.SuperStateAdminUncheckedCreateNestedManyWithoutManagedBySuperAdminInput
   managedComplaints?: Prisma.ComplaintUncheckedCreateNestedManyWithoutManagedBySuperAdminInput
+  managedSuperStateAdmins?: Prisma.SuperStateAdminUncheckedCreateNestedManyWithoutManagedBySuperAdminInput
 }
 
 export type SuperAdminCreateOrConnectWithoutManagedCategoriesInput = {
@@ -651,8 +651,8 @@ export type SuperAdminUpdateWithoutManagedCategoriesInput = {
   lastUpdated?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   status?: Prisma.EnumStatusFieldUpdateOperationsInput | $Enums.Status
   lastLogin?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  managedSuperStateAdmins?: Prisma.SuperStateAdminUpdateManyWithoutManagedBySuperAdminNestedInput
   managedComplaints?: Prisma.ComplaintUpdateManyWithoutManagedBySuperAdminNestedInput
+  managedSuperStateAdmins?: Prisma.SuperStateAdminUpdateManyWithoutManagedBySuperAdminNestedInput
 }
 
 export type SuperAdminUncheckedUpdateWithoutManagedCategoriesInput = {
@@ -667,8 +667,8 @@ export type SuperAdminUncheckedUpdateWithoutManagedCategoriesInput = {
   lastUpdated?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   status?: Prisma.EnumStatusFieldUpdateOperationsInput | $Enums.Status
   lastLogin?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  managedSuperStateAdmins?: Prisma.SuperStateAdminUncheckedUpdateManyWithoutManagedBySuperAdminNestedInput
   managedComplaints?: Prisma.ComplaintUncheckedUpdateManyWithoutManagedBySuperAdminNestedInput
+  managedSuperStateAdmins?: Prisma.SuperStateAdminUncheckedUpdateManyWithoutManagedBySuperAdminNestedInput
 }
 
 export type SuperAdminCreateWithoutManagedComplaintsInput = {
@@ -758,14 +758,14 @@ export type SuperAdminUncheckedUpdateWithoutManagedComplaintsInput = {
 
 export type SuperAdminCountOutputType = {
   managedCategories: number
-  managedSuperStateAdmins: number
   managedComplaints: number
+  managedSuperStateAdmins: number
 }
 
 export type SuperAdminCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   managedCategories?: boolean | SuperAdminCountOutputTypeCountManagedCategoriesArgs
-  managedSuperStateAdmins?: boolean | SuperAdminCountOutputTypeCountManagedSuperStateAdminsArgs
   managedComplaints?: boolean | SuperAdminCountOutputTypeCountManagedComplaintsArgs
+  managedSuperStateAdmins?: boolean | SuperAdminCountOutputTypeCountManagedSuperStateAdminsArgs
 }
 
 /**
@@ -788,15 +788,15 @@ export type SuperAdminCountOutputTypeCountManagedCategoriesArgs<ExtArgs extends 
 /**
  * SuperAdminCountOutputType without action
  */
-export type SuperAdminCountOutputTypeCountManagedSuperStateAdminsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  where?: Prisma.SuperStateAdminWhereInput
+export type SuperAdminCountOutputTypeCountManagedComplaintsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.ComplaintWhereInput
 }
 
 /**
  * SuperAdminCountOutputType without action
  */
-export type SuperAdminCountOutputTypeCountManagedComplaintsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  where?: Prisma.ComplaintWhereInput
+export type SuperAdminCountOutputTypeCountManagedSuperStateAdminsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.SuperStateAdminWhereInput
 }
 
 
@@ -813,8 +813,8 @@ export type SuperAdminSelect<ExtArgs extends runtime.Types.Extensions.InternalAr
   status?: boolean
   lastLogin?: boolean
   managedCategories?: boolean | Prisma.SuperAdmin$managedCategoriesArgs<ExtArgs>
-  managedSuperStateAdmins?: boolean | Prisma.SuperAdmin$managedSuperStateAdminsArgs<ExtArgs>
   managedComplaints?: boolean | Prisma.SuperAdmin$managedComplaintsArgs<ExtArgs>
+  managedSuperStateAdmins?: boolean | Prisma.SuperAdmin$managedSuperStateAdminsArgs<ExtArgs>
   _count?: boolean | Prisma.SuperAdminCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["superAdmin"]>
 
@@ -863,8 +863,8 @@ export type SuperAdminSelectScalar = {
 export type SuperAdminOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "fullName" | "adminId" | "officialEmail" | "phoneNumber" | "password" | "accessLevel" | "dateOfCreation" | "lastUpdated" | "status" | "lastLogin", ExtArgs["result"]["superAdmin"]>
 export type SuperAdminInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   managedCategories?: boolean | Prisma.SuperAdmin$managedCategoriesArgs<ExtArgs>
-  managedSuperStateAdmins?: boolean | Prisma.SuperAdmin$managedSuperStateAdminsArgs<ExtArgs>
   managedComplaints?: boolean | Prisma.SuperAdmin$managedComplaintsArgs<ExtArgs>
+  managedSuperStateAdmins?: boolean | Prisma.SuperAdmin$managedSuperStateAdminsArgs<ExtArgs>
   _count?: boolean | Prisma.SuperAdminCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type SuperAdminIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {}
@@ -874,8 +874,8 @@ export type $SuperAdminPayload<ExtArgs extends runtime.Types.Extensions.Internal
   name: "SuperAdmin"
   objects: {
     managedCategories: Prisma.$CategoryPayload<ExtArgs>[]
-    managedSuperStateAdmins: Prisma.$SuperStateAdminPayload<ExtArgs>[]
     managedComplaints: Prisma.$ComplaintPayload<ExtArgs>[]
+    managedSuperStateAdmins: Prisma.$SuperStateAdminPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -1284,8 +1284,8 @@ readonly fields: SuperAdminFieldRefs;
 export interface Prisma__SuperAdminClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
   managedCategories<T extends Prisma.SuperAdmin$managedCategoriesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.SuperAdmin$managedCategoriesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$CategoryPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
-  managedSuperStateAdmins<T extends Prisma.SuperAdmin$managedSuperStateAdminsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.SuperAdmin$managedSuperStateAdminsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$SuperStateAdminPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   managedComplaints<T extends Prisma.SuperAdmin$managedComplaintsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.SuperAdmin$managedComplaintsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ComplaintPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  managedSuperStateAdmins<T extends Prisma.SuperAdmin$managedSuperStateAdminsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.SuperAdmin$managedSuperStateAdminsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$SuperStateAdminPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -1738,30 +1738,6 @@ export type SuperAdmin$managedCategoriesArgs<ExtArgs extends runtime.Types.Exten
 }
 
 /**
- * SuperAdmin.managedSuperStateAdmins
- */
-export type SuperAdmin$managedSuperStateAdminsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  /**
-   * Select specific fields to fetch from the SuperStateAdmin
-   */
-  select?: Prisma.SuperStateAdminSelect<ExtArgs> | null
-  /**
-   * Omit specific fields from the SuperStateAdmin
-   */
-  omit?: Prisma.SuperStateAdminOmit<ExtArgs> | null
-  /**
-   * Choose, which related nodes to fetch as well
-   */
-  include?: Prisma.SuperStateAdminInclude<ExtArgs> | null
-  where?: Prisma.SuperStateAdminWhereInput
-  orderBy?: Prisma.SuperStateAdminOrderByWithRelationInput | Prisma.SuperStateAdminOrderByWithRelationInput[]
-  cursor?: Prisma.SuperStateAdminWhereUniqueInput
-  take?: number
-  skip?: number
-  distinct?: Prisma.SuperStateAdminScalarFieldEnum | Prisma.SuperStateAdminScalarFieldEnum[]
-}
-
-/**
  * SuperAdmin.managedComplaints
  */
 export type SuperAdmin$managedComplaintsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -1783,6 +1759,30 @@ export type SuperAdmin$managedComplaintsArgs<ExtArgs extends runtime.Types.Exten
   take?: number
   skip?: number
   distinct?: Prisma.ComplaintScalarFieldEnum | Prisma.ComplaintScalarFieldEnum[]
+}
+
+/**
+ * SuperAdmin.managedSuperStateAdmins
+ */
+export type SuperAdmin$managedSuperStateAdminsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the SuperStateAdmin
+   */
+  select?: Prisma.SuperStateAdminSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the SuperStateAdmin
+   */
+  omit?: Prisma.SuperStateAdminOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.SuperStateAdminInclude<ExtArgs> | null
+  where?: Prisma.SuperStateAdminWhereInput
+  orderBy?: Prisma.SuperStateAdminOrderByWithRelationInput | Prisma.SuperStateAdminOrderByWithRelationInput[]
+  cursor?: Prisma.SuperStateAdminWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.SuperStateAdminScalarFieldEnum | Prisma.SuperStateAdminScalarFieldEnum[]
 }
 
 /**
