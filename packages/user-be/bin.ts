@@ -5,6 +5,7 @@ import { getPrisma } from "./lib/prisma";
 import { retrieveAndInjectSecrets } from "./middleware/retriveSecrets";
 import { userQueueService } from "./lib/redis/userQueueService";
 import { complaintQueueService } from "./lib/redis/complaintQueueService";
+import { initializeGCP } from "./lib/gcp/gcp";
 
 // Load local .env file first (for development)
 dotenv.config();
@@ -25,6 +26,13 @@ async function bootstrap() {
     
     await complaintQueueService.connect();
     console.log('Complaint queue service initialized');
+
+    // Initialize GCP Vertex AI client
+    const gcpConfig = await initializeGCP();
+    console.log('GCP Vertex AI client initialized');
+    console.log(`  Project: ${gcpConfig.projectId}`);
+    console.log(`  Location: ${gcpConfig.location}`);
+    console.log(`  Endpoint: ${gcpConfig.endpointId}`);
 
     // Helper: non-blocking pop from complaint queue
     // Use when you need to manually pop a complaint for one-off processing
