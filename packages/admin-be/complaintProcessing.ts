@@ -1,9 +1,9 @@
 import { Router } from "express";
-import { complaintQueueService } from "../lib/redis/complaintQueueService";
-import { processedComplaintQueueService } from "../lib/redis/processedComplaintQueueService";
-import { PrismaClient } from "../prisma/generated/client/client";
-import { complaintProcessingSchema } from "../lib/validations/validation.complaint.processing";
-import { standardizeSubCategory } from "../lib/gcp/gcp";
+import { complaintQueueService } from "../user-be/lib/redis/complaintQueueService";
+import { processedComplaintQueueService } from "../user-be/lib/redis/processedComplaintQueueService";
+import { PrismaClient } from "../user-be/prisma/generated/client/client";
+import { complaintProcessingSchema } from "../user-be/lib/validations/validation.complaint.processing";
+import { standardizeSubCategory } from "./lib/gcp/gcp";
 import dotenv from "dotenv";
 
 dotenv.config();

@@ -11,6 +11,7 @@
     "typescript": "^5"
   },
   "dependencies": {
+    "@redis/client": "^5.10.0",
     "jest-mock-extended": "2.0.4"
   }
 }

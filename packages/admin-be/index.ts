@@ -7,6 +7,8 @@ import agentRoutes from './routes/agent';
 import municipalAdminRoutes from './routes/municipalAdminRoutes';
 import stateAdminRoutes from './routes/stateAdminRoutes';
 import superAdminRoutes from './routes/superAdminRoutes';
+import { complaintProcessingRouter, startComplaintPolling } from './routes/complaintProcessing';
+import { healthPoint } from './routes/health';
 
 export class Server {
   private app: Express;
@@ -53,10 +55,14 @@ export class Server {
     this.app.use('/api/state-admin', stateAdminRoutes(this.db));
     this.app.use('/api/municipal-admin', municipalAdminRoutes(this.db));
     this.app.use('/api/agent', agentRoutes(this.db));
-
+    this.app.use('/api/complaint', complaintProcessingRouter(this.db));
+  
+    this.app.use('/api', healthPoint(this.db));
     this.app.get('/health', (req, res) => {
       res.status(200).send('OK');
     });
+
+    startComplaintPolling(this.db);
   }
 
   public getApp(): Express {

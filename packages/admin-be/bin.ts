@@ -1,6 +1,8 @@
 import { Server } from "./index";
 import dotenv from "dotenv";
 import { getPrisma } from "./lib/prisma";
+import { initializeGCP } from "./lib/gcp/gcp";
+import { redisClient, RedisClientforComplaintQueue } from './lib/redis/redisClient';
 
 // Load local .env file first (for development)
 dotenv.config();
@@ -13,6 +15,32 @@ async function bootstrap() {
 
     const prisma = getPrisma();
     console.log('Prisma client initialized');
+
+    // Initialize Redis clients once and log a single sanitized message
+    try {
+      await redisClient.connect();
+      const complaintClient = new RedisClientforComplaintQueue();
+      await complaintClient.connect();
+
+      const rawUrl = process.env.REDIS_URL || 'redis://localhost:6379';
+      // mask credentials if present
+      const sanitized = rawUrl.replace(/:\/\/.*@/, '://<redacted>@');
+      console.log(`[Redis] connected to ${sanitized}`);
+    } catch (redisInitErr) {
+      console.warn('Failed to initialize Redis clients:', redisInitErr);
+    }
+
+    // // Helper: non-blocking pop from complaint queue
+    // const client = complaintQueueService['redisClient'].getClient();
+    // // simple non-blocking pop
+    // const raw = await client.lPop('complaint:registration:queue');
+    // if (!raw) return null;
+    // const complaint = JSON.parse(raw);
+
+    // Initialize GCP Vertex AI client
+    const gcpConfig = await initializeGCP();
+    console.log('GCP Vertex AI client initialized');
+    console.log(`  Endpoint: ${gcpConfig.endpointId}`);
 
     // Now that secrets are loaded, initialize server
     const server = new Server(prisma);

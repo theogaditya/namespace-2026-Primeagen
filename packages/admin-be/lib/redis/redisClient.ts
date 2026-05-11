@@ -6,6 +6,7 @@ dotenv.config();
 
 const REDIS_URL = process.env.REDIS_URL || 'redis://localhost:6379';
 
+// Generic Redis client (singleton pattern)
 class RedisClient {
   private client: RedisClientType;
   private isConnected: boolean = false;
@@ -59,3 +60,25 @@ class RedisClient {
 }
 
 export const redisClient = new RedisClient();
+
+// Complaint Queue Redis client (matches user-be pattern)
+export class RedisClientforComplaintQueue {
+  private complaintClient: RedisClientType;
+
+  constructor() {
+    this.complaintClient = createClient({
+      url: REDIS_URL,
+    });
+    this.complaintClient.on('error', (err) => console.log('Redis Complaint Client Error', err));
+  }
+
+  public async connect() {
+    if (!this.complaintClient.isOpen) {
+      await this.complaintClient.connect();
+    }
+  }
+
+  public getClient(): RedisClientType {
+    return this.complaintClient;
+  }
+}
