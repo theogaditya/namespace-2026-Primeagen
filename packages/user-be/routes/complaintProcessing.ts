@@ -1,12 +1,17 @@
 import { Router } from "express";
 import { complaintQueueService } from "../lib/redis/complaintQueueService";
+import { processedComplaintQueueService } from "../lib/redis/processedComplaintQueueService";
 import { PrismaClient } from "../prisma/generated/client/client";
 import { complaintProcessingSchema } from "../lib/validations/validation.complaint.processing";
+import { standardizeSubCategory } from "../lib/gcp/gcp";
+import dotenv from "dotenv";
+
+dotenv.config();
 
 let isPolling = false;
 let pollingInterval: NodeJS.Timeout | null = null;
 
-async function processNextComplaint(db: PrismaClient): Promise<{ processed: boolean; result?: any; error?: string }> {
+export async function processNextComplaint(db: PrismaClient): Promise<{ processed: boolean; result?: any; error?: string }> {
   try {
     await complaintQueueService.connect();
     const client = complaintQueueService['redisClient'].getClient();
@@ -25,8 +30,27 @@ async function processNextComplaint(db: PrismaClient): Promise<{ processed: bool
     }
 
     const complaintData = validationResult.data;
-    const AIstandardizedSubCategory = "dev";
-    // Placeholder for AI standardized sub-category
+    
+    // Check if complaint already exists (same complainant, subCategory, and description)
+    const existingComplaint = await db.complaint.findFirst({
+      where: {
+        complainantId: complaintData.complainantId,
+        subCategory: complaintData.subCategory,
+        description: complaintData.description,
+      },
+    });
+
+    if (existingComplaint) {
+      await client.lPop('complaint:registration:queue');
+      console.log(`Duplicate complaint detected, removed from queue. Existing complaint id=${existingComplaint.id}`);
+      return { processed: false, error: "Duplicate complaint removed from queue" };
+    }
+
+    // Placeholder for AI standardized sub-category (GCP permissions need to be fixed)
+    // const AIstandardizedSubCategory = "dev";
+
+    // TODO: Uncomment after fixing GCP permissions (cross-project access)
+    const AIstandardizedSubCategory = await standardizeSubCategory(complaintData.subCategory);
 
     const result = await db.$transaction(async (tx) => {
       const complaint = await tx.complaint.create({
@@ -55,17 +79,45 @@ async function processNextComplaint(db: PrismaClient): Promise<{ processed: bool
         },
       });
     
-    //   After Complaint is created, push it into a new queue for Auto-Assignment and Blockchain Processing
-      
-
       return complaint;
     });
 
-    await client.lPop('complaint:registration:queue');
+    // Push to processed queue for Auto-Assignment and Blockchain Processing
+    try {
+      await processedComplaintQueueService.pushToQueue({
+        id: result.id,
+        seq: result.seq,
+        status: result.status,
+        complainantId: result.complainantId,
+        categoryId: result.categoryId,
+        subCategory: result.subCategory,
+        assignedDepartment: result.assignedDepartment,
+        city: complaintData.location.city,
+        district: complaintData.location.district,
+      });
+    } catch (pushErr) {
+      console.error("Failed to push processed complaint to queue:", pushErr);
+    }
 
+    await client.lPop('complaint:registration:queue');
+    
     return { processed: true, result: { id: result.id, seq: result.seq, status: result.status } };
-  } catch (error) {
+  } catch (error: any) {
     console.error("Complaint processing error:", error);
+    
+    // Pop invalid complaints that cause DB errors (e.g., foreign key violations)
+    if (error?.code === 'P2003' || error?.code === 'P2002' || error?.code === 'P2025') {
+      try {
+        await complaintQueueService.connect();
+        const client = complaintQueueService['redisClient'].getClient();
+        await client.lPop('complaint:registration:queue');
+        console.log("Invalid complaint removed from queue due to DB constraint error");
+      } catch (popError) {
+        console.error("Failed to pop invalid complaint:", popError);
+      }
+      return { processed: false, error: "Invalid complaint removed from queue (DB constraint error)" };
+    }
+    
     return { processed: false, error: "Processing failed" };
   }
 }

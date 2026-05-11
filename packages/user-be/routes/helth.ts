@@ -2,6 +2,7 @@ import { Router, Request, Response } from "express";
 import { PrismaClient } from "../prisma/generated/client/client";
 import { userQueueService } from "../lib/redis/userQueueService";
 import { complaintQueueService } from "../lib/redis/complaintQueueService";
+import { processedComplaintQueueService } from "../lib/redis/processedComplaintQueueService";
 
 export function helthPoint(db: PrismaClient) {
   const router = Router();
@@ -13,8 +14,11 @@ export function helthPoint(db: PrismaClient) {
       
       let userQueueLength = 0;
       let complaintQueueLength = 0;
+      let processedQueueLength = 0;
+      let processedQueueExample: any = null;
       let userQueueStatus = "ok";
       let complaintQueueStatus = "ok";
+      let processedQueueStatus = "ok";
       
       try {
         userQueueLength = await userQueueService.getQueueLength();
@@ -30,7 +34,17 @@ export function helthPoint(db: PrismaClient) {
         console.error("Complaint queue health check failed:", redisError);
       }
 
-      const overallRedisStatus = userQueueStatus === "ok" && complaintQueueStatus === "ok" ? "ok" : "partial";
+      try {
+        processedQueueLength = await processedComplaintQueueService.getQueueLength();
+      } catch (redisError) {
+        processedQueueStatus = "error";
+        console.error("Processed complaint queue health check failed:", redisError);
+      }
+
+      const overallRedisStatus =
+          userQueueStatus === "ok" && complaintQueueStatus === "ok" && processedQueueStatus === "ok"
+            ? "ok"
+            : "partial";
 
       return res.status(200).json({ 
         status: "ok",
@@ -44,6 +58,10 @@ export function helthPoint(db: PrismaClient) {
           complaint: {
             status: complaintQueueStatus,
             length: complaintQueueLength,
+          },
+          processed: {
+            status: processedQueueStatus,
+            length: processedQueueLength,
           },
         },
         message: "All systems operational"

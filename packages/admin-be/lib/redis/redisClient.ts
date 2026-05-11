@@ -1,93 +1,59 @@
-import Redis from 'ioredis';
+import { createClient } from '@redis/client';
+import type { RedisClientType } from '@redis/client';
+import dotenv from 'dotenv';
+
+dotenv.config();
+
+const REDIS_URL = process.env.REDIS_URL || 'redis://localhost:6379';
 
 class RedisClient {
-  private client: Redis | null = null;
+  private client: RedisClientType;
   private isConnected: boolean = false;
 
   constructor() {
-    this.connect();
-  }
+    this.client = createClient({
+      url: REDIS_URL,
+    });
 
-  private connect(): void {
-    try {
-      const redisUrl = process.env.REDIS_URL || 'redis://localhost:6379';
-      
-      this.client = new Redis(redisUrl, {
-        retryStrategy: (times: number) => {
-          const delay = Math.min(times * 50, 2000);
-          console.log(`Redis retry attempt ${times}, waiting ${delay}ms`);
-          return delay;
-        },
-        maxRetriesPerRequest: null,
-        enableReadyCheck: true,
-        reconnectOnError: (err) => {
-          console.error('❌ Redis connection error:', err.message);
-          return true;
-        },
-      });
-
-      this.attachListeners();
-    } catch (err) {
-      console.error('❌ Failed to create Redis client:', err);
-      setTimeout(() => this.connect(), 3000);
-    }
-  }
-
-  private attachListeners(): void {
-    if (!this.client) return;
+    this.client.on('error', (err) => {
+      console.error('Redis Client Error:', err);
+      this.isConnected = false;
+    });
 
     this.client.on('ready', () => {
+      console.log('Redis client ready');
       this.isConnected = true;
     });
 
     this.client.on('connect', () => {
+      console.log('Redis client connected');
       this.isConnected = true;
     });
 
-    this.client.on('error', (err: any) => {
-      console.error('Redis error:', err?.message || err);
-      this.isConnected = false;
-    });
-
-    this.client.on('close', () => {
-      console.log('Redis connection closed');
-      this.isConnected = false;
-      setTimeout(() => this.reconnect(), 2000);
-    });
-
     this.client.on('end', () => {
-      console.log('ℹRedis connection ended');
+      console.log('Redis connection ended');
       this.isConnected = false;
     });
   }
 
-  private reconnect(): void {
-    try {
-      if (this.client) {
-        try { this.client.disconnect(); } catch (_) {}
-        this.client = null;
-      }
-    } catch (e) {
-      // ignore
+  async connect(): Promise<void> {
+    if (!this.client.isOpen) {
+      await this.client.connect();
     }
-    this.connect();
   }
 
-  getClient(): Redis {
-    if (!this.client) throw new Error('Redis client not initialized');
+  getClient(): RedisClientType {
     return this.client;
   }
 
   isReady(): boolean {
-    return this.isConnected;
+    return this.isConnected && this.client.isOpen;
   }
 
   async disconnect(): Promise<void> {
-    if (!this.client) return;
-    try {
+    if (this.client.isOpen) {
       await this.client.quit();
-    } catch (err) {
-      try { this.client.disconnect(); } catch (_) {}
+      this.isConnected = false;
     }
   }
 }

@@ -11,12 +11,13 @@ class ComplaintQueueService {
    * Push a complaint to the queue
    */
   async pushComplaint(complaint: any): Promise<void> {
+    await redisClient.connect();
     const client = redisClient.getClient();
-    await client.rpush(
+    await client.rPush(
       QUEUE_NAMES.COMPLAINT_REGISTRATION,
       JSON.stringify(complaint)
     );
-    console.log(`📨 Complaint ${complaint.id} pushed to queue`);
+    console.log(`Complaint ${complaint.id} pushed to queue`);
   }
 
   /**
@@ -25,8 +26,9 @@ class ComplaintQueueService {
    */
   async pollAndPop(): Promise<any | null> {
     try {
+      await redisClient.connect();
       const client = redisClient.getClient();
-      const len = await client.llen(QUEUE_NAMES.COMPLAINT_REGISTRATION);
+      const len = await client.lLen(QUEUE_NAMES.COMPLAINT_REGISTRATION);
       
       console.log(`Queue length: ${len}`);
       
@@ -34,7 +36,7 @@ class ComplaintQueueService {
         return null;
       }
 
-      const complaintJson = await client.lpop(QUEUE_NAMES.COMPLAINT_REGISTRATION);
+      const complaintJson = await client.lPop(QUEUE_NAMES.COMPLAINT_REGISTRATION);
       if (!complaintJson) {
         return null;
       }
@@ -43,7 +45,7 @@ class ComplaintQueueService {
         return JSON.parse(complaintJson);
       } catch (err: any) {
         console.error(
-          '❌ Failed to parse complaint JSON:',
+          'Failed to parse complaint JSON:',
           err?.message || err,
           '\nRaw payload:',
           complaintJson
@@ -51,7 +53,7 @@ class ComplaintQueueService {
         
         // Move to dead-letter queue
         try {
-          await client.lpush(QUEUE_NAMES.MALFORMED, complaintJson);
+          await client.lPush(QUEUE_NAMES.MALFORMED, complaintJson);
           console.log('Malformed complaint moved to dead-letter queue');
         } catch (dlqErr) {
           console.error('Failed to move to dead-letter queue:', dlqErr);
@@ -70,16 +72,17 @@ class ComplaintQueueService {
    */
   async blockingPop(timeout: number = 0): Promise<any | null> {
     try {
+      await redisClient.connect();
       const client = redisClient.getClient();
-      const result = await client.brpop(QUEUE_NAMES.COMPLAINT_REGISTRATION, timeout);
+      const result = await client.brPop(QUEUE_NAMES.COMPLAINT_REGISTRATION, timeout);
       
       if (result) {
-        const [, complaintJson] = result;
+        const complaintJson = result.element;
         try {
           return JSON.parse(complaintJson);
         } catch (err: any) {
           console.error(
-            '❌ Failed to parse complaint JSON:',
+            'Failed to parse complaint JSON:',
             err?.message || err,
             '\nRaw payload:',
             complaintJson
@@ -87,10 +90,10 @@ class ComplaintQueueService {
           
           // Move to dead-letter queue
           try {
-            await client.lpush(QUEUE_NAMES.MALFORMED, complaintJson);
+            await client.lPush(QUEUE_NAMES.MALFORMED, complaintJson);
             console.log('Malformed complaint moved to dead-letter queue');
           } catch (dlqErr) {
-            console.error('❌ Failed to move to dead-letter queue:', dlqErr);
+            console.error('Failed to move to dead-letter queue:', dlqErr);
           }
           
           return null;
@@ -99,7 +102,7 @@ class ComplaintQueueService {
       
       return null;
     } catch (err: any) {
-      console.error('❌ Redis blockingPop error:', err?.message || err);
+      console.error('Redis blockingPop error:', err?.message || err);
       return null;
     }
   }
@@ -109,10 +112,11 @@ class ComplaintQueueService {
    */
   async getQueueLength(): Promise<number> {
     try {
+      await redisClient.connect();
       const client = redisClient.getClient();
-      return await client.llen(QUEUE_NAMES.COMPLAINT_REGISTRATION);
+      return await client.lLen(QUEUE_NAMES.COMPLAINT_REGISTRATION);
     } catch (err) {
-      console.error('❌ Failed to get queue length:', err);
+      console.error('Failed to get queue length:', err);
       return 0;
     }
   }
@@ -123,8 +127,9 @@ class ComplaintQueueService {
    */
   async peekComplaint(): Promise<any | null> {
     try {
+      await redisClient.connect();
       const client = redisClient.getClient();
-      const len = await client.llen(QUEUE_NAMES.COMPLAINT_REGISTRATION);
+      const len = await client.lLen(QUEUE_NAMES.COMPLAINT_REGISTRATION);
       
       console.log(`Queue length: ${len}`);
       
@@ -133,7 +138,7 @@ class ComplaintQueueService {
       }
 
       // Get first item without removing (index 0)
-      const complaintJson = await client.lindex(QUEUE_NAMES.COMPLAINT_REGISTRATION, 0);
+      const complaintJson = await client.lIndex(QUEUE_NAMES.COMPLAINT_REGISTRATION, 0);
       if (!complaintJson) {
         return null;
       }
@@ -142,7 +147,7 @@ class ComplaintQueueService {
         return JSON.parse(complaintJson);
       } catch (err: any) {
         console.error(
-          '❌ Failed to parse complaint JSON:',
+          'Failed to parse complaint JSON:',
           err?.message || err,
           '\nRaw payload:',
           complaintJson
@@ -151,16 +156,16 @@ class ComplaintQueueService {
         // Remove malformed item and move to dead-letter queue
         await this.removeFirstComplaint();
         try {
-          await client.lpush(QUEUE_NAMES.MALFORMED, complaintJson);
+          await client.lPush(QUEUE_NAMES.MALFORMED, complaintJson);
           console.log('Malformed complaint moved to dead-letter queue');
         } catch (dlqErr) {
-          console.error('❌ Failed to move to dead-letter queue:', dlqErr);
+          console.error('Failed to move to dead-letter queue:', dlqErr);
         }
         
         return null;
       }
     } catch (err: any) {
-      console.error('❌ Redis peek error:', err?.message || err);
+      console.error('Redis peek error:', err?.message || err);
       return null;
     }
   }
@@ -171,11 +176,12 @@ class ComplaintQueueService {
    */
   async removeFirstComplaint(): Promise<void> {
     try {
+      await redisClient.connect();
       const client = redisClient.getClient();
-      await client.lpop(QUEUE_NAMES.COMPLAINT_REGISTRATION);
+      await client.lPop(QUEUE_NAMES.COMPLAINT_REGISTRATION);
       console.log('Complaint removed from queue after successful processing');
     } catch (err: any) {
-      console.error('❌ Redis remove error:', err?.message || err);
+      console.error('Redis remove error:', err?.message || err);
       throw err;
     }
   }

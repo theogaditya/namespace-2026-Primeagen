@@ -28,15 +28,15 @@ export type UserMinAggregateOutputType = {
   id: string | null
   email: string | null
   name: string | null
-  phoneNumber: string | null
-  dateOfBirth: Date | null
-  password: string | null
   aadhaarId: string | null
-  preferredLanguage: string | null
-  disability: string | null
   consentDataCollection: boolean | null
+  dateOfBirth: Date | null
   dateOfCreation: Date | null
+  disability: string | null
   lastUpdated: Date | null
+  password: string | null
+  phoneNumber: string | null
+  preferredLanguage: string | null
   status: $Enums.userStatus | null
 }
 
@@ -44,15 +44,15 @@ export type UserMaxAggregateOutputType = {
   id: string | null
   email: string | null
   name: string | null
-  phoneNumber: string | null
-  dateOfBirth: Date | null
-  password: string | null
   aadhaarId: string | null
-  preferredLanguage: string | null
-  disability: string | null
   consentDataCollection: boolean | null
+  dateOfBirth: Date | null
   dateOfCreation: Date | null
+  disability: string | null
   lastUpdated: Date | null
+  password: string | null
+  phoneNumber: string | null
+  preferredLanguage: string | null
   status: $Enums.userStatus | null
 }
 
@@ -60,15 +60,15 @@ export type UserCountAggregateOutputType = {
   id: number
   email: number
   name: number
-  phoneNumber: number
-  dateOfBirth: number
-  password: number
   aadhaarId: number
-  preferredLanguage: number
-  disability: number
   consentDataCollection: number
+  dateOfBirth: number
   dateOfCreation: number
+  disability: number
   lastUpdated: number
+  password: number
+  phoneNumber: number
+  preferredLanguage: number
   status: number
   _all: number
 }
@@ -78,15 +78,15 @@ export type UserMinAggregateInputType = {
   id?: true
   email?: true
   name?: true
-  phoneNumber?: true
-  dateOfBirth?: true
-  password?: true
   aadhaarId?: true
-  preferredLanguage?: true
-  disability?: true
   consentDataCollection?: true
+  dateOfBirth?: true
   dateOfCreation?: true
+  disability?: true
   lastUpdated?: true
+  password?: true
+  phoneNumber?: true
+  preferredLanguage?: true
   status?: true
 }
 
@@ -94,15 +94,15 @@ export type UserMaxAggregateInputType = {
   id?: true
   email?: true
   name?: true
-  phoneNumber?: true
-  dateOfBirth?: true
-  password?: true
   aadhaarId?: true
-  preferredLanguage?: true
-  disability?: true
   consentDataCollection?: true
+  dateOfBirth?: true
   dateOfCreation?: true
+  disability?: true
   lastUpdated?: true
+  password?: true
+  phoneNumber?: true
+  preferredLanguage?: true
   status?: true
 }
 
@@ -110,15 +110,15 @@ export type UserCountAggregateInputType = {
   id?: true
   email?: true
   name?: true
-  phoneNumber?: true
-  dateOfBirth?: true
-  password?: true
   aadhaarId?: true
-  preferredLanguage?: true
-  disability?: true
   consentDataCollection?: true
+  dateOfBirth?: true
   dateOfCreation?: true
+  disability?: true
   lastUpdated?: true
+  password?: true
+  phoneNumber?: true
+  preferredLanguage?: true
   status?: true
   _all?: true
 }
@@ -199,15 +199,15 @@ export type UserGroupByOutputType = {
   id: string
   email: string
   name: string
-  phoneNumber: string
-  dateOfBirth: Date
-  password: string
   aadhaarId: string
-  preferredLanguage: string
-  disability: string | null
   consentDataCollection: boolean
+  dateOfBirth: Date
   dateOfCreation: Date
+  disability: string | null
   lastUpdated: Date
+  password: string
+  phoneNumber: string
+  preferredLanguage: string
   status: $Enums.userStatus
   _count: UserCountAggregateOutputType | null
   _min: UserMinAggregateOutputType | null
@@ -236,40 +236,40 @@ export type UserWhereInput = {
   id?: Prisma.StringFilter<"User"> | string
   email?: Prisma.StringFilter<"User"> | string
   name?: Prisma.StringFilter<"User"> | string
-  phoneNumber?: Prisma.StringFilter<"User"> | string
-  dateOfBirth?: Prisma.DateTimeFilter<"User"> | Date | string
-  password?: Prisma.StringFilter<"User"> | string
   aadhaarId?: Prisma.StringFilter<"User"> | string
-  preferredLanguage?: Prisma.StringFilter<"User"> | string
-  disability?: Prisma.StringNullableFilter<"User"> | string | null
   consentDataCollection?: Prisma.BoolFilter<"User"> | boolean
+  dateOfBirth?: Prisma.DateTimeFilter<"User"> | Date | string
   dateOfCreation?: Prisma.DateTimeFilter<"User"> | Date | string
+  disability?: Prisma.StringNullableFilter<"User"> | string | null
   lastUpdated?: Prisma.DateTimeFilter<"User"> | Date | string
+  password?: Prisma.StringFilter<"User"> | string
+  phoneNumber?: Prisma.StringFilter<"User"> | string
+  preferredLanguage?: Prisma.StringFilter<"User"> | string
   status?: Prisma.EnumuserStatusFilter<"User"> | $Enums.userStatus
-  location?: Prisma.XOR<Prisma.UserLocationNullableScalarRelationFilter, Prisma.UserLocationWhereInput> | null
   complaints?: Prisma.ComplaintListRelationFilter
-  upvotes?: Prisma.UpvoteListRelationFilter
   auditLogsCreated?: Prisma.AuditLogListRelationFilter
+  upvotes?: Prisma.UpvoteListRelationFilter
+  location?: Prisma.XOR<Prisma.UserLocationNullableScalarRelationFilter, Prisma.UserLocationWhereInput> | null
 }
 
 export type UserOrderByWithRelationInput = {
   id?: Prisma.SortOrder
   email?: Prisma.SortOrder
   name?: Prisma.SortOrder
-  phoneNumber?: Prisma.SortOrder
-  dateOfBirth?: Prisma.SortOrder
-  password?: Prisma.SortOrder
   aadhaarId?: Prisma.SortOrder
-  preferredLanguage?: Prisma.SortOrder
-  disability?: Prisma.SortOrderInput | Prisma.SortOrder
   consentDataCollection?: Prisma.SortOrder
+  dateOfBirth?: Prisma.SortOrder
   dateOfCreation?: Prisma.SortOrder
+  disability?: Prisma.SortOrderInput | Prisma.SortOrder
   lastUpdated?: Prisma.SortOrder
+  password?: Prisma.SortOrder
+  phoneNumber?: Prisma.SortOrder
+  preferredLanguage?: Prisma.SortOrder
   status?: Prisma.SortOrder
-  location?: Prisma.UserLocationOrderByWithRelationInput
   complaints?: Prisma.ComplaintOrderByRelationAggregateInput
-  upvotes?: Prisma.UpvoteOrderByRelationAggregateInput
   auditLogsCreated?: Prisma.AuditLogOrderByRelationAggregateInput
+  upvotes?: Prisma.UpvoteOrderByRelationAggregateInput
+  location?: Prisma.UserLocationOrderByWithRelationInput
 }
 
 export type UserWhereUniqueInput = Prisma.AtLeast<{
@@ -280,34 +280,34 @@ export type UserWhereUniqueInput = Prisma.AtLeast<{
   OR?: Prisma.UserWhereInput[]
   NOT?: Prisma.UserWhereInput | Prisma.UserWhereInput[]
   name?: Prisma.StringFilter<"User"> | string
-  dateOfBirth?: Prisma.DateTimeFilter<"User"> | Date | string
-  password?: Prisma.StringFilter<"User"> | string
   aadhaarId?: Prisma.StringFilter<"User"> | string
-  preferredLanguage?: Prisma.StringFilter<"User"> | string
-  disability?: Prisma.StringNullableFilter<"User"> | string | null
   consentDataCollection?: Prisma.BoolFilter<"User"> | boolean
+  dateOfBirth?: Prisma.DateTimeFilter<"User"> | Date | string
   dateOfCreation?: Prisma.DateTimeFilter<"User"> | Date | string
+  disability?: Prisma.StringNullableFilter<"User"> | string | null
   lastUpdated?: Prisma.DateTimeFilter<"User"> | Date | string
+  password?: Prisma.StringFilter<"User"> | string
+  preferredLanguage?: Prisma.StringFilter<"User"> | string
   status?: Prisma.EnumuserStatusFilter<"User"> | $Enums.userStatus
-  location?: Prisma.XOR<Prisma.UserLocationNullableScalarRelationFilter, Prisma.UserLocationWhereInput> | null
   complaints?: Prisma.ComplaintListRelationFilter
-  upvotes?: Prisma.UpvoteListRelationFilter
   auditLogsCreated?: Prisma.AuditLogListRelationFilter
+  upvotes?: Prisma.UpvoteListRelationFilter
+  location?: Prisma.XOR<Prisma.UserLocationNullableScalarRelationFilter, Prisma.UserLocationWhereInput> | null
 }, "id" | "email" | "phoneNumber">
 
 export type UserOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
   email?: Prisma.SortOrder
   name?: Prisma.SortOrder
-  phoneNumber?: Prisma.SortOrder
-  dateOfBirth?: Prisma.SortOrder
-  password?: Prisma.SortOrder
   aadhaarId?: Prisma.SortOrder
-  preferredLanguage?: Prisma.SortOrder
-  disability?: Prisma.SortOrderInput | Prisma.SortOrder
   consentDataCollection?: Prisma.SortOrder
+  dateOfBirth?: Prisma.SortOrder
   dateOfCreation?: Prisma.SortOrder
+  disability?: Prisma.SortOrderInput | Prisma.SortOrder
   lastUpdated?: Prisma.SortOrder
+  password?: Prisma.SortOrder
+  phoneNumber?: Prisma.SortOrder
+  preferredLanguage?: Prisma.SortOrder
   status?: Prisma.SortOrder
   _count?: Prisma.UserCountOrderByAggregateInput
   _max?: Prisma.UserMaxOrderByAggregateInput
@@ -321,15 +321,15 @@ export type UserScalarWhereWithAggregatesInput = {
   id?: Prisma.StringWithAggregatesFilter<"User"> | string
   email?: Prisma.StringWithAggregatesFilter<"User"> | string
   name?: Prisma.StringWithAggregatesFilter<"User"> | string
-  phoneNumber?: Prisma.StringWithAggregatesFilter<"User"> | string
-  dateOfBirth?: Prisma.DateTimeWithAggregatesFilter<"User"> | Date | string
-  password?: Prisma.StringWithAggregatesFilter<"User"> | string
   aadhaarId?: Prisma.StringWithAggregatesFilter<"User"> | string
-  preferredLanguage?: Prisma.StringWithAggregatesFilter<"User"> | string
-  disability?: Prisma.StringNullableWithAggregatesFilter<"User"> | string | null
   consentDataCollection?: Prisma.BoolWithAggregatesFilter<"User"> | boolean
+  dateOfBirth?: Prisma.DateTimeWithAggregatesFilter<"User"> | Date | string
   dateOfCreation?: Prisma.DateTimeWithAggregatesFilter<"User"> | Date | string
+  disability?: Prisma.StringNullableWithAggregatesFilter<"User"> | string | null
   lastUpdated?: Prisma.DateTimeWithAggregatesFilter<"User"> | Date | string
+  password?: Prisma.StringWithAggregatesFilter<"User"> | string
+  phoneNumber?: Prisma.StringWithAggregatesFilter<"User"> | string
+  preferredLanguage?: Prisma.StringWithAggregatesFilter<"User"> | string
   status?: Prisma.EnumuserStatusWithAggregatesFilter<"User"> | $Enums.userStatus
 }
 
@@ -337,95 +337,95 @@ export type UserCreateInput = {
   id?: string
   email: string
   name: string
-  phoneNumber: string
-  dateOfBirth: Date | string
-  password: string
   aadhaarId: string
-  preferredLanguage?: string
-  disability?: string | null
   consentDataCollection?: boolean
+  dateOfBirth: Date | string
   dateOfCreation?: Date | string
+  disability?: string | null
   lastUpdated?: Date | string
+  password: string
+  phoneNumber: string
+  preferredLanguage?: string
   status?: $Enums.userStatus
-  location?: Prisma.UserLocationCreateNestedOneWithoutUserInput
   complaints?: Prisma.ComplaintCreateNestedManyWithoutComplainantInput
-  upvotes?: Prisma.UpvoteCreateNestedManyWithoutUserInput
   auditLogsCreated?: Prisma.AuditLogCreateNestedManyWithoutUserInput
+  upvotes?: Prisma.UpvoteCreateNestedManyWithoutUserInput
+  location?: Prisma.UserLocationCreateNestedOneWithoutUserInput
 }
 
 export type UserUncheckedCreateInput = {
   id?: string
   email: string
   name: string
-  phoneNumber: string
-  dateOfBirth: Date | string
-  password: string
   aadhaarId: string
-  preferredLanguage?: string
-  disability?: string | null
   consentDataCollection?: boolean
+  dateOfBirth: Date | string
   dateOfCreation?: Date | string
+  disability?: string | null
   lastUpdated?: Date | string
+  password: string
+  phoneNumber: string
+  preferredLanguage?: string
   status?: $Enums.userStatus
-  location?: Prisma.UserLocationUncheckedCreateNestedOneWithoutUserInput
   complaints?: Prisma.ComplaintUncheckedCreateNestedManyWithoutComplainantInput
-  upvotes?: Prisma.UpvoteUncheckedCreateNestedManyWithoutUserInput
   auditLogsCreated?: Prisma.AuditLogUncheckedCreateNestedManyWithoutUserInput
+  upvotes?: Prisma.UpvoteUncheckedCreateNestedManyWithoutUserInput
+  location?: Prisma.UserLocationUncheckedCreateNestedOneWithoutUserInput
 }
 
 export type UserUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
-  phoneNumber?: Prisma.StringFieldUpdateOperationsInput | string
-  dateOfBirth?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  password?: Prisma.StringFieldUpdateOperationsInput | string
   aadhaarId?: Prisma.StringFieldUpdateOperationsInput | string
-  preferredLanguage?: Prisma.StringFieldUpdateOperationsInput | string
-  disability?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   consentDataCollection?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  dateOfBirth?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   dateOfCreation?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  disability?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   lastUpdated?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  password?: Prisma.StringFieldUpdateOperationsInput | string
+  phoneNumber?: Prisma.StringFieldUpdateOperationsInput | string
+  preferredLanguage?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumuserStatusFieldUpdateOperationsInput | $Enums.userStatus
-  location?: Prisma.UserLocationUpdateOneWithoutUserNestedInput
   complaints?: Prisma.ComplaintUpdateManyWithoutComplainantNestedInput
-  upvotes?: Prisma.UpvoteUpdateManyWithoutUserNestedInput
   auditLogsCreated?: Prisma.AuditLogUpdateManyWithoutUserNestedInput
+  upvotes?: Prisma.UpvoteUpdateManyWithoutUserNestedInput
+  location?: Prisma.UserLocationUpdateOneWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
-  phoneNumber?: Prisma.StringFieldUpdateOperationsInput | string
-  dateOfBirth?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  password?: Prisma.StringFieldUpdateOperationsInput | string
   aadhaarId?: Prisma.StringFieldUpdateOperationsInput | string
-  preferredLanguage?: Prisma.StringFieldUpdateOperationsInput | string
-  disability?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   consentDataCollection?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  dateOfBirth?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   dateOfCreation?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  disability?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   lastUpdated?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  password?: Prisma.StringFieldUpdateOperationsInput | string
+  phoneNumber?: Prisma.StringFieldUpdateOperationsInput | string
+  preferredLanguage?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumuserStatusFieldUpdateOperationsInput | $Enums.userStatus
-  location?: Prisma.UserLocationUncheckedUpdateOneWithoutUserNestedInput
   complaints?: Prisma.ComplaintUncheckedUpdateManyWithoutComplainantNestedInput
-  upvotes?: Prisma.UpvoteUncheckedUpdateManyWithoutUserNestedInput
   auditLogsCreated?: Prisma.AuditLogUncheckedUpdateManyWithoutUserNestedInput
+  upvotes?: Prisma.UpvoteUncheckedUpdateManyWithoutUserNestedInput
+  location?: Prisma.UserLocationUncheckedUpdateOneWithoutUserNestedInput
 }
 
 export type UserCreateManyInput = {
   id?: string
   email: string
   name: string
-  phoneNumber: string
-  dateOfBirth: Date | string
-  password: string
   aadhaarId: string
-  preferredLanguage?: string
-  disability?: string | null
   consentDataCollection?: boolean
+  dateOfBirth: Date | string
   dateOfCreation?: Date | string
+  disability?: string | null
   lastUpdated?: Date | string
+  password: string
+  phoneNumber: string
+  preferredLanguage?: string
   status?: $Enums.userStatus
 }
 
@@ -433,15 +433,15 @@ export type UserUpdateManyMutationInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
-  phoneNumber?: Prisma.StringFieldUpdateOperationsInput | string
-  dateOfBirth?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  password?: Prisma.StringFieldUpdateOperationsInput | string
   aadhaarId?: Prisma.StringFieldUpdateOperationsInput | string
-  preferredLanguage?: Prisma.StringFieldUpdateOperationsInput | string
-  disability?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   consentDataCollection?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  dateOfBirth?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   dateOfCreation?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  disability?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   lastUpdated?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  password?: Prisma.StringFieldUpdateOperationsInput | string
+  phoneNumber?: Prisma.StringFieldUpdateOperationsInput | string
+  preferredLanguage?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumuserStatusFieldUpdateOperationsInput | $Enums.userStatus
 }
 
@@ -449,15 +449,15 @@ export type UserUncheckedUpdateManyInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
-  phoneNumber?: Prisma.StringFieldUpdateOperationsInput | string
-  dateOfBirth?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  password?: Prisma.StringFieldUpdateOperationsInput | string
   aadhaarId?: Prisma.StringFieldUpdateOperationsInput | string
-  preferredLanguage?: Prisma.StringFieldUpdateOperationsInput | string
-  disability?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   consentDataCollection?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  dateOfBirth?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   dateOfCreation?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  disability?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   lastUpdated?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  password?: Prisma.StringFieldUpdateOperationsInput | string
+  phoneNumber?: Prisma.StringFieldUpdateOperationsInput | string
+  preferredLanguage?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumuserStatusFieldUpdateOperationsInput | $Enums.userStatus
 }
 
@@ -465,15 +465,15 @@ export type UserCountOrderByAggregateInput = {
   id?: Prisma.SortOrder
   email?: Prisma.SortOrder
   name?: Prisma.SortOrder
-  phoneNumber?: Prisma.SortOrder
-  dateOfBirth?: Prisma.SortOrder
-  password?: Prisma.SortOrder
   aadhaarId?: Prisma.SortOrder
-  preferredLanguage?: Prisma.SortOrder
-  disability?: Prisma.SortOrder
   consentDataCollection?: Prisma.SortOrder
+  dateOfBirth?: Prisma.SortOrder
   dateOfCreation?: Prisma.SortOrder
+  disability?: Prisma.SortOrder
   lastUpdated?: Prisma.SortOrder
+  password?: Prisma.SortOrder
+  phoneNumber?: Prisma.SortOrder
+  preferredLanguage?: Prisma.SortOrder
   status?: Prisma.SortOrder
 }
 
@@ -481,15 +481,15 @@ export type UserMaxOrderByAggregateInput = {
   id?: Prisma.SortOrder
   email?: Prisma.SortOrder
   name?: Prisma.SortOrder
-  phoneNumber?: Prisma.SortOrder
-  dateOfBirth?: Prisma.SortOrder
-  password?: Prisma.SortOrder
   aadhaarId?: Prisma.SortOrder
-  preferredLanguage?: Prisma.SortOrder
-  disability?: Prisma.SortOrder
   consentDataCollection?: Prisma.SortOrder
+  dateOfBirth?: Prisma.SortOrder
   dateOfCreation?: Prisma.SortOrder
+  disability?: Prisma.SortOrder
   lastUpdated?: Prisma.SortOrder
+  password?: Prisma.SortOrder
+  phoneNumber?: Prisma.SortOrder
+  preferredLanguage?: Prisma.SortOrder
   status?: Prisma.SortOrder
 }
 
@@ -497,15 +497,15 @@ export type UserMinOrderByAggregateInput = {
   id?: Prisma.SortOrder
   email?: Prisma.SortOrder
   name?: Prisma.SortOrder
-  phoneNumber?: Prisma.SortOrder
-  dateOfBirth?: Prisma.SortOrder
-  password?: Prisma.SortOrder
   aadhaarId?: Prisma.SortOrder
-  preferredLanguage?: Prisma.SortOrder
-  disability?: Prisma.SortOrder
   consentDataCollection?: Prisma.SortOrder
+  dateOfBirth?: Prisma.SortOrder
   dateOfCreation?: Prisma.SortOrder
+  disability?: Prisma.SortOrder
   lastUpdated?: Prisma.SortOrder
+  password?: Prisma.SortOrder
+  phoneNumber?: Prisma.SortOrder
+  preferredLanguage?: Prisma.SortOrder
   status?: Prisma.SortOrder
 }
 
@@ -518,16 +518,16 @@ export type StringFieldUpdateOperationsInput = {
   set?: string
 }
 
+export type BoolFieldUpdateOperationsInput = {
+  set?: boolean
+}
+
 export type DateTimeFieldUpdateOperationsInput = {
   set?: Date | string
 }
 
 export type NullableStringFieldUpdateOperationsInput = {
   set?: string | null
-}
-
-export type BoolFieldUpdateOperationsInput = {
-  set?: boolean
 }
 
 export type EnumuserStatusFieldUpdateOperationsInput = {
@@ -594,38 +594,38 @@ export type UserCreateWithoutLocationInput = {
   id?: string
   email: string
   name: string
-  phoneNumber: string
-  dateOfBirth: Date | string
-  password: string
   aadhaarId: string
-  preferredLanguage?: string
-  disability?: string | null
   consentDataCollection?: boolean
+  dateOfBirth: Date | string
   dateOfCreation?: Date | string
+  disability?: string | null
   lastUpdated?: Date | string
+  password: string
+  phoneNumber: string
+  preferredLanguage?: string
   status?: $Enums.userStatus
   complaints?: Prisma.ComplaintCreateNestedManyWithoutComplainantInput
-  upvotes?: Prisma.UpvoteCreateNestedManyWithoutUserInput
   auditLogsCreated?: Prisma.AuditLogCreateNestedManyWithoutUserInput
+  upvotes?: Prisma.UpvoteCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutLocationInput = {
   id?: string
   email: string
   name: string
-  phoneNumber: string
-  dateOfBirth: Date | string
-  password: string
   aadhaarId: string
-  preferredLanguage?: string
-  disability?: string | null
   consentDataCollection?: boolean
+  dateOfBirth: Date | string
   dateOfCreation?: Date | string
+  disability?: string | null
   lastUpdated?: Date | string
+  password: string
+  phoneNumber: string
+  preferredLanguage?: string
   status?: $Enums.userStatus
   complaints?: Prisma.ComplaintUncheckedCreateNestedManyWithoutComplainantInput
-  upvotes?: Prisma.UpvoteUncheckedCreateNestedManyWithoutUserInput
   auditLogsCreated?: Prisma.AuditLogUncheckedCreateNestedManyWithoutUserInput
+  upvotes?: Prisma.UpvoteUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutLocationInput = {
@@ -648,76 +648,76 @@ export type UserUpdateWithoutLocationInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
-  phoneNumber?: Prisma.StringFieldUpdateOperationsInput | string
-  dateOfBirth?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  password?: Prisma.StringFieldUpdateOperationsInput | string
   aadhaarId?: Prisma.StringFieldUpdateOperationsInput | string
-  preferredLanguage?: Prisma.StringFieldUpdateOperationsInput | string
-  disability?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   consentDataCollection?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  dateOfBirth?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   dateOfCreation?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  disability?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   lastUpdated?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  password?: Prisma.StringFieldUpdateOperationsInput | string
+  phoneNumber?: Prisma.StringFieldUpdateOperationsInput | string
+  preferredLanguage?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumuserStatusFieldUpdateOperationsInput | $Enums.userStatus
   complaints?: Prisma.ComplaintUpdateManyWithoutComplainantNestedInput
-  upvotes?: Prisma.UpvoteUpdateManyWithoutUserNestedInput
   auditLogsCreated?: Prisma.AuditLogUpdateManyWithoutUserNestedInput
+  upvotes?: Prisma.UpvoteUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutLocationInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
-  phoneNumber?: Prisma.StringFieldUpdateOperationsInput | string
-  dateOfBirth?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  password?: Prisma.StringFieldUpdateOperationsInput | string
   aadhaarId?: Prisma.StringFieldUpdateOperationsInput | string
-  preferredLanguage?: Prisma.StringFieldUpdateOperationsInput | string
-  disability?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   consentDataCollection?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  dateOfBirth?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   dateOfCreation?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  disability?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   lastUpdated?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  password?: Prisma.StringFieldUpdateOperationsInput | string
+  phoneNumber?: Prisma.StringFieldUpdateOperationsInput | string
+  preferredLanguage?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumuserStatusFieldUpdateOperationsInput | $Enums.userStatus
   complaints?: Prisma.ComplaintUncheckedUpdateManyWithoutComplainantNestedInput
-  upvotes?: Prisma.UpvoteUncheckedUpdateManyWithoutUserNestedInput
   auditLogsCreated?: Prisma.AuditLogUncheckedUpdateManyWithoutUserNestedInput
+  upvotes?: Prisma.UpvoteUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutComplaintsInput = {
   id?: string
   email: string
   name: string
-  phoneNumber: string
-  dateOfBirth: Date | string
-  password: string
   aadhaarId: string
-  preferredLanguage?: string
-  disability?: string | null
   consentDataCollection?: boolean
+  dateOfBirth: Date | string
   dateOfCreation?: Date | string
+  disability?: string | null
   lastUpdated?: Date | string
+  password: string
+  phoneNumber: string
+  preferredLanguage?: string
   status?: $Enums.userStatus
-  location?: Prisma.UserLocationCreateNestedOneWithoutUserInput
-  upvotes?: Prisma.UpvoteCreateNestedManyWithoutUserInput
   auditLogsCreated?: Prisma.AuditLogCreateNestedManyWithoutUserInput
+  upvotes?: Prisma.UpvoteCreateNestedManyWithoutUserInput
+  location?: Prisma.UserLocationCreateNestedOneWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutComplaintsInput = {
   id?: string
   email: string
   name: string
-  phoneNumber: string
-  dateOfBirth: Date | string
-  password: string
   aadhaarId: string
-  preferredLanguage?: string
-  disability?: string | null
   consentDataCollection?: boolean
+  dateOfBirth: Date | string
   dateOfCreation?: Date | string
+  disability?: string | null
   lastUpdated?: Date | string
+  password: string
+  phoneNumber: string
+  preferredLanguage?: string
   status?: $Enums.userStatus
-  location?: Prisma.UserLocationUncheckedCreateNestedOneWithoutUserInput
-  upvotes?: Prisma.UpvoteUncheckedCreateNestedManyWithoutUserInput
   auditLogsCreated?: Prisma.AuditLogUncheckedCreateNestedManyWithoutUserInput
+  upvotes?: Prisma.UpvoteUncheckedCreateNestedManyWithoutUserInput
+  location?: Prisma.UserLocationUncheckedCreateNestedOneWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutComplaintsInput = {
@@ -740,76 +740,76 @@ export type UserUpdateWithoutComplaintsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
-  phoneNumber?: Prisma.StringFieldUpdateOperationsInput | string
-  dateOfBirth?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  password?: Prisma.StringFieldUpdateOperationsInput | string
   aadhaarId?: Prisma.StringFieldUpdateOperationsInput | string
-  preferredLanguage?: Prisma.StringFieldUpdateOperationsInput | string
-  disability?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   consentDataCollection?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  dateOfBirth?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   dateOfCreation?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  disability?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   lastUpdated?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  password?: Prisma.StringFieldUpdateOperationsInput | string
+  phoneNumber?: Prisma.StringFieldUpdateOperationsInput | string
+  preferredLanguage?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumuserStatusFieldUpdateOperationsInput | $Enums.userStatus
-  location?: Prisma.UserLocationUpdateOneWithoutUserNestedInput
-  upvotes?: Prisma.UpvoteUpdateManyWithoutUserNestedInput
   auditLogsCreated?: Prisma.AuditLogUpdateManyWithoutUserNestedInput
+  upvotes?: Prisma.UpvoteUpdateManyWithoutUserNestedInput
+  location?: Prisma.UserLocationUpdateOneWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutComplaintsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
-  phoneNumber?: Prisma.StringFieldUpdateOperationsInput | string
-  dateOfBirth?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  password?: Prisma.StringFieldUpdateOperationsInput | string
   aadhaarId?: Prisma.StringFieldUpdateOperationsInput | string
-  preferredLanguage?: Prisma.StringFieldUpdateOperationsInput | string
-  disability?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   consentDataCollection?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  dateOfBirth?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   dateOfCreation?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  disability?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   lastUpdated?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  password?: Prisma.StringFieldUpdateOperationsInput | string
+  phoneNumber?: Prisma.StringFieldUpdateOperationsInput | string
+  preferredLanguage?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumuserStatusFieldUpdateOperationsInput | $Enums.userStatus
-  location?: Prisma.UserLocationUncheckedUpdateOneWithoutUserNestedInput
-  upvotes?: Prisma.UpvoteUncheckedUpdateManyWithoutUserNestedInput
   auditLogsCreated?: Prisma.AuditLogUncheckedUpdateManyWithoutUserNestedInput
+  upvotes?: Prisma.UpvoteUncheckedUpdateManyWithoutUserNestedInput
+  location?: Prisma.UserLocationUncheckedUpdateOneWithoutUserNestedInput
 }
 
 export type UserCreateWithoutUpvotesInput = {
   id?: string
   email: string
   name: string
-  phoneNumber: string
-  dateOfBirth: Date | string
-  password: string
   aadhaarId: string
-  preferredLanguage?: string
-  disability?: string | null
   consentDataCollection?: boolean
+  dateOfBirth: Date | string
   dateOfCreation?: Date | string
+  disability?: string | null
   lastUpdated?: Date | string
+  password: string
+  phoneNumber: string
+  preferredLanguage?: string
   status?: $Enums.userStatus
-  location?: Prisma.UserLocationCreateNestedOneWithoutUserInput
   complaints?: Prisma.ComplaintCreateNestedManyWithoutComplainantInput
   auditLogsCreated?: Prisma.AuditLogCreateNestedManyWithoutUserInput
+  location?: Prisma.UserLocationCreateNestedOneWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutUpvotesInput = {
   id?: string
   email: string
   name: string
-  phoneNumber: string
-  dateOfBirth: Date | string
-  password: string
   aadhaarId: string
-  preferredLanguage?: string
-  disability?: string | null
   consentDataCollection?: boolean
+  dateOfBirth: Date | string
   dateOfCreation?: Date | string
+  disability?: string | null
   lastUpdated?: Date | string
+  password: string
+  phoneNumber: string
+  preferredLanguage?: string
   status?: $Enums.userStatus
-  location?: Prisma.UserLocationUncheckedCreateNestedOneWithoutUserInput
   complaints?: Prisma.ComplaintUncheckedCreateNestedManyWithoutComplainantInput
   auditLogsCreated?: Prisma.AuditLogUncheckedCreateNestedManyWithoutUserInput
+  location?: Prisma.UserLocationUncheckedCreateNestedOneWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutUpvotesInput = {
@@ -832,76 +832,76 @@ export type UserUpdateWithoutUpvotesInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
-  phoneNumber?: Prisma.StringFieldUpdateOperationsInput | string
-  dateOfBirth?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  password?: Prisma.StringFieldUpdateOperationsInput | string
   aadhaarId?: Prisma.StringFieldUpdateOperationsInput | string
-  preferredLanguage?: Prisma.StringFieldUpdateOperationsInput | string
-  disability?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   consentDataCollection?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  dateOfBirth?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   dateOfCreation?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  disability?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   lastUpdated?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  password?: Prisma.StringFieldUpdateOperationsInput | string
+  phoneNumber?: Prisma.StringFieldUpdateOperationsInput | string
+  preferredLanguage?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumuserStatusFieldUpdateOperationsInput | $Enums.userStatus
-  location?: Prisma.UserLocationUpdateOneWithoutUserNestedInput
   complaints?: Prisma.ComplaintUpdateManyWithoutComplainantNestedInput
   auditLogsCreated?: Prisma.AuditLogUpdateManyWithoutUserNestedInput
+  location?: Prisma.UserLocationUpdateOneWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutUpvotesInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
-  phoneNumber?: Prisma.StringFieldUpdateOperationsInput | string
-  dateOfBirth?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  password?: Prisma.StringFieldUpdateOperationsInput | string
   aadhaarId?: Prisma.StringFieldUpdateOperationsInput | string
-  preferredLanguage?: Prisma.StringFieldUpdateOperationsInput | string
-  disability?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   consentDataCollection?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  dateOfBirth?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   dateOfCreation?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  disability?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   lastUpdated?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  password?: Prisma.StringFieldUpdateOperationsInput | string
+  phoneNumber?: Prisma.StringFieldUpdateOperationsInput | string
+  preferredLanguage?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumuserStatusFieldUpdateOperationsInput | $Enums.userStatus
-  location?: Prisma.UserLocationUncheckedUpdateOneWithoutUserNestedInput
   complaints?: Prisma.ComplaintUncheckedUpdateManyWithoutComplainantNestedInput
   auditLogsCreated?: Prisma.AuditLogUncheckedUpdateManyWithoutUserNestedInput
+  location?: Prisma.UserLocationUncheckedUpdateOneWithoutUserNestedInput
 }
 
 export type UserCreateWithoutAuditLogsCreatedInput = {
   id?: string
   email: string
   name: string
-  phoneNumber: string
-  dateOfBirth: Date | string
-  password: string
   aadhaarId: string
-  preferredLanguage?: string
-  disability?: string | null
   consentDataCollection?: boolean
+  dateOfBirth: Date | string
   dateOfCreation?: Date | string
+  disability?: string | null
   lastUpdated?: Date | string
+  password: string
+  phoneNumber: string
+  preferredLanguage?: string
   status?: $Enums.userStatus
-  location?: Prisma.UserLocationCreateNestedOneWithoutUserInput
   complaints?: Prisma.ComplaintCreateNestedManyWithoutComplainantInput
   upvotes?: Prisma.UpvoteCreateNestedManyWithoutUserInput
+  location?: Prisma.UserLocationCreateNestedOneWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutAuditLogsCreatedInput = {
   id?: string
   email: string
   name: string
-  phoneNumber: string
-  dateOfBirth: Date | string
-  password: string
   aadhaarId: string
-  preferredLanguage?: string
-  disability?: string | null
   consentDataCollection?: boolean
+  dateOfBirth: Date | string
   dateOfCreation?: Date | string
+  disability?: string | null
   lastUpdated?: Date | string
+  password: string
+  phoneNumber: string
+  preferredLanguage?: string
   status?: $Enums.userStatus
-  location?: Prisma.UserLocationUncheckedCreateNestedOneWithoutUserInput
   complaints?: Prisma.ComplaintUncheckedCreateNestedManyWithoutComplainantInput
   upvotes?: Prisma.UpvoteUncheckedCreateNestedManyWithoutUserInput
+  location?: Prisma.UserLocationUncheckedCreateNestedOneWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutAuditLogsCreatedInput = {
@@ -924,38 +924,38 @@ export type UserUpdateWithoutAuditLogsCreatedInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
-  phoneNumber?: Prisma.StringFieldUpdateOperationsInput | string
-  dateOfBirth?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  password?: Prisma.StringFieldUpdateOperationsInput | string
   aadhaarId?: Prisma.StringFieldUpdateOperationsInput | string
-  preferredLanguage?: Prisma.StringFieldUpdateOperationsInput | string
-  disability?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   consentDataCollection?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  dateOfBirth?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   dateOfCreation?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  disability?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   lastUpdated?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  password?: Prisma.StringFieldUpdateOperationsInput | string
+  phoneNumber?: Prisma.StringFieldUpdateOperationsInput | string
+  preferredLanguage?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumuserStatusFieldUpdateOperationsInput | $Enums.userStatus
-  location?: Prisma.UserLocationUpdateOneWithoutUserNestedInput
   complaints?: Prisma.ComplaintUpdateManyWithoutComplainantNestedInput
   upvotes?: Prisma.UpvoteUpdateManyWithoutUserNestedInput
+  location?: Prisma.UserLocationUpdateOneWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutAuditLogsCreatedInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
-  phoneNumber?: Prisma.StringFieldUpdateOperationsInput | string
-  dateOfBirth?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  password?: Prisma.StringFieldUpdateOperationsInput | string
   aadhaarId?: Prisma.StringFieldUpdateOperationsInput | string
-  preferredLanguage?: Prisma.StringFieldUpdateOperationsInput | string
-  disability?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   consentDataCollection?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  dateOfBirth?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   dateOfCreation?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  disability?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   lastUpdated?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  password?: Prisma.StringFieldUpdateOperationsInput | string
+  phoneNumber?: Prisma.StringFieldUpdateOperationsInput | string
+  preferredLanguage?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumuserStatusFieldUpdateOperationsInput | $Enums.userStatus
-  location?: Prisma.UserLocationUncheckedUpdateOneWithoutUserNestedInput
   complaints?: Prisma.ComplaintUncheckedUpdateManyWithoutComplainantNestedInput
   upvotes?: Prisma.UpvoteUncheckedUpdateManyWithoutUserNestedInput
+  location?: Prisma.UserLocationUncheckedUpdateOneWithoutUserNestedInput
 }
 
 
@@ -965,14 +965,14 @@ export type UserUncheckedUpdateWithoutAuditLogsCreatedInput = {
 
 export type UserCountOutputType = {
   complaints: number
-  upvotes: number
   auditLogsCreated: number
+  upvotes: number
 }
 
 export type UserCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   complaints?: boolean | UserCountOutputTypeCountComplaintsArgs
-  upvotes?: boolean | UserCountOutputTypeCountUpvotesArgs
   auditLogsCreated?: boolean | UserCountOutputTypeCountAuditLogsCreatedArgs
+  upvotes?: boolean | UserCountOutputTypeCountUpvotesArgs
 }
 
 /**
@@ -995,15 +995,15 @@ export type UserCountOutputTypeCountComplaintsArgs<ExtArgs extends runtime.Types
 /**
  * UserCountOutputType without action
  */
-export type UserCountOutputTypeCountUpvotesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  where?: Prisma.UpvoteWhereInput
+export type UserCountOutputTypeCountAuditLogsCreatedArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.AuditLogWhereInput
 }
 
 /**
  * UserCountOutputType without action
  */
-export type UserCountOutputTypeCountAuditLogsCreatedArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  where?: Prisma.AuditLogWhereInput
+export type UserCountOutputTypeCountUpvotesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.UpvoteWhereInput
 }
 
 
@@ -1011,20 +1011,20 @@ export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
   id?: boolean
   email?: boolean
   name?: boolean
-  phoneNumber?: boolean
-  dateOfBirth?: boolean
-  password?: boolean
   aadhaarId?: boolean
-  preferredLanguage?: boolean
-  disability?: boolean
   consentDataCollection?: boolean
+  dateOfBirth?: boolean
   dateOfCreation?: boolean
+  disability?: boolean
   lastUpdated?: boolean
+  password?: boolean
+  phoneNumber?: boolean
+  preferredLanguage?: boolean
   status?: boolean
-  location?: boolean | Prisma.User$locationArgs<ExtArgs>
   complaints?: boolean | Prisma.User$complaintsArgs<ExtArgs>
-  upvotes?: boolean | Prisma.User$upvotesArgs<ExtArgs>
   auditLogsCreated?: boolean | Prisma.User$auditLogsCreatedArgs<ExtArgs>
+  upvotes?: boolean | Prisma.User$upvotesArgs<ExtArgs>
+  location?: boolean | Prisma.User$locationArgs<ExtArgs>
   _count?: boolean | Prisma.UserCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["user"]>
 
@@ -1032,15 +1032,15 @@ export type UserSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensio
   id?: boolean
   email?: boolean
   name?: boolean
-  phoneNumber?: boolean
-  dateOfBirth?: boolean
-  password?: boolean
   aadhaarId?: boolean
-  preferredLanguage?: boolean
-  disability?: boolean
   consentDataCollection?: boolean
+  dateOfBirth?: boolean
   dateOfCreation?: boolean
+  disability?: boolean
   lastUpdated?: boolean
+  password?: boolean
+  phoneNumber?: boolean
+  preferredLanguage?: boolean
   status?: boolean
 }, ExtArgs["result"]["user"]>
 
@@ -1048,15 +1048,15 @@ export type UserSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensio
   id?: boolean
   email?: boolean
   name?: boolean
-  phoneNumber?: boolean
-  dateOfBirth?: boolean
-  password?: boolean
   aadhaarId?: boolean
-  preferredLanguage?: boolean
-  disability?: boolean
   consentDataCollection?: boolean
+  dateOfBirth?: boolean
   dateOfCreation?: boolean
+  disability?: boolean
   lastUpdated?: boolean
+  password?: boolean
+  phoneNumber?: boolean
+  preferredLanguage?: boolean
   status?: boolean
 }, ExtArgs["result"]["user"]>
 
@@ -1064,24 +1064,24 @@ export type UserSelectScalar = {
   id?: boolean
   email?: boolean
   name?: boolean
-  phoneNumber?: boolean
-  dateOfBirth?: boolean
-  password?: boolean
   aadhaarId?: boolean
-  preferredLanguage?: boolean
-  disability?: boolean
   consentDataCollection?: boolean
+  dateOfBirth?: boolean
   dateOfCreation?: boolean
+  disability?: boolean
   lastUpdated?: boolean
+  password?: boolean
+  phoneNumber?: boolean
+  preferredLanguage?: boolean
   status?: boolean
 }
 
-export type UserOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "email" | "name" | "phoneNumber" | "dateOfBirth" | "password" | "aadhaarId" | "preferredLanguage" | "disability" | "consentDataCollection" | "dateOfCreation" | "lastUpdated" | "status", ExtArgs["result"]["user"]>
+export type UserOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "email" | "name" | "aadhaarId" | "consentDataCollection" | "dateOfBirth" | "dateOfCreation" | "disability" | "lastUpdated" | "password" | "phoneNumber" | "preferredLanguage" | "status", ExtArgs["result"]["user"]>
 export type UserInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  location?: boolean | Prisma.User$locationArgs<ExtArgs>
   complaints?: boolean | Prisma.User$complaintsArgs<ExtArgs>
-  upvotes?: boolean | Prisma.User$upvotesArgs<ExtArgs>
   auditLogsCreated?: boolean | Prisma.User$auditLogsCreatedArgs<ExtArgs>
+  upvotes?: boolean | Prisma.User$upvotesArgs<ExtArgs>
+  location?: boolean | Prisma.User$locationArgs<ExtArgs>
   _count?: boolean | Prisma.UserCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type UserIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {}
@@ -1090,24 +1090,24 @@ export type UserIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensi
 export type $UserPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   name: "User"
   objects: {
-    location: Prisma.$UserLocationPayload<ExtArgs> | null
     complaints: Prisma.$ComplaintPayload<ExtArgs>[]
-    upvotes: Prisma.$UpvotePayload<ExtArgs>[]
     auditLogsCreated: Prisma.$AuditLogPayload<ExtArgs>[]
+    upvotes: Prisma.$UpvotePayload<ExtArgs>[]
+    location: Prisma.$UserLocationPayload<ExtArgs> | null
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
     email: string
     name: string
-    phoneNumber: string
-    dateOfBirth: Date
-    password: string
     aadhaarId: string
-    preferredLanguage: string
-    disability: string | null
     consentDataCollection: boolean
+    dateOfBirth: Date
     dateOfCreation: Date
+    disability: string | null
     lastUpdated: Date
+    password: string
+    phoneNumber: string
+    preferredLanguage: string
     status: $Enums.userStatus
   }, ExtArgs["result"]["user"]>
   composites: {}
@@ -1503,10 +1503,10 @@ readonly fields: UserFieldRefs;
  */
 export interface Prisma__UserClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
-  location<T extends Prisma.User$locationArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$locationArgs<ExtArgs>>): Prisma.Prisma__UserLocationClient<runtime.Types.Result.GetResult<Prisma.$UserLocationPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   complaints<T extends Prisma.User$complaintsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$complaintsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ComplaintPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
-  upvotes<T extends Prisma.User$upvotesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$upvotesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$UpvotePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   auditLogsCreated<T extends Prisma.User$auditLogsCreatedArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$auditLogsCreatedArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$AuditLogPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  upvotes<T extends Prisma.User$upvotesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$upvotesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$UpvotePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  location<T extends Prisma.User$locationArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$locationArgs<ExtArgs>>): Prisma.Prisma__UserLocationClient<runtime.Types.Result.GetResult<Prisma.$UserLocationPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -1539,15 +1539,15 @@ export interface UserFieldRefs {
   readonly id: Prisma.FieldRef<"User", 'String'>
   readonly email: Prisma.FieldRef<"User", 'String'>
   readonly name: Prisma.FieldRef<"User", 'String'>
-  readonly phoneNumber: Prisma.FieldRef<"User", 'String'>
-  readonly dateOfBirth: Prisma.FieldRef<"User", 'DateTime'>
-  readonly password: Prisma.FieldRef<"User", 'String'>
   readonly aadhaarId: Prisma.FieldRef<"User", 'String'>
-  readonly preferredLanguage: Prisma.FieldRef<"User", 'String'>
-  readonly disability: Prisma.FieldRef<"User", 'String'>
   readonly consentDataCollection: Prisma.FieldRef<"User", 'Boolean'>
+  readonly dateOfBirth: Prisma.FieldRef<"User", 'DateTime'>
   readonly dateOfCreation: Prisma.FieldRef<"User", 'DateTime'>
+  readonly disability: Prisma.FieldRef<"User", 'String'>
   readonly lastUpdated: Prisma.FieldRef<"User", 'DateTime'>
+  readonly password: Prisma.FieldRef<"User", 'String'>
+  readonly phoneNumber: Prisma.FieldRef<"User", 'String'>
+  readonly preferredLanguage: Prisma.FieldRef<"User", 'String'>
   readonly status: Prisma.FieldRef<"User", 'userStatus'>
 }
     
@@ -1937,25 +1937,6 @@ export type UserDeleteManyArgs<ExtArgs extends runtime.Types.Extensions.Internal
 }
 
 /**
- * User.location
- */
-export type User$locationArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  /**
-   * Select specific fields to fetch from the UserLocation
-   */
-  select?: Prisma.UserLocationSelect<ExtArgs> | null
-  /**
-   * Omit specific fields from the UserLocation
-   */
-  omit?: Prisma.UserLocationOmit<ExtArgs> | null
-  /**
-   * Choose, which related nodes to fetch as well
-   */
-  include?: Prisma.UserLocationInclude<ExtArgs> | null
-  where?: Prisma.UserLocationWhereInput
-}
-
-/**
  * User.complaints
  */
 export type User$complaintsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -1977,6 +1958,30 @@ export type User$complaintsArgs<ExtArgs extends runtime.Types.Extensions.Interna
   take?: number
   skip?: number
   distinct?: Prisma.ComplaintScalarFieldEnum | Prisma.ComplaintScalarFieldEnum[]
+}
+
+/**
+ * User.auditLogsCreated
+ */
+export type User$auditLogsCreatedArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the AuditLog
+   */
+  select?: Prisma.AuditLogSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the AuditLog
+   */
+  omit?: Prisma.AuditLogOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.AuditLogInclude<ExtArgs> | null
+  where?: Prisma.AuditLogWhereInput
+  orderBy?: Prisma.AuditLogOrderByWithRelationInput | Prisma.AuditLogOrderByWithRelationInput[]
+  cursor?: Prisma.AuditLogWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.AuditLogScalarFieldEnum | Prisma.AuditLogScalarFieldEnum[]
 }
 
 /**
@@ -2004,27 +2009,22 @@ export type User$upvotesArgs<ExtArgs extends runtime.Types.Extensions.InternalAr
 }
 
 /**
- * User.auditLogsCreated
+ * User.location
  */
-export type User$auditLogsCreatedArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+export type User$locationArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   /**
-   * Select specific fields to fetch from the AuditLog
+   * Select specific fields to fetch from the UserLocation
    */
-  select?: Prisma.AuditLogSelect<ExtArgs> | null
+  select?: Prisma.UserLocationSelect<ExtArgs> | null
   /**
-   * Omit specific fields from the AuditLog
+   * Omit specific fields from the UserLocation
    */
-  omit?: Prisma.AuditLogOmit<ExtArgs> | null
+  omit?: Prisma.UserLocationOmit<ExtArgs> | null
   /**
    * Choose, which related nodes to fetch as well
    */
-  include?: Prisma.AuditLogInclude<ExtArgs> | null
-  where?: Prisma.AuditLogWhereInput
-  orderBy?: Prisma.AuditLogOrderByWithRelationInput | Prisma.AuditLogOrderByWithRelationInput[]
-  cursor?: Prisma.AuditLogWhereUniqueInput
-  take?: number
-  skip?: number
-  distinct?: Prisma.AuditLogScalarFieldEnum | Prisma.AuditLogScalarFieldEnum[]
+  include?: Prisma.UserLocationInclude<ExtArgs> | null
+  where?: Prisma.UserLocationWhereInput
 }
 
 /**

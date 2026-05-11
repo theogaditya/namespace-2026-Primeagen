@@ -4,6 +4,46 @@ import jwt from 'jsonwebtoken';
 import { PrismaClient } from '../prisma/generated/client/client';
 import { loginSchema } from '../lib/schemas/agentSchema';
 import { authenticateAgent } from '../middleware/adminAuth';
+import { getProcessedQueueLength, peekProcessedQueue } from '../lib/redis/assignQueue';
+
+let isAssignmentPolling = false;
+let assignmentPollingInterval: NodeJS.Timeout | null = null;
+
+async function processNextAssignment(prisma: PrismaClient): Promise<{ processed: boolean; result?: any; error?: string }> {
+  try {
+    const queueLength = await getProcessedQueueLength();
+    if (queueLength > 0) {
+      const complaint = await peekProcessedQueue();
+      console.log(`Found ${queueLength} complaint(s) in processed queue. Next: id=${complaint?.id}`);
+      // TODO: Add actual assignment logic here
+      return { processed: false, result: { queueLength, nextComplaint: complaint } };
+    }
+    return { processed: false };
+  } catch (error: any) {
+    console.error('Assignment processing error:', error);
+    return { processed: false, error: error.message };
+  }
+}
+
+export function startAssignmentPolling(prisma: PrismaClient) {
+  if (isAssignmentPolling) return;
+
+  isAssignmentPolling = true;
+  console.log("Assignment polling started (10s interval)");
+
+  assignmentPollingInterval = setInterval(async () => {
+    await processNextAssignment(prisma);
+  }, 10000);
+}
+
+export function stopAssignmentPolling() {
+  if (assignmentPollingInterval) {
+    clearInterval(assignmentPollingInterval);
+    assignmentPollingInterval = null;
+  }
+  isAssignmentPolling = false;
+  console.log("Assignment polling stopped");
+}
 
 export default function(prisma: PrismaClient) {
   const router = Router();
@@ -527,161 +567,56 @@ router.put('/me/workload/dec', authenticateAgent, async (req: any, res: any) => 
   }
 });
 
-// ---------- Auto-assign complaint to available agent --------
+// ---------- Auto-assign: Manual trigger --------
 router.post('/complaints/auto-assign', async (req: any, res: any) => {
-  console.log('Auto-assign endpoint hit');
+  const result = await processNextAssignment(prisma);
   
-  const { id: complaintId, city } = req.body;
+  if (!result.processed && !result.error) {
+    return res.status(204).json({
+      success: false,
+      message: 'No complaints in processed queue'
+    });
+  }
 
-  if (!city) {
+  if (result.error) {
     return res.status(400).json({
       success: false,
-      message: 'City is required'
+      message: result.error
     });
   }
 
-  try {
-    const municipality = city;
-
-    const agentFilter: any = {
-      status: 'ACTIVE',
-      municipality: municipality,
-      currentWorkload: {
-        lt: prisma.agent.fields.workloadLimit
-      }
-    };
-    
-    const availableAgents = await prisma.agent.findMany({
-      where: agentFilter
-    });
-
-    console.log(`Found ${availableAgents.length} available agents in ${municipality}`);
-
-    if (availableAgents.length === 0) {
-      console.log(`⚠️ No agents available in ${municipality}`);
-      return res.status(503).json({ 
-        success: false, 
-        message: `No agents available in ${municipality} with capacity to handle new complaints` 
-      });
-    }
-
-    const randomAgent = availableAgents[Math.floor(Math.random() * availableAgents.length)];
-    
-    if (!randomAgent) {
-      return res.status(500).json({
-        success: false,
-        message: 'Failed to select an agent'
-      });
-    }
-    
-    await prisma.agent.update({
-      where: { id: randomAgent.id },
-      data: { currentWorkload: { increment: 1 } }
-    });
-    
-    console.log(`Complaint ${complaintId} assigned to agent ${randomAgent.fullName}`);
-    
-    res.status(200).json({ 
-      success: true,
-      message: 'Complaint auto-assigned successfully',
-      complaintId: complaintId,
-      assignedTo: {
-        id: randomAgent.id,
-        fullName: randomAgent.fullName,
-        department: randomAgent.department,
-        municipality: randomAgent.municipality
-      }
-    });
-
-  } catch (error: any) {
-    console.error('❌ Auto-assignment error:', error);
-    res.status(500).json({ 
-      success: false,
-      message: 'Failed to auto-assign complaint',
-      error: process.env.NODE_ENV === 'development' ? error.message : undefined
-    });
-  }
+  return res.status(200).json({
+    success: true,
+    message: 'Assignment processed',
+    data: result.result
+  });
 });
 
+// ---------- Auto-assign: Start polling --------
+router.post('/complaints/auto-assign/start', (req: any, res: any) => {
+  startAssignmentPolling(prisma);
+  return res.status(200).json({
+    success: true,
+    message: 'Assignment polling started'
+  });
+});
 
+// ---------- Auto-assign: Stop polling --------
+router.post('/complaints/auto-assign/stop', (req: any, res: any) => {
+  stopAssignmentPolling();
+  return res.status(200).json({
+    success: true,
+    message: 'Assignment polling stopped'
+  });
+});
 
-// // ---------- Auto-assign complaint to available agent --------
-// router.post('/complaints/auto-assign', async (req: any, res: any) => {
-//   const complaintId = req.params.id;
-
-//   try {
-//     // Check if complaint exists
-//     const complaint = await prisma.complaint.findUnique({ where: { id: complaintId } });
-//     if (!complaint) {
-//       return res.status(404).json({ success: false, message: 'Complaint not found' });
-//     }
-
-//     // Check if already assigned
-//     if (complaint.assignedAgentId) {
-//       return res.status(400).json({ success: false, message: 'Complaint already assigned' });
-//     }
-
-//     // Find all agents with available workload capacity (currentWorkload < workloadLimit)
-//     const availableAgents = await prisma.agent.findMany({
-//       where: {
-//         status: 'ACTIVE',
-//         currentWorkload: {
-//           lt: prisma.agent.fields.workloadLimit
-//         }
-//       },
-//       select: {
-//         id: true,
-//         fullName: true,
-//         currentWorkload: true,
-//         workloadLimit: true,
-//         department: true
-//       }
-//     });
-
-//     if (availableAgents.length === 0) {
-//       return res.status(503).json({ 
-//         success: false, 
-//         message: 'No agents available with capacity to handle new complaints' 
-//       });
-//     }
-
-//     // Pick a random agent for uniform distribution
-//     const randomAgent = availableAgents[Math.floor(Math.random() * availableAgents.length)];
-
-//     // Assign complaint and increment agent workload in a transaction
-//     await prisma.$transaction([
-//       prisma.complaint.update({
-//         where: { id: complaintId },
-//         data: { 
-//           assignedAgentId: randomAgent.id,
-//           status: 'UNDER_PROCESSING'
-//         }
-//       }),
-//       prisma.agent.update({
-//         where: { id: randomAgent.id },
-//         data: { currentWorkload: { increment: 1 } }
-//       })
-//     ]);
-
-//     res.status(200).json({ 
-//       success: true,
-//       message: 'Complaint auto-assigned successfully',
-//       assignedTo: {
-//         id: randomAgent.id,
-//         fullName: randomAgent.fullName,
-//         department: randomAgent.department
-//       }
-//     });
-
-//   } catch (error: any) {
-//     console.error('Auto-assignment error:', error);
-//     res.status(500).json({ 
-//       success: false,
-//       message: 'Failed to auto-assign complaint',
-//       error: process.env.NODE_ENV === 'development' ? error.message : undefined
-//     });
-//   }
-// });
+// ---------- Auto-assign: Polling status --------
+router.get('/complaints/auto-assign/status', (req: any, res: any) => {
+  return res.status(200).json({
+    success: true,
+    isPolling: isAssignmentPolling
+  });
+});
 
   return router;
 }

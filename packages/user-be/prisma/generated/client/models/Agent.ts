@@ -50,7 +50,6 @@ export type AgentMinAggregateOutputType = {
   officialEmail: string | null
   department: $Enums.Department | null
   municipality: string | null
-  district: string | null
   accessLevel: $Enums.AccessLevel | null
   workloadLimit: number | null
   currentWorkload: number | null
@@ -63,6 +62,7 @@ export type AgentMinAggregateOutputType = {
   avgResolutionTime: string | null
   collaborationMetric: number | null
   managedByMunicipalId: string | null
+  district: string | null
 }
 
 export type AgentMaxAggregateOutputType = {
@@ -75,7 +75,6 @@ export type AgentMaxAggregateOutputType = {
   officialEmail: string | null
   department: $Enums.Department | null
   municipality: string | null
-  district: string | null
   accessLevel: $Enums.AccessLevel | null
   workloadLimit: number | null
   currentWorkload: number | null
@@ -88,6 +87,7 @@ export type AgentMaxAggregateOutputType = {
   avgResolutionTime: string | null
   collaborationMetric: number | null
   managedByMunicipalId: string | null
+  district: string | null
 }
 
 export type AgentCountAggregateOutputType = {
@@ -100,7 +100,6 @@ export type AgentCountAggregateOutputType = {
   officialEmail: number
   department: number
   municipality: number
-  district: number
   accessLevel: number
   workloadLimit: number
   currentWorkload: number
@@ -113,6 +112,7 @@ export type AgentCountAggregateOutputType = {
   avgResolutionTime: number
   collaborationMetric: number
   managedByMunicipalId: number
+  district: number
   _all: number
 }
 
@@ -141,7 +141,6 @@ export type AgentMinAggregateInputType = {
   officialEmail?: true
   department?: true
   municipality?: true
-  district?: true
   accessLevel?: true
   workloadLimit?: true
   currentWorkload?: true
@@ -154,6 +153,7 @@ export type AgentMinAggregateInputType = {
   avgResolutionTime?: true
   collaborationMetric?: true
   managedByMunicipalId?: true
+  district?: true
 }
 
 export type AgentMaxAggregateInputType = {
@@ -166,7 +166,6 @@ export type AgentMaxAggregateInputType = {
   officialEmail?: true
   department?: true
   municipality?: true
-  district?: true
   accessLevel?: true
   workloadLimit?: true
   currentWorkload?: true
@@ -179,6 +178,7 @@ export type AgentMaxAggregateInputType = {
   avgResolutionTime?: true
   collaborationMetric?: true
   managedByMunicipalId?: true
+  district?: true
 }
 
 export type AgentCountAggregateInputType = {
@@ -191,7 +191,6 @@ export type AgentCountAggregateInputType = {
   officialEmail?: true
   department?: true
   municipality?: true
-  district?: true
   accessLevel?: true
   workloadLimit?: true
   currentWorkload?: true
@@ -204,6 +203,7 @@ export type AgentCountAggregateInputType = {
   avgResolutionTime?: true
   collaborationMetric?: true
   managedByMunicipalId?: true
+  district?: true
   _all?: true
 }
 
@@ -303,7 +303,6 @@ export type AgentGroupByOutputType = {
   officialEmail: string
   department: $Enums.Department
   municipality: string | null
-  district: string | null
   accessLevel: $Enums.AccessLevel
   workloadLimit: number
   currentWorkload: number
@@ -316,6 +315,7 @@ export type AgentGroupByOutputType = {
   avgResolutionTime: string | null
   collaborationMetric: number
   managedByMunicipalId: string | null
+  district: string | null
   _count: AgentCountAggregateOutputType | null
   _avg: AgentAvgAggregateOutputType | null
   _sum: AgentSumAggregateOutputType | null
@@ -351,7 +351,6 @@ export type AgentWhereInput = {
   officialEmail?: Prisma.StringFilter<"Agent"> | string
   department?: Prisma.EnumDepartmentFilter<"Agent"> | $Enums.Department
   municipality?: Prisma.StringNullableFilter<"Agent"> | string | null
-  district?: Prisma.StringNullableFilter<"Agent"> | string | null
   accessLevel?: Prisma.EnumAccessLevelFilter<"Agent"> | $Enums.AccessLevel
   workloadLimit?: Prisma.IntFilter<"Agent"> | number
   currentWorkload?: Prisma.IntFilter<"Agent"> | number
@@ -364,9 +363,10 @@ export type AgentWhereInput = {
   avgResolutionTime?: Prisma.StringNullableFilter<"Agent"> | string | null
   collaborationMetric?: Prisma.IntFilter<"Agent"> | number
   managedByMunicipalId?: Prisma.StringNullableFilter<"Agent"> | string | null
+  district?: Prisma.StringNullableFilter<"Agent"> | string | null
+  managedByMunicipal?: Prisma.XOR<Prisma.DepartmentMunicipalAdminNullableScalarRelationFilter, Prisma.DepartmentMunicipalAdminWhereInput> | null
   assignedComplaints?: Prisma.ComplaintListRelationFilter
   coAssignedComplaints?: Prisma.ComplaintListRelationFilter
-  managedByMunicipal?: Prisma.XOR<Prisma.DepartmentMunicipalAdminNullableScalarRelationFilter, Prisma.DepartmentMunicipalAdminWhereInput> | null
 }
 
 export type AgentOrderByWithRelationInput = {
@@ -379,7 +379,6 @@ export type AgentOrderByWithRelationInput = {
   officialEmail?: Prisma.SortOrder
   department?: Prisma.SortOrder
   municipality?: Prisma.SortOrderInput | Prisma.SortOrder
-  district?: Prisma.SortOrderInput | Prisma.SortOrder
   accessLevel?: Prisma.SortOrder
   workloadLimit?: Prisma.SortOrder
   currentWorkload?: Prisma.SortOrder
@@ -392,9 +391,10 @@ export type AgentOrderByWithRelationInput = {
   avgResolutionTime?: Prisma.SortOrderInput | Prisma.SortOrder
   collaborationMetric?: Prisma.SortOrder
   managedByMunicipalId?: Prisma.SortOrderInput | Prisma.SortOrder
+  district?: Prisma.SortOrderInput | Prisma.SortOrder
+  managedByMunicipal?: Prisma.DepartmentMunicipalAdminOrderByWithRelationInput
   assignedComplaints?: Prisma.ComplaintOrderByRelationAggregateInput
   coAssignedComplaints?: Prisma.ComplaintOrderByRelationAggregateInput
-  managedByMunicipal?: Prisma.DepartmentMunicipalAdminOrderByWithRelationInput
 }
 
 export type AgentWhereUniqueInput = Prisma.AtLeast<{
@@ -410,7 +410,6 @@ export type AgentWhereUniqueInput = Prisma.AtLeast<{
   phoneNumber?: Prisma.StringFilter<"Agent"> | string
   department?: Prisma.EnumDepartmentFilter<"Agent"> | $Enums.Department
   municipality?: Prisma.StringNullableFilter<"Agent"> | string | null
-  district?: Prisma.StringNullableFilter<"Agent"> | string | null
   accessLevel?: Prisma.EnumAccessLevelFilter<"Agent"> | $Enums.AccessLevel
   workloadLimit?: Prisma.IntFilter<"Agent"> | number
   currentWorkload?: Prisma.IntFilter<"Agent"> | number
@@ -423,9 +422,10 @@ export type AgentWhereUniqueInput = Prisma.AtLeast<{
   avgResolutionTime?: Prisma.StringNullableFilter<"Agent"> | string | null
   collaborationMetric?: Prisma.IntFilter<"Agent"> | number
   managedByMunicipalId?: Prisma.StringNullableFilter<"Agent"> | string | null
+  district?: Prisma.StringNullableFilter<"Agent"> | string | null
+  managedByMunicipal?: Prisma.XOR<Prisma.DepartmentMunicipalAdminNullableScalarRelationFilter, Prisma.DepartmentMunicipalAdminWhereInput> | null
   assignedComplaints?: Prisma.ComplaintListRelationFilter
   coAssignedComplaints?: Prisma.ComplaintListRelationFilter
-  managedByMunicipal?: Prisma.XOR<Prisma.DepartmentMunicipalAdminNullableScalarRelationFilter, Prisma.DepartmentMunicipalAdminWhereInput> | null
 }, "id" | "email" | "employeeId" | "officialEmail">
 
 export type AgentOrderByWithAggregationInput = {
@@ -438,7 +438,6 @@ export type AgentOrderByWithAggregationInput = {
   officialEmail?: Prisma.SortOrder
   department?: Prisma.SortOrder
   municipality?: Prisma.SortOrderInput | Prisma.SortOrder
-  district?: Prisma.SortOrderInput | Prisma.SortOrder
   accessLevel?: Prisma.SortOrder
   workloadLimit?: Prisma.SortOrder
   currentWorkload?: Prisma.SortOrder
@@ -451,6 +450,7 @@ export type AgentOrderByWithAggregationInput = {
   avgResolutionTime?: Prisma.SortOrderInput | Prisma.SortOrder
   collaborationMetric?: Prisma.SortOrder
   managedByMunicipalId?: Prisma.SortOrderInput | Prisma.SortOrder
+  district?: Prisma.SortOrderInput | Prisma.SortOrder
   _count?: Prisma.AgentCountOrderByAggregateInput
   _avg?: Prisma.AgentAvgOrderByAggregateInput
   _max?: Prisma.AgentMaxOrderByAggregateInput
@@ -471,7 +471,6 @@ export type AgentScalarWhereWithAggregatesInput = {
   officialEmail?: Prisma.StringWithAggregatesFilter<"Agent"> | string
   department?: Prisma.EnumDepartmentWithAggregatesFilter<"Agent"> | $Enums.Department
   municipality?: Prisma.StringNullableWithAggregatesFilter<"Agent"> | string | null
-  district?: Prisma.StringNullableWithAggregatesFilter<"Agent"> | string | null
   accessLevel?: Prisma.EnumAccessLevelWithAggregatesFilter<"Agent"> | $Enums.AccessLevel
   workloadLimit?: Prisma.IntWithAggregatesFilter<"Agent"> | number
   currentWorkload?: Prisma.IntWithAggregatesFilter<"Agent"> | number
@@ -484,6 +483,7 @@ export type AgentScalarWhereWithAggregatesInput = {
   avgResolutionTime?: Prisma.StringNullableWithAggregatesFilter<"Agent"> | string | null
   collaborationMetric?: Prisma.IntWithAggregatesFilter<"Agent"> | number
   managedByMunicipalId?: Prisma.StringNullableWithAggregatesFilter<"Agent"> | string | null
+  district?: Prisma.StringNullableWithAggregatesFilter<"Agent"> | string | null
 }
 
 export type AgentCreateInput = {
@@ -496,7 +496,6 @@ export type AgentCreateInput = {
   officialEmail: string
   department: $Enums.Department
   municipality?: string | null
-  district?: string | null
   accessLevel?: $Enums.AccessLevel
   workloadLimit?: number
   currentWorkload?: number
@@ -508,9 +507,10 @@ export type AgentCreateInput = {
   resolutionRate?: number
   avgResolutionTime?: string | null
   collaborationMetric?: number
+  district?: string | null
+  managedByMunicipal?: Prisma.DepartmentMunicipalAdminCreateNestedOneWithoutManagedAgentsInput
   assignedComplaints?: Prisma.ComplaintCreateNestedManyWithoutAssignedAgentInput
   coAssignedComplaints?: Prisma.ComplaintCreateNestedManyWithoutCoAssignedAgentsInput
-  managedByMunicipal?: Prisma.DepartmentMunicipalAdminCreateNestedOneWithoutManagedAgentsInput
 }
 
 export type AgentUncheckedCreateInput = {
@@ -523,7 +523,6 @@ export type AgentUncheckedCreateInput = {
   officialEmail: string
   department: $Enums.Department
   municipality?: string | null
-  district?: string | null
   accessLevel?: $Enums.AccessLevel
   workloadLimit?: number
   currentWorkload?: number
@@ -536,6 +535,7 @@ export type AgentUncheckedCreateInput = {
   avgResolutionTime?: string | null
   collaborationMetric?: number
   managedByMunicipalId?: string | null
+  district?: string | null
   assignedComplaints?: Prisma.ComplaintUncheckedCreateNestedManyWithoutAssignedAgentInput
   coAssignedComplaints?: Prisma.ComplaintUncheckedCreateNestedManyWithoutCoAssignedAgentsInput
 }
@@ -550,7 +550,6 @@ export type AgentUpdateInput = {
   officialEmail?: Prisma.StringFieldUpdateOperationsInput | string
   department?: Prisma.EnumDepartmentFieldUpdateOperationsInput | $Enums.Department
   municipality?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  district?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   accessLevel?: Prisma.EnumAccessLevelFieldUpdateOperationsInput | $Enums.AccessLevel
   workloadLimit?: Prisma.IntFieldUpdateOperationsInput | number
   currentWorkload?: Prisma.IntFieldUpdateOperationsInput | number
@@ -562,9 +561,10 @@ export type AgentUpdateInput = {
   resolutionRate?: Prisma.FloatFieldUpdateOperationsInput | number
   avgResolutionTime?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   collaborationMetric?: Prisma.IntFieldUpdateOperationsInput | number
+  district?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  managedByMunicipal?: Prisma.DepartmentMunicipalAdminUpdateOneWithoutManagedAgentsNestedInput
   assignedComplaints?: Prisma.ComplaintUpdateManyWithoutAssignedAgentNestedInput
   coAssignedComplaints?: Prisma.ComplaintUpdateManyWithoutCoAssignedAgentsNestedInput
-  managedByMunicipal?: Prisma.DepartmentMunicipalAdminUpdateOneWithoutManagedAgentsNestedInput
 }
 
 export type AgentUncheckedUpdateInput = {
@@ -577,7 +577,6 @@ export type AgentUncheckedUpdateInput = {
   officialEmail?: Prisma.StringFieldUpdateOperationsInput | string
   department?: Prisma.EnumDepartmentFieldUpdateOperationsInput | $Enums.Department
   municipality?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  district?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   accessLevel?: Prisma.EnumAccessLevelFieldUpdateOperationsInput | $Enums.AccessLevel
   workloadLimit?: Prisma.IntFieldUpdateOperationsInput | number
   currentWorkload?: Prisma.IntFieldUpdateOperationsInput | number
@@ -590,6 +589,7 @@ export type AgentUncheckedUpdateInput = {
   avgResolutionTime?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   collaborationMetric?: Prisma.IntFieldUpdateOperationsInput | number
   managedByMunicipalId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  district?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   assignedComplaints?: Prisma.ComplaintUncheckedUpdateManyWithoutAssignedAgentNestedInput
   coAssignedComplaints?: Prisma.ComplaintUncheckedUpdateManyWithoutCoAssignedAgentsNestedInput
 }
@@ -604,7 +604,6 @@ export type AgentCreateManyInput = {
   officialEmail: string
   department: $Enums.Department
   municipality?: string | null
-  district?: string | null
   accessLevel?: $Enums.AccessLevel
   workloadLimit?: number
   currentWorkload?: number
@@ -617,6 +616,7 @@ export type AgentCreateManyInput = {
   avgResolutionTime?: string | null
   collaborationMetric?: number
   managedByMunicipalId?: string | null
+  district?: string | null
 }
 
 export type AgentUpdateManyMutationInput = {
@@ -629,7 +629,6 @@ export type AgentUpdateManyMutationInput = {
   officialEmail?: Prisma.StringFieldUpdateOperationsInput | string
   department?: Prisma.EnumDepartmentFieldUpdateOperationsInput | $Enums.Department
   municipality?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  district?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   accessLevel?: Prisma.EnumAccessLevelFieldUpdateOperationsInput | $Enums.AccessLevel
   workloadLimit?: Prisma.IntFieldUpdateOperationsInput | number
   currentWorkload?: Prisma.IntFieldUpdateOperationsInput | number
@@ -641,6 +640,7 @@ export type AgentUpdateManyMutationInput = {
   resolutionRate?: Prisma.FloatFieldUpdateOperationsInput | number
   avgResolutionTime?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   collaborationMetric?: Prisma.IntFieldUpdateOperationsInput | number
+  district?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
 export type AgentUncheckedUpdateManyInput = {
@@ -653,7 +653,6 @@ export type AgentUncheckedUpdateManyInput = {
   officialEmail?: Prisma.StringFieldUpdateOperationsInput | string
   department?: Prisma.EnumDepartmentFieldUpdateOperationsInput | $Enums.Department
   municipality?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  district?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   accessLevel?: Prisma.EnumAccessLevelFieldUpdateOperationsInput | $Enums.AccessLevel
   workloadLimit?: Prisma.IntFieldUpdateOperationsInput | number
   currentWorkload?: Prisma.IntFieldUpdateOperationsInput | number
@@ -666,6 +665,7 @@ export type AgentUncheckedUpdateManyInput = {
   avgResolutionTime?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   collaborationMetric?: Prisma.IntFieldUpdateOperationsInput | number
   managedByMunicipalId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  district?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
 export type AgentCountOrderByAggregateInput = {
@@ -678,7 +678,6 @@ export type AgentCountOrderByAggregateInput = {
   officialEmail?: Prisma.SortOrder
   department?: Prisma.SortOrder
   municipality?: Prisma.SortOrder
-  district?: Prisma.SortOrder
   accessLevel?: Prisma.SortOrder
   workloadLimit?: Prisma.SortOrder
   currentWorkload?: Prisma.SortOrder
@@ -691,6 +690,7 @@ export type AgentCountOrderByAggregateInput = {
   avgResolutionTime?: Prisma.SortOrder
   collaborationMetric?: Prisma.SortOrder
   managedByMunicipalId?: Prisma.SortOrder
+  district?: Prisma.SortOrder
 }
 
 export type AgentAvgOrderByAggregateInput = {
@@ -710,7 +710,6 @@ export type AgentMaxOrderByAggregateInput = {
   officialEmail?: Prisma.SortOrder
   department?: Prisma.SortOrder
   municipality?: Prisma.SortOrder
-  district?: Prisma.SortOrder
   accessLevel?: Prisma.SortOrder
   workloadLimit?: Prisma.SortOrder
   currentWorkload?: Prisma.SortOrder
@@ -723,6 +722,7 @@ export type AgentMaxOrderByAggregateInput = {
   avgResolutionTime?: Prisma.SortOrder
   collaborationMetric?: Prisma.SortOrder
   managedByMunicipalId?: Prisma.SortOrder
+  district?: Prisma.SortOrder
 }
 
 export type AgentMinOrderByAggregateInput = {
@@ -735,7 +735,6 @@ export type AgentMinOrderByAggregateInput = {
   officialEmail?: Prisma.SortOrder
   department?: Prisma.SortOrder
   municipality?: Prisma.SortOrder
-  district?: Prisma.SortOrder
   accessLevel?: Prisma.SortOrder
   workloadLimit?: Prisma.SortOrder
   currentWorkload?: Prisma.SortOrder
@@ -748,6 +747,7 @@ export type AgentMinOrderByAggregateInput = {
   avgResolutionTime?: Prisma.SortOrder
   collaborationMetric?: Prisma.SortOrder
   managedByMunicipalId?: Prisma.SortOrder
+  district?: Prisma.SortOrder
 }
 
 export type AgentSumOrderByAggregateInput = {
@@ -910,7 +910,6 @@ export type AgentCreateWithoutManagedByMunicipalInput = {
   officialEmail: string
   department: $Enums.Department
   municipality?: string | null
-  district?: string | null
   accessLevel?: $Enums.AccessLevel
   workloadLimit?: number
   currentWorkload?: number
@@ -922,6 +921,7 @@ export type AgentCreateWithoutManagedByMunicipalInput = {
   resolutionRate?: number
   avgResolutionTime?: string | null
   collaborationMetric?: number
+  district?: string | null
   assignedComplaints?: Prisma.ComplaintCreateNestedManyWithoutAssignedAgentInput
   coAssignedComplaints?: Prisma.ComplaintCreateNestedManyWithoutCoAssignedAgentsInput
 }
@@ -936,7 +936,6 @@ export type AgentUncheckedCreateWithoutManagedByMunicipalInput = {
   officialEmail: string
   department: $Enums.Department
   municipality?: string | null
-  district?: string | null
   accessLevel?: $Enums.AccessLevel
   workloadLimit?: number
   currentWorkload?: number
@@ -948,6 +947,7 @@ export type AgentUncheckedCreateWithoutManagedByMunicipalInput = {
   resolutionRate?: number
   avgResolutionTime?: string | null
   collaborationMetric?: number
+  district?: string | null
   assignedComplaints?: Prisma.ComplaintUncheckedCreateNestedManyWithoutAssignedAgentInput
   coAssignedComplaints?: Prisma.ComplaintUncheckedCreateNestedManyWithoutCoAssignedAgentsInput
 }
@@ -991,7 +991,6 @@ export type AgentScalarWhereInput = {
   officialEmail?: Prisma.StringFilter<"Agent"> | string
   department?: Prisma.EnumDepartmentFilter<"Agent"> | $Enums.Department
   municipality?: Prisma.StringNullableFilter<"Agent"> | string | null
-  district?: Prisma.StringNullableFilter<"Agent"> | string | null
   accessLevel?: Prisma.EnumAccessLevelFilter<"Agent"> | $Enums.AccessLevel
   workloadLimit?: Prisma.IntFilter<"Agent"> | number
   currentWorkload?: Prisma.IntFilter<"Agent"> | number
@@ -1004,6 +1003,7 @@ export type AgentScalarWhereInput = {
   avgResolutionTime?: Prisma.StringNullableFilter<"Agent"> | string | null
   collaborationMetric?: Prisma.IntFilter<"Agent"> | number
   managedByMunicipalId?: Prisma.StringNullableFilter<"Agent"> | string | null
+  district?: Prisma.StringNullableFilter<"Agent"> | string | null
 }
 
 export type AgentCreateWithoutAssignedComplaintsInput = {
@@ -1016,7 +1016,6 @@ export type AgentCreateWithoutAssignedComplaintsInput = {
   officialEmail: string
   department: $Enums.Department
   municipality?: string | null
-  district?: string | null
   accessLevel?: $Enums.AccessLevel
   workloadLimit?: number
   currentWorkload?: number
@@ -1028,8 +1027,9 @@ export type AgentCreateWithoutAssignedComplaintsInput = {
   resolutionRate?: number
   avgResolutionTime?: string | null
   collaborationMetric?: number
-  coAssignedComplaints?: Prisma.ComplaintCreateNestedManyWithoutCoAssignedAgentsInput
+  district?: string | null
   managedByMunicipal?: Prisma.DepartmentMunicipalAdminCreateNestedOneWithoutManagedAgentsInput
+  coAssignedComplaints?: Prisma.ComplaintCreateNestedManyWithoutCoAssignedAgentsInput
 }
 
 export type AgentUncheckedCreateWithoutAssignedComplaintsInput = {
@@ -1042,7 +1042,6 @@ export type AgentUncheckedCreateWithoutAssignedComplaintsInput = {
   officialEmail: string
   department: $Enums.Department
   municipality?: string | null
-  district?: string | null
   accessLevel?: $Enums.AccessLevel
   workloadLimit?: number
   currentWorkload?: number
@@ -1055,6 +1054,7 @@ export type AgentUncheckedCreateWithoutAssignedComplaintsInput = {
   avgResolutionTime?: string | null
   collaborationMetric?: number
   managedByMunicipalId?: string | null
+  district?: string | null
   coAssignedComplaints?: Prisma.ComplaintUncheckedCreateNestedManyWithoutCoAssignedAgentsInput
 }
 
@@ -1073,7 +1073,6 @@ export type AgentCreateWithoutCoAssignedComplaintsInput = {
   officialEmail: string
   department: $Enums.Department
   municipality?: string | null
-  district?: string | null
   accessLevel?: $Enums.AccessLevel
   workloadLimit?: number
   currentWorkload?: number
@@ -1085,8 +1084,9 @@ export type AgentCreateWithoutCoAssignedComplaintsInput = {
   resolutionRate?: number
   avgResolutionTime?: string | null
   collaborationMetric?: number
-  assignedComplaints?: Prisma.ComplaintCreateNestedManyWithoutAssignedAgentInput
+  district?: string | null
   managedByMunicipal?: Prisma.DepartmentMunicipalAdminCreateNestedOneWithoutManagedAgentsInput
+  assignedComplaints?: Prisma.ComplaintCreateNestedManyWithoutAssignedAgentInput
 }
 
 export type AgentUncheckedCreateWithoutCoAssignedComplaintsInput = {
@@ -1099,7 +1099,6 @@ export type AgentUncheckedCreateWithoutCoAssignedComplaintsInput = {
   officialEmail: string
   department: $Enums.Department
   municipality?: string | null
-  district?: string | null
   accessLevel?: $Enums.AccessLevel
   workloadLimit?: number
   currentWorkload?: number
@@ -1112,6 +1111,7 @@ export type AgentUncheckedCreateWithoutCoAssignedComplaintsInput = {
   avgResolutionTime?: string | null
   collaborationMetric?: number
   managedByMunicipalId?: string | null
+  district?: string | null
   assignedComplaints?: Prisma.ComplaintUncheckedCreateNestedManyWithoutAssignedAgentInput
 }
 
@@ -1141,7 +1141,6 @@ export type AgentUpdateWithoutAssignedComplaintsInput = {
   officialEmail?: Prisma.StringFieldUpdateOperationsInput | string
   department?: Prisma.EnumDepartmentFieldUpdateOperationsInput | $Enums.Department
   municipality?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  district?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   accessLevel?: Prisma.EnumAccessLevelFieldUpdateOperationsInput | $Enums.AccessLevel
   workloadLimit?: Prisma.IntFieldUpdateOperationsInput | number
   currentWorkload?: Prisma.IntFieldUpdateOperationsInput | number
@@ -1153,8 +1152,9 @@ export type AgentUpdateWithoutAssignedComplaintsInput = {
   resolutionRate?: Prisma.FloatFieldUpdateOperationsInput | number
   avgResolutionTime?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   collaborationMetric?: Prisma.IntFieldUpdateOperationsInput | number
-  coAssignedComplaints?: Prisma.ComplaintUpdateManyWithoutCoAssignedAgentsNestedInput
+  district?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   managedByMunicipal?: Prisma.DepartmentMunicipalAdminUpdateOneWithoutManagedAgentsNestedInput
+  coAssignedComplaints?: Prisma.ComplaintUpdateManyWithoutCoAssignedAgentsNestedInput
 }
 
 export type AgentUncheckedUpdateWithoutAssignedComplaintsInput = {
@@ -1167,7 +1167,6 @@ export type AgentUncheckedUpdateWithoutAssignedComplaintsInput = {
   officialEmail?: Prisma.StringFieldUpdateOperationsInput | string
   department?: Prisma.EnumDepartmentFieldUpdateOperationsInput | $Enums.Department
   municipality?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  district?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   accessLevel?: Prisma.EnumAccessLevelFieldUpdateOperationsInput | $Enums.AccessLevel
   workloadLimit?: Prisma.IntFieldUpdateOperationsInput | number
   currentWorkload?: Prisma.IntFieldUpdateOperationsInput | number
@@ -1180,6 +1179,7 @@ export type AgentUncheckedUpdateWithoutAssignedComplaintsInput = {
   avgResolutionTime?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   collaborationMetric?: Prisma.IntFieldUpdateOperationsInput | number
   managedByMunicipalId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  district?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   coAssignedComplaints?: Prisma.ComplaintUncheckedUpdateManyWithoutCoAssignedAgentsNestedInput
 }
 
@@ -1209,7 +1209,6 @@ export type AgentCreateManyManagedByMunicipalInput = {
   officialEmail: string
   department: $Enums.Department
   municipality?: string | null
-  district?: string | null
   accessLevel?: $Enums.AccessLevel
   workloadLimit?: number
   currentWorkload?: number
@@ -1221,6 +1220,7 @@ export type AgentCreateManyManagedByMunicipalInput = {
   resolutionRate?: number
   avgResolutionTime?: string | null
   collaborationMetric?: number
+  district?: string | null
 }
 
 export type AgentUpdateWithoutManagedByMunicipalInput = {
@@ -1233,7 +1233,6 @@ export type AgentUpdateWithoutManagedByMunicipalInput = {
   officialEmail?: Prisma.StringFieldUpdateOperationsInput | string
   department?: Prisma.EnumDepartmentFieldUpdateOperationsInput | $Enums.Department
   municipality?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  district?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   accessLevel?: Prisma.EnumAccessLevelFieldUpdateOperationsInput | $Enums.AccessLevel
   workloadLimit?: Prisma.IntFieldUpdateOperationsInput | number
   currentWorkload?: Prisma.IntFieldUpdateOperationsInput | number
@@ -1245,6 +1244,7 @@ export type AgentUpdateWithoutManagedByMunicipalInput = {
   resolutionRate?: Prisma.FloatFieldUpdateOperationsInput | number
   avgResolutionTime?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   collaborationMetric?: Prisma.IntFieldUpdateOperationsInput | number
+  district?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   assignedComplaints?: Prisma.ComplaintUpdateManyWithoutAssignedAgentNestedInput
   coAssignedComplaints?: Prisma.ComplaintUpdateManyWithoutCoAssignedAgentsNestedInput
 }
@@ -1259,7 +1259,6 @@ export type AgentUncheckedUpdateWithoutManagedByMunicipalInput = {
   officialEmail?: Prisma.StringFieldUpdateOperationsInput | string
   department?: Prisma.EnumDepartmentFieldUpdateOperationsInput | $Enums.Department
   municipality?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  district?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   accessLevel?: Prisma.EnumAccessLevelFieldUpdateOperationsInput | $Enums.AccessLevel
   workloadLimit?: Prisma.IntFieldUpdateOperationsInput | number
   currentWorkload?: Prisma.IntFieldUpdateOperationsInput | number
@@ -1271,6 +1270,7 @@ export type AgentUncheckedUpdateWithoutManagedByMunicipalInput = {
   resolutionRate?: Prisma.FloatFieldUpdateOperationsInput | number
   avgResolutionTime?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   collaborationMetric?: Prisma.IntFieldUpdateOperationsInput | number
+  district?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   assignedComplaints?: Prisma.ComplaintUncheckedUpdateManyWithoutAssignedAgentNestedInput
   coAssignedComplaints?: Prisma.ComplaintUncheckedUpdateManyWithoutCoAssignedAgentsNestedInput
 }
@@ -1285,7 +1285,6 @@ export type AgentUncheckedUpdateManyWithoutManagedByMunicipalInput = {
   officialEmail?: Prisma.StringFieldUpdateOperationsInput | string
   department?: Prisma.EnumDepartmentFieldUpdateOperationsInput | $Enums.Department
   municipality?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  district?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   accessLevel?: Prisma.EnumAccessLevelFieldUpdateOperationsInput | $Enums.AccessLevel
   workloadLimit?: Prisma.IntFieldUpdateOperationsInput | number
   currentWorkload?: Prisma.IntFieldUpdateOperationsInput | number
@@ -1297,6 +1296,7 @@ export type AgentUncheckedUpdateManyWithoutManagedByMunicipalInput = {
   resolutionRate?: Prisma.FloatFieldUpdateOperationsInput | number
   avgResolutionTime?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   collaborationMetric?: Prisma.IntFieldUpdateOperationsInput | number
+  district?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
 export type AgentUpdateWithoutCoAssignedComplaintsInput = {
@@ -1309,7 +1309,6 @@ export type AgentUpdateWithoutCoAssignedComplaintsInput = {
   officialEmail?: Prisma.StringFieldUpdateOperationsInput | string
   department?: Prisma.EnumDepartmentFieldUpdateOperationsInput | $Enums.Department
   municipality?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  district?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   accessLevel?: Prisma.EnumAccessLevelFieldUpdateOperationsInput | $Enums.AccessLevel
   workloadLimit?: Prisma.IntFieldUpdateOperationsInput | number
   currentWorkload?: Prisma.IntFieldUpdateOperationsInput | number
@@ -1321,8 +1320,9 @@ export type AgentUpdateWithoutCoAssignedComplaintsInput = {
   resolutionRate?: Prisma.FloatFieldUpdateOperationsInput | number
   avgResolutionTime?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   collaborationMetric?: Prisma.IntFieldUpdateOperationsInput | number
-  assignedComplaints?: Prisma.ComplaintUpdateManyWithoutAssignedAgentNestedInput
+  district?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   managedByMunicipal?: Prisma.DepartmentMunicipalAdminUpdateOneWithoutManagedAgentsNestedInput
+  assignedComplaints?: Prisma.ComplaintUpdateManyWithoutAssignedAgentNestedInput
 }
 
 export type AgentUncheckedUpdateWithoutCoAssignedComplaintsInput = {
@@ -1335,7 +1335,6 @@ export type AgentUncheckedUpdateWithoutCoAssignedComplaintsInput = {
   officialEmail?: Prisma.StringFieldUpdateOperationsInput | string
   department?: Prisma.EnumDepartmentFieldUpdateOperationsInput | $Enums.Department
   municipality?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  district?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   accessLevel?: Prisma.EnumAccessLevelFieldUpdateOperationsInput | $Enums.AccessLevel
   workloadLimit?: Prisma.IntFieldUpdateOperationsInput | number
   currentWorkload?: Prisma.IntFieldUpdateOperationsInput | number
@@ -1348,6 +1347,7 @@ export type AgentUncheckedUpdateWithoutCoAssignedComplaintsInput = {
   avgResolutionTime?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   collaborationMetric?: Prisma.IntFieldUpdateOperationsInput | number
   managedByMunicipalId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  district?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   assignedComplaints?: Prisma.ComplaintUncheckedUpdateManyWithoutAssignedAgentNestedInput
 }
 
@@ -1361,7 +1361,6 @@ export type AgentUncheckedUpdateManyWithoutCoAssignedComplaintsInput = {
   officialEmail?: Prisma.StringFieldUpdateOperationsInput | string
   department?: Prisma.EnumDepartmentFieldUpdateOperationsInput | $Enums.Department
   municipality?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  district?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   accessLevel?: Prisma.EnumAccessLevelFieldUpdateOperationsInput | $Enums.AccessLevel
   workloadLimit?: Prisma.IntFieldUpdateOperationsInput | number
   currentWorkload?: Prisma.IntFieldUpdateOperationsInput | number
@@ -1374,6 +1373,7 @@ export type AgentUncheckedUpdateManyWithoutCoAssignedComplaintsInput = {
   avgResolutionTime?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   collaborationMetric?: Prisma.IntFieldUpdateOperationsInput | number
   managedByMunicipalId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  district?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
 
@@ -1426,7 +1426,6 @@ export type AgentSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = 
   officialEmail?: boolean
   department?: boolean
   municipality?: boolean
-  district?: boolean
   accessLevel?: boolean
   workloadLimit?: boolean
   currentWorkload?: boolean
@@ -1439,9 +1438,10 @@ export type AgentSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = 
   avgResolutionTime?: boolean
   collaborationMetric?: boolean
   managedByMunicipalId?: boolean
+  district?: boolean
+  managedByMunicipal?: boolean | Prisma.Agent$managedByMunicipalArgs<ExtArgs>
   assignedComplaints?: boolean | Prisma.Agent$assignedComplaintsArgs<ExtArgs>
   coAssignedComplaints?: boolean | Prisma.Agent$coAssignedComplaintsArgs<ExtArgs>
-  managedByMunicipal?: boolean | Prisma.Agent$managedByMunicipalArgs<ExtArgs>
   _count?: boolean | Prisma.AgentCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["agent"]>
 
@@ -1455,7 +1455,6 @@ export type AgentSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensi
   officialEmail?: boolean
   department?: boolean
   municipality?: boolean
-  district?: boolean
   accessLevel?: boolean
   workloadLimit?: boolean
   currentWorkload?: boolean
@@ -1468,6 +1467,7 @@ export type AgentSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensi
   avgResolutionTime?: boolean
   collaborationMetric?: boolean
   managedByMunicipalId?: boolean
+  district?: boolean
   managedByMunicipal?: boolean | Prisma.Agent$managedByMunicipalArgs<ExtArgs>
 }, ExtArgs["result"]["agent"]>
 
@@ -1481,7 +1481,6 @@ export type AgentSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensi
   officialEmail?: boolean
   department?: boolean
   municipality?: boolean
-  district?: boolean
   accessLevel?: boolean
   workloadLimit?: boolean
   currentWorkload?: boolean
@@ -1494,6 +1493,7 @@ export type AgentSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensi
   avgResolutionTime?: boolean
   collaborationMetric?: boolean
   managedByMunicipalId?: boolean
+  district?: boolean
   managedByMunicipal?: boolean | Prisma.Agent$managedByMunicipalArgs<ExtArgs>
 }, ExtArgs["result"]["agent"]>
 
@@ -1507,7 +1507,6 @@ export type AgentSelectScalar = {
   officialEmail?: boolean
   department?: boolean
   municipality?: boolean
-  district?: boolean
   accessLevel?: boolean
   workloadLimit?: boolean
   currentWorkload?: boolean
@@ -1520,13 +1519,14 @@ export type AgentSelectScalar = {
   avgResolutionTime?: boolean
   collaborationMetric?: boolean
   managedByMunicipalId?: boolean
+  district?: boolean
 }
 
-export type AgentOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "email" | "fullName" | "employeeId" | "password" | "phoneNumber" | "officialEmail" | "department" | "municipality" | "district" | "accessLevel" | "workloadLimit" | "currentWorkload" | "availabilityStatus" | "dateOfCreation" | "lastUpdated" | "status" | "lastLogin" | "resolutionRate" | "avgResolutionTime" | "collaborationMetric" | "managedByMunicipalId", ExtArgs["result"]["agent"]>
+export type AgentOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "email" | "fullName" | "employeeId" | "password" | "phoneNumber" | "officialEmail" | "department" | "municipality" | "accessLevel" | "workloadLimit" | "currentWorkload" | "availabilityStatus" | "dateOfCreation" | "lastUpdated" | "status" | "lastLogin" | "resolutionRate" | "avgResolutionTime" | "collaborationMetric" | "managedByMunicipalId" | "district", ExtArgs["result"]["agent"]>
 export type AgentInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  managedByMunicipal?: boolean | Prisma.Agent$managedByMunicipalArgs<ExtArgs>
   assignedComplaints?: boolean | Prisma.Agent$assignedComplaintsArgs<ExtArgs>
   coAssignedComplaints?: boolean | Prisma.Agent$coAssignedComplaintsArgs<ExtArgs>
-  managedByMunicipal?: boolean | Prisma.Agent$managedByMunicipalArgs<ExtArgs>
   _count?: boolean | Prisma.AgentCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type AgentIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -1539,9 +1539,9 @@ export type AgentIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extens
 export type $AgentPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   name: "Agent"
   objects: {
+    managedByMunicipal: Prisma.$DepartmentMunicipalAdminPayload<ExtArgs> | null
     assignedComplaints: Prisma.$ComplaintPayload<ExtArgs>[]
     coAssignedComplaints: Prisma.$ComplaintPayload<ExtArgs>[]
-    managedByMunicipal: Prisma.$DepartmentMunicipalAdminPayload<ExtArgs> | null
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -1553,7 +1553,6 @@ export type $AgentPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs 
     officialEmail: string
     department: $Enums.Department
     municipality: string | null
-    district: string | null
     accessLevel: $Enums.AccessLevel
     workloadLimit: number
     currentWorkload: number
@@ -1566,6 +1565,7 @@ export type $AgentPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs 
     avgResolutionTime: string | null
     collaborationMetric: number
     managedByMunicipalId: string | null
+    district: string | null
   }, ExtArgs["result"]["agent"]>
   composites: {}
 }
@@ -1960,9 +1960,9 @@ readonly fields: AgentFieldRefs;
  */
 export interface Prisma__AgentClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
+  managedByMunicipal<T extends Prisma.Agent$managedByMunicipalArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Agent$managedByMunicipalArgs<ExtArgs>>): Prisma.Prisma__DepartmentMunicipalAdminClient<runtime.Types.Result.GetResult<Prisma.$DepartmentMunicipalAdminPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   assignedComplaints<T extends Prisma.Agent$assignedComplaintsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Agent$assignedComplaintsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ComplaintPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   coAssignedComplaints<T extends Prisma.Agent$coAssignedComplaintsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Agent$coAssignedComplaintsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ComplaintPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
-  managedByMunicipal<T extends Prisma.Agent$managedByMunicipalArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Agent$managedByMunicipalArgs<ExtArgs>>): Prisma.Prisma__DepartmentMunicipalAdminClient<runtime.Types.Result.GetResult<Prisma.$DepartmentMunicipalAdminPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -2001,7 +2001,6 @@ export interface AgentFieldRefs {
   readonly officialEmail: Prisma.FieldRef<"Agent", 'String'>
   readonly department: Prisma.FieldRef<"Agent", 'Department'>
   readonly municipality: Prisma.FieldRef<"Agent", 'String'>
-  readonly district: Prisma.FieldRef<"Agent", 'String'>
   readonly accessLevel: Prisma.FieldRef<"Agent", 'AccessLevel'>
   readonly workloadLimit: Prisma.FieldRef<"Agent", 'Int'>
   readonly currentWorkload: Prisma.FieldRef<"Agent", 'Int'>
@@ -2014,6 +2013,7 @@ export interface AgentFieldRefs {
   readonly avgResolutionTime: Prisma.FieldRef<"Agent", 'String'>
   readonly collaborationMetric: Prisma.FieldRef<"Agent", 'Int'>
   readonly managedByMunicipalId: Prisma.FieldRef<"Agent", 'String'>
+  readonly district: Prisma.FieldRef<"Agent", 'String'>
 }
     
 
@@ -2410,6 +2410,25 @@ export type AgentDeleteManyArgs<ExtArgs extends runtime.Types.Extensions.Interna
 }
 
 /**
+ * Agent.managedByMunicipal
+ */
+export type Agent$managedByMunicipalArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the DepartmentMunicipalAdmin
+   */
+  select?: Prisma.DepartmentMunicipalAdminSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the DepartmentMunicipalAdmin
+   */
+  omit?: Prisma.DepartmentMunicipalAdminOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.DepartmentMunicipalAdminInclude<ExtArgs> | null
+  where?: Prisma.DepartmentMunicipalAdminWhereInput
+}
+
+/**
  * Agent.assignedComplaints
  */
 export type Agent$assignedComplaintsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -2455,25 +2474,6 @@ export type Agent$coAssignedComplaintsArgs<ExtArgs extends runtime.Types.Extensi
   take?: number
   skip?: number
   distinct?: Prisma.ComplaintScalarFieldEnum | Prisma.ComplaintScalarFieldEnum[]
-}
-
-/**
- * Agent.managedByMunicipal
- */
-export type Agent$managedByMunicipalArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  /**
-   * Select specific fields to fetch from the DepartmentMunicipalAdmin
-   */
-  select?: Prisma.DepartmentMunicipalAdminSelect<ExtArgs> | null
-  /**
-   * Omit specific fields from the DepartmentMunicipalAdmin
-   */
-  omit?: Prisma.DepartmentMunicipalAdminOmit<ExtArgs> | null
-  /**
-   * Choose, which related nodes to fetch as well
-   */
-  include?: Prisma.DepartmentMunicipalAdminInclude<ExtArgs> | null
-  where?: Prisma.DepartmentMunicipalAdminWhereInput
 }
 
 /**

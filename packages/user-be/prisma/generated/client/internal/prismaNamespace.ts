@@ -1721,15 +1721,15 @@ export const UserScalarFieldEnum = {
   id: 'id',
   email: 'email',
   name: 'name',
-  phoneNumber: 'phoneNumber',
-  dateOfBirth: 'dateOfBirth',
-  password: 'password',
   aadhaarId: 'aadhaarId',
-  preferredLanguage: 'preferredLanguage',
-  disability: 'disability',
   consentDataCollection: 'consentDataCollection',
+  dateOfBirth: 'dateOfBirth',
   dateOfCreation: 'dateOfCreation',
+  disability: 'disability',
   lastUpdated: 'lastUpdated',
+  password: 'password',
+  phoneNumber: 'phoneNumber',
+  preferredLanguage: 'preferredLanguage',
   status: 'status'
 } as const
 
@@ -1745,8 +1745,8 @@ export const UserLocationScalarFieldEnum = {
   locality: 'locality',
   street: 'street',
   municipal: 'municipal',
-  state: 'state',
-  country: 'country'
+  country: 'country',
+  state: 'state'
 } as const
 
 export type UserLocationScalarFieldEnum = (typeof UserLocationScalarFieldEnum)[keyof typeof UserLocationScalarFieldEnum]
@@ -1762,7 +1762,6 @@ export const AgentScalarFieldEnum = {
   officialEmail: 'officialEmail',
   department: 'department',
   municipality: 'municipality',
-  district: 'district',
   accessLevel: 'accessLevel',
   workloadLimit: 'workloadLimit',
   currentWorkload: 'currentWorkload',
@@ -1774,7 +1773,8 @@ export const AgentScalarFieldEnum = {
   resolutionRate: 'resolutionRate',
   avgResolutionTime: 'avgResolutionTime',
   collaborationMetric: 'collaborationMetric',
-  managedByMunicipalId: 'managedByMunicipalId'
+  managedByMunicipalId: 'managedByMunicipalId',
+  district: 'district'
 } as const
 
 export type AgentScalarFieldEnum = (typeof AgentScalarFieldEnum)[keyof typeof AgentScalarFieldEnum]
@@ -1906,31 +1906,31 @@ export type CategoryScalarFieldEnum = (typeof CategoryScalarFieldEnum)[keyof typ
 export const ComplaintScalarFieldEnum = {
   id: 'id',
   submissionDate: 'submissionDate',
-  seq: 'seq',
   complainantId: 'complainantId',
-  categoryId: 'categoryId',
   subCategory: 'subCategory',
-  AIstandardizedSubCategory: 'AIstandardizedSubCategory',
-  AIabusedFlag: 'AIabusedFlag',
   description: 'description',
   urgency: 'urgency',
   attachmentUrl: 'attachmentUrl',
-  AIimageVarificationStatus: 'AIimageVarificationStatus',
-  assignedDepartment: 'assignedDepartment',
   status: 'status',
-  sla: 'sla',
   upvoteCount: 'upvoteCount',
   isPublic: 'isPublic',
-  escalationLevel: 'escalationLevel',
-  dateOfResolution: 'dateOfResolution',
-  lastUpdated: 'lastUpdated',
   assignedAgentId: 'assignedAgentId',
-  managedByMunicipalAdminId: 'managedByMunicipalAdminId',
-  moderatedByMunicipalAdminId: 'moderatedByMunicipalAdminId',
+  assignedDepartment: 'assignedDepartment',
+  categoryId: 'categoryId',
   crossDeptIssueSuperMunicipalId: 'crossDeptIssueSuperMunicipalId',
+  dateOfResolution: 'dateOfResolution',
   escalatedToStateAdminId: 'escalatedToStateAdminId',
   escalatedToSuperStateAdminId: 'escalatedToSuperStateAdminId',
-  managedBySuperAdminId: 'managedBySuperAdminId'
+  escalationLevel: 'escalationLevel',
+  managedByMunicipalAdminId: 'managedByMunicipalAdminId',
+  managedBySuperAdminId: 'managedBySuperAdminId',
+  moderatedByMunicipalAdminId: 'moderatedByMunicipalAdminId',
+  seq: 'seq',
+  sla: 'sla',
+  AIabusedFlag: 'AIabusedFlag',
+  AIimageVarificationStatus: 'AIimageVarificationStatus',
+  AIstandardizedSubCategory: 'AIstandardizedSubCategory',
+  lastUpdated: 'lastUpdated'
 } as const
 
 export type ComplaintScalarFieldEnum = (typeof ComplaintScalarFieldEnum)[keyof typeof ComplaintScalarFieldEnum]
@@ -2059,6 +2059,13 @@ export type ListStringFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaMod
 
 
 /**
+ * Reference to a field of type 'Boolean'
+ */
+export type BooleanFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Boolean'>
+    
+
+
+/**
  * Reference to a field of type 'DateTime'
  */
 export type DateTimeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'DateTime'>
@@ -2069,13 +2076,6 @@ export type DateTimeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel
  * Reference to a field of type 'DateTime[]'
  */
 export type ListDateTimeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'DateTime[]'>
-    
-
-
-/**
- * Reference to a field of type 'Boolean'
- */
-export type BooleanFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Boolean'>
     
 
 
