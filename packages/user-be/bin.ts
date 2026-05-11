@@ -5,7 +5,6 @@ import { getPrisma } from "./lib/prisma";
 import { retrieveAndInjectSecrets } from "./middleware/retriveSecrets";
 import { userQueueService } from "./lib/redis/userQueueService";
 import { complaintQueueService } from "./lib/redis/complaintQueueService";
-import { initializeGCP } from "./lib/gcp/gcp";
 
 // Load local .env file first (for development)
 dotenv.config();
@@ -26,18 +25,6 @@ async function bootstrap() {
     
     await complaintQueueService.connect();
     console.log('Complaint queue service initialized');
-
-    // // Helper: non-blocking pop from complaint queue
-    // const client = complaintQueueService['redisClient'].getClient();
-    // // simple non-blocking pop
-    // const raw = await client.lPop('complaint:registration:queue');
-    // if (!raw) return null;
-    // const complaint = JSON.parse(raw);
-
-    // Initialize GCP Vertex AI client
-    const gcpConfig = await initializeGCP();
-    console.log('GCP Vertex AI client initialized');
-    console.log(`  Endpoint: ${gcpConfig.endpointId}`);
 
     // Now that secrets are loaded, initialize server
     const server = new Server(prisma);

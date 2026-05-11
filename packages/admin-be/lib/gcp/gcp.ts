@@ -72,10 +72,10 @@ export async function standardizeSubCategory(subCategory: string): Promise<strin
       console.warn("AI returned empty; falling back to original.");
       return subCategory;
     }
-  } catch (error) {
-    console.error("Error calling Vertex AI API:", error);
-    throw new Error(
-      "An internal server error occurred while contacting the Vertex AI model"
-    );
+  } catch (err) {
+    // Do not throw — make standardization a best-effort call and fall back to original
+    const msg = err && (err as any).message ? (err as any).message : String(err);
+    console.warn("Vertex AI standardization failed, falling back to original subCategory:", msg);
+    return subCategory;
   }
 }

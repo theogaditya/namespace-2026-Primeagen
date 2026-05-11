@@ -11,7 +11,6 @@ import { addUserRouter } from "./routes/adduser";
 import { loginUserRouter } from "./routes/loginUser";
 import { logoutUserRouter } from "./routes/logoutUser";
 import { createComplaintRouter } from "./routes/createComplaint";
-import { complaintProcessingRouter, startComplaintPolling } from "./routes/complaintProcessing";
 import { createAuthMiddleware } from "./middleware/authRoute";
 
 dotenv.config();
@@ -79,10 +78,6 @@ export class Server {
       // Protected routes (auth required)
       this.app.use('/api/users', logoutUserRouter(this.db));
       this.app.use('/api/complaints', authMiddleware, createComplaintRouter(this.db));
-      this.app.use('/api/complaints', complaintProcessingRouter(this.db));
-
-      // Start complaint polling automatically
-      startComplaintPolling(this.db);
     }
 
   public getApp(): Express {
