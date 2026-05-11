@@ -7,7 +7,8 @@
     "dev": "bun run bin.ts",
     "start": "bun run bin.ts",
     "build": "bun build bin.ts --outdir ./dist --target bun",
-    "worker": "bun run workers/startWorker.ts"
+    "worker": "bun run workers/startWorker.ts",
+    "test:unit": "vitest test --run"
   },
   "keywords": [],
   "author": "",
