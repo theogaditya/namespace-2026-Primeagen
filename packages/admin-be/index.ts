@@ -20,7 +20,6 @@ export class Server {
     this.setupMiddleware();
     this.setupRoutes();
   }
-
   private setupMiddleware() {
     this.app.use(express.json());
     this.app.use(cookieParser());

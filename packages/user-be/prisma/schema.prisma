@@ -221,6 +221,7 @@ model Complaint {
   status                         ComplaintStatus           @default(REGISTERED)
   upvoteCount                    Int                       @default(0)
   isPublic                       Boolean
+  isDuplicate                    Boolean?              
   assignedAgentId                String?
   assignedDepartment             String
   categoryId                     String

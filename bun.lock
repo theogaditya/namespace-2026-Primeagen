@@ -1,6 +1,5 @@
 {
   "lockfileVersion": 1,
-  "configVersion": 1,
   "workspaces": {
     "": {
       "name": "sih",
@@ -19,6 +18,7 @@
       "name": "admin-be",
       "version": "1.0.0",
       "dependencies": {
+        "@google-cloud/vertexai": "^1.10.0",
         "@prisma/adapter-pg": "^7.0.1",
         "@prisma/client": "^7.0.1",
         "axios": "^1.13.2",
