@@ -89,7 +89,6 @@ curl -X POST http://localhost:3000/api/complaints  \
   -H "Content-Type: application/json" \
   -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI5ZTAzZDcxNC0xYTJmLTRhNDUtOTc0MC05OGYxYTMzMTE1YWIiLCJlbWFpbCI6InVzZXIubm92MzAuMjAyNUBleGFtcGxlLmNvbSIsIm5hbWUiOiJOb3ZlbWJlciBVc2VyIiwiaWF0IjoxNzY0NTM0NzUxLCJleHAiOjE3NjQ2MjExNTF9.CFYzI6Lu6TqNkmUGjK-aO5CnVPhijSwX7j-k8TuD4Pg" \
   -d '{
-    "complainantId": "9e03d714-1a2f-4a45-9740-98f1a33115ab",
     "categoryId": "123e4567-e89b-12d3-a456-426614174001",
     "subCategory": "Water Leakage",
     "description": "There is a major water leakage on the main road causing traffic issues",
@@ -109,7 +108,6 @@ curl -X POST http://localhost:3000/api/complaints  \
   -H "Content-Type: application/json" \
   -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI5ZTAzZDcxNC0xYTJmLTRhNDUtOTc0MC05OGYxYTMzMTE1YWIiLCJlbWFpbCI6InVzZXIubm92MzAuMjAyNUBleGFtcGxlLmNvbSIsIm5hbWUiOiJOb3ZlbWJlciBVc2VyIiwiaWF0IjoxNzY0NTM0NzUxLCJleHAiOjE3NjQ2MjExNTF9.CFYzI6Lu6TqNkmUGjK-aO5CnVPhijSwX7j-k8TuD4Pg" \
   -d '{
-    "complainantId": "9e03d714-1a2f-4a45-9740-98f1a33115ab",
     "categoryId": "123e4567-e89b-12d3-a456-426614174001",
     "subCategory": "Water Leakage",
     "description": "There is a major water leakage on the main road causing traffic issues",
@@ -130,7 +128,6 @@ curl -X POST http://localhost:3000/api/complaints  \
   -H "Content-Type: application/json" \
   -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI5ZTAzZDcxNC0xYTJmLTRhNDUtOTc0MC05OGYxYTMzMTE1YWIiLCJlbWFpbCI6InVzZXIubm92MzAuMjAyNUBleGFtcGxlLmNvbSIsIm5hbWUiOiJOb3ZlbWJlciBVc2VyIiwiaWF0IjoxNzY0NTM0NzUxLCJleHAiOjE3NjQ2MjExNTF9.CFYzI6Lu6TqNkmUGjK-aO5CnVPhijSwX7j-k8TuD4Pg" \
   -d '{
-    "complainantId": "9e03d714-1a2f-4a45-9740-98f1a33115ab",
     "categoryId": "123e4567-e89b-12d3-a456-426614174001",
     "subCategory": "Water Leakage",
     "description": "There is a major water leakage on the main road causing traffic issues",

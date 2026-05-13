@@ -35,10 +35,9 @@ export async function processNextComplaint(db: PrismaClient): Promise<{ processe
 
     const complaintData = validationResult.data;
     
-    // Check if complaint already exists (same complainant, subCategory, and description)
+    // Check if complaint already exists (same subCategory and description)
     const existingComplaint = await db.complaint.findFirst({
       where: {
-        complainantId: complaintData.complainantId,
         subCategory: complaintData.subCategory,
         description: complaintData.description,
       },
@@ -59,7 +58,6 @@ export async function processNextComplaint(db: PrismaClient): Promise<{ processe
     const result = await db.$transaction(async (tx) => {
       const complaint = await tx.complaint.create({
         data: {
-          complainantId: complaintData.complainantId,
           categoryId: complaintData.categoryId,
           subCategory: complaintData.subCategory,
           AIstandardizedSubCategory,
@@ -92,7 +90,6 @@ export async function processNextComplaint(db: PrismaClient): Promise<{ processe
         id: result.id,
         seq: result.seq,
         status: result.status,
-        complainantId: result.complainantId,
         categoryId: result.categoryId,
         subCategory: result.subCategory,
         assignedDepartment: result.assignedDepartment,

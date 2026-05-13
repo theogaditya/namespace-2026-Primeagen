@@ -67,7 +67,6 @@ describe('processNextComplaint', () => {
 
   it('processes valid complaint and pushes to processed queue', async () => {
     const validComplaint = {
-      complainantId: '9e03d714-1a2f-4a45-9740-98f1a33115ab',
       categoryId: 'c953f48a-9c65-4560-a9af-0771d46e8166',
       subCategory: 'Water Leakage',
       description: 'Major water leakage causing traffic issues',
@@ -94,7 +93,6 @@ describe('processNextComplaint', () => {
       id: 'complaint-id-123', 
       seq: 1, 
       status: 'REGISTERED', 
-      complainantId: '9e03d714-1a2f-4a45-9740-98f1a33115ab',
       categoryId: 'c953f48a-9c65-4560-a9af-0771d46e8166',
       subCategory: 'Water Leakage'
     });
@@ -126,7 +124,7 @@ describe('processNextComplaint', () => {
 
   it('removes complaint with validation errors and returns processed=false', async () => {
     const invalidComplaint = {
-      // Missing required fields like complainantId, categoryId
+      // Missing required fields like categoryId
       subCategory: 'Water Leakage',
       description: 'desc'
     };
@@ -144,7 +142,6 @@ describe('processNextComplaint', () => {
 
   it('removes duplicate complaint and returns processed=false', async () => {
     const validComplaint = {
-      complainantId: '9e03d714-1a2f-4a45-9740-98f1a33115ab',
       categoryId: 'c953f48a-9c65-4560-a9af-0771d46e8166',
       subCategory: 'Water Leakage',
       description: 'Duplicate complaint',

@@ -19,7 +19,6 @@ curl -X POST 'http://localhost:3000/api/complaints' \
 	-H 'Content-Type: application/json' \
 	-H 'Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI5ZTAzZDcxNC0xYTJmLTRhNDUtOTc0MC05OGYxYTMzMTE1YWIiLCJlbWFpbCI6InVzZXIubm92MzAuMjAyNUBleGFtcGxlLmNvbSIsIm5hbWUiOiJOb3ZlbWJlciBVc2VyIiwiaWF0IjoxNzY0NjA3MzE5LCJleHAiOjE3NjQ2OTM3MTl9.kB7ENj0zHUIr1tikJT3rynoHhPYpsKwgm7WV5ofSuWA' \
 	-d '{
-		"complainantId": "9e03d714-1a2f-4a45-9740-98f1a33115ab",
 		"categoryId": "c953f48a-9c65-4560-a9af-0771d46e8166",
 		"subCategory": "Water Leakage",
 		"description": "There is a major water leakage on the main road causing traffic issues",
@@ -50,7 +49,7 @@ curl -X POST 'http://localhost:3000/api/complaints' \
 **Behavior notes**
 - Poll interval: `user-be` uses a 10-second interval; it peeks first and only removes an item after successful processing. This makes the system resistant to partial failures.
 - Dead-letter handling: malformed or DB-failing complaints are removed from the registration queue and optionally pushed to `complaint:assignment:malformed` for further inspection.
-- Idempotency: the poller checks for duplicate complaints (by complainant/subCategory/description) and removes duplicates to avoid double-creation.
+- Idempotency: the poller checks for duplicate complaints (by subCategory/description) and removes duplicates to avoid double-creation.
 
 If you want, I can also add a small note on how to inspect the queues via `redis-cli` or how to run `prisma studio` to verify created complaints.
 

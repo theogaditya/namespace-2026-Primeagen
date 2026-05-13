@@ -79,7 +79,6 @@ export interface ComplaintLocation {
 }
 
 export interface CreateComplaint {
-  complainantId: string;
   categoryId: string;
   subCategory: string;
   description: string;

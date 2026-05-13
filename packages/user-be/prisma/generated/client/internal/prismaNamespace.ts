@@ -1914,6 +1914,7 @@ export const ComplaintScalarFieldEnum = {
   status: 'status',
   upvoteCount: 'upvoteCount',
   isPublic: 'isPublic',
+  isDuplicate: 'isDuplicate',
   assignedAgentId: 'assignedAgentId',
   assignedDepartment: 'assignedDepartment',
   categoryId: 'categoryId',

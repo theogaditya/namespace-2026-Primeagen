@@ -76,7 +76,6 @@ export function createComplaintRouter(db: PrismaClient) {
         success: true,
         message: "Complaint submitted successfully and is being processed",
         data: {
-          complainantId: complaintData.complainantId,
           categoryId: complaintData.categoryId,
           subCategory: complaintData.subCategory,
           assignedDepartment: complaintData.assignedDepartment,

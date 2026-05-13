@@ -21,7 +21,7 @@ model User {
   phoneNumber           String        @unique
   preferredLanguage     String        @default("English")
   status                userStatus    @default(ACTIVE)
-  complaints            Complaint[]   @relation("ComplainantComplaints")
+  Complaint             Complaint?
   auditLogsCreated      AuditLog[]    @relation("LogCreator")
   upvotes               Upvote[]
   location              UserLocation?
@@ -213,7 +213,7 @@ model Category {
 model Complaint {
   id                             String                    @id @default(uuid())
   submissionDate                 DateTime                  @default(now())
-  complainantId                  String
+  complainantId                  String?
   subCategory                    String
   description                    String
   urgency                        ComplaintUrgency          @default(LOW)
@@ -221,7 +221,6 @@ model Complaint {
   status                         ComplaintStatus           @default(REGISTERED)
   upvoteCount                    Int                       @default(0)
   isPublic                       Boolean
-  isDuplicate                    Boolean?              
   assignedAgentId                String?
   assignedDepartment             String
   categoryId                     String
@@ -239,12 +238,13 @@ model Complaint {
   AIimageVarificationStatus      Boolean?
   AIstandardizedSubCategory      String?
   lastUpdated                    DateTime                  @updatedAt
+  isDuplicate                    Boolean?
   assignedAgent                  Agent?                    @relation("AssignedAgentComplaints", fields: [assignedAgentId], references: [id])
   category                       Category                  @relation(fields: [categoryId], references: [id])
-  complainant                    User                      @relation("ComplainantComplaints", fields: [complainantId], references: [id])
   crossDeptIssueSuperMunicipal   SuperMunicipalAdmin?      @relation("SuperMunicipalToCrossDeptIssues", fields: [crossDeptIssueSuperMunicipalId], references: [id])
   escalatedToStateAdmin          DepartmentStateAdmin?     @relation("StateAdminToEscalatedComplaints", fields: [escalatedToStateAdminId], references: [id])
   escalatedToSuperStateAdmin     SuperStateAdmin?          @relation("SuperStateToEscalatedComplaints", fields: [escalatedToSuperStateAdminId], references: [id])
+  User                           User                      @relation(fields: [id], references: [id])
   managedByMunicipalAdmin        DepartmentMunicipalAdmin? @relation("MunicipalAdminToComplaints", fields: [managedByMunicipalAdminId], references: [id])
   managedBySuperAdmin            SuperAdmin?               @relation(fields: [managedBySuperAdminId], references: [id])
   moderatedByMunicipalAdmin      DepartmentMunicipalAdmin? @relation("MunicipalAdminModeratedComplaints", fields: [moderatedByMunicipalAdminId], references: [id])

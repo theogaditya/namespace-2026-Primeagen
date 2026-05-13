@@ -2,7 +2,6 @@ import { z } from 'zod';
 import { complaintUrgencyEnum, departmentEnum, complaintLocationSchema } from './validation.complaint';
 
 export const complaintProcessingSchema = z.object({
-  complainantId: z.string().uuid('Invalid complainant ID'),
   categoryId: z.string().uuid('Invalid category ID'),
   subCategory: z.string().min(1, 'Sub-category is required'),
   description: z.string().min(10, 'Description must be at least 10 characters'),

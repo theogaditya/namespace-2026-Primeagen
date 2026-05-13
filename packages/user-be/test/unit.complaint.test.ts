@@ -60,7 +60,6 @@ afterEach(() => {
 
 describe('Create Complaint routes', () => {
   const validComplaintPayload = {
-    complainantId: '123e4567-e89b-12d3-a456-426614174000',
     categoryId: '123e4567-e89b-12d3-a456-426614174001',
     subCategory: 'Water Leakage',
     description: 'There is a major water leakage on the main road causing traffic issues',
@@ -86,7 +85,6 @@ describe('Create Complaint routes', () => {
     expect(res.status).toBe(202);
     expect(res.body.success).toBe(true);
     expect(res.body.message).toBe('Complaint submitted successfully and is being processed');
-    expect(res.body.data).toHaveProperty('complainantId', validComplaintPayload.complainantId);
     expect(res.body.data).toHaveProperty('categoryId', validComplaintPayload.categoryId);
     expect(res.body.data).toHaveProperty('subCategory', validComplaintPayload.subCategory);
     expect(res.body.data).toHaveProperty('assignedDepartment', validComplaintPayload.assignedDepartment);
@@ -98,7 +96,6 @@ describe('Create Complaint routes', () => {
 
   it('returns 202 with optional fields omitted', async () => {
     const minimalPayload = {
-      complainantId: '123e4567-e89b-12d3-a456-426614174000',
       categoryId: '123e4567-e89b-12d3-a456-426614174001',
       subCategory: 'Road Damage',
       description: 'Large pothole on the main road causing accidents',
@@ -120,20 +117,7 @@ describe('Create Complaint routes', () => {
     expect(res.body.success).toBe(true);
   });
 
-  it('returns 400 for invalid complainantId (not UUID)', async () => {
-    const invalidPayload = {
-      ...validComplaintPayload,
-      complainantId: 'invalid-id',
-    };
 
-    const res = await request(app)
-      .post('/api/complaints')
-      .send(invalidPayload);
-
-    expect(res.status).toBe(400);
-    expect(res.body.success).toBe(false);
-    expect(Array.isArray(res.body.errors)).toBe(true);
-  });
 
   it('returns 400 for invalid categoryId (not UUID)', async () => {
     const invalidPayload = {
@@ -151,7 +135,7 @@ describe('Create Complaint routes', () => {
 
   it('returns 400 for missing required fields', async () => {
     const incompletePayload = {
-      complainantId: '123e4567-e89b-12d3-a456-426614174000',
+      categoryId: '123e4567-e89b-12d3-a456-426614174001',
     };
 
     const res = await request(app)
@@ -301,7 +285,6 @@ describe('Create Complaint routes', () => {
 
   it('defaults urgency to LOW when not provided', async () => {
     const payloadWithoutUrgency = {
-      complainantId: '123e4567-e89b-12d3-a456-426614174000',
       categoryId: '123e4567-e89b-12d3-a456-426614174001',
       subCategory: 'Minor Issue',
       description: 'This is a minor issue that can be addressed later',
@@ -385,7 +368,6 @@ describe('Create Complaint routes', () => {
 
 describe('Create Complaint with Authentication', () => {
   const validComplaintPayload = {
-    complainantId: '123e4567-e89b-12d3-a456-426614174000',
     categoryId: '123e4567-e89b-12d3-a456-426614174001',
     subCategory: 'Water Leakage',
     description: 'There is a major water leakage on the main road causing traffic issues',
