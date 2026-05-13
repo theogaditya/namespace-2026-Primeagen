@@ -112,7 +112,8 @@ describe('processNextComplaint', () => {
     expect(result.result).toEqual({ 
       id: 'complaint-id-123', 
       seq: 1, 
-      status: 'REGISTERED' 
+      status: 'REGISTERED',
+      isDuplicate: false
     });
     expect(mockProcessedComplaintQueueService.pushToQueue).toHaveBeenCalled();
     expect(mockRedisClient.lPop).toHaveBeenCalledWith('complaint:registration:queue');
@@ -186,15 +187,17 @@ describe('processNextComplaint', () => {
     const { processNextComplaint } = await import('../routes/complaintProcessing');
     const result = await processNextComplaint(prismaMock);
 
-    // Duplicate should still be processed and created
+    // Duplicate should still be processed and created but NOT pushed to queue
     expect(result.processed).toBe(true);
     expect(result.result).toEqual({ 
       id: 'new-complaint-id', 
       seq: 2, 
-      status: 'REGISTERED' 
+      status: 'REGISTERED',
+      isDuplicate: true
     });
     expect(mockCreateComplaint).toHaveBeenCalled();
-    expect(mockProcessedComplaintQueueService.pushToQueue).toHaveBeenCalled();
+    // Duplicates are NOT pushed to the processed queue
+    expect(mockProcessedComplaintQueueService.pushToQueue).not.toHaveBeenCalled();
     expect(mockRedisClient.lPop).toHaveBeenCalledWith('complaint:registration:queue');
   });
 });

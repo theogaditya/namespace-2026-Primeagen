@@ -4,6 +4,7 @@ import express from 'express';
 import type { Express } from 'express';
 import { PrismaClient } from './prisma/generated/client/client';
 import agentRoutes from './routes/agent';
+import authRoutes from './routes/auth';
 import municipalAdminRoutes from './routes/municipalAdminRoutes';
 import stateAdminRoutes from './routes/stateAdminRoutes';
 import superAdminRoutes from './routes/superAdminRoutes';
@@ -53,6 +54,7 @@ export class Server {
   }
 
   private setupRoutes() {
+    this.app.use('/api/auth', authRoutes(this.db));
     this.app.use('/api/super-admin', superAdminRoutes(this.db));
     this.app.use('/api/state-admin', stateAdminRoutes(this.db));
     this.app.use('/api/municipal-admin', municipalAdminRoutes(this.db));
