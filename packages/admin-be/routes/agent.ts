@@ -207,7 +207,7 @@ router.get('/me', async (req, res: any) => {
 // ----- 3. Get All Complaints -----
 router.get('/complaints',authenticateAgent, async (req, res:any) => {
   try {
-    const complaints = await prisma.complaint.findMany({
+    const complaintsRaw = await prisma.complaint.findMany({
       where: {
         status: {
           not: 'DELETED'
@@ -215,12 +215,17 @@ router.get('/complaints',authenticateAgent, async (req, res:any) => {
       },
       include: {
         category: true,
-        complainant: true,
+        User: true, // relation field in schema is `User` (complainant)
       },
       orderBy: {
         submissionDate: 'desc' 
       }
     });
+
+    const complaints = complaintsRaw.map(({ User, ...rest }) => ({
+      ...rest,
+      complainant: User || null
+    }));
 
     return res.json({ success: true, complaints });
   } catch (error) {
@@ -259,22 +264,25 @@ router.get('/complaints/:id', authenticateAgent, async (req: any, res: any) => {
   try {
     const { id } = req.params;
 
-  const complaint = await prisma.complaint.findUnique({
+  const complaintRaw = await prisma.complaint.findUnique({
     where: { id },
     include: {
-      complainant: true,
+      User: true, // relation field in schema is `User` (complainant)
       category: true,
       location: true,
       upvotes: true
     }
   });
 
-    if (!complaint) {
+    if (!complaintRaw) {
       return res.status(404).json({ 
         success: false, 
         message: 'Complaint not found' 
       });
     }
+
+    const { User, ...rest } = complaintRaw as any;
+    const complaint = { ...rest, complainant: User || null };
 
     return res.json({ 
       success: true, 
@@ -351,7 +359,7 @@ router.put('/complaints/:id/status', authenticateAgent, async (req: any, res: an
       });
     }
 
-    const updatedComplaint = await prisma.complaint.update({
+    const updatedComplaintRaw = await prisma.complaint.update({
       where: { id },
       data: {
         status: newStatus,
@@ -359,7 +367,7 @@ router.put('/complaints/:id/status', authenticateAgent, async (req: any, res: an
         ...(newStatus === 'ESCALATED_TO_MUNICIPAL_LEVEL' && { escalatedAt: new Date() })
       },
       include: {
-        complainant: true,
+        User: true, // relation field in schema is `User` (complainant)
         category: true,
         location: true,
         upvotes: true,
@@ -381,6 +389,10 @@ router.put('/complaints/:id/status', authenticateAgent, async (req: any, res: an
         }
       });
     }
+
+    // Map Prisma relation `User` to `complainant` for response consistency
+    const { User, ...complaintRest } = updatedComplaintRaw as any;
+    const updatedComplaint = { ...complaintRest, complainant: User || null };
 
     console.log('Successfully updated complaint with status:', newStatus);
 
@@ -406,14 +418,14 @@ router.put('/complaints/:id/status', authenticateAgent, async (req: any, res: an
 router.put('/complaints/:id/escalate', authenticateAgent, async (req: any, res: any) => {
   try {
     const { id } = req.params;
-    // Ensure complaint exists and is assigned to requesting agent
+    // Ensure complaint exists
     const complaint = await prisma.complaint.findUnique({ where: { id } });
     if (!complaint) {
       return res.status(404).json({ success: false, message: 'Complaint not found' });
     }
 
-    // Only the assigned agent may escalate
-    if (complaint.assignedAgentId !== req.agent.id) {
+    // Allow escalation if: complaint is unassigned OR assigned to this agent
+    if (complaint.assignedAgentId && complaint.assignedAgentId !== req.agent.id) {
       return res.status(403).json({ success: false, message: 'Not authorized to escalate this complaint' });
     }
 

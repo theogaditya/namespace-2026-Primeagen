@@ -1,3 +1,8 @@
+## links
+ppt = https://sih-swaraj.s3.ap-south-2.amazonaws.com/docx/SwarjDesk.pdf
+solution report = https://sih-swaraj.s3.ap-south-2.amazonaws.com/docx/Detailed-Report-Swarajdesk+-+Google+Docs.pdf
+business model = https://sih-swaraj.s3.ap-south-2.amazonaws.com/docx/Buisness+Model+Proposal+-+Swarajdesk+-+Google+Docs.pdf
+
 ## create new user 
 curl -X POST http://localhost:3000/api/users/signup \
   -H "Content-Type: application/json" \

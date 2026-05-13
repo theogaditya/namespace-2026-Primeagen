@@ -489,15 +489,21 @@ router.patch('/admins/:id/status', async (req, res:any) => {
 // ----- 9. Get All Complaints -----
 router.get('/complaints', async (req, res) => {
   try {
-    const complaints = await prisma.complaint.findMany({
+    const complaintsRaw = await prisma.complaint.findMany({
       include: {
         category: true,
-        complainant: true 
+        User: true // relation field in schema is `User` (complainant)
       },
       orderBy: {
-        submissionDate: 'desc' 
+        submissionDate: 'desc'
       }
     });
+
+    // Normalize relation key to `complainant` for response consistency
+    const complaints = complaintsRaw.map(({ User, ...rest }) => ({
+      ...rest,
+      complainant: User || null
+    }));
 
     res.json({ success: true, complaints });
   } catch (error) {

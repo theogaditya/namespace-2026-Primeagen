@@ -36,11 +36,15 @@ vi.mock('../lib/gcp/gcp', () => ({
 // minimal mock prisma client
 const mockCreateComplaint = vi.fn();
 const mockFindFirst = vi.fn();
+const mockFindCategory = vi.fn();
 
 const prismaMock: any = {
   complaint: {
     create: mockCreateComplaint,
     findFirst: mockFindFirst,
+  },
+  category: {
+    findUnique: mockFindCategory,
   },
   $transaction: vi.fn(async (fn: any) => {
     return fn({ complaint: { create: mockCreateComplaint } });
@@ -67,6 +71,7 @@ describe('processNextComplaint', () => {
 
   it('processes valid complaint and pushes to processed queue', async () => {
     const validComplaint = {
+      userId: 'b162fd66-80aa-4ab6-b9cb-a6dc42b50291',
       categoryId: 'c953f48a-9c65-4560-a9af-0771d46e8166',
       subCategory: 'Water Leakage',
       description: 'Major water leakage causing traffic issues',
@@ -84,6 +89,9 @@ describe('processNextComplaint', () => {
     const sample = JSON.stringify(validComplaint);
     mockRedisClient.lIndex.mockResolvedValue(sample);
     mockRedisClient.lPop.mockResolvedValue(sample);
+
+    // Mock category exists
+    mockFindCategory.mockResolvedValue({ id: validComplaint.categoryId, name: 'Water Supply & Sanitation' });
 
     // Mock no existing duplicate complaint
     mockFindFirst.mockResolvedValue(null);
@@ -132,6 +140,9 @@ describe('processNextComplaint', () => {
     const sample = JSON.stringify(invalidComplaint);
     mockRedisClient.lIndex.mockResolvedValue(sample);
 
+    // category check should not be called because validation fails earlier
+    mockFindCategory.mockResolvedValue(null);
+
     const { processNextComplaint } = await import('../routes/complaintProcessing');
     const result = await processNextComplaint(prismaMock);
 
@@ -142,6 +153,7 @@ describe('processNextComplaint', () => {
 
   it('flags duplicate complaint with isDuplicate=true and still creates it', async () => {
     const validComplaint = {
+      userId: 'b162fd66-80aa-4ab6-b9cb-a6dc42b50291',
       categoryId: 'c953f48a-9c65-4560-a9af-0771d46e8166',
       subCategory: 'Water Leakage',
       description: 'Duplicate complaint',
@@ -157,6 +169,9 @@ describe('processNextComplaint', () => {
     
     // Mock existing complaint found (duplicate)
     mockFindFirst.mockResolvedValue({ id: 'existing-id' });
+
+    // Mock category exists
+    mockFindCategory.mockResolvedValue({ id: validComplaint.categoryId, name: 'Water Supply & Sanitation' });
 
     // Mock successful complaint creation (with isDuplicate flag)
     mockCreateComplaint.mockResolvedValue({ 

@@ -156,7 +156,7 @@ router.post('/create/agent', authenticateMunicipalAdmin, async (req, res: any) =
 // ----- 9. Get All Complaints -----
 router.get('/complaints', async (req, res:any) => {
   try {
-    const complaints = await prisma.complaint.findMany({
+    const complaintsRaw = await prisma.complaint.findMany({
       where: {
         status: {
          not:'DELETED'
@@ -164,12 +164,17 @@ router.get('/complaints', async (req, res:any) => {
     },
       include: {
         category: true,
-        complainant: true 
+        User: true // relation field in schema is `User` (complainant)
       },
       orderBy: {
-        submissionDate: 'desc' 
+        submissionDate: 'desc'
       }
     });
+
+    const complaints = complaintsRaw.map(({ User, ...rest }) => ({
+      ...rest,
+      complainant: User || null
+    }));
 
     res.json({ success: true, complaints });
   } catch (error) {
@@ -210,7 +215,7 @@ router.put('/complaints/:id/status', authenticateMunicipalAdmin, async (req: any
         ...(status === 'COMPLETED' && { dateOfResolution: new Date() })
       },
       include: {
-        complainant: true,
+        User: true, // relation field for complainant
         category: true,
         location: true,
         upvotes: true,
@@ -233,10 +238,14 @@ router.put('/complaints/:id/status', authenticateMunicipalAdmin, async (req: any
       });
     }
 
+    // Map Prisma relation `User` to `complainant` for response consistency
+    const { User, ...complaintRest } = updatedComplaint as any;
+    const complaintForResponse = { ...complaintRest, complainant: User || null };
+
     return res.json({ 
       success: true, 
       message: 'Complaint status updated successfully',
-      complaint: updatedComplaint 
+      complaint: complaintForResponse 
     });
 
   } catch (error: any) {
