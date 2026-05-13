@@ -16,23 +16,23 @@ This document explains how the Redis queues work in `user-be` for complaint inge
 
 ```bash
 curl -X POST 'http://localhost:3000/api/complaints' \
-	-H 'Content-Type: application/json' \
-	-H 'Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI5ZTAzZDcxNC0xYTJmLTRhNDUtOTc0MC05OGYxYTMzMTE1YWIiLCJlbWFpbCI6InVzZXIubm92MzAuMjAyNUBleGFtcGxlLmNvbSIsIm5hbWUiOiJOb3ZlbWJlciBVc2VyIiwiaWF0IjoxNzY0NjA3MzE5LCJleHAiOjE3NjQ2OTM3MTl9.kB7ENj0zHUIr1tikJT3rynoHhPYpsKwgm7WV5ofSuWA' \
-	-d '{
-		"categoryId": "c953f48a-9c65-4560-a9af-0771d46e8166",
-		"subCategory": "Water Leakage",
-		"description": "There is a major water leakage on the main road causing traffic issues",
-		"urgency": "HIGH",
-		"assignedDepartment": "WATER_SUPPLY_SANITATION",
-		"isPublic": true,
-		"location": {
-			"pin": "560001",
-			"district": "Ranchi",
-			"city": "Ranchi",
-			"locality": "Lewis Road",
-			"street": "5th Block"
-		}
-	}'
+    -H 'Content-Type: application/json' \
+    -H 'Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJjMjVhZmNiNC01NzkxLTQzNDUtOTQ2NC02ZDQ5MDBmMmY1NmMiLCJlbWFpbCI6InVzZXIubm92MzAuMjAyNUBleGFtcGxlLmNvbSIsIm5hbWUiOiJOb3ZlbWJlciBVc2VyIiwiaWF0IjoxNzY0NjU4ODg5LCJleHAiOjE3NjQ3NDUyODl9.Dcc9ueJuxHWVHNr3mD6WkYx9Eo0spBeEULUq7a1IOSA' \
+    -d '{
+        "categoryId": "4e167d28-1050-47ab-93ef-fad373f69962",
+        "subCategory": "Water Leakage",
+        "description": "There is a major water leakage on the main road causing traffic issues",
+        "urgency": "HIGH",
+        "assignedDepartment": "WATER_SUPPLY_SANITATION",
+        "isPublic": true,
+        "location": {
+            "pin": "560001",
+            "district": "Ranchi",
+            "city": "Ranchi",
+            "locality": "Lewis Road",
+            "street": "5th Block"
+        }
+    }'
 ```
 
 3. Right after the API returns, the complaint JSON will be in Redis key `complaint:registration:queue` (it may be pushed by the request handler before DB creation depending on configuration).

@@ -35,6 +35,17 @@ export async function processNextComplaint(db: PrismaClient): Promise<{ processe
 
     const complaintData = validationResult.data;
     
+    // Verify referenced category exists to avoid FK violations
+    const categoryExists = await db.category.findUnique({
+      where: { id: complaintData.categoryId },
+    });
+    if (!categoryExists) {
+      // Remove invalid complaint from queue to avoid repeated failures
+      await client.lPop(REGISTRATION_QUEUE);
+      console.warn(`Invalid categoryId=${complaintData.categoryId} - removed from queue`);
+      return { processed: false, error: "Invalid categoryId removed from queue" };
+    }
+
     // Check if complaint already exists (same subCategory and description)
     const existingComplaint = await db.complaint.findFirst({
       where: {
@@ -43,10 +54,11 @@ export async function processNextComplaint(db: PrismaClient): Promise<{ processe
       },
     });
 
-    if (existingComplaint) {
-      await client.lPop(REGISTRATION_QUEUE);
-      console.log(`Duplicate complaint detected, removed from queue. Existing complaint id=${existingComplaint.id}`);
-      return { processed: false, error: "Duplicate complaint removed from queue" };
+    // If a duplicate exists, do NOT remove it from the queue.
+    // Instead, mark the new complaint as duplicate and proceed with creation.
+    const isDuplicate = !!existingComplaint;
+    if (isDuplicate) {
+      console.log(`Duplicate complaint detected. Existing complaint id=${existingComplaint?.id}. New complaint will be flagged as duplicate.`);
     }
 
     // Placeholder for AI standardized sub-category  
@@ -58,10 +70,18 @@ export async function processNextComplaint(db: PrismaClient): Promise<{ processe
     const result = await db.$transaction(async (tx) => {
       const complaint = await tx.complaint.create({
         data: {
+          // Note: The schema has a broken relation `User @relation(fields: [id], references: [id])`
+          // which requires Complaint.id = User.id. This prevents multiple complaints per user.
+          // We use complainantId to track the user and let Prisma generate a unique UUID for id.
+          // If this fails with FK error, the schema needs to be fixed with a migration.
+          complainantId: complaintData.userId,  // Store userId in complainantId field
           categoryId: complaintData.categoryId,
           subCategory: complaintData.subCategory,
           AIstandardizedSubCategory,
           description: complaintData.description,
+          isDuplicate: isDuplicate || false,
+          // AIabusedFlag: false, // Placeholder for future AI abuse detection
+          // AIimageVarificationStatus: false, // Placeholder for future AI image verification
           urgency: complaintData.urgency || "LOW",
           attachmentUrl: complaintData.attachmentUrl || null,
           assignedDepartment: complaintData.assignedDepartment,

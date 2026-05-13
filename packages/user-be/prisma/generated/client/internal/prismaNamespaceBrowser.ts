@@ -283,7 +283,6 @@ export const ComplaintScalarFieldEnum = {
   status: 'status',
   upvoteCount: 'upvoteCount',
   isPublic: 'isPublic',
-  isDuplicate: 'isDuplicate',
   assignedAgentId: 'assignedAgentId',
   assignedDepartment: 'assignedDepartment',
   categoryId: 'categoryId',
@@ -300,7 +299,8 @@ export const ComplaintScalarFieldEnum = {
   AIabusedFlag: 'AIabusedFlag',
   AIimageVarificationStatus: 'AIimageVarificationStatus',
   AIstandardizedSubCategory: 'AIstandardizedSubCategory',
-  lastUpdated: 'lastUpdated'
+  lastUpdated: 'lastUpdated',
+  isDuplicate: 'isDuplicate'
 } as const
 
 export type ComplaintScalarFieldEnum = (typeof ComplaintScalarFieldEnum)[keyof typeof ComplaintScalarFieldEnum]

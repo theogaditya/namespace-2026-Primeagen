@@ -62,6 +62,7 @@ export function createComplaintRouter(db: PrismaClient) {
       try {
         await complaintQueueService.pushComplaintToQueue({
           ...complaintData,
+          userId: req.userId,  // Include userId for complaint creation (FK constraint)
           submissionDate: new Date().toISOString(),
         });
       } catch (queueError) {
