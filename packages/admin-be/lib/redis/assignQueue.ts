@@ -8,7 +8,6 @@ export interface ProcessedComplaint {
   id: string;
   seq: number;
   status: string;
-  complainantId: string;
   categoryId: string;
   subCategory: string;
   assignedDepartment: string;

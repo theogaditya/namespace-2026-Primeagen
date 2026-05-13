@@ -37,7 +37,6 @@ curl -X POST http://localhost:3000/api/complaints  \
   -H "Content-Type: application/json" \
   -H "Authorization: Bearer <paste-token-here>" \
   -d '{
-    "complainantId": "c953f48a-9c65-4560-a9af-0771d46e8166",
     "categoryId": "123e4567-e89b-12d3-a456-426614174001",
     "subCategory": "Water Leakage",
     "description": "There is a major water leakage on the main road causing traffic issues",

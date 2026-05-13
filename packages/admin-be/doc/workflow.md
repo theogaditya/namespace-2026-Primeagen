@@ -17,9 +17,9 @@ This document explains how the Redis queues work in `user-be` for complaint inge
 ```bash
 curl -X POST 'http://localhost:3000/api/complaints' \
     -H 'Content-Type: application/json' \
-    -H 'Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2NDI4MzUwMS1mZGZkLTQyMzQtYjE2Ny1mMDQyMTE2OWU2ZWQiLCJlbWFpbCI6InVzZXIubm92MzAuMjAyNUBleGFtcGxlLmNvbSIsIm5hbWUiOiJOb3ZlbWJlciBVc2VyIiwiaWF0IjoxNzY0NjU3MTI3LCJleHAiOjE3NjQ3NDM1Mjd9.j_MokVEEnsNQCvuH25n1GDB8bqdY0aDNBQsB9CHou4A' \
+    -H 'Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJjMjVhZmNiNC01NzkxLTQzNDUtOTQ2NC02ZDQ5MDBmMmY1NmMiLCJlbWFpbCI6InVzZXIubm92MzAuMjAyNUBleGFtcGxlLmNvbSIsIm5hbWUiOiJOb3ZlbWJlciBVc2VyIiwiaWF0IjoxNzY0NjU4ODg5LCJleHAiOjE3NjQ3NDUyODl9.Dcc9ueJuxHWVHNr3mD6WkYx9Eo0spBeEULUq7a1IOSA' \
     -d '{
-        "categoryId": "c953f48a-9c65-4560-a9af-0771d46e8166",
+        "categoryId": "4e167d28-1050-47ab-93ef-fad373f69962",
         "subCategory": "Water Leakage",
         "description": "There is a major water leakage on the main road causing traffic issues",
         "urgency": "HIGH",
@@ -49,7 +49,7 @@ curl -X POST 'http://localhost:3000/api/complaints' \
 **Behavior notes**
 - Poll interval: `user-be` uses a 10-second interval; it peeks first and only removes an item after successful processing. This makes the system resistant to partial failures.
 - Dead-letter handling: malformed or DB-failing complaints are removed from the registration queue and optionally pushed to `complaint:assignment:malformed` for further inspection.
-- Idempotency: the poller checks for duplicate complaints (by complainant/subCategory/description) and removes duplicates to avoid double-creation.
+- Idempotency: the poller checks for duplicate complaints (by subCategory/description) and removes duplicates to avoid double-creation.
 
 If you want, I can also add a small note on how to inspect the queues via `redis-cli` or how to run `prisma studio` to verify created complaints.
 
