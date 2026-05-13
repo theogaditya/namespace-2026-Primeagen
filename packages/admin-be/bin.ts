@@ -37,6 +37,19 @@ async function bootstrap() {
     // if (!raw) return null;
     // const complaint = JSON.parse(raw);
 
+    // // Clear out the processedComplaintQueue on server start
+    // // Uncomment the following lines to enable queue clearing
+    // try {
+    //   const complaintClient = new RedisClientforComplaintQueue();
+    //   await complaintClient.connect();
+    //   const client = complaintClient.getClient();
+    //   const PROCESSED_QUEUE = 'complaint:processed:queue';
+    //   const deleted = await client.del(PROCESSED_QUEUE);
+    //   console.log(`[Redis] Cleared ${PROCESSED_QUEUE} - deleted ${deleted} key(s)`);
+    // } catch (clearErr) {
+    //   console.warn('[Redis] Failed to clear processed complaint queue:', clearErr);
+    // }
+
     // Initialize GCP Vertex AI client
     const gcpConfig = await initializeGCP();
     console.log('GCP Vertex AI client initialized');
