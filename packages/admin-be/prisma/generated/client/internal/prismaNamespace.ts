@@ -1930,7 +1930,8 @@ export const ComplaintScalarFieldEnum = {
   AIabusedFlag: 'AIabusedFlag',
   AIimageVarificationStatus: 'AIimageVarificationStatus',
   AIstandardizedSubCategory: 'AIstandardizedSubCategory',
-  lastUpdated: 'lastUpdated'
+  lastUpdated: 'lastUpdated',
+  isDuplicate: 'isDuplicate'
 } as const
 
 export type ComplaintScalarFieldEnum = (typeof ComplaintScalarFieldEnum)[keyof typeof ComplaintScalarFieldEnum]

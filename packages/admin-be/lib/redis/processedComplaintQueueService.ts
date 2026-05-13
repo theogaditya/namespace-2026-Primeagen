@@ -29,7 +29,6 @@ export class ProcessedComplaintQueueService {
         id: string;
         seq: number;
         status: string;
-        complainantId: string;
         categoryId: string;
         subCategory: string;
         assignedDepartment: string;

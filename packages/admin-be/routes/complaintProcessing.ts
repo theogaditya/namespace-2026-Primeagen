@@ -38,16 +38,16 @@ export async function processNextComplaint(db: PrismaClient): Promise<{ processe
     // Check if complaint already exists (same complainant, subCategory, and description)
     const existingComplaint = await db.complaint.findFirst({
       where: {
-        complainantId: complaintData.complainantId,
         subCategory: complaintData.subCategory,
         description: complaintData.description,
       },
     });
 
-    if (existingComplaint) {
-      await client.lPop(REGISTRATION_QUEUE);
-      console.log(`Duplicate complaint detected, removed from queue. Existing complaint id=${existingComplaint.id}`);
-      return { processed: false, error: "Duplicate complaint removed from queue" };
+    // If a duplicate exists, do NOT remove it from the queue.
+    // Instead, mark the new complaint as duplicate and proceed with creation.
+    const isDuplicate = !!existingComplaint;
+    if (isDuplicate) {
+      console.log(`Duplicate complaint detected. Existing complaint id=${existingComplaint?.id}. New complaint will be flagged as duplicate.`);
     }
 
     // Placeholder for AI standardized sub-category  
@@ -59,11 +59,13 @@ export async function processNextComplaint(db: PrismaClient): Promise<{ processe
     const result = await db.$transaction(async (tx) => {
       const complaint = await tx.complaint.create({
         data: {
-          complainantId: complaintData.complainantId,
           categoryId: complaintData.categoryId,
           subCategory: complaintData.subCategory,
           AIstandardizedSubCategory,
           description: complaintData.description,
+          isDuplicate: isDuplicate || false,
+          // AIabusedFlag: false, // Placeholder for future AI abuse detection
+          // AIimageVarificationStatus: false, // Placeholder for future AI image verification
           urgency: complaintData.urgency || "LOW",
           attachmentUrl: complaintData.attachmentUrl || null,
           assignedDepartment: complaintData.assignedDepartment,
@@ -92,7 +94,6 @@ export async function processNextComplaint(db: PrismaClient): Promise<{ processe
         id: result.id,
         seq: result.seq,
         status: result.status,
-        complainantId: result.complainantId,
         categoryId: result.categoryId,
         subCategory: result.subCategory,
         assignedDepartment: result.assignedDepartment,

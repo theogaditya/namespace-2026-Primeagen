@@ -67,7 +67,6 @@ describe('processNextComplaint', () => {
 
   it('processes valid complaint and pushes to processed queue', async () => {
     const validComplaint = {
-      complainantId: '9e03d714-1a2f-4a45-9740-98f1a33115ab',
       categoryId: 'c953f48a-9c65-4560-a9af-0771d46e8166',
       subCategory: 'Water Leakage',
       description: 'Major water leakage causing traffic issues',
@@ -93,8 +92,7 @@ describe('processNextComplaint', () => {
     mockCreateComplaint.mockResolvedValue({ 
       id: 'complaint-id-123', 
       seq: 1, 
-      status: 'REGISTERED', 
-      complainantId: '9e03d714-1a2f-4a45-9740-98f1a33115ab',
+      status: 'REGISTERED',
       categoryId: 'c953f48a-9c65-4560-a9af-0771d46e8166',
       subCategory: 'Water Leakage'
     });
@@ -126,7 +124,7 @@ describe('processNextComplaint', () => {
 
   it('removes complaint with validation errors and returns processed=false', async () => {
     const invalidComplaint = {
-      // Missing required fields like complainantId, categoryId
+      // Missing required fields like categoryId, assignedDepartment, isPublic, location
       subCategory: 'Water Leakage',
       description: 'desc'
     };
@@ -142,9 +140,8 @@ describe('processNextComplaint', () => {
     expect(mockRedisClient.lPop).toHaveBeenCalledWith('complaint:registration:queue');
   });
 
-  it('removes duplicate complaint and returns processed=false', async () => {
+  it('flags duplicate complaint with isDuplicate=true and still creates it', async () => {
     const validComplaint = {
-      complainantId: '9e03d714-1a2f-4a45-9740-98f1a33115ab',
       categoryId: 'c953f48a-9c65-4560-a9af-0771d46e8166',
       subCategory: 'Water Leakage',
       description: 'Duplicate complaint',
@@ -156,15 +153,33 @@ describe('processNextComplaint', () => {
 
     const sample = JSON.stringify(validComplaint);
     mockRedisClient.lIndex.mockResolvedValue(sample);
+    mockRedisClient.lPop.mockResolvedValue(sample);
     
     // Mock existing complaint found (duplicate)
     mockFindFirst.mockResolvedValue({ id: 'existing-id' });
 
+    // Mock successful complaint creation (with isDuplicate flag)
+    mockCreateComplaint.mockResolvedValue({ 
+      id: 'new-complaint-id', 
+      seq: 2, 
+      status: 'REGISTERED',
+      categoryId: 'c953f48a-9c65-4560-a9af-0771d46e8166',
+      subCategory: 'Water Leakage',
+      isDuplicate: true
+    });
+
     const { processNextComplaint } = await import('../routes/complaintProcessing');
     const result = await processNextComplaint(prismaMock);
 
-    expect(result.processed).toBe(false);
-    expect(result.error).toBe('Duplicate complaint removed from queue');
+    // Duplicate should still be processed and created
+    expect(result.processed).toBe(true);
+    expect(result.result).toEqual({ 
+      id: 'new-complaint-id', 
+      seq: 2, 
+      status: 'REGISTERED' 
+    });
+    expect(mockCreateComplaint).toHaveBeenCalled();
+    expect(mockProcessedComplaintQueueService.pushToQueue).toHaveBeenCalled();
     expect(mockRedisClient.lPop).toHaveBeenCalledWith('complaint:registration:queue');
   });
 });
