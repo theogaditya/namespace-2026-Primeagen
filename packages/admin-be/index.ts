@@ -28,6 +28,7 @@ export class Server {
     const allowedOrigins = [
       'http://localhost:3000',
       'http://localhost:3003',
+      'http://localhost:3001',
       'https://admin.swarajdesk.co.in'
     ];
 

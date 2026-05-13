@@ -70,10 +70,6 @@ export async function processNextComplaint(db: PrismaClient): Promise<{ processe
     const result = await db.$transaction(async (tx) => {
       const complaint = await tx.complaint.create({
         data: {
-          // Note: The schema has a broken relation `User @relation(fields: [id], references: [id])`
-          // which requires Complaint.id = User.id. This prevents multiple complaints per user.
-          // We use complainantId to track the user and let Prisma generate a unique UUID for id.
-          // If this fails with FK error, the schema needs to be fixed with a migration.
           complainantId: complaintData.userId,  // Store userId in complainantId field
           categoryId: complaintData.categoryId,
           subCategory: complaintData.subCategory,
@@ -104,25 +100,30 @@ export async function processNextComplaint(db: PrismaClient): Promise<{ processe
       return complaint;
     });
 
-    // Push to processed queue for Auto-Assignment and Blockchain Processing
-    try {
-      await processedComplaintQueueService.pushToQueue({
-        id: result.id,
-        seq: result.seq,
-        status: result.status,
-        categoryId: result.categoryId,
-        subCategory: result.subCategory,
-        assignedDepartment: result.assignedDepartment,
-        city: complaintData.location.city,
-        district: complaintData.location.district,
-      });
-    } catch (pushErr) {
-      console.error("Failed to push processed complaint to queue:", pushErr);
-    }
-
+    // Pop from registration queue
     await client.lPop(REGISTRATION_QUEUE);
+
+    // Only push to processed queue if NOT a duplicate
+    if (!isDuplicate) {
+      try {
+        await processedComplaintQueueService.pushToQueue({
+          id: result.id,
+          seq: result.seq,
+          status: result.status,
+          categoryId: result.categoryId,
+          subCategory: result.subCategory,
+          assignedDepartment: result.assignedDepartment,
+          city: complaintData.location.city,
+          district: complaintData.location.district,
+        });
+      } catch (pushErr) {
+        console.error("Failed to push processed complaint to queue:", pushErr);
+      }
+    } else {
+      console.log(`Duplicate complaint id=${result.id} created but not pushed to processed queue.`);
+    }
     
-    return { processed: true, result: { id: result.id, seq: result.seq, status: result.status } };
+    return { processed: true, result: { id: result.id, seq: result.seq, status: result.status, isDuplicate } };
   } catch (error: any) {
     console.error("Complaint processing error:", error);
     
