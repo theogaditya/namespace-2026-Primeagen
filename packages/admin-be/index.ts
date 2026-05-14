@@ -4,12 +4,14 @@ import express from 'express';
 import type { Express } from 'express';
 import { PrismaClient } from './prisma/generated/client/client';
 import agentRoutes from './routes/agent';
+import authRoutes from './routes/auth';
 import municipalAdminRoutes from './routes/municipalAdminRoutes';
 import stateAdminRoutes from './routes/stateAdminRoutes';
 import superAdminRoutes from './routes/superAdminRoutes';
 import { complaintProcessingRouter, startComplaintPolling } from './routes/complaintProcessing';
 import { userComplaintsRouter } from './routes/userComplaints';
 import { healthPoint } from './routes/health';
+import autoAssignRouter, { startAutoAssignPolling } from './routes/autoAssign';
 
 export class Server {
   private app: Express;
@@ -52,12 +54,14 @@ export class Server {
   }
 
   private setupRoutes() {
+    this.app.use('/api/auth', authRoutes(this.db));
     this.app.use('/api/super-admin', superAdminRoutes(this.db));
     this.app.use('/api/state-admin', stateAdminRoutes(this.db));
     this.app.use('/api/municipal-admin', municipalAdminRoutes(this.db));
     this.app.use('/api/agent', agentRoutes(this.db));
     this.app.use('/api/complaint', complaintProcessingRouter(this.db));
     this.app.use('/api/users', userComplaintsRouter(this.db));
+    this.app.use('/api/auto-assign', autoAssignRouter);
   
     this.app.use('/api', healthPoint(this.db));
     this.app.get('/health', (req, res) => {
@@ -65,6 +69,7 @@ export class Server {
     });
 
     startComplaintPolling(this.db);
+    startAutoAssignPolling();
   }
 
   public getApp(): Express {

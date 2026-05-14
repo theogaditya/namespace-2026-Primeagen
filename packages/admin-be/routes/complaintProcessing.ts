@@ -62,10 +62,10 @@ export async function processNextComplaint(db: PrismaClient): Promise<{ processe
     }
 
     // Placeholder for AI standardized sub-category  
-    // const AIstandardizedSubCategory = "dev";
+    const AIstandardizedSubCategory = "dev";
     
     // AI standardized sub-category (stub for now)
-    const AIstandardizedSubCategory = await standardizeSubCategory(complaintData.subCategory);
+    // const AIstandardizedSubCategory = await standardizeSubCategory(complaintData.subCategory);
 
     const result = await db.$transaction(async (tx) => {
       const complaint = await tx.complaint.create({

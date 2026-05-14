@@ -246,7 +246,7 @@ export type UserWhereInput = {
   phoneNumber?: Prisma.StringFilter<"User"> | string
   preferredLanguage?: Prisma.StringFilter<"User"> | string
   status?: Prisma.EnumuserStatusFilter<"User"> | $Enums.userStatus
-  Complaint?: Prisma.XOR<Prisma.ComplaintNullableScalarRelationFilter, Prisma.ComplaintWhereInput> | null
+  complaints?: Prisma.ComplaintListRelationFilter
   auditLogsCreated?: Prisma.AuditLogListRelationFilter
   upvotes?: Prisma.UpvoteListRelationFilter
   location?: Prisma.XOR<Prisma.UserLocationNullableScalarRelationFilter, Prisma.UserLocationWhereInput> | null
@@ -266,7 +266,7 @@ export type UserOrderByWithRelationInput = {
   phoneNumber?: Prisma.SortOrder
   preferredLanguage?: Prisma.SortOrder
   status?: Prisma.SortOrder
-  Complaint?: Prisma.ComplaintOrderByWithRelationInput
+  complaints?: Prisma.ComplaintOrderByRelationAggregateInput
   auditLogsCreated?: Prisma.AuditLogOrderByRelationAggregateInput
   upvotes?: Prisma.UpvoteOrderByRelationAggregateInput
   location?: Prisma.UserLocationOrderByWithRelationInput
@@ -289,7 +289,7 @@ export type UserWhereUniqueInput = Prisma.AtLeast<{
   password?: Prisma.StringFilter<"User"> | string
   preferredLanguage?: Prisma.StringFilter<"User"> | string
   status?: Prisma.EnumuserStatusFilter<"User"> | $Enums.userStatus
-  Complaint?: Prisma.XOR<Prisma.ComplaintNullableScalarRelationFilter, Prisma.ComplaintWhereInput> | null
+  complaints?: Prisma.ComplaintListRelationFilter
   auditLogsCreated?: Prisma.AuditLogListRelationFilter
   upvotes?: Prisma.UpvoteListRelationFilter
   location?: Prisma.XOR<Prisma.UserLocationNullableScalarRelationFilter, Prisma.UserLocationWhereInput> | null
@@ -347,7 +347,7 @@ export type UserCreateInput = {
   phoneNumber: string
   preferredLanguage?: string
   status?: $Enums.userStatus
-  Complaint?: Prisma.ComplaintCreateNestedOneWithoutUserInput
+  complaints?: Prisma.ComplaintCreateNestedManyWithoutUserInput
   auditLogsCreated?: Prisma.AuditLogCreateNestedManyWithoutUserInput
   upvotes?: Prisma.UpvoteCreateNestedManyWithoutUserInput
   location?: Prisma.UserLocationCreateNestedOneWithoutUserInput
@@ -367,7 +367,7 @@ export type UserUncheckedCreateInput = {
   phoneNumber: string
   preferredLanguage?: string
   status?: $Enums.userStatus
-  Complaint?: Prisma.ComplaintUncheckedCreateNestedOneWithoutUserInput
+  complaints?: Prisma.ComplaintUncheckedCreateNestedManyWithoutUserInput
   auditLogsCreated?: Prisma.AuditLogUncheckedCreateNestedManyWithoutUserInput
   upvotes?: Prisma.UpvoteUncheckedCreateNestedManyWithoutUserInput
   location?: Prisma.UserLocationUncheckedCreateNestedOneWithoutUserInput
@@ -387,7 +387,7 @@ export type UserUpdateInput = {
   phoneNumber?: Prisma.StringFieldUpdateOperationsInput | string
   preferredLanguage?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumuserStatusFieldUpdateOperationsInput | $Enums.userStatus
-  Complaint?: Prisma.ComplaintUpdateOneWithoutUserNestedInput
+  complaints?: Prisma.ComplaintUpdateManyWithoutUserNestedInput
   auditLogsCreated?: Prisma.AuditLogUpdateManyWithoutUserNestedInput
   upvotes?: Prisma.UpvoteUpdateManyWithoutUserNestedInput
   location?: Prisma.UserLocationUpdateOneWithoutUserNestedInput
@@ -407,7 +407,7 @@ export type UserUncheckedUpdateInput = {
   phoneNumber?: Prisma.StringFieldUpdateOperationsInput | string
   preferredLanguage?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumuserStatusFieldUpdateOperationsInput | $Enums.userStatus
-  Complaint?: Prisma.ComplaintUncheckedUpdateOneWithoutUserNestedInput
+  complaints?: Prisma.ComplaintUncheckedUpdateManyWithoutUserNestedInput
   auditLogsCreated?: Prisma.AuditLogUncheckedUpdateManyWithoutUserNestedInput
   upvotes?: Prisma.UpvoteUncheckedUpdateManyWithoutUserNestedInput
   location?: Prisma.UserLocationUncheckedUpdateOneWithoutUserNestedInput
@@ -514,6 +514,11 @@ export type UserScalarRelationFilter = {
   isNot?: Prisma.UserWhereInput
 }
 
+export type UserNullableScalarRelationFilter = {
+  is?: Prisma.UserWhereInput | null
+  isNot?: Prisma.UserWhereInput | null
+}
+
 export type StringFieldUpdateOperationsInput = {
   set?: string
 }
@@ -548,18 +553,20 @@ export type UserUpdateOneRequiredWithoutLocationNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutLocationInput, Prisma.UserUpdateWithoutLocationInput>, Prisma.UserUncheckedUpdateWithoutLocationInput>
 }
 
-export type UserCreateNestedOneWithoutComplaintInput = {
-  create?: Prisma.XOR<Prisma.UserCreateWithoutComplaintInput, Prisma.UserUncheckedCreateWithoutComplaintInput>
-  connectOrCreate?: Prisma.UserCreateOrConnectWithoutComplaintInput
+export type UserCreateNestedOneWithoutComplaintsInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutComplaintsInput, Prisma.UserUncheckedCreateWithoutComplaintsInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutComplaintsInput
   connect?: Prisma.UserWhereUniqueInput
 }
 
-export type UserUpdateOneRequiredWithoutComplaintNestedInput = {
-  create?: Prisma.XOR<Prisma.UserCreateWithoutComplaintInput, Prisma.UserUncheckedCreateWithoutComplaintInput>
-  connectOrCreate?: Prisma.UserCreateOrConnectWithoutComplaintInput
-  upsert?: Prisma.UserUpsertWithoutComplaintInput
+export type UserUpdateOneWithoutComplaintsNestedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutComplaintsInput, Prisma.UserUncheckedCreateWithoutComplaintsInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutComplaintsInput
+  upsert?: Prisma.UserUpsertWithoutComplaintsInput
+  disconnect?: Prisma.UserWhereInput | boolean
+  delete?: Prisma.UserWhereInput | boolean
   connect?: Prisma.UserWhereUniqueInput
-  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutComplaintInput, Prisma.UserUpdateWithoutComplaintInput>, Prisma.UserUncheckedUpdateWithoutComplaintInput>
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutComplaintsInput, Prisma.UserUpdateWithoutComplaintsInput>, Prisma.UserUncheckedUpdateWithoutComplaintsInput>
 }
 
 export type UserCreateNestedOneWithoutUpvotesInput = {
@@ -604,7 +611,7 @@ export type UserCreateWithoutLocationInput = {
   phoneNumber: string
   preferredLanguage?: string
   status?: $Enums.userStatus
-  Complaint?: Prisma.ComplaintCreateNestedOneWithoutUserInput
+  complaints?: Prisma.ComplaintCreateNestedManyWithoutUserInput
   auditLogsCreated?: Prisma.AuditLogCreateNestedManyWithoutUserInput
   upvotes?: Prisma.UpvoteCreateNestedManyWithoutUserInput
 }
@@ -623,7 +630,7 @@ export type UserUncheckedCreateWithoutLocationInput = {
   phoneNumber: string
   preferredLanguage?: string
   status?: $Enums.userStatus
-  Complaint?: Prisma.ComplaintUncheckedCreateNestedOneWithoutUserInput
+  complaints?: Prisma.ComplaintUncheckedCreateNestedManyWithoutUserInput
   auditLogsCreated?: Prisma.AuditLogUncheckedCreateNestedManyWithoutUserInput
   upvotes?: Prisma.UpvoteUncheckedCreateNestedManyWithoutUserInput
 }
@@ -658,7 +665,7 @@ export type UserUpdateWithoutLocationInput = {
   phoneNumber?: Prisma.StringFieldUpdateOperationsInput | string
   preferredLanguage?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumuserStatusFieldUpdateOperationsInput | $Enums.userStatus
-  Complaint?: Prisma.ComplaintUpdateOneWithoutUserNestedInput
+  complaints?: Prisma.ComplaintUpdateManyWithoutUserNestedInput
   auditLogsCreated?: Prisma.AuditLogUpdateManyWithoutUserNestedInput
   upvotes?: Prisma.UpvoteUpdateManyWithoutUserNestedInput
 }
@@ -677,12 +684,12 @@ export type UserUncheckedUpdateWithoutLocationInput = {
   phoneNumber?: Prisma.StringFieldUpdateOperationsInput | string
   preferredLanguage?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumuserStatusFieldUpdateOperationsInput | $Enums.userStatus
-  Complaint?: Prisma.ComplaintUncheckedUpdateOneWithoutUserNestedInput
+  complaints?: Prisma.ComplaintUncheckedUpdateManyWithoutUserNestedInput
   auditLogsCreated?: Prisma.AuditLogUncheckedUpdateManyWithoutUserNestedInput
   upvotes?: Prisma.UpvoteUncheckedUpdateManyWithoutUserNestedInput
 }
 
-export type UserCreateWithoutComplaintInput = {
+export type UserCreateWithoutComplaintsInput = {
   id?: string
   email: string
   name: string
@@ -701,7 +708,7 @@ export type UserCreateWithoutComplaintInput = {
   location?: Prisma.UserLocationCreateNestedOneWithoutUserInput
 }
 
-export type UserUncheckedCreateWithoutComplaintInput = {
+export type UserUncheckedCreateWithoutComplaintsInput = {
   id?: string
   email: string
   name: string
@@ -720,23 +727,23 @@ export type UserUncheckedCreateWithoutComplaintInput = {
   location?: Prisma.UserLocationUncheckedCreateNestedOneWithoutUserInput
 }
 
-export type UserCreateOrConnectWithoutComplaintInput = {
+export type UserCreateOrConnectWithoutComplaintsInput = {
   where: Prisma.UserWhereUniqueInput
-  create: Prisma.XOR<Prisma.UserCreateWithoutComplaintInput, Prisma.UserUncheckedCreateWithoutComplaintInput>
+  create: Prisma.XOR<Prisma.UserCreateWithoutComplaintsInput, Prisma.UserUncheckedCreateWithoutComplaintsInput>
 }
 
-export type UserUpsertWithoutComplaintInput = {
-  update: Prisma.XOR<Prisma.UserUpdateWithoutComplaintInput, Prisma.UserUncheckedUpdateWithoutComplaintInput>
-  create: Prisma.XOR<Prisma.UserCreateWithoutComplaintInput, Prisma.UserUncheckedCreateWithoutComplaintInput>
+export type UserUpsertWithoutComplaintsInput = {
+  update: Prisma.XOR<Prisma.UserUpdateWithoutComplaintsInput, Prisma.UserUncheckedUpdateWithoutComplaintsInput>
+  create: Prisma.XOR<Prisma.UserCreateWithoutComplaintsInput, Prisma.UserUncheckedCreateWithoutComplaintsInput>
   where?: Prisma.UserWhereInput
 }
 
-export type UserUpdateToOneWithWhereWithoutComplaintInput = {
+export type UserUpdateToOneWithWhereWithoutComplaintsInput = {
   where?: Prisma.UserWhereInput
-  data: Prisma.XOR<Prisma.UserUpdateWithoutComplaintInput, Prisma.UserUncheckedUpdateWithoutComplaintInput>
+  data: Prisma.XOR<Prisma.UserUpdateWithoutComplaintsInput, Prisma.UserUncheckedUpdateWithoutComplaintsInput>
 }
 
-export type UserUpdateWithoutComplaintInput = {
+export type UserUpdateWithoutComplaintsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
@@ -755,7 +762,7 @@ export type UserUpdateWithoutComplaintInput = {
   location?: Prisma.UserLocationUpdateOneWithoutUserNestedInput
 }
 
-export type UserUncheckedUpdateWithoutComplaintInput = {
+export type UserUncheckedUpdateWithoutComplaintsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
@@ -788,7 +795,7 @@ export type UserCreateWithoutUpvotesInput = {
   phoneNumber: string
   preferredLanguage?: string
   status?: $Enums.userStatus
-  Complaint?: Prisma.ComplaintCreateNestedOneWithoutUserInput
+  complaints?: Prisma.ComplaintCreateNestedManyWithoutUserInput
   auditLogsCreated?: Prisma.AuditLogCreateNestedManyWithoutUserInput
   location?: Prisma.UserLocationCreateNestedOneWithoutUserInput
 }
@@ -807,7 +814,7 @@ export type UserUncheckedCreateWithoutUpvotesInput = {
   phoneNumber: string
   preferredLanguage?: string
   status?: $Enums.userStatus
-  Complaint?: Prisma.ComplaintUncheckedCreateNestedOneWithoutUserInput
+  complaints?: Prisma.ComplaintUncheckedCreateNestedManyWithoutUserInput
   auditLogsCreated?: Prisma.AuditLogUncheckedCreateNestedManyWithoutUserInput
   location?: Prisma.UserLocationUncheckedCreateNestedOneWithoutUserInput
 }
@@ -842,7 +849,7 @@ export type UserUpdateWithoutUpvotesInput = {
   phoneNumber?: Prisma.StringFieldUpdateOperationsInput | string
   preferredLanguage?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumuserStatusFieldUpdateOperationsInput | $Enums.userStatus
-  Complaint?: Prisma.ComplaintUpdateOneWithoutUserNestedInput
+  complaints?: Prisma.ComplaintUpdateManyWithoutUserNestedInput
   auditLogsCreated?: Prisma.AuditLogUpdateManyWithoutUserNestedInput
   location?: Prisma.UserLocationUpdateOneWithoutUserNestedInput
 }
@@ -861,7 +868,7 @@ export type UserUncheckedUpdateWithoutUpvotesInput = {
   phoneNumber?: Prisma.StringFieldUpdateOperationsInput | string
   preferredLanguage?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumuserStatusFieldUpdateOperationsInput | $Enums.userStatus
-  Complaint?: Prisma.ComplaintUncheckedUpdateOneWithoutUserNestedInput
+  complaints?: Prisma.ComplaintUncheckedUpdateManyWithoutUserNestedInput
   auditLogsCreated?: Prisma.AuditLogUncheckedUpdateManyWithoutUserNestedInput
   location?: Prisma.UserLocationUncheckedUpdateOneWithoutUserNestedInput
 }
@@ -880,7 +887,7 @@ export type UserCreateWithoutAuditLogsCreatedInput = {
   phoneNumber: string
   preferredLanguage?: string
   status?: $Enums.userStatus
-  Complaint?: Prisma.ComplaintCreateNestedOneWithoutUserInput
+  complaints?: Prisma.ComplaintCreateNestedManyWithoutUserInput
   upvotes?: Prisma.UpvoteCreateNestedManyWithoutUserInput
   location?: Prisma.UserLocationCreateNestedOneWithoutUserInput
 }
@@ -899,7 +906,7 @@ export type UserUncheckedCreateWithoutAuditLogsCreatedInput = {
   phoneNumber: string
   preferredLanguage?: string
   status?: $Enums.userStatus
-  Complaint?: Prisma.ComplaintUncheckedCreateNestedOneWithoutUserInput
+  complaints?: Prisma.ComplaintUncheckedCreateNestedManyWithoutUserInput
   upvotes?: Prisma.UpvoteUncheckedCreateNestedManyWithoutUserInput
   location?: Prisma.UserLocationUncheckedCreateNestedOneWithoutUserInput
 }
@@ -934,7 +941,7 @@ export type UserUpdateWithoutAuditLogsCreatedInput = {
   phoneNumber?: Prisma.StringFieldUpdateOperationsInput | string
   preferredLanguage?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumuserStatusFieldUpdateOperationsInput | $Enums.userStatus
-  Complaint?: Prisma.ComplaintUpdateOneWithoutUserNestedInput
+  complaints?: Prisma.ComplaintUpdateManyWithoutUserNestedInput
   upvotes?: Prisma.UpvoteUpdateManyWithoutUserNestedInput
   location?: Prisma.UserLocationUpdateOneWithoutUserNestedInput
 }
@@ -953,7 +960,7 @@ export type UserUncheckedUpdateWithoutAuditLogsCreatedInput = {
   phoneNumber?: Prisma.StringFieldUpdateOperationsInput | string
   preferredLanguage?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumuserStatusFieldUpdateOperationsInput | $Enums.userStatus
-  Complaint?: Prisma.ComplaintUncheckedUpdateOneWithoutUserNestedInput
+  complaints?: Prisma.ComplaintUncheckedUpdateManyWithoutUserNestedInput
   upvotes?: Prisma.UpvoteUncheckedUpdateManyWithoutUserNestedInput
   location?: Prisma.UserLocationUncheckedUpdateOneWithoutUserNestedInput
 }
@@ -964,11 +971,13 @@ export type UserUncheckedUpdateWithoutAuditLogsCreatedInput = {
  */
 
 export type UserCountOutputType = {
+  complaints: number
   auditLogsCreated: number
   upvotes: number
 }
 
 export type UserCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  complaints?: boolean | UserCountOutputTypeCountComplaintsArgs
   auditLogsCreated?: boolean | UserCountOutputTypeCountAuditLogsCreatedArgs
   upvotes?: boolean | UserCountOutputTypeCountUpvotesArgs
 }
@@ -981,6 +990,13 @@ export type UserCountOutputTypeDefaultArgs<ExtArgs extends runtime.Types.Extensi
    * Select specific fields to fetch from the UserCountOutputType
    */
   select?: Prisma.UserCountOutputTypeSelect<ExtArgs> | null
+}
+
+/**
+ * UserCountOutputType without action
+ */
+export type UserCountOutputTypeCountComplaintsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.ComplaintWhereInput
 }
 
 /**
@@ -1012,7 +1028,7 @@ export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
   phoneNumber?: boolean
   preferredLanguage?: boolean
   status?: boolean
-  Complaint?: boolean | Prisma.User$ComplaintArgs<ExtArgs>
+  complaints?: boolean | Prisma.User$complaintsArgs<ExtArgs>
   auditLogsCreated?: boolean | Prisma.User$auditLogsCreatedArgs<ExtArgs>
   upvotes?: boolean | Prisma.User$upvotesArgs<ExtArgs>
   location?: boolean | Prisma.User$locationArgs<ExtArgs>
@@ -1069,7 +1085,7 @@ export type UserSelectScalar = {
 
 export type UserOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "email" | "name" | "aadhaarId" | "consentDataCollection" | "dateOfBirth" | "dateOfCreation" | "disability" | "lastUpdated" | "password" | "phoneNumber" | "preferredLanguage" | "status", ExtArgs["result"]["user"]>
 export type UserInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  Complaint?: boolean | Prisma.User$ComplaintArgs<ExtArgs>
+  complaints?: boolean | Prisma.User$complaintsArgs<ExtArgs>
   auditLogsCreated?: boolean | Prisma.User$auditLogsCreatedArgs<ExtArgs>
   upvotes?: boolean | Prisma.User$upvotesArgs<ExtArgs>
   location?: boolean | Prisma.User$locationArgs<ExtArgs>
@@ -1081,7 +1097,7 @@ export type UserIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensi
 export type $UserPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   name: "User"
   objects: {
-    Complaint: Prisma.$ComplaintPayload<ExtArgs> | null
+    complaints: Prisma.$ComplaintPayload<ExtArgs>[]
     auditLogsCreated: Prisma.$AuditLogPayload<ExtArgs>[]
     upvotes: Prisma.$UpvotePayload<ExtArgs>[]
     location: Prisma.$UserLocationPayload<ExtArgs> | null
@@ -1494,7 +1510,7 @@ readonly fields: UserFieldRefs;
  */
 export interface Prisma__UserClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
-  Complaint<T extends Prisma.User$ComplaintArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$ComplaintArgs<ExtArgs>>): Prisma.Prisma__ComplaintClient<runtime.Types.Result.GetResult<Prisma.$ComplaintPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+  complaints<T extends Prisma.User$complaintsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$complaintsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ComplaintPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   auditLogsCreated<T extends Prisma.User$auditLogsCreatedArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$auditLogsCreatedArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$AuditLogPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   upvotes<T extends Prisma.User$upvotesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$upvotesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$UpvotePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   location<T extends Prisma.User$locationArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$locationArgs<ExtArgs>>): Prisma.Prisma__UserLocationClient<runtime.Types.Result.GetResult<Prisma.$UserLocationPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
@@ -1928,9 +1944,9 @@ export type UserDeleteManyArgs<ExtArgs extends runtime.Types.Extensions.Internal
 }
 
 /**
- * User.Complaint
+ * User.complaints
  */
-export type User$ComplaintArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+export type User$complaintsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   /**
    * Select specific fields to fetch from the Complaint
    */
@@ -1944,6 +1960,11 @@ export type User$ComplaintArgs<ExtArgs extends runtime.Types.Extensions.Internal
    */
   include?: Prisma.ComplaintInclude<ExtArgs> | null
   where?: Prisma.ComplaintWhereInput
+  orderBy?: Prisma.ComplaintOrderByWithRelationInput | Prisma.ComplaintOrderByWithRelationInput[]
+  cursor?: Prisma.ComplaintWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.ComplaintScalarFieldEnum | Prisma.ComplaintScalarFieldEnum[]
 }
 
 /**

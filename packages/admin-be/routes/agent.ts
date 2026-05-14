@@ -579,56 +579,5 @@ router.put('/me/workload/dec', authenticateAgent, async (req: any, res: any) => 
   }
 });
 
-// ---------- Auto-assign: Manual trigger --------
-router.post('/complaints/auto-assign', async (req: any, res: any) => {
-  const result = await processNextAssignment(prisma);
-  
-  if (!result.processed && !result.error) {
-    return res.status(204).json({
-      success: false,
-      message: 'No complaints in processed queue'
-    });
-  }
-
-  if (result.error) {
-    return res.status(400).json({
-      success: false,
-      message: result.error
-    });
-  }
-
-  return res.status(200).json({
-    success: true,
-    message: 'Assignment processed',
-    data: result.result
-  });
-});
-
-// ---------- Auto-assign: Start polling --------
-router.post('/complaints/auto-assign/start', (req: any, res: any) => {
-  startAssignmentPolling(prisma);
-  return res.status(200).json({
-    success: true,
-    message: 'Assignment polling started'
-  });
-});
-
-// ---------- Auto-assign: Stop polling --------
-router.post('/complaints/auto-assign/stop', (req: any, res: any) => {
-  stopAssignmentPolling();
-  return res.status(200).json({
-    success: true,
-    message: 'Assignment polling stopped'
-  });
-});
-
-// ---------- Auto-assign: Polling status --------
-router.get('/complaints/auto-assign/status', (req: any, res: any) => {
-  return res.status(200).json({
-    success: true,
-    isPolling: isAssignmentPolling
-  });
-});
-
   return router;
 }
