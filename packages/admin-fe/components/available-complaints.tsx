@@ -79,6 +79,7 @@ export function AvailableComplaints() {
   const [selectedStatus, setSelectedStatus] = useState<string | null>(null)
   const [statusUpdating, setStatusUpdating] = useState(false)
   const [escalateFlag, setEscalateFlag] = useState(false)
+  const [currentAdminId, setCurrentAdminId] = useState<string | null>(null)
 
   const fetchAvailableComplaints = async () => {
     try {
@@ -123,6 +124,18 @@ export function AvailableComplaints() {
   useEffect(() => {
     fetchAvailableComplaints()
   }, [pagination.page])
+
+  useEffect(() => {
+    try {
+      const adminRaw = localStorage.getItem('admin')
+      if (adminRaw) {
+        const adminObj = JSON.parse(adminRaw)
+        setCurrentAdminId(adminObj?.id || adminObj?.userId || adminObj?.adminId || null)
+      }
+    } catch (err) {
+      // ignore parse errors
+    }
+  }, [])
 
   useEffect(() => {
     const debounce = setTimeout(() => {
@@ -514,9 +527,27 @@ export function AvailableComplaints() {
                 <Button
                   variant="destructive"
                   size="sm"
-                  disabled={statusUpdating}
+                  disabled={
+                    statusUpdating ||
+                    !selectedComplaint ||
+                    !selectedComplaint.assignedAgent ||
+                    (!!currentAdminId && selectedComplaint.assignedAgent.id !== currentAdminId)
+                  }
+                  title={
+                    !selectedComplaint
+                      ? undefined
+                      : !selectedComplaint.assignedAgent
+                      ? 'Only the assigned agent can escalate this complaint'
+                      : (!!currentAdminId && selectedComplaint.assignedAgent.id !== currentAdminId)
+                      ? 'You are not the assigned agent for this complaint'
+                      : undefined
+                  }
                   onClick={async () => {
                     if (!selectedComplaint) return
+                    // Only allow escalate if current admin is assigned (defensive check)
+                    if (!selectedComplaint.assignedAgent || (!!currentAdminId && selectedComplaint.assignedAgent.id !== currentAdminId)) {
+                      return alert('Only the assigned agent can escalate this complaint')
+                    }
                     setStatusUpdating(true)
                     try {
                       const token = localStorage.getItem('token')
@@ -546,7 +577,7 @@ export function AvailableComplaints() {
                     }
                   }}
                 >
-                  {statusUpdating ? 'Escalating...' : 'Escalate to municipal level'}
+                  {statusUpdating ? 'Escalating...' : 'Escalate to Municipal Level'}
                 </Button>
               </div>
             </div>
