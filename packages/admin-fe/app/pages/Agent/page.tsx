@@ -1,10 +1,10 @@
 import { AdminLayout } from "@/components/admin-layout"
-import { JobManagement } from "@/components/job-management"
+import { AvailableComplaints } from "@/components/available-complaints"
 
 export default function AgentPage() {
   return (
     <AdminLayout>
-      <JobManagement />
+      <AvailableComplaints />
     </AdminLayout>
   )
 }

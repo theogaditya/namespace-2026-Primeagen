@@ -2,7 +2,8 @@
 
 import type React from "react"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
+import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import {
   BarChart3,
@@ -41,6 +42,20 @@ interface AdminLayoutProps {
 
 export function AdminLayout({ children }: AdminLayoutProps) {
   const [sidebarOpen, setSidebarOpen] = useState(false)
+  const [adminData, setAdminData] = useState<{ fullName?: string; officialEmail?: string; id?: string } | null>(null)
+  const router = useRouter()
+
+  useEffect(() => {
+    try {
+      const raw = typeof window !== 'undefined' ? localStorage.getItem('admin') : null
+      if (raw) {
+        const parsed = JSON.parse(raw)
+        setAdminData({ fullName: parsed.fullName || parsed.fullName || parsed.name, officialEmail: parsed.officialEmail || parsed.email, id: parsed.id })
+      }
+    } catch (err) {
+      console.warn('Failed to parse admin from localStorage', err)
+    }
+  }, [])
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -51,7 +66,7 @@ export function AdminLayout({ children }: AdminLayoutProps) {
           <div className="fixed inset-y-0 left-0 w-64 bg-white shadow-xl">
             <div className="flex h-full flex-col">
               <div className="flex h-16 items-center justify-between border-b bg-white px-4">
-                <h1 className="text-xl font-bold text-blue-600">ExtrUp Admin</h1>
+                <h1 className="text-xl font-bold text-blue-600">SwarajDesK Agent</h1>
                 <Button variant="ghost" size="icon" onClick={() => setSidebarOpen(false)}>
                   <X className="h-6 w-6" />
                 </Button>
@@ -88,7 +103,7 @@ export function AdminLayout({ children }: AdminLayoutProps) {
       <div className="hidden lg:fixed lg:inset-y-0 lg:flex lg:w-64 lg:flex-col">
         <div className="flex min-h-0 flex-1 flex-col bg-white border-r border-gray-200">
           <div className="flex h-16 items-center justify-center border-b bg-white px-4">
-            <h1 className="text-xl font-bold text-blue-600">SwarajDesk Admin</h1>
+            <h1 className="text-xl font-bold text-blue-600">SwarajDesk Agent</h1>
           </div>
           <div className="flex flex-1 flex-col overflow-y-auto">
             <nav className="flex-1 space-y-1 px-2 py-4">
@@ -137,20 +152,20 @@ export function AdminLayout({ children }: AdminLayoutProps) {
             <div className="ml-4 flex items-center md:ml-6">
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" className="relative h-8 w-8 rounded-full">
-                    <Avatar className="h-8 w-8">
-                      <AvatarImage src="/placeholder.svg?height=32&width=32" alt="Admin" />
-                      <AvatarFallback>AD</AvatarFallback>
-                    </Avatar>
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent className="w-56" align="end">
-                  <DropdownMenuLabel className="font-normal">
-                    <div className="flex flex-col space-y-1">
-                      <p className="text-sm font-medium leading-none">Admin User</p>
-                      <p className="text-xs leading-none text-muted-foreground">admin@extrup.com</p>
-                    </div>
-                  </DropdownMenuLabel>
+                    <Button variant="ghost" className="relative h-8 w-8 rounded-full">
+                      <Avatar className="h-8 w-8">
+                        <AvatarImage src={adminData ? `/api/avatar/${adminData.id}` : '/placeholder.svg?height=32&width=32'} alt={adminData?.fullName || 'Admin'} />
+                        <AvatarFallback>{adminData?.fullName ? adminData.fullName.split(' ').map(n=>n[0]).slice(0,2).join('') : 'AD'}</AvatarFallback>
+                      </Avatar>
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent className="w-56" align="end">
+                    <DropdownMenuLabel className="font-normal">
+                      <div className="flex flex-col space-y-1">
+                        <p className="text-sm font-medium leading-none">{adminData?.fullName || 'Admin User'}</p>
+                        <p className="text-xs leading-none text-muted-foreground">{adminData?.officialEmail || '—'}</p>
+                      </div>
+                    </DropdownMenuLabel>
                   <DropdownMenuSeparator />
                   <DropdownMenuItem>
                     <User className="mr-2 h-4 w-4" />
@@ -161,10 +176,39 @@ export function AdminLayout({ children }: AdminLayoutProps) {
                     <span>Settings</span>
                   </DropdownMenuItem>
                   <DropdownMenuSeparator />
-                  <DropdownMenuItem>
-                    <LogOut className="mr-2 h-4 w-4" />
-                    <span>Log out</span>
-                  </DropdownMenuItem>
+                    <DropdownMenuItem onClick={async () => {
+                      // Logout flow: attempt server-side invalidation then clear client state
+                      try {
+                        const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null
+                        const adminType = typeof window !== 'undefined' ? localStorage.getItem('adminType') : null
+
+                        if (adminType === 'SUPER_ADMIN') {
+                          // super-admin logout endpoint clears cookie
+                          await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000'}/api/super-admin/logout`, { method: 'POST', credentials: 'include' })
+                        } else if (token) {
+                          // try to invalidate token on server if endpoint exists
+                          try {
+                            await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000'}/api/users/logout`, {
+                              method: 'POST',
+                              headers: { Authorization: `Bearer ${token}` },
+                            })
+                          } catch (e) {
+                            // ignore server errors; we'll still clear client state
+                          }
+                        }
+                      } catch (err) {
+                        console.warn('Logout error', err)
+                      } finally {
+                        // Clear client-side auth
+                        try { localStorage.removeItem('token'); localStorage.removeItem('admin'); localStorage.removeItem('adminType'); } catch {}
+                        // notify other tabs
+                        try { window.dispatchEvent(new Event('authChange')) } catch {}
+                        router.push('/')
+                      }
+                    }}>
+                      <LogOut className="mr-2 h-4 w-4" />
+                      <span>Log out</span>
+                    </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
             </div>

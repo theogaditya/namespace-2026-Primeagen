@@ -3,7 +3,7 @@ import jwt from 'jsonwebtoken';
 import bcrypt from 'bcrypt';
 import { PrismaClient } from '../prisma/generated/client/client';
 import { agentSchema } from '../lib/schemas/agentSchema';
-import { authenticateMunicipalAdmin } from '../middleware/adminAuth';
+import { authenticateMunicipalAdminOnly } from '../middleware/unifiedAuth';
 
 export default function(prisma: PrismaClient) {
   const router = express.Router();
@@ -53,7 +53,7 @@ router.post('/login', async (req, res: any) => {
 
 
 // Create Agent
-router.post('/create/agent', authenticateMunicipalAdmin, async (req, res: any) => {
+router.post('/create/agent', authenticateMunicipalAdminOnly, async (req, res: any) => {
   const parse = agentSchema.safeParse(req.body);
   if (!parse.success) {
     return res.status(400).json({ 
@@ -70,7 +70,7 @@ router.post('/create/agent', authenticateMunicipalAdmin, async (req, res: any) =
 
   try {
     // attach the creating municipal admin as the manager
-    const managerId = (req as any).user?.id;
+    const managerId = (req as any).admin?.id;
 
     const existingAgent = await prisma.agent.findFirst({
       where: {
@@ -184,7 +184,7 @@ router.get('/complaints', async (req, res:any) => {
 });
 
 // ----- 10. Update Complaint Status -----
-router.put('/complaints/:id/status', authenticateMunicipalAdmin, async (req: any, res: any) => {
+router.put('/complaints/:id/status', authenticateMunicipalAdminOnly, async (req: any, res: any) => {
   try {
     const { id } = req.params;
     const { status } = req.body;
@@ -259,7 +259,7 @@ router.put('/complaints/:id/status', authenticateMunicipalAdmin, async (req: any
 });
 
 // ----- 10. Update Complaint Status -----
-router.put('/complaints/:id/escalate', authenticateMunicipalAdmin, async (req: any, res: any) => {
+router.put('/complaints/:id/escalate', authenticateMunicipalAdminOnly, async (req: any, res: any) => {
   try {
     const { id } = req.params;
 

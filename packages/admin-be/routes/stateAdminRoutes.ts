@@ -3,7 +3,7 @@ import jwt from 'jsonwebtoken';
 import bcrypt from 'bcrypt';
 import dotenv from 'dotenv';
 import { PrismaClient } from '../prisma/generated/client/client';
-import { authenticateStateAdmin } from '../middleware/adminAuth';
+import { authenticateStateAdminOnly } from '../middleware/unifiedAuth';
 
 export default function(prisma: PrismaClient) {
   const router = express.Router();
@@ -85,7 +85,7 @@ router.get('/state-admins', async (req, res: any) => {
 });
 
 // ----- 3. Get All Complaints -----
-router.get('/complaints',authenticateStateAdmin, async (req, res:any) => {
+router.get('/complaints',authenticateStateAdminOnly, async (req, res:any) => {
   try {
     const complaintsRaw = await prisma.complaint.findMany({
       include: {
@@ -110,7 +110,7 @@ router.get('/complaints',authenticateStateAdmin, async (req, res:any) => {
 });
 
 // ----- 4. Update Complaint Status -----
-router.put('/complaints/:id/status', authenticateStateAdmin, async (req: any, res: any) => {
+router.put('/complaints/:id/status', authenticateStateAdminOnly, async (req: any, res: any) => {
   try {
     const { id } = req.params;
     const { status } = req.body;
@@ -195,7 +195,7 @@ router.put('/complaints/:id/status', authenticateStateAdmin, async (req: any, re
 });
 
 // ----- 5. Escalate Complaint -----
-router.put('/complaints/:id/escalate', authenticateStateAdmin, async (req: any, res: any) => {
+router.put('/complaints/:id/escalate', authenticateStateAdminOnly, async (req: any, res: any) => {
   try {
     const { id } = req.params;
 

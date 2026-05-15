@@ -3,7 +3,7 @@ import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import { PrismaClient } from '../prisma/generated/client/client';
 import { loginSchema } from '../lib/schemas/agentSchema';
-import { authenticateAgent } from '../middleware/adminAuth';
+import { authenticateAgentOnly } from '../middleware/unifiedAuth';
 import { getProcessedQueueLength, peekProcessedQueue } from '../lib/redis/assignQueue';
 
 let isAssignmentPolling = false;
@@ -205,7 +205,7 @@ router.get('/me', async (req, res: any) => {
 });
 
 // ----- 3. Get All Complaints -----
-router.get('/complaints',authenticateAgent, async (req, res:any) => {
+router.get('/complaints',authenticateAgentOnly, async (req, res:any) => {
   try {
     const complaintsRaw = await prisma.complaint.findMany({
       where: {
@@ -260,7 +260,7 @@ router.get('/complaints',authenticateAgent, async (req, res:any) => {
 // });
 
 // ----- 4. Get Complaint Details -----
-router.get('/complaints/:id', authenticateAgent, async (req: any, res: any) => {
+router.get('/complaints/:id', authenticateAgentOnly, async (req: any, res: any) => {
   try {
     const { id } = req.params;
 
@@ -300,7 +300,7 @@ router.get('/complaints/:id', authenticateAgent, async (req: any, res: any) => {
 });
 
 // ----- 5. Update Complaint Status -----
-router.put('/complaints/:id/status', authenticateAgent, async (req: any, res: any) => {
+router.put('/complaints/:id/status', authenticateAgentOnly, async (req: any, res: any) => {
   try {
     const { id } = req.params;
     const { status, escalate } = req.body;
@@ -344,7 +344,7 @@ router.put('/complaints/:id/status', authenticateAgent, async (req: any, res: an
     }
 
     // If this update is an escalation, ensure the complaint is assigned to this agent
-    if (isEscalation && existingComplaint.assignedAgentId !== req.agent.id) {
+    if (isEscalation && existingComplaint.assignedAgentId !== req.admin.id) {
       return res.status(403).json({
         success: false,
         message: 'Not authorized to escalate this complaint'
@@ -352,7 +352,7 @@ router.put('/complaints/:id/status', authenticateAgent, async (req: any, res: an
     }
 
     // Only the agent assigned to the complaint may update its status
-    if (existingComplaint.assignedAgentId !== req.agent.id) {
+    if (existingComplaint.assignedAgentId !== req.admin.id) {
       return res.status(403).json({
         success: false,
         message: 'Not authorized to update this complaint'
@@ -415,7 +415,7 @@ router.put('/complaints/:id/status', authenticateAgent, async (req: any, res: an
 });
 
 // ----- 6. Escalate Complaint Status -----
-router.put('/complaints/:id/escalate', authenticateAgent, async (req: any, res: any) => {
+router.put('/complaints/:id/escalate', authenticateAgentOnly, async (req: any, res: any) => {
   try {
     const { id } = req.params;
     // Ensure complaint exists
@@ -425,11 +425,11 @@ router.put('/complaints/:id/escalate', authenticateAgent, async (req: any, res: 
     }
 
     // Allow escalation if: complaint is unassigned OR assigned to this agent
-    if (complaint.assignedAgentId && complaint.assignedAgentId !== req.agent.id) {
+    if (complaint.assignedAgentId && complaint.assignedAgentId !== req.admin.id) {
       return res.status(403).json({ success: false, message: 'Not authorized to escalate this complaint' });
     }
 
-    const agent = await prisma.agent.findUnique({ where: { id: req.agent.id } });
+    const agent = await prisma.agent.findUnique({ where: { id: req.admin.id } });
     if (!agent || agent.status !== 'ACTIVE') {
       return res.status(400).json({ error: 'Agent not active' });
     }
@@ -443,7 +443,7 @@ router.put('/complaints/:id/escalate', authenticateAgent, async (req: any, res: 
 
     if (agent.currentWorkload > 0) {
       await prisma.agent.update({
-        where: { id: req.agent.id },
+        where: { id: req.admin.id },
         data: { currentWorkload: { decrement: 1 } },
       });
     }
@@ -464,9 +464,9 @@ router.put('/complaints/:id/escalate', authenticateAgent, async (req: any, res: 
 });
 
 // -------- Assign Complaint to Agent --------
-router.post('/complaints/:id/assign', authenticateAgent, async (req: any, res:any) => {
+router.post('/complaints/:id/assign', authenticateAgentOnly, async (req: any, res:any) => {
   const complaintId = req.params.id;
-  const agentId = req.agent.id;
+  const agentId = req.admin.id;
 
   try {
     const agent = await prisma.agent.findUnique({
@@ -506,8 +506,8 @@ router.post('/complaints/:id/assign', authenticateAgent, async (req: any, res:an
 });
 
 // ---------- Fetch assigned complaints  ---------- 
-router.get('/me/complaints', authenticateAgent, async (req: any, res) => {
-  const agentId = req.agent.id;
+router.get('/me/complaints', authenticateAgentOnly, async (req: any, res) => {
+  const agentId = req.admin.id;
 
   try {
     const complaints = await prisma.complaint.findMany({
@@ -522,7 +522,7 @@ router.get('/me/complaints', authenticateAgent, async (req: any, res) => {
 });
 
 // ---------- Endpoint to reduce workload of agent --------
-router.put('/me/workload/dec', authenticateAgent, async (req: any, res: any) => {
+router.put('/me/workload/dec', authenticateAgentOnly, async (req: any, res: any) => {
   try {
     const token = req.cookies?.agentToken || req.headers.authorization?.replace('Bearer ', '');
     
