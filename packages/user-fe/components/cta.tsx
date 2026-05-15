@@ -2,6 +2,7 @@
 
 import type React from "react"
 import { useState, useCallback, useEffect } from "react"
+import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
 import {
@@ -21,6 +22,7 @@ import {
   Vote,
   Briefcase,
   GraduationCap,
+  LayoutDashboard,
 } from "lucide-react"
 
 interface CTASectionProps {
@@ -28,8 +30,10 @@ interface CTASectionProps {
   description?: string
   primaryButtonText?: string
   secondaryButtonText?: string
+  dashboardButtonText?: string
   onPrimaryClick?: () => void
   onSecondaryClick?: () => void
+  onDashboardClick?: () => void
 }
 
 interface Particle {
@@ -56,11 +60,15 @@ export function CTASection({
   description = "Register your complaint in just a few clicks and help make your community better. Your voice matters.",
   primaryButtonText = "Register a Complaint",
   secondaryButtonText = "Log In",
+  dashboardButtonText = "Dashboard",
   onPrimaryClick,
   onSecondaryClick,
+  onDashboardClick,
 }: CTASectionProps) {
+  const router = useRouter()
   const [primaryClicked, setPrimaryClicked] = useState(false)
   const [secondaryClicked, setSecondaryClicked] = useState(false)
+  const [dashboardClicked, setDashboardClicked] = useState(false)
   const [particles, setParticles] = useState<Particle[]>([])
   const [ripples, setRipples] = useState<{ id: number; x: number; y: number }[]>([])
   const [mounted, setMounted] = useState(false)
@@ -170,6 +178,7 @@ export function CTASection({
     createParticles()
     setTimeout(() => setPrimaryClicked(false), 800)
     onPrimaryClick?.()
+    router.push("/regComplaint")
   }
 
   const handleSecondaryClick = (e: React.MouseEvent<HTMLButtonElement>) => {
@@ -177,10 +186,19 @@ export function CTASection({
     createRipple(e)
     setTimeout(() => setSecondaryClicked(false), 600)
     onSecondaryClick?.()
+    router.push("/loginUser")
+  }
+
+  const handleDashboardClick = (e: React.MouseEvent<HTMLButtonElement>) => {
+    setDashboardClicked(true)
+    createRipple(e)
+    setTimeout(() => setDashboardClicked(false), 600)
+    onDashboardClick?.()
+    router.push("/dashboard")
   }
 
   return (
-    <section className="w-full min-h-screen relative overflow-hidden bg-gradient-to-b from-slate-50 via-white to-slate-100 flex items-center justify-center">
+    <section className="w-full min-h-screen relative overflow-hidden bg-linear-to-b from-slate-50 via-white to-slate-100 flex items-center justify-center">
       {/* Floating icons container */}
       <div
         className="absolute inset-0 flex items-center justify-center pointer-events-none"
@@ -249,7 +267,7 @@ export function CTASection({
             size="lg"
             onClick={handleSecondaryClick}
             className={cn(
-              "min-w-[160px] h-14 px-8 rounded-full border-2 border-slate-300 bg-white hover:bg-slate-50 hover:border-slate-400 transition-all duration-300 hover:scale-105 relative overflow-hidden text-slate-800 font-medium",
+              "min-w-40 h-14 px-8 rounded-full border-2 border-slate-300 bg-white hover:bg-slate-50 hover:border-slate-400 transition-all duration-300 hover:scale-105 relative overflow-hidden text-slate-800 font-medium",
               secondaryClicked && "scale-95",
             )}
           >
@@ -268,6 +286,21 @@ export function CTASection({
             ))}
             <span className={cn("relative z-10 transition-all duration-300", secondaryClicked && "scale-110")}>
               {secondaryButtonText}
+            </span>
+          </Button>
+
+          <Button
+            variant="outline"
+            size="lg"
+            onClick={handleDashboardClick}
+            className={cn(
+              "min-w-40 h-14 px-8 rounded-full border-2 border-emerald-300 bg-white hover:bg-emerald-50 hover:border-emerald-400 transition-all duration-300 hover:scale-105 relative overflow-hidden text-emerald-700 font-medium",
+              dashboardClicked && "scale-95",
+            )}
+          >
+            <span className={cn("relative z-10 transition-all duration-300 inline-flex items-center gap-2", dashboardClicked && "scale-110")}>
+              <LayoutDashboard className="w-4 h-4" />
+              {dashboardButtonText}
             </span>
           </Button>
 

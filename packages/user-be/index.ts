@@ -11,6 +11,8 @@ import { addUserRouter } from "./routes/adduser";
 import { loginUserRouter } from "./routes/loginUser";
 import { logoutUserRouter } from "./routes/logoutUser";
 import { createComplaintRouter } from "./routes/createComplaint";
+import { districtsRouter } from "./routes/districts";
+import { categoriesRouter } from "./routes/categories";
 import { createAuthMiddleware } from "./middleware/authRoute";
 
 dotenv.config();
@@ -74,6 +76,8 @@ export class Server {
       this.app.use('/api',helthPoint(this.db));
       this.app.use('/api/users', addUserRouter(this.db));
       this.app.use('/api/users', loginUserRouter(this.db));
+      this.app.use('/api/districts', districtsRouter(this.db));
+      this.app.use('/api/categories', categoriesRouter(this.db));
       
       // Protected routes (auth required)
       this.app.use('/api/users', logoutUserRouter(this.db));

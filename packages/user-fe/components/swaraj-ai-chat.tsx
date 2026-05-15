@@ -145,7 +145,7 @@ export function SwarajAIChat({ className }: SwarajAIChatProps) {
         )}
         aria-label="Open Swaraj AI Chat"
       >
-        <Bot className="w-7 h-7" />
+        <Bot className="w-8 h-8" />
         <span className="font-medium text-sm">Chat with Swaraj AI</span>
       </button>
 

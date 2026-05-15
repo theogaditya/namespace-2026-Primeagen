@@ -4,19 +4,19 @@ async function main() {
   const prisma = getPrisma();
 
   const depts = [
-    { name: "Infrastructure",         subCategories: [], learnedSubCategories: [], assignedDepartment: "Infrastructure" },
-    { name: "Education",              subCategories: [], learnedSubCategories: [], assignedDepartment: "Education" },
-    { name: "Revenue",                subCategories: [], learnedSubCategories: [], assignedDepartment: "Revenue" },
-    { name: "Health",                 subCategories: [], learnedSubCategories: [], assignedDepartment: "Health" },
-    { name: "Water Supply & Sanitation", subCategories: [], learnedSubCategories: [], assignedDepartment: "Water Supply & Sanitation" },
-    { name: "Electricity & Power",    subCategories: [], learnedSubCategories: [], assignedDepartment: "Electricity & Power" },
-    { name: "Transportation",         subCategories: [], learnedSubCategories: [], assignedDepartment: "Transportation" },
-    { name: "Municipal Services",     subCategories: [], learnedSubCategories: [], assignedDepartment: "Municipal Services" },
-    { name: "Police Services",        subCategories: [], learnedSubCategories: [], assignedDepartment: "Police Services" },
-    { name: "Environment",            subCategories: [], learnedSubCategories: [], assignedDepartment: "Environment" },
-    { name: "Housing & Urban Development", subCategories: [], learnedSubCategories: [], assignedDepartment: "Housing & Urban Development" },
-    { name: "Social Welfare",         subCategories: [], learnedSubCategories: [], assignedDepartment: "Social Welfare" },
-    { name: "Public Grievances",      subCategories: [], learnedSubCategories: [], assignedDepartment: "Public Grievances" },
+    { name: "Infrastructure",         subCategories: [], learnedSubCategories: [], assignedDepartment: "INFRASTRUCTURE" },
+    { name: "Education",              subCategories: [], learnedSubCategories: [], assignedDepartment: "EDUCATION" },
+    { name: "Revenue",                subCategories: [], learnedSubCategories: [], assignedDepartment: "REVENUE" },
+    { name: "Health",                 subCategories: [], learnedSubCategories: [], assignedDepartment: "HEALTH" },
+    { name: "Water Supply & Sanitation", subCategories: [], learnedSubCategories: [], assignedDepartment: "WATER_SUPPLY_SANITATION" },
+    { name: "Electricity & Power",    subCategories: [], learnedSubCategories: [], assignedDepartment: "ELECTRICITY_POWER" },
+    { name: "Transportation",         subCategories: [], learnedSubCategories: [], assignedDepartment: "TRANSPORTATION" },
+    { name: "Municipal Services",     subCategories: [], learnedSubCategories: [], assignedDepartment: "MUNICIPAL_SERVICES" },
+    { name: "Police Services",        subCategories: [], learnedSubCategories: [], assignedDepartment: "POLICE_SERVICES" },
+    { name: "Environment",            subCategories: [], learnedSubCategories: [], assignedDepartment: "ENVIRONMENT" },
+    { name: "Housing & Urban Development", subCategories: [], learnedSubCategories: [], assignedDepartment: "HOUSING_URBAN_DEVELOPMENT" },
+    { name: "Social Welfare",         subCategories: [], learnedSubCategories: [], assignedDepartment: "SOCIAL_WELFARE" },
+    { name: "Public Grievances",      subCategories: [], learnedSubCategories: [], assignedDepartment: "PUBLIC_GRIEVANCES" },
   ];
 
   for (const dept of depts) {
