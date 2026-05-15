@@ -2,7 +2,7 @@ import express from 'express';
 import dotenv from 'dotenv';
 import jwt from 'jsonwebtoken';
 import bcrypt from 'bcrypt';
-import { authenticateSuperAdmin } from '../middleware/superAdminAuth';
+import { authenticateSuperAdminOnly } from '../middleware/unifiedAuth';
 import {
   createSuperAdminSchema,
   superAdminLoginSchema,
@@ -159,10 +159,10 @@ router.post('/create', async (req, res: any) => {
 
 
 // ----- 4. Get Current Super Admin Profile -----
-router.get('/profile', authenticateSuperAdmin, async (req, res: any) => {
+router.get('/profile', authenticateSuperAdminOnly, async (req, res: any) => {
   try {
     const superAdmin = await prisma.superAdmin.findUnique({
-      where: { id: req.superAdmin!.id },
+      where: { id: (req as any).admin.id },
       select: {
         id: true,
         fullName: true,
@@ -189,7 +189,7 @@ router.get('/profile', authenticateSuperAdmin, async (req, res: any) => {
 });
 
 // ----- 5. Create Department State Admin -----
-router.post('/create/state-admins', authenticateSuperAdmin, async (req, res: any) => {
+router.post('/create/state-admins', authenticateSuperAdminOnly, async (req, res: any) => {
   const parseResult = createStateAdminSchema.safeParse(req.body);
 
   if (!parseResult.success) {
@@ -252,7 +252,7 @@ router.post('/create/state-admins', authenticateSuperAdmin, async (req, res: any
 });
 
 // ----- 6. Create Department Municipal Admin -----
-router.post('/create/municipal-admins', authenticateSuperAdmin, async (req, res: any) => {
+router.post('/create/municipal-admins', authenticateSuperAdminOnly, async (req, res: any) => {
   const parseResult = createMunicipalAdminSchema.safeParse(req.body);
 
   if (!parseResult.success) {
@@ -314,7 +314,7 @@ router.post('/create/municipal-admins', authenticateSuperAdmin, async (req, res:
 });
 
 // ----- 7. Create Super Municipal Admin -----
-router.post('/create/super-municipal-admins', authenticateSuperAdmin, async (req, res: any) => {
+router.post('/create/super-municipal-admins', authenticateSuperAdminOnly, async (req, res: any) => {
   const { fullName, officialEmail, phoneNumber, password, municipality } = req.body;
 
   if (!fullName || !officialEmail || !password || !municipality) {
@@ -373,7 +373,7 @@ router.post('/create/super-municipal-admins', authenticateSuperAdmin, async (req
 });
 
 // ----- 8. Create Super State Admin -----
-router.post('/create/super-state-admins', authenticateSuperAdmin, async (req, res: any) => {
+router.post('/create/super-state-admins', authenticateSuperAdminOnly, async (req, res: any) => {
   const { fullName, officialEmail, phoneNumber, password, state } = req.body;
 
   if (!fullName || !officialEmail || !password || !state) {

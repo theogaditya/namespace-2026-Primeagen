@@ -5,6 +5,7 @@ import type { Express } from 'express';
 import { PrismaClient } from './prisma/generated/client/client';
 import agentRoutes from './routes/agent';
 import authRoutes from './routes/auth';
+import complaintRoutes from './routes/complaint';
 import municipalAdminRoutes from './routes/municipalAdminRoutes';
 import stateAdminRoutes from './routes/stateAdminRoutes';
 import superAdminRoutes from './routes/superAdminRoutes';
@@ -59,6 +60,7 @@ export class Server {
     this.app.use('/api/state-admin', stateAdminRoutes(this.db));
     this.app.use('/api/municipal-admin', municipalAdminRoutes(this.db));
     this.app.use('/api/agent', agentRoutes(this.db));
+    this.app.use('/api/complaints', complaintRoutes(this.db));
     this.app.use('/api/complaint', complaintProcessingRouter(this.db));
     this.app.use('/api/users', userComplaintsRouter(this.db));
     this.app.use('/api/auto-assign', autoAssignRouter);
