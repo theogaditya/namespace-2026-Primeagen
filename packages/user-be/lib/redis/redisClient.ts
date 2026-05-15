@@ -1,13 +1,12 @@
 import { createClient, RedisClientType } from '@redis/client';
-import dotenv from 'dotenv';
 
-dotenv.config();
-
-const REDIS_URL = process.env.REDIS_URL; 
+// Note: REDIS_URL is read at connection time, not module load time
+// This allows AWS Secrets to be injected before Redis clients are created
 
 export class RedisPublishClient {
     private Publishclient: RedisClientType;
     constructor() {
+        const REDIS_URL = process.env.REDIS_URL;
         this.Publishclient = createClient({
             url: REDIS_URL,
         });
@@ -27,6 +26,7 @@ export class RedisPublishClient {
 export class RedisSubscribeClient {
     private Subscribeclient: RedisClientType;
     constructor() {
+        const REDIS_URL = process.env.REDIS_URL;
         this.Subscribeclient = createClient({
             url: REDIS_URL,
         });
@@ -46,6 +46,7 @@ export class RedisSubscribeClient {
 export class generaleClientforCaching{
     private generalClient: RedisClientType;
     constructor() {
+        const REDIS_URL = process.env.REDIS_URL;
         this.generalClient = createClient({
             url: REDIS_URL,
         });
@@ -65,6 +66,7 @@ export class generaleClientforCaching{
 export class RedisClientforUserQueue {
     private UserqueueClient: RedisClientType;
     constructor() {
+        const REDIS_URL = process.env.REDIS_URL;
         this.UserqueueClient = createClient({
             url: REDIS_URL,
         });
@@ -85,6 +87,7 @@ export class RedisClientforUserQueue {
 export class RedisClientforComplaintQueue{
     private complaintClient: RedisClientType;
     constructor() {
+        const REDIS_URL = process.env.REDIS_URL;
         this.complaintClient = createClient({
             url: REDIS_URL,
         });

@@ -2,12 +2,13 @@ import { RedisClientforComplaintQueue } from './redisClient';
 
 export class ComplaintQueueService {
     private static instance: ComplaintQueueService;
-    private redisClient: RedisClientforComplaintQueue;
+    private redisClient: RedisClientforComplaintQueue | null = null;
     private isConnected: boolean = false;
     private readonly QUEUE_NAME = 'complaint:registration:queue';
 
     private constructor() {
-        this.redisClient = new RedisClientforComplaintQueue();
+        // Don't create Redis client here - wait until connect() is called
+        // This allows AWS secrets to be loaded first
     }
 
     public static getInstance(): ComplaintQueueService {
@@ -19,6 +20,8 @@ export class ComplaintQueueService {
 
     public async connect(): Promise<void> {
         if (!this.isConnected) {
+            // Create Redis client now (after AWS secrets are loaded)
+            this.redisClient = new RedisClientforComplaintQueue();
             await this.redisClient.connect();
             this.isConnected = true;
             console.log('Complaint Queue Redis client connected successfully');
@@ -31,7 +34,7 @@ export class ComplaintQueueService {
                 await this.connect();
             }
 
-            const client = this.redisClient.getClient();
+            const client = this.redisClient!.getClient();
             
             // Push complaint data to the queue (right push - RPUSH adds to the end of the list)
             // The processing service will pop from the left (LPOP - first in, first out)
@@ -50,7 +53,7 @@ export class ComplaintQueueService {
                 await this.connect();
             }
 
-            const client = this.redisClient.getClient();
+            const client = this.redisClient!.getClient();
             return await client.lLen(this.QUEUE_NAME);
         } catch (error) {
             console.error('Error getting complaint queue length:', error);
@@ -59,7 +62,7 @@ export class ComplaintQueueService {
     }
 
     public async disconnect(): Promise<void> {
-        if (this.isConnected) {
+        if (this.isConnected && this.redisClient) {
             const client = this.redisClient.getClient();
             await client.quit();
             this.isConnected = false;

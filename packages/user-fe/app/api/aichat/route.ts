@@ -7,7 +7,7 @@ import {
   MAX_WORD_COUNT 
 } from "@/lib/types/chat";
 
-const SWARAJ_AI_URL = "http://44.192.24.50:8000/chat_swaraj";
+const SWARAJ_AI_URL = process.env.NEXT_PUBLIC_CHATBOT_LINK || "http://44.192.24.50:8000/chat_swaraj";
 
 const VALID_LANGUAGES: Language[] = ["english", "hindi", "hinglish"];
 

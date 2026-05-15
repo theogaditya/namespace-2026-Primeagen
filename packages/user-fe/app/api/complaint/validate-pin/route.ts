@@ -24,6 +24,8 @@ interface PinValidationAPIResponse {
   error?: string;
 }
 
+const PIN_API_BASE = process.env.NEXT_PUBLIC_PIN_API_BASE || "https://api.postalpincode.in/pincode";
+
 export async function GET(
   request: NextRequest
 ): Promise<NextResponse<PinValidationAPIResponse>> {
@@ -41,7 +43,7 @@ export async function GET(
 
     // Fetch pin details from postal API
     const response = await fetch(
-      `https://api.postalpincode.in/pincode/${pin}`,
+      `${PIN_API_BASE}/${pin}`,
       {
         method: "GET",
         headers: {

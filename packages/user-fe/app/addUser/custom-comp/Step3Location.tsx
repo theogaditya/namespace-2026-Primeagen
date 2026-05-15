@@ -7,6 +7,7 @@ import { LoadingPopup } from "./LoadingPopup";
 import { FormField } from "./useSignupForm";
 import { z } from "zod";
 import { MapPin, Building2, Landmark } from "lucide-react";
+const USER_BE_URL = process.env.NEXT_PUBLIC_USER_BE_URL || "http://localhost:3000";
 
 interface Step3Props {
   formData: {
@@ -83,7 +84,7 @@ export function Step3Location({
     setPinError(null);
     
     try {
-      const response = await fetch(`http://localhost:3000/api/users/location/${pin}`);
+      const response = await fetch(`${USER_BE_URL}/api/users/location/${pin}`);
       const data = await response.json();
       
       if (data.success) {
