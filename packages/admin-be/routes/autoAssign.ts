@@ -191,6 +191,8 @@ export async function autoAssignComplaint(): Promise<{
         data: {
           managedByMunicipalAdminId: selectedAdmin.id,
           status: 'UNDER_PROCESSING',
+          // mark escalation level when assigning to a municipal admin
+          escalationLevel: 'MUNICIPAL_ADMIN',
         },
       }),
       prisma.departmentMunicipalAdmin.update({

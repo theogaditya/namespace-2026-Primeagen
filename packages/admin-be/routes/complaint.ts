@@ -84,6 +84,13 @@ export default function (prisma: PrismaClient) {
                 officialEmail: true,
               },
             },
+            managedByMunicipalAdmin: {
+              select: {
+                id: true,
+                fullName: true,
+                officialEmail: true,
+              },
+            },
           },
           orderBy: {
             submissionDate: 'desc',
@@ -103,6 +110,7 @@ export default function (prisma: PrismaClient) {
         category: complaint.category?.name || 'Unknown',
         subCategory: complaint.subCategory,
         status: complaint.status,
+        escalationLevel: complaint.escalationLevel,
         urgency: complaint.urgency,
         department: complaint.assignedDepartment,
         submissionDate: complaint.submissionDate,
@@ -113,7 +121,13 @@ export default function (prisma: PrismaClient) {
         upvoteCount: complaint.upvoteCount,
         isDuplicate: complaint.isDuplicate,
         sla: complaint.sla,
-        escalationLevel: complaint.escalationLevel,
+        managedByMunicipalAdmin: complaint.managedByMunicipalAdmin
+          ? {
+              id: complaint.managedByMunicipalAdmin.id,
+              name: complaint.managedByMunicipalAdmin.fullName,
+              email: complaint.managedByMunicipalAdmin.officialEmail,
+            }
+          : null,
         location: complaint.location
           ? {
               district: complaint.location.district,
@@ -266,6 +280,13 @@ export default function (prisma: PrismaClient) {
                 officialEmail: true,
               },
             },
+            managedByMunicipalAdmin: {
+              select: {
+                id: true,
+                fullName: true,
+                officialEmail: true,
+              },
+            },
           },
           orderBy: {
             submissionDate: 'desc',
@@ -285,6 +306,7 @@ export default function (prisma: PrismaClient) {
         category: complaint.category?.name || 'Unknown',
         subCategory: complaint.subCategory,
         status: complaint.status,
+        escalationLevel: complaint.escalationLevel,
         urgency: complaint.urgency,
         department: complaint.assignedDepartment,
         submissionDate: complaint.submissionDate,
@@ -314,6 +336,13 @@ export default function (prisma: PrismaClient) {
               id: complaint.assignedAgent.id,
               name: complaint.assignedAgent.fullName,
               email: complaint.assignedAgent.officialEmail,
+            }
+          : null,
+        managedByMunicipalAdmin: complaint.managedByMunicipalAdmin
+          ? {
+              id: complaint.managedByMunicipalAdmin.id,
+              name: complaint.managedByMunicipalAdmin.fullName,
+              email: complaint.managedByMunicipalAdmin.officialEmail,
             }
           : null,
       }));

@@ -13,6 +13,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { Search, MoreHorizontal, Eye, UserPlus, FileText, Clock, AlertTriangle, CheckCircle } from "lucide-react"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 
 interface Complaint {
   id: string
@@ -42,12 +43,22 @@ interface Complaint {
     email: string
     phone: string
   } | null
+  assignedAgent?: {
+    id: string
+    name: string
+    email: string
+  } | null
+  managedByMunicipalAdmin?: {
+    id: string
+    name: string
+    email: string
+  } | null
+  escalationLevel?: string | null
 }
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL
 
 export function AvailableComplaints() {
-  const [searchTerm, setSearchTerm] = useState("")
   const [complaints, setComplaints] = useState<Complaint[]>([])
   const [loading, setLoading] = useState(true)
   const [assigning, setAssigning] = useState<string | null>(null)
@@ -57,6 +68,8 @@ export function AvailableComplaints() {
     total: 0,
     totalPages: 0,
   })
+  const [assignmentFilter, setAssignmentFilter] = useState<'all' | 'assigned' | 'unassigned' | 'escalated'>('all')
+  const [searchTerm, setSearchTerm] = useState("")
 
   const fetchAvailableComplaints = async () => {
     try {
@@ -194,12 +207,20 @@ export function AvailableComplaints() {
     },
   ]
 
+  const displayedComplaints = complaints.filter((complaint) => {
+    if (assignmentFilter === 'all') return true
+    if (assignmentFilter === 'assigned') return !!complaint.assignedAgent || !!complaint.managedByMunicipalAdmin
+    if (assignmentFilter === 'unassigned') return !complaint.assignedAgent && !complaint.managedByMunicipalAdmin
+    if (assignmentFilter === 'escalated') return !!complaint.escalationLevel || (complaint.status && complaint.status.toString().includes('ESCALATED'))
+    return true
+  })
+
   return (
     <div className="p-6 space-y-6">
       {/* Header */}
       <div>
-        <h1 className="text-2xl font-bold text-gray-900">Available Complaints</h1>
-        <p className="text-gray-600">Unassigned complaints available for you to pick up</p>
+        <h1 className="text-2xl font-bold text-gray-900">Complaints Management</h1>
+        <p className="text-gray-600">Manage and track all complaints on the platform</p>
       </div>
 
       {/* Stats Cards */}
@@ -222,8 +243,8 @@ export function AvailableComplaints() {
       {/* Complaints Table */}
       <Card>
         <CardHeader>
-          <CardTitle>Unassigned Complaints</CardTitle>
-          <CardDescription>Pick up complaints to start working on them</CardDescription>
+          <CardTitle>Complaints</CardTitle>
+          <CardDescription>Overview of all complaints on the platform</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="flex flex-col sm:flex-row gap-4 mb-6">
@@ -236,6 +257,17 @@ export function AvailableComplaints() {
                 className="pl-10"
               />
             </div>
+                <Select value={assignmentFilter} onValueChange={(v) => setAssignmentFilter(v as any)}>
+                  <SelectTrigger className="w-full sm:w-[200px]">
+                    <SelectValue placeholder="Filter" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All Complaints</SelectItem>
+                    <SelectItem value="assigned">Assigned</SelectItem>
+                    <SelectItem value="unassigned">Unassigned</SelectItem>
+                    <SelectItem value="escalated">Escalated</SelectItem>
+                  </SelectContent>
+                </Select>
           </div>
 
           <div className="rounded-md border">
@@ -256,14 +288,14 @@ export function AvailableComplaints() {
                       Loading...
                     </TableCell>
                   </TableRow>
-                ) : complaints.length === 0 ? (
+                ) : displayedComplaints.length === 0 ? (
                   <TableRow>
                     <TableCell colSpan={5} className="text-center py-8 text-gray-500">
                       No available complaints found
                     </TableCell>
                   </TableRow>
                 ) : (
-                  complaints.map((complaint) => (
+                  displayedComplaints.map((complaint) => (
                     <TableRow key={complaint.id}>
                       <TableCell>
                         <div>
@@ -299,13 +331,16 @@ export function AvailableComplaints() {
                               <Eye className="mr-2 h-4 w-4" />
                               View Details
                             </DropdownMenuItem>
-                            <DropdownMenuItem
-                              onClick={() => handleAssignToMe(complaint.id)}
-                              className={assigning === complaint.id ? "opacity-50 pointer-events-none" : ""}
-                            >
-                              <UserPlus className="mr-2 h-4 w-4" />
-                              {assigning === complaint.id ? "Assigning..." : "Assign to Me"}
-                            </DropdownMenuItem>
+                            {/* Show Assign option only when complaint is not already assigned */}
+                            {!complaint.assignedAgent && !complaint.managedByMunicipalAdmin && (
+                              <DropdownMenuItem
+                                onClick={() => handleAssignToMe(complaint.id)}
+                                className={assigning === complaint.id ? "opacity-50 pointer-events-none" : ""}
+                              >
+                                <UserPlus className="mr-2 h-4 w-4" />
+                                {assigning === complaint.id ? "Assigning..." : "Assign to Me"}
+                              </DropdownMenuItem>
+                            )}
                           </DropdownMenuContent>
                         </DropdownMenu>
                       </TableCell>
@@ -319,7 +354,7 @@ export function AvailableComplaints() {
           {/* Pagination */}
           <div className="flex items-center justify-between space-x-2 py-4">
             <div className="text-sm text-gray-500">
-              Showing {complaints.length} of {pagination.total} complaints
+              Showing {displayedComplaints.length} of {pagination.total} complaints
             </div>
             <div className="flex space-x-2">
               <Button
