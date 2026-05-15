@@ -12,8 +12,9 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-import { Search, MoreHorizontal, Eye, UserPlus, FileText, Clock, AlertTriangle, CheckCircle } from "lucide-react"
+import { Search, MoreHorizontal, Eye, UserPlus, User, FileText, Clock, AlertTriangle, CheckCircle, Sparkles } from "lucide-react"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { Modal } from "@/components/ui/modal"
 
 interface Complaint {
   id: string
@@ -54,6 +55,9 @@ interface Complaint {
     email: string
   } | null
   escalationLevel?: string | null
+  AIStandardizedSubcategory?: string | null
+  // matches DB field casing from Prisma
+  AIstandardizedSubCategory?: string | null
 }
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL
@@ -68,8 +72,13 @@ export function AvailableComplaints() {
     total: 0,
     totalPages: 0,
   })
-  const [assignmentFilter, setAssignmentFilter] = useState<'all' | 'assigned' | 'unassigned' | 'escalated'>('all')
+  const [assignmentFilter, setAssignmentFilter] = useState<'all' | 'assigned' | 'unassigned' | 'escalated'>('unassigned')
   const [searchTerm, setSearchTerm] = useState("")
+  const [isModalOpen, setIsModalOpen] = useState(false)
+  const [selectedComplaint, setSelectedComplaint] = useState<Complaint | null>(null)
+  const [selectedStatus, setSelectedStatus] = useState<string | null>(null)
+  const [statusUpdating, setStatusUpdating] = useState(false)
+  const [escalateFlag, setEscalateFlag] = useState(false)
 
   const fetchAvailableComplaints = async () => {
     try {
@@ -161,14 +170,73 @@ export function AvailableComplaints() {
 
   const getUrgencyBadge = (urgency: string) => {
     switch (urgency) {
+      case "CRITICAL":
+        return <Badge className="bg-red-100 text-red-800">Critical</Badge>
       case "HIGH":
-        return <Badge className="bg-red-100 text-red-800">High</Badge>
+        return <Badge className="bg-yellow-100 text-yellow-800">High</Badge>
       case "MEDIUM":
-        return <Badge className="bg-yellow-100 text-yellow-800">Medium</Badge>
+        return <Badge className="bg-amber-100 text-amber-800">Medium</Badge>
       case "LOW":
         return <Badge className="bg-green-100 text-green-800">Low</Badge>
       default:
         return <Badge variant="secondary">{urgency}</Badge>
+    }
+  }
+
+  const toTitle = (s: string | undefined) => {
+    if (!s) return ''
+    return s
+      .toLowerCase()
+      .split(/_|\s+/)
+      .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
+      .join(' ')
+  }
+
+  const getStatusBadge = (status?: string) => {
+    switch (status) {
+      case 'UNDER_PROCESSING':
+        return <Badge className="bg-yellow-100 text-yellow-800">Under Processing</Badge>
+      case 'FORWARDED':
+        return <Badge className="bg-violet-100 text-violet-800">Forwarded</Badge>
+      case 'ON_HOLD':
+        return <Badge className="bg-gray-100 text-gray-800">On Hold</Badge>
+      case 'COMPLETED':
+        return <Badge className="bg-green-100 text-green-800">Completed</Badge>
+      case 'REJECTED':
+        return <Badge className="bg-red-100 text-red-800">Rejected</Badge>
+      case 'ESCALATED_TO_MUNICIPAL_LEVEL':
+        return <Badge className="bg-orange-100 text-orange-800">Escalated (Municipal)</Badge>
+      case 'ESCALATED_TO_STATE_LEVEL':
+        return <Badge className="bg-orange-100 text-orange-800">Escalated (State)</Badge>
+      case 'DELETED':
+        return <Badge className="bg-muted text-muted-foreground">Deleted</Badge>
+      default:
+        return status ? <Badge variant="secondary">{toTitle(status)}</Badge> : null
+    }
+  }
+
+  const getDepartmentBadge = (department?: string) => {
+    if (!department) return null
+    switch (department) {
+      case 'INFRASTRUCTURE':
+      case 'WATER_SUPPLY_SANITATION':
+      case 'ELECTRICITY_POWER':
+      case 'MUNICIPAL_SERVICES':
+      case 'POLICE_SERVICES':
+        return <Badge className="bg-indigo-100 text-indigo-800">{toTitle(department)}</Badge>
+      case 'EDUCATION':
+      case 'HEALTH':
+      case 'SOCIAL_WELFARE':
+        return <Badge className="bg-emerald-100 text-emerald-800">{toTitle(department)}</Badge>
+      case 'REVENUE':
+      case 'HOUSING_URBAN_DEVELOPMENT':
+      case 'TRANSPORTATION':
+      case 'PUBLIC_GRIEVANCES':
+        return <Badge className="bg-amber-100 text-amber-800">{toTitle(department)}</Badge>
+      case 'ENVIRONMENT':
+        return <Badge className="bg-green-100 text-green-800">{toTitle(department)}</Badge>
+      default:
+        return <Badge variant="secondary">{toTitle(department)}</Badge>
     }
   }
 
@@ -182,25 +250,25 @@ export function AvailableComplaints() {
 
   const stats = [
     {
-      title: "Available Complaints",
+      title: "Unassigned Complaints",
       value: pagination.total.toString(),
       icon: FileText,
       color: "text-blue-600",
     },
     {
-      title: "High Priority",
+      title: "High Priority Complaints",
       value: complaints.filter((c) => c.urgency === "HIGH").length.toString(),
       icon: AlertTriangle,
       color: "text-red-600",
     },
     {
-      title: "Medium Priority",
+      title: "Medium Priority Complaints",
       value: complaints.filter((c) => c.urgency === "MEDIUM").length.toString(),
       icon: Clock,
       color: "text-yellow-600",
     },
     {
-      title: "Low Priority",
+      title: "Low Priority Complaints",
       value: complaints.filter((c) => c.urgency === "LOW").length.toString(),
       icon: CheckCircle,
       color: "text-green-600",
@@ -214,6 +282,34 @@ export function AvailableComplaints() {
     if (assignmentFilter === 'escalated') return !!complaint.escalationLevel || (complaint.status && complaint.status.toString().includes('ESCALATED'))
     return true
   })
+
+  const getHeaderTitle = () => {
+    switch (assignmentFilter) {
+      case 'unassigned':
+        return 'Unassigned Complaints'
+      case 'assigned':
+        return 'Assigned Complaints'
+      case 'escalated':
+        return 'Escalated Complaints'
+      case 'all':
+      default:
+        return 'Complaints'
+    }
+  }
+
+  const getHeaderDescription = () => {
+    switch (assignmentFilter) {
+      case 'unassigned':
+        return 'Complaints yet to be assigned to any agent or municipal admin'
+      case 'assigned':
+        return 'Complaints currently assigned to agents or municipal admins'
+      case 'escalated':
+        return 'Complaints escalated to higher authorities'
+      case 'all':
+      default:
+        return 'Overview of all complaints on the platform'
+    }
+  }
 
   return (
     <div className="p-6 space-y-6">
@@ -243,15 +339,15 @@ export function AvailableComplaints() {
       {/* Complaints Table */}
       <Card>
         <CardHeader>
-          <CardTitle>Complaints</CardTitle>
-          <CardDescription>Overview of all complaints on the platform</CardDescription>
-        </CardHeader>
+            <CardTitle>{getHeaderTitle()}</CardTitle>
+            <CardDescription>{getHeaderDescription()}</CardDescription>
+          </CardHeader>
         <CardContent>
           <div className="flex flex-col sm:flex-row gap-4 mb-6">
             <div className="relative flex-1">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
               <Input
-                placeholder="Search complaints..."
+                placeholder="Search by complaint ID, title, category, or location"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 className="pl-10"
@@ -262,10 +358,10 @@ export function AvailableComplaints() {
                     <SelectValue placeholder="Filter" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="all">All Complaints</SelectItem>
-                    <SelectItem value="assigned">Assigned</SelectItem>
                     <SelectItem value="unassigned">Unassigned</SelectItem>
+                    <SelectItem value="assigned">Assigned</SelectItem>
                     <SelectItem value="escalated">Escalated</SelectItem>
+                    <SelectItem value="all">All Complaints</SelectItem>
                   </SelectContent>
                 </Select>
           </div>
@@ -274,10 +370,10 @@ export function AvailableComplaints() {
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead>Complaint Description</TableHead>
+                  <TableHead>Complaint</TableHead>
                   <TableHead>Urgency</TableHead>
                   <TableHead>Location</TableHead>
-                  <TableHead>Created Date</TableHead>
+                  <TableHead>Submitted On</TableHead>
                   <TableHead className="text-right">Actions</TableHead>
                 </TableRow>
               </TableHeader>
@@ -285,13 +381,16 @@ export function AvailableComplaints() {
                 {loading ? (
                   <TableRow>
                     <TableCell colSpan={5} className="text-center py-8">
-                      Loading...
+                      <div className="flex items-center justify-center space-x-3">
+                        <div className="w-5 h-5 border-2 border-t-transparent border-gray-600 rounded-full animate-spin" />
+                        <span className="text-gray-600">Loading...</span>
+                      </div>
                     </TableCell>
                   </TableRow>
                 ) : displayedComplaints.length === 0 ? (
                   <TableRow>
                     <TableCell colSpan={5} className="text-center py-8 text-gray-500">
-                      No available complaints found
+                      No complaints match your criteria
                     </TableCell>
                   </TableRow>
                 ) : (
@@ -302,6 +401,9 @@ export function AvailableComplaints() {
                           <div className="font-medium text-gray-900 line-clamp-2">{complaint.description}</div>
                           <div className="text-sm text-gray-500">
                             #{complaint.seq} • {complaint.category}
+                          </div>
+                          <div className="mt-2 flex flex-wrap gap-2">
+                            {getDepartmentBadge((complaint as any).department)}
                           </div>
                         </div>
                       </TableCell>
@@ -319,30 +421,40 @@ export function AvailableComplaints() {
                         {formatDate(complaint.submissionDate)}
                       </TableCell>
                       <TableCell className="text-right">
-                        <DropdownMenu>
-                          <DropdownMenuTrigger asChild>
-                            <Button variant="ghost" className="h-8 w-8 p-0">
-                              <span className="sr-only">Open menu</span>
-                              <MoreHorizontal className="h-4 w-4" />
-                            </Button>
-                          </DropdownMenuTrigger>
-                          <DropdownMenuContent align="end">
-                            <DropdownMenuItem>
-                              <Eye className="mr-2 h-4 w-4" />
-                              View Details
-                            </DropdownMenuItem>
-                            {/* Show Assign option only when complaint is not already assigned */}
-                            {!complaint.assignedAgent && !complaint.managedByMunicipalAdmin && (
+                        {(!complaint.assignedAgent && !complaint.managedByMunicipalAdmin) ? (
+                          // Two actions available -> keep dropdown
+                          <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                              <Button variant="ghost" className="h-8 w-8 p-0">
+                                <span className="sr-only">Open menu</span>
+                                <MoreHorizontal className="h-4 w-4" />
+                              </Button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent align="end">
+                              <DropdownMenuItem className="group" onClick={() => { setSelectedComplaint(complaint); setSelectedStatus(complaint.status || null); setEscalateFlag(false); setIsModalOpen(true); }}>
+                                <Eye className="mr-2 h-4 w-4 text-blue-500 group-hover:text-black transition-colors" />
+                                View details
+                              </DropdownMenuItem>
                               <DropdownMenuItem
                                 onClick={() => handleAssignToMe(complaint.id)}
                                 className={assigning === complaint.id ? "opacity-50 pointer-events-none" : ""}
                               >
                                 <UserPlus className="mr-2 h-4 w-4" />
-                                {assigning === complaint.id ? "Assigning..." : "Assign to Me"}
+                                {assigning === complaint.id ? "Claiming..." : "Claim complaint"}
                               </DropdownMenuItem>
-                            )}
-                          </DropdownMenuContent>
-                        </DropdownMenu>
+                            </DropdownMenuContent>
+                          </DropdownMenu>
+                        ) : (
+                          // Only one action (View Details) -> show it inline
+                          <Button
+                            variant="ghost"
+                            className="h-8 w-8 p-0 group hover:text-black"
+                            onClick={() => { setSelectedComplaint(complaint); setSelectedStatus(complaint.status || null); setEscalateFlag(false); setIsModalOpen(true); }}
+                          >
+                            <span className="sr-only">View details</span>
+                            <Eye className="h-4 w-4 text-blue-500 group-hover:text-black transition-colors" />
+                          </Button>
+                        )}
                       </TableCell>
                     </TableRow>
                   ))
@@ -354,7 +466,7 @@ export function AvailableComplaints() {
           {/* Pagination */}
           <div className="flex items-center justify-between space-x-2 py-4">
             <div className="text-sm text-gray-500">
-              Showing {displayedComplaints.length} of {pagination.total} complaints
+              Displaying {displayedComplaints.length} of {pagination.total} complaints
             </div>
             <div className="flex space-x-2">
               <Button
@@ -375,6 +487,194 @@ export function AvailableComplaints() {
               </Button>
             </div>
           </div>
+          {/* Complaint Details Modal */}
+          <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)}>
+            <div className="sticky top-0 z-10 bg-white pb-3 border-b -mx-6 px-6">
+              <div className="flex items-start justify-between">
+                <div>
+                  <h3 className="text-lg font-semibold">{selectedComplaint?.title || selectedComplaint?.subCategory}</h3>
+                  <p className="text-sm text-gray-500">#{selectedComplaint?.seq} • {selectedComplaint?.category}</p>
+                  {(
+                    selectedComplaint?.AIStandardizedSubcategory ||
+                    selectedComplaint?.AIstandardizedSubCategory
+                  ) && (
+                    <p className="text-sm text-gray-500 mt-1 flex items-center">
+                      <Sparkles className="mr-2 h-4 w-4 text-emerald-500" />
+                      <span>SwarajAI classification: {selectedComplaint?.AIStandardizedSubcategory || selectedComplaint?.AIstandardizedSubCategory}</span>
+                    </p>
+                  )}
+                  {/* Assigned agent (non-sensitive) */}
+                  {selectedComplaint?.assignedAgent && (
+                    <p className="text-sm text-gray-500 mt-2 flex items-center">
+                      <User className="mr-2 h-4 w-4 text-gray-400" />
+                      <span>Assigned to {selectedComplaint.assignedAgent.name}</span>
+                    </p>
+                  )}
+                </div>
+                <Button
+                  variant="destructive"
+                  size="sm"
+                  disabled={statusUpdating}
+                  onClick={async () => {
+                    if (!selectedComplaint) return
+                    setStatusUpdating(true)
+                    try {
+                      const token = localStorage.getItem('token')
+                      if (!token) throw new Error('Not authenticated')
+                      const res = await fetch(`${API_URL}/api/agent/complaints/${selectedComplaint.id}/escalate`, {
+                        method: 'PUT',
+                        headers: {
+                          'Content-Type': 'application/json',
+                          Authorization: `Bearer ${token}`,
+                        },
+                      })
+                      const body = await res.json()
+                      if (!res.ok) {
+                        alert(body.message || 'Unable to escalate the complaint at this time')
+                      } else {
+                        const updated = body.complaint
+                        setComplaints((prev) => prev.map((c) => (c.id === updated.id ? { ...c, status: updated.status, escalationLevel: 'MUNICIPAL_ADMIN' } : c)))
+                        setSelectedComplaint((prev) => prev ? { ...prev, status: updated.status, escalationLevel: 'MUNICIPAL_ADMIN' } : prev)
+                        setSelectedStatus(updated.status)
+                        alert(body.message || 'Complaint escalated successfully')
+                      }
+                    } catch (err: any) {
+                      console.error('Escalate error', err)
+                      alert(err?.message || 'Unable to escalate the complaint')
+                    } finally {
+                      setStatusUpdating(false)
+                    }
+                  }}
+                >
+                  {statusUpdating ? 'Escalating...' : 'Escalate to municipal level'}
+                </Button>
+              </div>
+            </div>
+
+            {/* Scrollable content */}
+            <div className="space-y-4 mt-4">
+              {/* Description */}
+              <div>
+                <h4 className="text-sm font-medium text-gray-700">Description</h4>
+                <p className="text-sm text-gray-800 whitespace-pre-wrap mt-1">{selectedComplaint?.description}</p>
+              </div>
+
+              {/* Status and urgency row */}
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                <div className="flex flex-col">
+                  <h4 className="text-sm font-medium text-gray-700">Status</h4>
+                  <div className="mt-1 flex flex-wrap items-center gap-2">
+                    {getStatusBadge(selectedComplaint?.status)}
+                    {selectedComplaint?.escalationLevel && (
+                      <Badge className="bg-orange-100 text-orange-800">{toTitle(selectedComplaint.escalationLevel)}</Badge>
+                    )}
+                  </div>
+                </div>
+                <div className="flex flex-col">
+                  <h4 className="text-sm font-medium text-gray-700">Urgency</h4>
+                  <div className="mt-1">{getUrgencyBadge(selectedComplaint?.urgency || '')}</div>
+                </div>
+                <div className="flex flex-col">
+                  <h4 className="text-sm font-medium text-gray-700">Department</h4>
+                  <div className="mt-1">{getDepartmentBadge(selectedComplaint?.department)}</div>
+                </div>
+                <div className="flex flex-col">
+                  <h4 className="text-sm font-medium text-gray-700">Submitted</h4>
+                  <p className="text-sm text-gray-800 mt-1">{selectedComplaint ? formatDate(selectedComplaint.submissionDate) : ''}</p>
+                </div>
+              </div>
+
+              {/* Complainant and Location row */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="flex flex-col">
+                    <h4 className="text-sm font-medium text-gray-700">Complainant</h4>
+                    {selectedComplaint?.complainant ? (
+                      <div className="text-sm text-gray-800 mt-1">
+                        <div>{selectedComplaint.complainant.name}</div>
+                        <div className="text-xs text-gray-500">Contact information withheld</div>
+                      </div>
+                    ) : (
+                      <p className="text-sm text-gray-500 mt-1">N/A</p>
+                    )}
+                  </div>
+                <div className="flex flex-col">
+                  <h4 className="text-sm font-medium text-gray-700">Location</h4>
+                  {selectedComplaint?.location ? (
+                    <div className="text-sm text-gray-800 mt-1">
+                      <div>{selectedComplaint.location.locality}, {selectedComplaint.location.city}</div>
+                      <div className="text-xs text-gray-500">PIN: {selectedComplaint.location.pin}</div>
+                    </div>
+                  ) : (
+                    <p className="text-sm text-gray-500 mt-1">N/A</p>
+                  )}
+                </div>
+              </div>
+
+              {/* Attachment */}
+              {selectedComplaint?.attachmentUrl && (
+                <div>
+                  <h4 className="text-sm font-medium text-gray-700">Attachment</h4>
+                  <div className="mt-2">
+                    <img src={selectedComplaint.attachmentUrl} alt="Complaint attachment preview" className="max-w-full h-auto rounded-md border" />
+                  </div>
+                </div>
+              )}
+
+              {/* Status update controls */}
+              <div className="border-t pt-4">
+                <h4 className="text-sm font-medium text-gray-700 mb-2">Update complaint status</h4>
+                <div className="flex flex-wrap items-center gap-3">
+                  <Select value={selectedStatus || ''} onValueChange={(v) => setSelectedStatus(v)}>
+                    <SelectTrigger className="w-[200px]">
+                      <SelectValue placeholder="Select status" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="UNDER_PROCESSING">Under Processing</SelectItem>
+                      <SelectItem value="FORWARDED">Forwarded</SelectItem>
+                      <SelectItem value="ON_HOLD">On Hold</SelectItem>
+                      <SelectItem value="COMPLETED">Completed</SelectItem>
+                      <SelectItem value="REJECTED">Rejected</SelectItem>
+                    </SelectContent>
+                  </Select>
+                  <Button
+                    disabled={statusUpdating}
+                    onClick={async () => {
+                      if (!selectedComplaint || !selectedStatus) return alert('Select a status first')
+                      setStatusUpdating(true)
+                      try {
+                        const token = localStorage.getItem('token')
+                        if (!token) throw new Error('Not authenticated')
+                        const res = await fetch(`${API_URL}/api/agent/complaints/${selectedComplaint.id}/status`, {
+                          method: 'PUT',
+                          headers: {
+                            'Content-Type': 'application/json',
+                            Authorization: `Bearer ${token}`,
+                          },
+                          body: JSON.stringify({ status: selectedStatus }),
+                        })
+                        const body = await res.json()
+                        if (!res.ok) {
+                          alert(body.message || 'Unable to update the complaint status at this time')
+                        } else {
+                          const updated = body.complaint
+                          setComplaints((prev) => prev.map((c) => (c.id === updated.id ? { ...c, status: updated.status } : c)))
+                          setSelectedComplaint((prev) => prev ? { ...prev, status: updated.status } : prev)
+                          alert(body.message || 'Complaint status updated successfully')
+                        }
+                      } catch (err: any) {
+                        console.error('Status update error', err)
+                        alert(err?.message || 'Unable to update the complaint status')
+                      } finally {
+                        setStatusUpdating(false)
+                      }
+                    }}
+                  >
+                    {statusUpdating ? 'Updating...' : 'Save status'}
+                  </Button>
+                </div>
+              </div>
+            </div>
+          </Modal>
         </CardContent>
       </Card>
     </div>

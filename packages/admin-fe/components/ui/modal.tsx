@@ -44,13 +44,14 @@ export function Modal({ isOpen, onClose, children, title, className }: ModalProp
       {/* Modal content */}
       <div
         className={cn(
-          "relative z-50 w-full max-w-2xl max-h-[90vh] overflow-auto rounded-lg bg-white shadow-lg",
+          // Responsive modal sizing: mobile-friendly margins and progressive max-widths
+          "relative z-50 w-full max-h-[90vh] flex flex-col rounded-lg bg-white shadow-lg mx-4 sm:mx-0 sm:max-w-md md:max-w-2xl lg:max-w-3xl xl:max-w-4xl",
           className
         )}
       >
-        {/* Header */}
+        {/* Sticky Header */}
         {title && (
-          <div className="flex items-center justify-between border-b px-6 py-4">
+          <div className="sticky top-0 z-10 flex items-center justify-between border-b bg-white px-6 py-4 rounded-t-lg">
             <h2 className="text-lg font-semibold text-gray-900">{title}</h2>
             <button
               onClick={onClose}
@@ -61,8 +62,8 @@ export function Modal({ isOpen, onClose, children, title, className }: ModalProp
           </div>
         )}
         
-        {/* Body */}
-        <div className="p-6">
+        {/* Scrollable Body */}
+        <div className="flex-1 overflow-y-auto p-6">
           {children}
         </div>
       </div>
@@ -102,6 +103,9 @@ interface ModalFooterProps {
 }
 
 export function ModalFooter({ children, className }: ModalFooterProps) {
+  // If there are no children, don't render footer container (avoids extra spacing)
+  if (!children || React.Children.count(children) === 0) return null
+
   return (
     <div className={cn("mt-6 flex justify-end space-x-2", className)}>
       {children}

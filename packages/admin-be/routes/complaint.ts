@@ -121,6 +121,8 @@ export default function (prisma: PrismaClient) {
         upvoteCount: complaint.upvoteCount,
         isDuplicate: complaint.isDuplicate,
         sla: complaint.sla,
+        AIstandardizedSubCategory: complaint.AIstandardizedSubCategory || null,
+        AIStandardizedSubcategory: complaint.AIstandardizedSubCategory || null,
         managedByMunicipalAdmin: complaint.managedByMunicipalAdmin
           ? {
               id: complaint.managedByMunicipalAdmin.id,
@@ -314,6 +316,9 @@ export default function (prisma: PrismaClient) {
         attachmentUrl: complaint.attachmentUrl,
         isPublic: complaint.isPublic,
         upvoteCount: complaint.upvoteCount,
+        // Include AI standardized subcategory if present (both DB field and a frontend-friendly alias)
+        AIstandardizedSubCategory: complaint.AIstandardizedSubCategory || null,
+        AIStandardizedSubcategory: complaint.AIstandardizedSubCategory || null,
         location: complaint.location
           ? {
               district: complaint.location.district,
