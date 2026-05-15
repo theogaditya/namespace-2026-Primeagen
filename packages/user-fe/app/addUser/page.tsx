@@ -19,6 +19,7 @@ import {
 import { ArrowLeft, ArrowRight, CheckCircle, Loader2, UserPlus } from "lucide-react";
 
 const GOOGLE_API_KEY = process.env.NEXT_PUBLIC_GOOGLE_API_KEY || "";
+const USER_BE_URL = process.env.NEXT_PUBLIC_USER_BE_URL || "http://localhost:3000";
 
 const steps = [
   { id: 1, label: "Personal", description: "Basic info" },
@@ -119,7 +120,7 @@ export default function AddUser() {
     };
 
     try {
-      const response = await fetch("http://localhost:3000/api/users/signup", {
+      const response = await fetch(`${USER_BE_URL}/api/users/signup`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

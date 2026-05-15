@@ -2,18 +2,37 @@ import {
   SecretsManagerClient,
   GetSecretValueCommand,
 } from "@aws-sdk/client-secrets-manager";
+import dotenv from "dotenv";
+import path from "path";
+
+// Load bootstrap credentials first (contains only AWS Secrets Manager credentials)
+// This allows the app to work without a full .env file
+const bootstrapPath = path.resolve(process.cwd(), ".env.bootstrap");
+dotenv.config({ path: bootstrapPath });
 
 const SECRET_NAME = process.env.SECRET_NAME_AWS_USER_BE || "sih-swaraj-user-be";
 const REGION = process.env.AWS_REGION || "ap-south-2";
 
-// Create AWS Secrets Manager client with explicit credentials
-const client = new SecretsManagerClient({
-  region: REGION,
-  credentials: {
-    accessKeyId: process.env.SECRETS_AWS_ACCESS_KEY_ID!,
-    secretAccessKey: process.env.SECRETS_AWS_SECRET_ACCESS_KEY!,
-  },
-});
+// Function to create AWS Secrets Manager client
+function createSecretsClient(): SecretsManagerClient | null {
+  const accessKeyId = process.env.SECRETS_AWS_ACCESS_KEY_ID;
+  const secretAccessKey = process.env.SECRETS_AWS_SECRET_ACCESS_KEY;
+
+  if (!accessKeyId || !secretAccessKey) {
+    console.warn("[AWS Secrets] AWS credentials not found in environment");
+    console.warn("[AWS Secrets] Please ensure SECRETS_AWS_ACCESS_KEY_ID and SECRETS_AWS_SECRET_ACCESS_KEY are set");
+    console.warn("[AWS Secrets] You can set them in .env.bootstrap or as environment variables");
+    return null;
+  }
+
+  return new SecretsManagerClient({
+    region: REGION,
+    credentials: {
+      accessKeyId,
+      secretAccessKey,
+    },
+  });
+}
 
 interface SecretValues {
   PORT?: string;
@@ -34,6 +53,13 @@ interface SecretValues {
 export async function retrieveAndInjectSecrets(): Promise<void> {
   try {
     console.log("[AWS Secrets] Retrieving secrets from AWS Secrets Manager...");
+    
+    // Create client when needed (after bootstrap env is loaded)
+    const client = createSecretsClient();
+    
+    if (!client) {
+      throw new Error("AWS Secrets Manager client could not be created - missing credentials");
+    }
     
     const command = new GetSecretValueCommand({
       SecretId: SECRET_NAME,
@@ -84,6 +110,6 @@ export async function retrieveAndInjectSecrets(): Promise<void> {
 /**
  * Initialize secrets synchronously (for testing or when secrets are already loaded)
  */
-export function getSecretsClient(): SecretsManagerClient {
-  return client;
+export function getSecretsClient(): SecretsManagerClient | null {
+  return createSecretsClient();
 }

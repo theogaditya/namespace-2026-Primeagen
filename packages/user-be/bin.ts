@@ -6,7 +6,8 @@ import { retrieveAndInjectSecrets } from "./middleware/retriveSecrets";
 import { userQueueService } from "./lib/redis/userQueueService";
 import { complaintQueueService } from "./lib/redis/complaintQueueService";
 
-// Load local .env file first (for development)
+// Load local .env file first (for development) - this is optional
+// The app can work with just .env.bootstrap + AWS Secrets
 dotenv.config();
 
 // Main async function to handle secrets retrieval

@@ -11,6 +11,8 @@ import {
 } from "./custom-comp";
 import { CheckCircle, Loader2, LogIn } from "lucide-react";
 
+const USER_BE_URL = process.env.NEXT_PUBLIC_USER_BE_URL || "http://localhost:3000";
+
 export default function LoginUser() {
   const router = useRouter();
   const {
@@ -48,7 +50,7 @@ export default function LoginUser() {
     setSubmitError(null);
 
     try {
-      const response = await fetch("http://localhost:3000/api/users/login", {
+      const response = await fetch(`${USER_BE_URL}/api/users/login`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

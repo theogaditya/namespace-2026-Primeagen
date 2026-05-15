@@ -4,6 +4,7 @@ import { userSignupSchema } from "../lib/validations/validation.user";
 import { UserSignup } from "../lib/types/types";
 import { PrismaClient } from "../prisma/generated/client/client";
 import { userQueueService } from "../lib/redis/userQueueService";
+const pinAPIBase = process.env.pinAPIBase || "https://api.postalpincode.in/pincode";
 
 export function addUserRouter(db: PrismaClient) {
   const router = Router();
@@ -124,7 +125,7 @@ export function addUserRouter(db: PrismaClient) {
       }
 
       const response = await fetch(
-        `https://api.postalpincode.in/pincode/${pin}`
+        `${pinAPIBase}/${pin}`
       );
       const data: any = await response.json();
 

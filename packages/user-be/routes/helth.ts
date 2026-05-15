@@ -6,7 +6,7 @@ import { complaintQueueService } from "../lib/redis/complaintQueueService";
 export function helthPoint(db: PrismaClient) {
   const router = Router();
 
-  router.get("/helth", async (req: Request, res: Response) => {
+  router.get("/health", async (req: Request, res: Response) => {
     try{
       try {
       await db.$queryRaw`SELECT 1`;
