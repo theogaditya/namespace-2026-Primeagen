@@ -134,3 +134,17 @@ body {
 .skiptranslate > iframe.skiptranslate {
   z-index: 99999998 !important;
 }
+
+/* Custom animations */
+@keyframes shimmer {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+.animate-shimmer {
+  animation: shimmer 2s infinite;
+}
