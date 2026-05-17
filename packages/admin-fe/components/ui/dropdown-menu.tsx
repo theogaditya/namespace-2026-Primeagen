@@ -88,7 +88,7 @@ const DropdownMenuContent = React.forwardRef<
         else if (ref) ref.current = node
       }}
       className={cn(
-        "absolute z-50 mt-2 min-w-[8rem] overflow-hidden rounded-md border bg-white p-1 text-gray-900 shadow-md",
+        "absolute z-50 mt-2 min-w-32 overflow-hidden rounded-md border bg-white p-1 text-gray-900 shadow-md",
         "animate-in fade-in-0 zoom-in-95",
         align === "end" && "right-0",
         align === "start" && "left-0",

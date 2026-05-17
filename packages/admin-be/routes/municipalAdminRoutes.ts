@@ -7,7 +7,7 @@ import { authenticateMunicipalAdminOnly } from '../middleware/unifiedAuth';
 
 export default function(prisma: PrismaClient) {
   const router = express.Router();
-  const JWT_SECRET = process.env.JWT_SECRET!;
+  
 
 // Login
 router.post('/login', async (req, res: any) => {
@@ -24,13 +24,19 @@ router.post('/login', async (req, res: any) => {
     return res.status(401).json({ success: false, message: 'Invalid credentials' });
   }
 
+  const secret = process.env.JWT_SECRET;
+  if (!secret) {
+    console.error('[municipalAdmin.login] Missing JWT secret in environment');
+    return res.status(500).json({ success: false, message: 'Server misconfigured: missing JWT secret' });
+  }
+
   const token = jwt.sign(
     {
       id: admin.id,
       email: admin.officialEmail,
       accessLevel: admin.accessLevel,
     },
-    JWT_SECRET,
+    secret,
     { expiresIn: '7d' }
   );
 

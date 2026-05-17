@@ -17,8 +17,6 @@ export default function(prisma: PrismaClient) {
   const envFile = nodeEnv === 'production' ? '.env.prod' : '.env.local';
   dotenv.config({ path: envFile });
 
-  const JWT_SECRET = process.env.JWT_SECRET!;
-
 // ----- 1. Super Admin Login -----
 router.post('/login', async (req, res: any) => {
   const parseResult = superAdminLoginSchema.safeParse(req.body);
@@ -48,13 +46,19 @@ router.post('/login', async (req, res: any) => {
       data: { lastLogin: new Date() }
     });
 
+    const secret = process.env.JWT_SECRET;
+    if (!secret) {
+      console.error('[superAdmin.login] Missing JWT secret in environment');
+      return res.status(500).json({ success: false, message: 'Server misconfigured: missing JWT secret' });
+    }
+
     const token = jwt.sign(
       {
         id: admin.id,
         email: admin.officialEmail,
         accessLevel: admin.accessLevel,
       },
-      JWT_SECRET,
+      secret,
       { expiresIn: '24h' }
     );
 

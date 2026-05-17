@@ -87,7 +87,7 @@ export function AdminLayout({ children }: AdminLayoutProps) {
                     <item.icon
                       className={cn(
                         item.current ? "text-blue-500" : "text-gray-400 group-hover:text-gray-500",
-                        "mr-3 h-5 w-5 flex-shrink-0",
+                        "mr-3 h-5 w-5 shrink-0",
                       )}
                     />
                     {item.name}
@@ -121,7 +121,7 @@ export function AdminLayout({ children }: AdminLayoutProps) {
                   <item.icon
                     className={cn(
                       item.current ? "text-blue-500" : "text-gray-400 group-hover:text-gray-500",
-                      "mr-3 h-5 w-5 flex-shrink-0",
+                      "mr-3 h-5 w-5 shrink-0",
                     )}
                   />
                   {item.name}
@@ -135,7 +135,7 @@ export function AdminLayout({ children }: AdminLayoutProps) {
       {/* Main content */}
       <div className="lg:pl-64">
         {/* Top navigation */}
-        <div className="sticky top-0 z-10 flex h-16 flex-shrink-0 bg-white border-b border-gray-200">
+        <div className="sticky top-0 z-10 flex h-16 shrink-0 bg-white border-b border-gray-200">
           <Button variant="ghost" size="icon" className="lg:hidden" onClick={() => setSidebarOpen(true)}>
             <Menu className="h-6 w-6" />
             <span className="sr-only">Open sidebar</span>

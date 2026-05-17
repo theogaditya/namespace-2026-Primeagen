@@ -7,7 +7,7 @@ import type { AdminType } from '../lib/schemas/authSchema';
 
 export default function (prisma: PrismaClient) {
   const router = Router();
-  const JWT_SECRET: string = process.env.JWT_SECRET!;
+  
 
   // Unified Login for all admin types
   router.post('/login', async (req, res: any) => {
@@ -113,8 +113,15 @@ export default function (prisma: PrismaClient) {
       // Update lastLogin
       await updateLastLogin(prisma, adminType, admin.id);
 
+      // Ensure JWT secret is available
+      const secret = process.env.JWT_SECRET;
+      if (!secret) {
+        console.error('[auth.login] Missing JWT secret in environment');
+        return res.status(500).json({ success: false, message: 'Server misconfigured: missing JWT secret' });
+      }
+
       // Generate JWT token
-      const token = jwt.sign(tokenPayload, JWT_SECRET, { expiresIn: '7d' });
+      const token = jwt.sign(tokenPayload, secret, { expiresIn: '7d' });
 
       // Prepare admin response (excluding password)
       const { password: _, ...adminData } = admin;
@@ -150,7 +157,13 @@ export default function (prisma: PrismaClient) {
     const token: string = authHeader.split(' ')[1]!;
 
     try {
-      const decoded = jwt.verify(token, JWT_SECRET);
+      const secret = process.env.JWT_SECRET;
+      if (!secret) {
+        console.error('[auth.verify] Missing JWT secret in environment');
+        return res.status(500).json({ success: false, message: 'Server misconfigured: missing JWT secret' });
+      }
+
+      const decoded = jwt.verify(token, secret);
 
       return res.json({
         success: true,

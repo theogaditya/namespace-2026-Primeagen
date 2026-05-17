@@ -216,7 +216,7 @@ export function DashboardOverview() {
           <CardContent className="space-y-4">
             {topFreelancers.map((freelancer, index) => (
               <div key={freelancer.id} className="flex items-center space-x-3">
-                <div className="flex-shrink-0">
+                <div className="shrink-0">
                   <span className="inline-flex items-center justify-center h-6 w-6 rounded-full bg-blue-100 text-blue-800 text-xs font-medium">
                     {index + 1}
                   </span>
