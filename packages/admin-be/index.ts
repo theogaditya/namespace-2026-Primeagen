@@ -29,7 +29,6 @@ export class Server {
     this.app.use(cookieParser());
 
     const allowedOrigins = (process.env.ALLOWED_ORIGINS || '').split(',').map((s) => s.trim()).filter(Boolean);
-    console.log('[CORS] Allowed origins from env:', allowedOrigins.join(', '));
 
     this.app.use(
       cors({

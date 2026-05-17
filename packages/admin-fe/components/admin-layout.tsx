@@ -3,7 +3,7 @@
 import type React from "react"
 
 import { useState, useEffect } from "react"
-import { useRouter } from "next/navigation"
+import { useRouter, usePathname } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import {
   BarChart3,
@@ -28,13 +28,20 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 
-const navigation = [
-  { name: "Dashboard", href: "/", icon: BarChart3, current: true },
-  { name: "Complaints", href: "/users", icon: FileText, current: false },
-  { name: "Reports & Reviews", href: "/reports", icon: Flag, current: false },
-  { name: "Admin Settings", href: "/settings", icon: Settings, current: false },
-  { name: "Roles & Permissions", href: "/roles", icon: Shield, current: false },
-]
+const getDashboardPath = (adminType: string | null): string => {
+  switch (adminType) {
+    case 'AGENT':
+      return '/pages/Agent'
+    case 'MUNICIPAL_ADMIN':
+      return '/pages/Municipal'
+    case 'STATE_ADMIN':
+      return '/pages/State'
+    case 'SUPER_ADMIN':
+      return '/pages/Super'
+    default:
+      return '/pages/Agent'
+  }
+}
 
 interface AdminLayoutProps {
   children: React.ReactNode
@@ -42,20 +49,42 @@ interface AdminLayoutProps {
 
 export function AdminLayout({ children }: AdminLayoutProps) {
   const [sidebarOpen, setSidebarOpen] = useState(false)
-  const [adminData, setAdminData] = useState<{ fullName?: string; officialEmail?: string; id?: string } | null>(null)
+  const [adminData, setAdminData] = useState<{ fullName?: string; officialEmail?: string; id?: string; adminType?: string } | null>(null)
   const router = useRouter()
+  const pathname = usePathname()
 
   useEffect(() => {
     try {
       const raw = typeof window !== 'undefined' ? localStorage.getItem('admin') : null
       if (raw) {
         const parsed = JSON.parse(raw)
-        setAdminData({ fullName: parsed.fullName || parsed.fullName || parsed.name, officialEmail: parsed.officialEmail || parsed.email, id: parsed.id })
+        setAdminData({ 
+          fullName: parsed.fullName || parsed.name, 
+          officialEmail: parsed.officialEmail || parsed.email, 
+          id: parsed.id,
+          adminType: parsed.adminType || localStorage.getItem('adminType')
+        })
       }
     } catch (err) {
       console.warn('Failed to parse admin from localStorage', err)
     }
   }, [])
+
+  // Check if a nav item is currently active
+  const isActive = (href: string): boolean => {
+    if (href.startsWith('/pages/')) {
+      // Dashboard pages - match if pathname starts with /pages/
+      return pathname?.startsWith('/pages/') || false
+    }
+    return pathname === href
+  }
+
+  // Build navigation with dynamic dashboard path
+  const navItems = [
+    { name: "Dashboard", href: getDashboardPath(adminData?.adminType || null), icon: BarChart3 },
+    { name: "My Complaints", href: "/users", icon: FileText },
+    { name: "Reports & Reviews", href: "/reports", icon: Flag },
+  ]
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -72,27 +101,30 @@ export function AdminLayout({ children }: AdminLayoutProps) {
                 </Button>
               </div>
               <nav className="flex-1 space-y-1 bg-white px-2 py-4">
-                {navigation.map((item) => (
-                  <Link
-                    key={item.name}
-                    href={item.href}
-                    onClick={() => setSidebarOpen(false)}
-                    className={cn(
-                      item.current
-                        ? "bg-blue-50 border-r-2 border-blue-600 text-blue-700"
-                        : "text-gray-600 hover:bg-gray-50 hover:text-gray-900",
-                      "group flex items-center px-2 py-2 text-sm font-medium rounded-md",
-                    )}
-                  >
-                    <item.icon
+                {navItems.map((item) => {
+                  const active = isActive(item.href)
+                  return (
+                    <Link
+                      key={item.name}
+                      href={item.href}
+                      onClick={() => setSidebarOpen(false)}
                       className={cn(
-                        item.current ? "text-blue-500" : "text-gray-400 group-hover:text-gray-500",
-                        "mr-3 h-5 w-5 shrink-0",
+                        active
+                          ? "bg-blue-50 border-r-2 border-blue-600 text-blue-700"
+                          : "text-gray-600 hover:bg-gray-50 hover:text-gray-900",
+                        "group flex items-center px-2 py-2 text-sm font-medium rounded-md",
                       )}
-                    />
-                    {item.name}
-                  </Link>
-                ))}
+                    >
+                      <item.icon
+                        className={cn(
+                          active ? "text-blue-500" : "text-gray-400 group-hover:text-gray-500",
+                          "mr-3 h-5 w-5 shrink-0",
+                        )}
+                      />
+                      {item.name}
+                    </Link>
+                  )
+                })}
               </nav>
             </div>
           </div>
@@ -107,26 +139,29 @@ export function AdminLayout({ children }: AdminLayoutProps) {
           </div>
           <div className="flex flex-1 flex-col overflow-y-auto">
             <nav className="flex-1 space-y-1 px-2 py-4">
-              {navigation.map((item) => (
-                <Link
-                  key={item.name}
-                  href={item.href}
-                  className={cn(
-                    item.current
-                      ? "bg-blue-50 border-r-2 border-blue-600 text-blue-700"
-                      : "text-gray-600 hover:bg-gray-50 hover:text-gray-900",
-                    "group flex items-center px-2 py-2 text-sm font-medium rounded-md",
-                  )}
-                >
-                  <item.icon
+              {navItems.map((item) => {
+                const active = isActive(item.href)
+                return (
+                  <Link
+                    key={item.name}
+                    href={item.href}
                     className={cn(
-                      item.current ? "text-blue-500" : "text-gray-400 group-hover:text-gray-500",
-                      "mr-3 h-5 w-5 shrink-0",
+                      active
+                        ? "bg-blue-50 border-r-2 border-blue-600 text-blue-700"
+                        : "text-gray-600 hover:bg-gray-50 hover:text-gray-900",
+                      "group flex items-center px-2 py-2 text-sm font-medium rounded-md",
                     )}
-                  />
-                  {item.name}
-                </Link>
-              ))}
+                  >
+                    <item.icon
+                      className={cn(
+                        active ? "text-blue-500" : "text-gray-400 group-hover:text-gray-500",
+                        "mr-3 h-5 w-5 shrink-0",
+                      )}
+                    />
+                    {item.name}
+                  </Link>
+                )
+              })}
             </nav>
           </div>
         </div>

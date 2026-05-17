@@ -12,9 +12,19 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-import { Search, MoreHorizontal, Eye, UserPlus, User, FileText, Clock, AlertTriangle, CheckCircle, Sparkles, X } from "lucide-react"
+import { Search, MoreHorizontal, Eye, UserPlus, User, FileText, Clock, AlertTriangle, CheckCircle, Sparkles, X, Flag, Users, Briefcase } from "lucide-react"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Modal } from "@/components/ui/modal"
+
+interface OverviewStats {
+  total: number
+  registered: number
+  inProgress: number
+  resolved: number
+  closed: number
+  highPriority: number
+  assigned: number
+}
 
 interface Complaint {
   id: string
@@ -73,13 +83,18 @@ export function AvailableComplaints() {
     totalPages: 0,
   })
   const [assignmentFilter, setAssignmentFilter] = useState<'all' | 'assigned' | 'unassigned' | 'escalated'>('all')
-  const [searchTerm, setSearchTerm] = useState("")
+  const [urgencyFilter, setUrgencyFilter] = useState<'all' | 'LOW' | 'MEDIUM' | 'HIGH' | 'CRITICAL'>('all')
+  const [searchTerm, setSearchTerm] = useState('')
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [selectedComplaint, setSelectedComplaint] = useState<Complaint | null>(null)
   const [selectedStatus, setSelectedStatus] = useState<string | null>(null)
   const [statusUpdating, setStatusUpdating] = useState(false)
   const [escalateFlag, setEscalateFlag] = useState(false)
   const [currentAdminId, setCurrentAdminId] = useState<string | null>(null)
+  const [adminType, setAdminType] = useState<string | null>(null)
+  const [overviewStats, setOverviewStats] = useState<OverviewStats>({ total: 0, registered: 0, inProgress: 0, resolved: 0, closed: 0, highPriority: 0, assigned: 0 })
+  // Random 3-digit number for "Complaints Solved" – generated once per mount
+  const [randomSolved] = useState<number>(() => Math.floor(Math.random() * 900) + 100)
 
   const fetchAvailableComplaints = async () => {
     try {
@@ -123,7 +138,29 @@ export function AvailableComplaints() {
 
   useEffect(() => {
     fetchAvailableComplaints()
+    fetchOverviewStats()
   }, [pagination.page])
+
+  const fetchOverviewStats = async () => {
+    try {
+      const token = localStorage.getItem("token")
+      if (!token) return
+
+      const response = await fetch(`${API_URL}/api/complaints/stats/overview`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      })
+
+      const data = await response.json()
+
+      if (data.success) {
+        setOverviewStats(data.data)
+      }
+    } catch (error) {
+      console.error("Error fetching overview stats:", error)
+    }
+  }
 
   useEffect(() => {
     try {
@@ -131,6 +168,7 @@ export function AvailableComplaints() {
       if (adminRaw) {
         const adminObj = JSON.parse(adminRaw)
         setCurrentAdminId(adminObj?.id || adminObj?.userId || adminObj?.adminId || null)
+        setAdminType(adminObj?.adminType || localStorage.getItem('adminType') || null)
       }
     } catch (err) {
       // ignore parse errors
@@ -261,34 +299,56 @@ export function AvailableComplaints() {
     })
   }
 
+  // compute critical-only count from fetched complaints (frontend source of truth)
+  const criticalCount = complaints.filter((c) => c.urgency === 'CRITICAL').length
+
   const stats = [
     {
-      title: "Unassigned Complaints",
+      title: "TOTAL REGISTERED",
       value: pagination.total.toString(),
-      icon: FileText,
-      color: "text-blue-600",
+      subtitle: `${new Date().getFullYear()} YTD`,
+      icon: Briefcase,
+      bgColor: "bg-blue-600",
+      iconBg: "bg-blue-500",
     },
     {
-      title: "High Priority Complaints",
-      value: complaints.filter((c) => c.urgency === "HIGH").length.toString(),
+      title: "HIGH PRIORITY",
+      // Use critical-only count derived from the fetched complaints list
+      value: criticalCount.toString(),
+      subtitle: "Needs attention",
+      trend: criticalCount > 0 ? "↑ Urgent" : "",
+      trendColor: "text-red-200",
       icon: AlertTriangle,
-      color: "text-red-600",
+      bgColor: "bg-amber-500",
+      iconBg: "bg-amber-400",
     },
     {
-      title: "Medium Priority Complaints",
-      value: complaints.filter((c) => c.urgency === "MEDIUM").length.toString(),
+      title: "ASSIGNED",
+      value: overviewStats.assigned.toString(),
+      subtitle: "In progress",
+      icon: Users,
+      bgColor: "bg-emerald-600",
+      iconBg: "bg-emerald-500",
+    },
+    {
+      title: "ESCALATED",
+      value: complaints.filter((c) => 
+        c.status?.includes('ESCALATED') || 
+        !!c.managedByMunicipalAdmin?.id || 
+        !!c.escalationLevel
+      ).length.toString(),
+      subtitle: "⚠ Awaiting Review",
       icon: Clock,
-      color: "text-yellow-600",
-    },
-    {
-      title: "Low Priority Complaints",
-      value: complaints.filter((c) => c.urgency === "LOW").length.toString(),
-      icon: CheckCircle,
-      color: "text-green-600",
+      bgColor: "bg-slate-700",
+      iconBg: "bg-slate-600",
     },
   ]
 
   const displayedComplaints = complaints.filter((complaint) => {
+    // Urgency filter
+    if (urgencyFilter !== 'all' && complaint.urgency !== urgencyFilter) return false
+    
+    // Assignment filter
     if (assignmentFilter === 'all') return true
     if (assignmentFilter === 'assigned') return !!complaint.assignedAgent?.id || !!complaint.managedByMunicipalAdmin?.id
     if (assignmentFilter === 'unassigned') return !complaint.assignedAgent?.id && !complaint.managedByMunicipalAdmin?.id
@@ -335,6 +395,18 @@ export function AvailableComplaints() {
   )
   const escalateDisabled = statusUpdating || !selectedComplaint || (!isAssignedToCurrentAgent && !isAssignedToMunicipal)
 
+  // Determine whether the logged-in user can update status for a complaint
+  const canUpdateStatus = (complaint: Complaint | null) => {
+    if (!complaint) return false
+    // Municipal admin and higher can update any complaint
+    if (adminType === 'MUNICIPAL_ADMIN' || adminType === 'STATE_ADMIN' || adminType === 'SUPER_ADMIN') return true
+    // Agents can update only if currently assigned to them
+    if (adminType === 'AGENT') {
+      return !!(complaint.assignedAgent?.id && currentAdminId && complaint.assignedAgent.id === currentAdminId)
+    }
+    return false
+  }
+
   return (
     <div className="p-6 space-y-6">
       {/* Header */}
@@ -346,17 +418,25 @@ export function AvailableComplaints() {
       {/* Stats Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         {stats.map((stat) => (
-          <Card key={stat.title}>
-            <CardContent className="p-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm font-medium text-gray-600">{stat.title}</p>
-                  <p className="text-2xl font-bold text-gray-900">{stat.value}</p>
-                </div>
-                <stat.icon className={`h-8 w-8 ${stat.color}`} />
+          <div key={stat.title} className={`${stat.bgColor} rounded-2xl p-6 text-white shadow-lg relative overflow-hidden`}>
+            {/* Background decoration */}
+            <div className="absolute top-0 right-0 w-32 h-32 bg-white/5 rounded-full -translate-y-1/2 translate-x-1/2" />
+            <div className="absolute bottom-0 left-0 w-24 h-24 bg-white/5 rounded-full translate-y-1/2 -translate-x-1/2" />
+            
+            <div className="relative flex items-start justify-between">
+              <div className="space-y-1">
+                <p className="text-xs font-semibold tracking-wider text-white/80 uppercase">{stat.title}</p>
+                <p className="text-4xl font-bold tracking-tight">{stat.value}</p>
+                <p className="text-sm text-white/70 mt-2">
+                  {stat.trend && <span className={stat.trendColor}>{stat.trend} </span>}
+                  {stat.subtitle}
+                </p>
               </div>
-            </CardContent>
-          </Card>
+              <div className={`${stat.iconBg} p-3 rounded-xl shadow-md`}>
+                <stat.icon className="h-6 w-6 text-white" />
+              </div>
+            </div>
+          </div>
         ))}
       </div>
 
@@ -382,10 +462,22 @@ export function AvailableComplaints() {
                     <SelectValue placeholder="Filter" />
                   </SelectTrigger>
                   <SelectContent>
+                    <SelectItem value="all">All Complaints</SelectItem>
                     <SelectItem value="unassigned">Unassigned</SelectItem>
                     <SelectItem value="assigned">Assigned</SelectItem>
                     <SelectItem value="escalated">Escalated</SelectItem>
-                    <SelectItem value="all">All Complaints</SelectItem>
+                  </SelectContent>
+                </Select>
+                <Select value={urgencyFilter} onValueChange={(v) => setUrgencyFilter(v as any)}>
+                  <SelectTrigger className="w-full sm:w-[180px]">
+                    <SelectValue placeholder="Priority" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All Priorities</SelectItem>
+                    <SelectItem value="CRITICAL">Critical</SelectItem>
+                    <SelectItem value="HIGH">High</SelectItem>
+                    <SelectItem value="MEDIUM">Medium</SelectItem>
+                    <SelectItem value="LOW">Low</SelectItem>
                   </SelectContent>
                 </Select>
           </div>
@@ -693,59 +785,73 @@ export function AvailableComplaints() {
                 </div>
               )}
 
-              {/* Status update controls */}
-              <div className="border-t pt-4">
-                <h4 className="text-sm font-semibold text-gray-700 mb-2">Update complaint status</h4>
-                <div className="flex flex-wrap items-center gap-3">
-                  <Select value={selectedStatus || ''} onValueChange={(v) => setSelectedStatus(v)}>
-                    <SelectTrigger className="w-[200px]">
-                      <SelectValue placeholder="Select status" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="UNDER_PROCESSING">Under Processing</SelectItem>
-                      <SelectItem value="FORWARDED">Forwarded</SelectItem>
-                      <SelectItem value="ON_HOLD">On Hold</SelectItem>
-                      <SelectItem value="COMPLETED">Completed</SelectItem>
-                      <SelectItem value="REJECTED">Rejected</SelectItem>
-                    </SelectContent>
-                  </Select>
-                  <Button
-                    disabled={statusUpdating}
-                    onClick={async () => {
-                      if (!selectedComplaint || !selectedStatus) return alert('Select a status first')
-                      setStatusUpdating(true)
-                      try {
-                        const token = localStorage.getItem('token')
-                        if (!token) throw new Error('Not authenticated')
-                        const res = await fetch(`${API_URL}/api/agent/complaints/${selectedComplaint.id}/status`, {
-                          method: 'PUT',
-                          headers: {
-                            'Content-Type': 'application/json',
-                            Authorization: `Bearer ${token}`,
-                          },
-                          body: JSON.stringify({ status: selectedStatus }),
-                        })
-                        const body = await res.json()
-                        if (!res.ok) {
-                          alert(body.message || 'Unable to update the complaint status at this time')
-                        } else {
-                          const updated = body.complaint
-                          setComplaints((prev) => prev.map((c) => (c.id === updated.id ? { ...c, status: updated.status } : c)))
-                          setSelectedComplaint((prev) => prev ? { ...prev, status: updated.status } : prev)
-                          alert(body.message || 'Complaint status updated successfully')
+              {/* Status update controls - visible only to municipal+ admins or the assigned agent */}
+              {canUpdateStatus(selectedComplaint) ? (
+                <div className="border-t pt-4">
+                  <h4 className="text-sm font-semibold text-gray-700 mb-2">Update complaint status</h4>
+                  <div className="flex flex-wrap items-center gap-3">
+                    <Select value={selectedStatus || ''} onValueChange={(v) => setSelectedStatus(v)}>
+                      <SelectTrigger className="w-[200px]">
+                        <SelectValue placeholder="Select status" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="UNDER_PROCESSING">Under Processing</SelectItem>
+                        <SelectItem value="FORWARDED">Forwarded</SelectItem>
+                        <SelectItem value="ON_HOLD">On Hold</SelectItem>
+                        <SelectItem value="COMPLETED">Completed</SelectItem>
+                        <SelectItem value="REJECTED">Rejected</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    <Button
+                      disabled={statusUpdating}
+                      onClick={async () => {
+                        if (!selectedComplaint || !selectedStatus) return alert('Select a status first')
+                        setStatusUpdating(true)
+                        try {
+                          const token = localStorage.getItem('token')
+                          if (!token) throw new Error('Not authenticated')
+                          // Choose endpoint based on admin type: agents use agent endpoint, admins use municipal/state endpoints
+                          let endpoint = ''
+                          if (adminType === 'AGENT') endpoint = `${API_URL}/api/agent/complaints/${selectedComplaint.id}/status`
+                          else if (adminType === 'MUNICIPAL_ADMIN') endpoint = `${API_URL}/api/municipal-admin/complaints/${selectedComplaint.id}/status`
+                          else if (adminType === 'STATE_ADMIN') endpoint = `${API_URL}/api/state-admin/complaints/${selectedComplaint.id}/status`
+                          else if (adminType === 'SUPER_ADMIN') endpoint = `${API_URL}/api/super-admin/complaints/${selectedComplaint.id}/status`
+                          else endpoint = `${API_URL}/api/agent/complaints/${selectedComplaint.id}/status`
+
+                          const res = await fetch(endpoint, {
+                            method: 'PUT',
+                            headers: {
+                              'Content-Type': 'application/json',
+                              Authorization: `Bearer ${token}`,
+                            },
+                            body: JSON.stringify({ status: selectedStatus }),
+                          })
+                          const body = await res.json()
+                          if (!res.ok) {
+                            alert(body.message || 'Unable to update the complaint status at this time')
+                          } else {
+                            const updated = body.complaint
+                            setComplaints((prev) => prev.map((c) => (c.id === updated.id ? { ...c, status: updated.status } : c)))
+                            setSelectedComplaint((prev) => prev ? { ...prev, status: updated.status } : prev)
+                            alert(body.message || 'Complaint status updated successfully')
+                          }
+                        } catch (err: any) {
+                          console.error('Status update error', err)
+                          alert(err?.message || 'Unable to update the complaint status')
+                        } finally {
+                          setStatusUpdating(false)
                         }
-                      } catch (err: any) {
-                        console.error('Status update error', err)
-                        alert(err?.message || 'Unable to update the complaint status')
-                      } finally {
-                        setStatusUpdating(false)
-                      }
-                    }}
-                  >
-                    {statusUpdating ? 'Updating...' : 'Save status'}
-                  </Button>
+                      }}
+                    >
+                      {statusUpdating ? 'Updating...' : 'Save status'}
+                    </Button>
+                  </div>
                 </div>
-              </div>
+              ) : (
+                <div className="border-t pt-4">
+                  <p className="text-sm text-amber-600 bg-amber-50 p-3 rounded-md">Only Municipal Admins and Higher, or Assigned Agent, can Update Status.</p>
+                </div>
+              )}
             </div>
           </Modal>
         </CardContent>

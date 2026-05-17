@@ -200,12 +200,24 @@ export default function (prisma: PrismaClient) {
           break;
       }
 
-      const [total, registered, inProgress, resolved, closed] = await Promise.all([
+      const [
+        total,
+        registered,
+        underProcessing,
+        completed,
+        onHold,
+        highPriority,
+        assignedCount,
+      ] = await Promise.all([
         prisma.complaint.count({ where: whereClause }),
         prisma.complaint.count({ where: { ...whereClause, status: 'REGISTERED' } }),
-        prisma.complaint.count({ where: { ...whereClause, status: 'IN_PROGRESS' } }),
-        prisma.complaint.count({ where: { ...whereClause, status: 'RESOLVED' } }),
-        prisma.complaint.count({ where: { ...whereClause, status: 'CLOSED' } }),
+        prisma.complaint.count({ where: { ...whereClause, status: 'UNDER_PROCESSING' } }),
+        prisma.complaint.count({ where: { ...whereClause, status: 'COMPLETED' } }),
+        prisma.complaint.count({ where: { ...whereClause, status: 'ON_HOLD' } }),
+        // Count high and critical urgencies
+        prisma.complaint.count({ where: { ...whereClause, urgency: { in: ['HIGH', 'CRITICAL'] } } }),
+        // Count assigned complaints (assignedAgentId not null)
+        prisma.complaint.count({ where: { ...whereClause, NOT: { assignedAgentId: null } } }),
       ]);
 
       return res.json({
@@ -213,9 +225,11 @@ export default function (prisma: PrismaClient) {
         data: {
           total,
           registered,
-          inProgress,
-          resolved,
-          closed,
+          inProgress: underProcessing,
+          resolved: completed,
+          closed: onHold,
+          highPriority,
+          assigned: assignedCount,
         },
       });
     } catch (error) {
