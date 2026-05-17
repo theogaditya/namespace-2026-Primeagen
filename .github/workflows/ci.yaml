@@ -25,6 +25,26 @@ jobs:
       - name: Test user-be
         run: bun run --cwd packages/user-be test:unit
 
+  admin-be:
+    name: Build & Test admin-be
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
+      - name: Install dependencies
+        run: bun install
+
+      - name: Build admin-be
+        run: bun run --cwd packages/admin-be build
+
+      - name: Test admin-be
+        run: bun run --cwd packages/admin-be test:unit
+
   user-fe:
     name: Build user-fe
     runs-on: ubuntu-latest
