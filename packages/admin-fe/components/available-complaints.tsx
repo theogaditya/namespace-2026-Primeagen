@@ -12,7 +12,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-import { Search, MoreHorizontal, Eye, UserPlus, User, FileText, Clock, AlertTriangle, CheckCircle, Sparkles } from "lucide-react"
+import { Search, MoreHorizontal, Eye, UserPlus, User, FileText, Clock, AlertTriangle, CheckCircle, Sparkles, X } from "lucide-react"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Modal } from "@/components/ui/modal"
 
@@ -72,7 +72,7 @@ export function AvailableComplaints() {
     total: 0,
     totalPages: 0,
   })
-  const [assignmentFilter, setAssignmentFilter] = useState<'all' | 'assigned' | 'unassigned' | 'escalated'>('unassigned')
+  const [assignmentFilter, setAssignmentFilter] = useState<'all' | 'assigned' | 'unassigned' | 'escalated'>('all')
   const [searchTerm, setSearchTerm] = useState("")
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [selectedComplaint, setSelectedComplaint] = useState<Complaint | null>(null)
@@ -290,9 +290,13 @@ export function AvailableComplaints() {
 
   const displayedComplaints = complaints.filter((complaint) => {
     if (assignmentFilter === 'all') return true
-    if (assignmentFilter === 'assigned') return !!complaint.assignedAgent || !!complaint.managedByMunicipalAdmin
-    if (assignmentFilter === 'unassigned') return !complaint.assignedAgent && !complaint.managedByMunicipalAdmin
-    if (assignmentFilter === 'escalated') return !!complaint.escalationLevel || (complaint.status && complaint.status.toString().includes('ESCALATED'))
+    if (assignmentFilter === 'assigned') return !!complaint.assignedAgent?.id || !!complaint.managedByMunicipalAdmin?.id
+    if (assignmentFilter === 'unassigned') return !complaint.assignedAgent?.id && !complaint.managedByMunicipalAdmin?.id
+    if (assignmentFilter === 'escalated') return (
+      !!complaint.managedByMunicipalAdmin?.id ||
+      !!complaint.escalationLevel ||
+      (complaint.status && complaint.status.toString().includes('ESCALATED'))
+    )
     return true
   })
 
@@ -323,6 +327,13 @@ export function AvailableComplaints() {
         return 'Overview of all complaints on the platform'
     }
   }
+
+  // Escalation / assignment derived flags (used by modal controls)
+  const isAssignedToMunicipal = !!selectedComplaint?.managedByMunicipalAdmin?.id
+  const isAssignedToCurrentAgent = !!(
+    selectedComplaint?.assignedAgent?.id && currentAdminId && selectedComplaint.assignedAgent.id === currentAdminId
+  )
+  const escalateDisabled = statusUpdating || !selectedComplaint || (!isAssignedToCurrentAgent && !isAssignedToMunicipal)
 
   return (
     <div className="p-6 space-y-6">
@@ -386,8 +397,8 @@ export function AvailableComplaints() {
                   <TableHead>Complaint</TableHead>
                   <TableHead>Urgency</TableHead>
                   <TableHead>Location</TableHead>
-                  <TableHead>Submitted On</TableHead>
-                  <TableHead className="text-right">Actions</TableHead>
+                  <TableHead>Registerd</TableHead>
+                  <TableHead className="text-center align-middle">Actions</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -433,8 +444,8 @@ export function AvailableComplaints() {
                       <TableCell className="text-sm text-gray-500">
                         {formatDate(complaint.submissionDate)}
                       </TableCell>
-                      <TableCell className="text-right">
-                        {(!complaint.assignedAgent && !complaint.managedByMunicipalAdmin) ? (
+                      <TableCell className="text-center align-middle">
+                        {(!complaint.assignedAgent?.id && !complaint.managedByMunicipalAdmin?.id) ? (
                           // Two actions available -> keep dropdown
                           <DropdownMenu>
                             <DropdownMenuTrigger asChild>
@@ -448,24 +459,25 @@ export function AvailableComplaints() {
                                 <Eye className="mr-2 h-4 w-4 text-blue-500 group-hover:text-black transition-colors" />
                                 View details
                               </DropdownMenuItem>
-                              <DropdownMenuItem
-                                onClick={() => handleAssignToMe(complaint.id)}
-                                className={assigning === complaint.id ? "opacity-50 pointer-events-none" : ""}
-                              >
-                                <UserPlus className="mr-2 h-4 w-4" />
-                                {assigning === complaint.id ? "Claiming..." : "Claim complaint"}
-                              </DropdownMenuItem>
+                                  <DropdownMenuItem
+                                    onClick={() => handleAssignToMe(complaint.id)}
+                                    className={assigning === complaint.id ? "opacity-50 pointer-events-none" : ""}
+                                  >
+                                    <UserPlus className="mr-2 h-4 w-4" />
+                                    {assigning === complaint.id ? "Claiming..." : "Claim complaint"}
+                                  </DropdownMenuItem>
                             </DropdownMenuContent>
                           </DropdownMenu>
                         ) : (
                           // Only one action (View Details) -> show it inline
                           <Button
                             variant="ghost"
-                            className="h-8 w-8 p-0 group hover:text-black"
+                            className="h-8 px-2 py-0 group hover:text-black inline-flex items-center gap-2 text-sm"
                             onClick={() => { setSelectedComplaint(complaint); setSelectedStatus(complaint.status || null); setEscalateFlag(false); setIsModalOpen(true); }}
                           >
                             <span className="sr-only">View details</span>
                             <Eye className="h-4 w-4 text-blue-500 group-hover:text-black transition-colors" />
+                            <span className="text-blue-500 group-hover:text-black transition-colors">View</span>
                           </Button>
                         )}
                       </TableCell>
@@ -502,10 +514,11 @@ export function AvailableComplaints() {
           </div>
           {/* Complaint Details Modal */}
           <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)}>
-            <div className="sticky top-0 z-10 bg-white pb-3 border-b -mx-6 px-6">
+            {/* Sticky header with shadow to create visual separation */}
+            <div className="sticky top-0 z-10 bg-white pb-4 border-b shadow-sm -mx-6 px-6 -mt-6 pt-0">
               <div className="flex items-start justify-between">
                 <div>
-                  <h3 className="text-lg font-semibold">{selectedComplaint?.title || selectedComplaint?.subCategory}</h3>
+                  <h3 className="text-lg font-bold">{selectedComplaint?.title || selectedComplaint?.subCategory}</h3>
                   <p className="text-sm text-gray-500">#{selectedComplaint?.seq} • {selectedComplaint?.category}</p>
                   {(
                     selectedComplaint?.AIStandardizedSubcategory ||
@@ -516,84 +529,113 @@ export function AvailableComplaints() {
                       <span>SwarajAI classification: {selectedComplaint?.AIStandardizedSubcategory || selectedComplaint?.AIstandardizedSubCategory}</span>
                     </p>
                   )}
-                  {/* Assigned agent (non-sensitive) */}
-                  {selectedComplaint?.assignedAgent && (
+                  {/* Assigned agent / municipal admin (non-sensitive) */}
+                  {selectedComplaint?.assignedAgent ? (
                     <p className="text-sm text-gray-500 mt-2 flex items-center">
                       <User className="mr-2 h-4 w-4 text-gray-400" />
                       <span>Assigned to {selectedComplaint.assignedAgent.name}</span>
                     </p>
-                  )}
+                  ) : selectedComplaint?.managedByMunicipalAdmin ? (
+                    <p className="text-sm text-gray-500 mt-2 flex items-center">
+                      <User className="mr-2 h-4 w-4 text-gray-400" />
+                      <span>Assigned to Municipal Admin {selectedComplaint.managedByMunicipalAdmin.name}</span>
+                    </p>
+                  ) : null}
                 </div>
-                <Button
-                  variant="destructive"
-                  size="sm"
-                  disabled={
-                    statusUpdating ||
-                    !selectedComplaint ||
-                    !selectedComplaint.assignedAgent ||
-                    (!!currentAdminId && selectedComplaint.assignedAgent.id !== currentAdminId)
-                  }
-                  title={
-                    !selectedComplaint
-                      ? undefined
-                      : !selectedComplaint.assignedAgent
-                      ? 'Only the assigned agent can escalate this complaint'
-                      : (!!currentAdminId && selectedComplaint.assignedAgent.id !== currentAdminId)
-                      ? 'You are not the assigned agent for this complaint'
-                      : undefined
-                  }
-                  onClick={async () => {
-                    if (!selectedComplaint) return
-                    // Only allow escalate if current admin is assigned (defensive check)
-                    if (!selectedComplaint.assignedAgent || (!!currentAdminId && selectedComplaint.assignedAgent.id !== currentAdminId)) {
-                      return alert('Only the assigned agent can escalate this complaint')
-                    }
-                    setStatusUpdating(true)
-                    try {
-                      const token = localStorage.getItem('token')
-                      if (!token) throw new Error('Not authenticated')
-                      const res = await fetch(`${API_URL}/api/agent/complaints/${selectedComplaint.id}/escalate`, {
-                        method: 'PUT',
-                        headers: {
-                          'Content-Type': 'application/json',
-                          Authorization: `Bearer ${token}`,
-                        },
-                      })
-                      const body = await res.json()
-                      if (!res.ok) {
-                        alert(body.message || 'Unable to escalate the complaint at this time')
-                      } else {
-                        const updated = body.complaint
-                        setComplaints((prev) => prev.map((c) => (c.id === updated.id ? { ...c, status: updated.status, escalationLevel: 'MUNICIPAL_ADMIN' } : c)))
-                        setSelectedComplaint((prev) => prev ? { ...prev, status: updated.status, escalationLevel: 'MUNICIPAL_ADMIN' } : prev)
-                        setSelectedStatus(updated.status)
-                        alert(body.message || 'Complaint escalated successfully')
-                      }
-                    } catch (err: any) {
-                      console.error('Escalate error', err)
-                      alert(err?.message || 'Unable to escalate the complaint')
-                    } finally {
-                      setStatusUpdating(false)
-                    }
-                  }}
-                >
-                  {statusUpdating ? 'Escalating...' : 'Escalate to Municipal Level'}
-                </Button>
+                {/* controls are positioned absolutely within header (close top-right, escalate bottom-right) */}
               </div>
-            </div>
+
+              {/* Close button (top-right) */}
+              <button
+                onClick={() => setIsModalOpen(false)}
+                aria-label="Close"
+                className="absolute top-3 right-3 rounded-full p-1 hover:bg-gray-100 transition-colors"
+              >
+                <X className="h-4 w-4 text-gray-500" />
+              </button>
+
+              {/* Escalate button (bottom-right) */}
+              <div className="absolute right-3 bottom-3">
+                {isAssignedToMunicipal ? (
+                  <Button variant="outline" size="sm" disabled className="bg-gray-100 text-gray-600 border-gray-200">
+                    Escalated
+                  </Button>
+                ) : isAssignedToCurrentAgent ? (
+                  <Button
+                    variant="destructive"
+                    size="sm"
+                    disabled={statusUpdating}
+                    onClick={async () => {
+                      if (!selectedComplaint) return
+                      setStatusUpdating(true)
+                      try {
+                        const token = localStorage.getItem('token')
+                        if (!token) throw new Error('Not authenticated')
+                        const res = await fetch(`${API_URL}/api/agent/complaints/${selectedComplaint.id}/escalate`, {
+                          method: 'PUT',
+                          headers: {
+                            'Content-Type': 'application/json',
+                            Authorization: `Bearer ${token}`,
+                          },
+                        })
+                        const body = await res.json()
+                        if (!res.ok) {
+                          alert(body.message || 'Unable to escalate the complaint at this time')
+                        } else {
+                          const updated = body.complaint
+                          // Build municipal admin object from response (backend returns assignedMunicipalAdmin)
+                          const assignedMunicipal = body.assignedMunicipalAdmin
+                            ? { id: body.assignedMunicipalAdmin.id, name: body.assignedMunicipalAdmin.fullName, email: body.assignedMunicipalAdmin.officialEmail }
+                            : updated?.managedByMunicipalAdmin
+                              ? { id: updated.managedByMunicipalAdmin.id, name: updated.managedByMunicipalAdmin.fullName, email: updated.managedByMunicipalAdmin.officialEmail }
+                              : null
+                          // Update list
+                          setComplaints((prev) =>
+                            prev.map((c) =>
+                              c.id === updated.id
+                                ? { ...c, status: updated.status, escalationLevel: 'MUNICIPAL_ADMIN', managedByMunicipalAdmin: assignedMunicipal, assignedAgent: null }
+                                : c
+                            )
+                          )
+                          // Update modal selected complaint
+                          setSelectedComplaint((prev) =>
+                            prev
+                              ? { ...prev, status: updated.status, escalationLevel: 'MUNICIPAL_ADMIN', managedByMunicipalAdmin: assignedMunicipal, assignedAgent: null }
+                              : prev
+                          )
+                          setSelectedStatus(updated.status)
+                          alert(body.message || 'Complaint escalated successfully')
+                        }
+                      } catch (err: any) {
+                        console.error('Escalate error', err)
+                        alert(err?.message || 'Unable to escalate the complaint')
+                      } finally {
+                        setStatusUpdating(false)
+                      }
+                    }}
+                  >
+                    {statusUpdating ? 'Escalating...' : 'Escalate to Municipal Level'}
+                  </Button>
+                ) : (
+                  <Button variant="outline" size="sm" disabled className="bg-gray-100 text-gray-600 border-gray-200" title={!selectedComplaint ? undefined : 'Only the assigned agent can escalate this complaint'}>
+                    Escalate to Municipal Level
+                  </Button>
+                )}
+              </div>
+              </div>
 
             {/* Scrollable content */}
-            <div className="space-y-4 mt-4">
+            <div className="space-y-4 pt-9">
               {/* Description */}
               <div>
-                <h4 className="text-sm font-medium text-gray-700">Description</h4>
+                <h4 className="text-sm font-semibold text-gray-700">Description</h4>
                 <p className="text-sm text-gray-800 whitespace-pre-wrap mt-1">{selectedComplaint?.description}</p>
               </div>
 
               {/* Status and urgency row */}
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                 <div className="flex flex-col">
-                  <h4 className="text-sm font-medium text-gray-700">Status</h4>
+                  <h4 className="text-sm font-semibold text-gray-700">Status</h4>
                   <div className="mt-1 flex flex-wrap items-center gap-2">
                     {getStatusBadge(selectedComplaint?.status)}
                     {selectedComplaint?.escalationLevel && (
@@ -602,15 +644,15 @@ export function AvailableComplaints() {
                   </div>
                 </div>
                 <div className="flex flex-col">
-                  <h4 className="text-sm font-medium text-gray-700">Urgency</h4>
+                  <h4 className="text-sm font-semibold text-gray-700">Urgency</h4>
                   <div className="mt-1">{getUrgencyBadge(selectedComplaint?.urgency || '')}</div>
                 </div>
                 <div className="flex flex-col">
-                  <h4 className="text-sm font-medium text-gray-700">Department</h4>
+                  <h4 className="text-sm font-semibold text-gray-700">Department</h4>
                   <div className="mt-1">{getDepartmentBadge(selectedComplaint?.department)}</div>
                 </div>
                 <div className="flex flex-col">
-                  <h4 className="text-sm font-medium text-gray-700">Submitted</h4>
+                  <h4 className="text-sm font-semibold text-gray-700">Submitted</h4>
                   <p className="text-sm text-gray-800 mt-1">{selectedComplaint ? formatDate(selectedComplaint.submissionDate) : ''}</p>
                 </div>
               </div>
@@ -618,7 +660,7 @@ export function AvailableComplaints() {
               {/* Complainant and Location row */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="flex flex-col">
-                    <h4 className="text-sm font-medium text-gray-700">Complainant</h4>
+                  <h4 className="text-sm font-semibold text-gray-700">Complainant</h4>
                     {selectedComplaint?.complainant ? (
                       <div className="text-sm text-gray-800 mt-1">
                         <div>{selectedComplaint.complainant.name}</div>
@@ -629,7 +671,7 @@ export function AvailableComplaints() {
                     )}
                   </div>
                 <div className="flex flex-col">
-                  <h4 className="text-sm font-medium text-gray-700">Location</h4>
+                  <h4 className="text-sm font-semibold text-gray-700">Location</h4>
                   {selectedComplaint?.location ? (
                     <div className="text-sm text-gray-800 mt-1">
                       <div>{selectedComplaint.location.locality}, {selectedComplaint.location.city}</div>
@@ -644,7 +686,7 @@ export function AvailableComplaints() {
               {/* Attachment */}
               {selectedComplaint?.attachmentUrl && (
                 <div>
-                  <h4 className="text-sm font-medium text-gray-700">Attachment</h4>
+                  <h4 className="text-sm font-semibold text-gray-700">Attachment</h4>
                   <div className="mt-2">
                     <img src={selectedComplaint.attachmentUrl} alt="Complaint attachment preview" className="max-w-full h-auto rounded-md border" />
                   </div>
@@ -653,7 +695,7 @@ export function AvailableComplaints() {
 
               {/* Status update controls */}
               <div className="border-t pt-4">
-                <h4 className="text-sm font-medium text-gray-700 mb-2">Update complaint status</h4>
+                <h4 className="text-sm font-semibold text-gray-700 mb-2">Update complaint status</h4>
                 <div className="flex flex-wrap items-center gap-3">
                   <Select value={selectedStatus || ''} onValueChange={(v) => setSelectedStatus(v)}>
                     <SelectTrigger className="w-[200px]">

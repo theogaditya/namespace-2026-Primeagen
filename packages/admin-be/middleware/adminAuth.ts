@@ -6,8 +6,6 @@ const nodeEnv = process.env.NODE_ENV || 'development';
 const envFile = nodeEnv === 'production' ? '.env.prod' : '.env.local';
 dotenv.config({ path: envFile });
 
-const JWT_SECRET = process.env.JWT_SECRET!;
-
 export const authenticateStateAdmin = (req: Request, res: any, next: NextFunction): void => {
   console.log('[DEBUG] Starting authentication check');
   console.log('[DEBUG] Cookies:', req.cookies);
@@ -23,7 +21,13 @@ export const authenticateStateAdmin = (req: Request, res: any, next: NextFunctio
   console.log('[DEBUG] Token found:', token.substring(0, 20) + '...');
 
   try {
-    const decoded = jwt.verify(token, JWT_SECRET) as {
+    const secret = process.env.JWT_SECRET;
+    if (!secret) {
+      console.error('[authenticateStateAdmin] Missing JWT secret in environment');
+      return res.status(500).json({ success: false, message: 'Server misconfiguration: missing JWT secret' });
+    }
+
+    const decoded = jwt.verify(token, secret) as {
       id: string;
       email: string;
       accessLevel: string;
@@ -62,7 +66,13 @@ export const authenticateMunicipalAdmin = (req: Request, res: any, next: NextFun
   }
 
   try {
-    const decoded = jwt.verify(token, JWT_SECRET) as any;
+    const secret = process.env.JWT_SECRET;
+    if (!secret) {
+      console.error('[authenticateMunicipalAdmin] Missing JWT secret in environment');
+      return res.status(500).json({ success: false, message: 'Server misconfiguration: missing JWT secret' });
+    }
+
+    const decoded = jwt.verify(token, secret) as any;
 
     if (decoded.accessLevel !== 'DEPT_MUNICIPAL_ADMIN') {
       return res.status(403).json({ success: false, message: 'Unauthorized: Not a municipal admin' });
@@ -93,7 +103,13 @@ export const authenticateAgent = (req: Request, res: any, next: NextFunction):vo
   }
 
   try {
-    const decoded = jwt.verify(token, JWT_SECRET) as {
+    const secret = process.env.JWT_SECRET;
+    if (!secret) {
+      console.error('[authenticateAgent] Missing JWT secret in environment');
+      return res.status(500).json({ success: false, message: 'Server misconfiguration: missing JWT secret' });
+    }
+
+    const decoded = jwt.verify(token, secret) as {
       id: string;
       officialEmail: string;
       accessLevel: string;

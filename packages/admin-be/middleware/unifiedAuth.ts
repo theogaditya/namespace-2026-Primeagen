@@ -1,8 +1,6 @@
 import type { Request, Response, NextFunction } from 'express';
 import jwt from 'jsonwebtoken';
 
-const JWT_SECRET = process.env.JWT_SECRET!;
-
 // Admin types that the unified middleware can authenticate
 export type AdminType = 'SUPER_ADMIN' | 'STATE_ADMIN' | 'MUNICIPAL_ADMIN' | 'AGENT';
 
@@ -52,7 +50,14 @@ export const authenticateAdmin = (req: Request, res: any, next: NextFunction): v
   }
 
   try {
-    const decoded = jwt.verify(token, JWT_SECRET) as DecodedToken;
+    const secret = process.env.JWT_SECRET;
+
+    if (!secret) {
+      console.error('[authenticateAdmin] Missing JWT secret in environment');
+      return res.status(500).json({ success: false, message: 'Server misconfiguration: missing JWT secret' });
+    }
+
+    const decoded = jwt.verify(token, secret) as DecodedToken;
 
     // Normalize adminType for backwards compatibility
     // Some tokens may have accessLevel or type instead of adminType

@@ -47,7 +47,7 @@ export function stopAssignmentPolling() {
 
 export default function(prisma: PrismaClient) {
   const router = Router();
-  const JWT_SECRET= process.env.JWT_SECRET!;
+  
 
 // Agent Login
 router.post('/login', async (req, res: any) => {
@@ -105,6 +105,13 @@ router.post('/login', async (req, res: any) => {
       data: { lastLogin: new Date() }
     });
 
+    // Ensure JWT secret is available
+    const secret = process.env.JWT_SECRET;
+    if (!secret) {
+      console.error('[agent.login] Missing JWT secret in environment');
+      return res.status(500).json({ message: 'Server misconfigured: missing JWT secret' });
+    }
+
     // Generate JWT token
     const token = jwt.sign(
       { 
@@ -114,7 +121,7 @@ router.post('/login', async (req, res: any) => {
         department: agent.department,
         type: 'AGENT'
       },
-      JWT_SECRET,
+      secret,
       { expiresIn: '24h' }
     );
 
@@ -153,7 +160,13 @@ router.get('/me', async (req, res: any) => {
       return res.status(401).json({ message: 'No token provided' });
     }
 
-    const decoded = jwt.verify(token, process.env.JWT_SECRET || 'your-secret-key') as any;
+    const secret = process.env.JWT_SECRET;
+    if (!secret) {
+      console.error('[agent.me] Missing JWT secret in environment');
+      return res.status(500).json({ message: 'Server misconfigured: missing JWT secret' });
+    }
+
+    const decoded = jwt.verify(token, secret) as any;
     
     if (decoded.type !== 'AGENT') {
       return res.status(403).json({ message: 'Access denied' });
@@ -530,7 +543,13 @@ router.put('/me/workload/dec', authenticateAgentOnly, async (req: any, res: any)
       return res.status(401).json({ message: 'No token provided' });
     }
 
-    const decoded = jwt.verify(token, process.env.JWT_SECRET || 'your-secret-key') as any;
+    const secret = process.env.JWT_SECRET;
+    if (!secret) {
+      console.error('[agent.workload.dec] Missing JWT secret in environment');
+      return res.status(500).json({ message: 'Server misconfigured: missing JWT secret' });
+    }
+
+    const decoded = jwt.verify(token, secret) as any;
     
     if (decoded.type !== 'AGENT') {
       return res.status(403).json({ message: 'Access denied' });
