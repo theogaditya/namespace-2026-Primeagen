@@ -217,6 +217,65 @@ router.get('/me', async (req, res: any) => {
   }
 });
 
+// ----- Get Complaints Assigned to the Authenticated Agent -----
+router.get('/my-complaints', authenticateAgentOnly, async (req: any, res: any) => {
+  try {
+    const agentId = req.admin.id;
+    const page = parseInt(req.query.page as string) || 1;
+    const limit = parseInt(req.query.limit as string) || 20;
+    const skip = (page - 1) * limit;
+
+    const [complaintsRaw, total] = await Promise.all([
+      prisma.complaint.findMany({
+        where: {
+          assignedAgentId: agentId,
+          status: { not: 'DELETED' },
+        },
+        include: {
+          category: true,
+          User: true,
+          location: true,
+          assignedAgent: {
+            select: { id: true, fullName: true, officialEmail: true },
+          },
+          managedByMunicipalAdmin: {
+            select: { id: true, fullName: true, officialEmail: true },
+          },
+        },
+        orderBy: { submissionDate: 'desc' },
+        skip,
+        take: limit,
+      }),
+      prisma.complaint.count({
+        where: { assignedAgentId: agentId, status: { not: 'DELETED' } },
+      }),
+    ]);
+
+    const complaints = complaintsRaw.map(({ User, ...rest }) => ({
+      ...rest,
+      complainant: User || null,
+    }));
+
+    return res.json({
+      success: true,
+      complaints,
+      pagination: {
+        page,
+        limit,
+        total,
+        totalPages: Math.ceil(total / limit),
+      },
+    });
+  } catch (error: any) {
+    console.error('Error fetching assigned complaints:', error);
+    return res.status(500).json({
+      success: false,
+      message: 'Failed to fetch assigned complaints',
+      error: process.env.NODE_ENV === 'development' ? error.message : undefined,
+    });
+  }
+});
+
 // ----- 3. Get All Complaints -----
 router.get('/complaints',authenticateAgentOnly, async (req, res:any) => {
   try {
