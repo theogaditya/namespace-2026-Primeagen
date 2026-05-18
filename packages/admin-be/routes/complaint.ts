@@ -3,6 +3,95 @@ import type { Request, Response } from 'express';
 import { PrismaClient } from '../prisma/generated/client/client';
 import { authenticateAdmin } from '../middleware/unifiedAuth';
 
+// Jharkhand district coordinates for geocoding fallback
+const JHARKHAND_DISTRICTS: Record<string, { lat: number; lng: number }> = {
+  'ranchi': { lat: 23.3441, lng: 85.3096 },
+  'dhanbad': { lat: 23.7957, lng: 86.4304 },
+  'jamshedpur': { lat: 22.8046, lng: 86.2029 },
+  'bokaro': { lat: 23.6693, lng: 86.1511 },
+  'hazaribagh': { lat: 23.9925, lng: 85.3637 },
+  'deoghar': { lat: 24.4851, lng: 86.6947 },
+  'giridih': { lat: 24.1851, lng: 86.3004 },
+  'ramgarh': { lat: 23.6277, lng: 85.5614 },
+  'dumka': { lat: 24.2680, lng: 87.2500 },
+  'palamu': { lat: 24.0267, lng: 84.0525 },
+  'garhwa': { lat: 24.1600, lng: 83.8000 },
+  'chatra': { lat: 24.2067, lng: 84.8700 },
+  'koderma': { lat: 24.4675, lng: 85.5940 },
+  'jamtara': { lat: 23.9575, lng: 86.8014 },
+  'sahebganj': { lat: 25.2550, lng: 87.6550 },
+  'pakur': { lat: 24.6347, lng: 87.8450 },
+  'godda': { lat: 24.8274, lng: 87.2126 },
+  'lohardaga': { lat: 23.4357, lng: 84.6839 },
+  'gumla': { lat: 23.0440, lng: 84.5420 },
+  'simdega': { lat: 22.6155, lng: 84.5032 },
+  'west singhbhum': { lat: 22.4732, lng: 85.6033 },
+  'east singhbhum': { lat: 22.8046, lng: 86.2029 },
+  'seraikela kharsawan': { lat: 22.7075, lng: 85.8375 },
+  'khunti': { lat: 23.0750, lng: 85.2800 },
+  'latehar': { lat: 23.7475, lng: 84.5000 },
+};
+
+// Simple hash function to generate consistent offset from complaint ID
+function hashCode(str: string): number {
+  let hash = 0;
+  for (let i = 0; i < str.length; i++) {
+    const char = str.charCodeAt(i);
+    hash = ((hash << 5) - hash) + char;
+    hash = hash & hash; // Convert to 32bit integer
+  }
+  return hash;
+}
+
+// Get deterministic offset based on complaint ID (returns value between -0.01 and 0.01)
+function getDeterministicOffset(id: string, seed: number): number {
+  const hash = hashCode(id + seed.toString());
+  return ((hash % 1000) / 1000) * 0.02 - 0.01; // ~1km offset, deterministic
+}
+
+// Helper to get coordinates from district/city name with deterministic offset
+function getCoordinatesFromLocation(
+  district: string | null, 
+  city: string | null, 
+  locality: string | null,
+  complaintId: string
+): { lat: number; lng: number } | null {
+  // Try district first
+  if (district) {
+    const normalizedDistrict = district.toLowerCase().trim();
+    if (JHARKHAND_DISTRICTS[normalizedDistrict]) {
+      return {
+        lat: JHARKHAND_DISTRICTS[normalizedDistrict].lat + getDeterministicOffset(complaintId, 1),
+        lng: JHARKHAND_DISTRICTS[normalizedDistrict].lng + getDeterministicOffset(complaintId, 2),
+      };
+    }
+    // Try partial match
+    for (const [key, coords] of Object.entries(JHARKHAND_DISTRICTS)) {
+      if (normalizedDistrict.includes(key) || key.includes(normalizedDistrict)) {
+        return { 
+          lat: coords.lat + getDeterministicOffset(complaintId, 1), 
+          lng: coords.lng + getDeterministicOffset(complaintId, 2) 
+        };
+      }
+    }
+  }
+  
+  // Try city as fallback
+  if (city) {
+    const normalizedCity = city.toLowerCase().trim();
+    for (const [key, coords] of Object.entries(JHARKHAND_DISTRICTS)) {
+      if (normalizedCity.includes(key) || key.includes(normalizedCity)) {
+        return { 
+          lat: coords.lat + getDeterministicOffset(complaintId, 1), 
+          lng: coords.lng + getDeterministicOffset(complaintId, 2) 
+        };
+      }
+    }
+  }
+  
+  return null;
+}
+
 export default function (prisma: PrismaClient) {
   const router = Router();
 
@@ -337,7 +426,7 @@ export default function (prisma: PrismaClient) {
           ? {
               district: complaint.location.district,
               city: complaint.location.city,
-              locality: complaint.location.locality,
+                isDuplicate: complaint.isDuplicate,
               street: complaint.location.street,
               pin: complaint.location.pin,
             }
@@ -381,6 +470,105 @@ export default function (prisma: PrismaClient) {
       return res.status(500).json({
         success: false,
         message: 'Failed to fetch complaints',
+      });
+    }
+  });
+
+  // Get complaint locations for map (all non-duplicate complaints with geocoding fallback)
+  // NOTE: This must be placed BEFORE the /:id route to avoid route shadowing
+  router.get('/locations', authenticateAdmin, async (req: Request, res: Response) => {
+    try {
+      // Fetch ALL non-duplicate complaints (not just ones with coordinates)
+      const complaints = await prisma.complaint.findMany({
+        where: {
+          isDuplicate: { not: true },
+          status: { not: 'DELETED' },
+        },
+        select: {
+          id: true,
+          seq: true,
+          subCategory: true,
+          description: true,
+          status: true,
+          urgency: true,
+          submissionDate: true,
+          category: {
+            select: {
+              name: true,
+            },
+          },
+          location: {
+            select: {
+              latitude: true,
+              longitude: true,
+              district: true,
+              city: true,
+              locality: true,
+              pin: true,
+            },
+          },
+        },
+        orderBy: {
+          submissionDate: 'desc',
+        },
+      });
+
+      // Process complaints - use stored coordinates or geocode from district/city
+      const locations = complaints
+        .map((c) => {
+          let lat: number | null = c.location?.latitude ?? null;
+          let lng: number | null = c.location?.longitude ?? null;
+
+          // If no coordinates, try to geocode from district/city (with deterministic offset based on ID)
+          if (lat == null || lng == null) {
+            const geocoded = getCoordinatesFromLocation(
+              c.location?.district ?? null,
+              c.location?.city ?? null,
+              c.location?.locality ?? null,
+              c.id // Pass complaint ID for deterministic offset
+            );
+            if (geocoded) {
+              lat = geocoded.lat;
+              lng = geocoded.lng;
+            }
+          }
+
+          // Skip if still no coordinates
+          if (lat == null || lng == null) {
+            return null;
+          }
+
+          return {
+            id: c.id,
+            seq: c.seq,
+            subCategory: c.subCategory,
+            description: c.description,
+            status: c.status,
+            urgency: c.urgency,
+            submissionDate: c.submissionDate,
+            category: c.category?.name || 'Unknown',
+            latitude: lat,
+            longitude: lng,
+            district: c.location?.district ?? null,
+            city: c.location?.city ?? null,
+            locality: c.location?.locality ?? null,
+            pin: c.location?.pin ?? null,
+          };
+        })
+        .filter((loc): loc is NonNullable<typeof loc> => loc !== null);
+
+      // console.log(`[complaints/locations] Returning ${locations.length} complaint locations (geocoded from ${complaints.length} total)`);
+
+      return res.json({
+        success: true,
+        count: locations.length,
+        locations,
+      });
+    } catch (error) {
+      console.error('Error fetching complaint locations:', error);
+      return res.status(500).json({
+        success: false,
+        message: 'Failed to fetch complaint locations',
       });
     }
   });

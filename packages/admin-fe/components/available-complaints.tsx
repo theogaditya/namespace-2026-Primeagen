@@ -68,6 +68,7 @@ interface Complaint {
   AIStandardizedSubcategory?: string | null
   // matches DB field casing from Prisma
   AIstandardizedSubCategory?: string | null
+  isDuplicate?: boolean | null
 }
 
 // Use NEXT_PUBLIC_API_URL when provided, otherwise fallback to admin-be default port 4000
@@ -76,6 +77,7 @@ const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000'
 export function AvailableComplaints() {
   const [complaints, setComplaints] = useState<Complaint[]>([])
   const [loading, setLoading] = useState(true)
+  const [initialLoadDone, setInitialLoadDone] = useState(false)
   const [assigning, setAssigning] = useState<string | null>(null)
   const [pagination, setPagination] = useState({
     page: 1,
@@ -97,7 +99,8 @@ export function AvailableComplaints() {
   // Random 3-digit number for "Complaints Solved" – generated once per mount
   const [randomSolved] = useState<number>(() => Math.floor(Math.random() * 900) + 100)
 
-  const fetchAvailableComplaints = async () => {
+  const fetchAvailableComplaints = async (showLoader = true) => {
+    if (showLoader) setLoading(true)
     try {
       const token = localStorage.getItem("token")
       if (!token) {
@@ -123,17 +126,26 @@ export function AvailableComplaints() {
       const data = await response.json()
 
       if (data.success) {
-        setComplaints(data.data)
+        // Filter out duplicate complaints flagged by the backend
+        const filtered = (data.data as any[]).filter((c) => !c.isDuplicate)
+
+        // Adjust pagination total to account for filtered duplicates on this page
+        const duplicatesOnPage = (data.data as any[]).length - filtered.length
+        const adjustedTotal = Math.max(0, (data.pagination?.total ?? filtered.length) - duplicatesOnPage)
+        const adjustedTotalPages = Math.max(1, Math.ceil(adjustedTotal / pagination.limit))
+
+        setComplaints(filtered)
         setPagination((prev) => ({
           ...prev,
-          total: data.pagination.total,
-          totalPages: data.pagination.totalPages,
+          total: adjustedTotal,
+          totalPages: adjustedTotalPages,
         }))
       }
     } catch (error) {
       console.error("Error fetching available complaints:", error)
     } finally {
       setLoading(false)
+      setInitialLoadDone(true)
     }
   }
 
@@ -177,9 +189,13 @@ export function AvailableComplaints() {
   }, [])
 
   useEffect(() => {
+    // Skip the initial render - the pagination.page effect handles the first load
+    if (!initialLoadDone) return
+    
     const debounce = setTimeout(() => {
       if (pagination.page === 1) {
-        fetchAvailableComplaints()
+        // Don't show loading skeleton for search - just update data silently
+        fetchAvailableComplaints(false)
       } else {
         setPagination((prev) => ({ ...prev, page: 1 }))
       }
@@ -412,33 +428,52 @@ export function AvailableComplaints() {
     <div className="p-6 space-y-6">
       {/* Header */}
       <div>
-        <h1 className="text-2xl font-bold text-gray-900">Complaints Management</h1>
+        {/* <h1 className="text-2xl font-bold text-gray-900">Complaints Management</h1> */}
         <p className="text-gray-600">Manage and track all complaints on the platform</p>
       </div>
 
       {/* Stats Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        {stats.map((stat) => (
-          <div key={stat.title} className={`${stat.bgColor} rounded-2xl p-6 text-white shadow-lg relative overflow-hidden`}>
-            {/* Background decoration */}
-            <div className="absolute top-0 right-0 w-32 h-32 bg-white/5 rounded-full -translate-y-1/2 translate-x-1/2" />
-            <div className="absolute bottom-0 left-0 w-24 h-24 bg-white/5 rounded-full translate-y-1/2 -translate-x-1/2" />
-            
-            <div className="relative flex items-start justify-between">
-              <div className="space-y-1">
-                <p className="text-xs font-semibold tracking-wider text-white/80 uppercase">{stat.title}</p>
-                <p className="text-4xl font-bold tracking-tight">{stat.value}</p>
-                <p className="text-sm text-white/70 mt-2">
-                  {stat.trend && <span className={stat.trendColor}>{stat.trend} </span>}
-                  {stat.subtitle}
-                </p>
-              </div>
-              <div className={`${stat.iconBg} p-3 rounded-xl shadow-md`}>
-                <stat.icon className="h-6 w-6 text-white" />
+        {loading ? (
+          // Skeleton loading state for stats cards
+          [...Array(4)].map((_, i) => (
+            <div key={i} className="bg-gray-200 rounded-2xl p-6 shadow-lg relative overflow-hidden animate-pulse">
+              <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -translate-y-1/2 translate-x-1/2" />
+              <div className="absolute bottom-0 left-0 w-24 h-24 bg-white/10 rounded-full translate-y-1/2 -translate-x-1/2" />
+              
+              <div className="relative flex items-start justify-between">
+                <div className="space-y-3">
+                  <div className="h-3 bg-gray-300 rounded w-24"></div>
+                  <div className="h-10 bg-gray-300 rounded w-16"></div>
+                  <div className="h-4 bg-gray-300 rounded w-20 mt-2"></div>
+                </div>
+                <div className="bg-gray-300 p-3 rounded-xl h-12 w-12"></div>
               </div>
             </div>
-          </div>
-        ))}
+          ))
+        ) : (
+          stats.map((stat) => (
+            <div key={stat.title} className={`${stat.bgColor} rounded-2xl p-6 text-white shadow-lg relative overflow-hidden`}>
+              {/* Background decoration */}
+              <div className="absolute top-0 right-0 w-32 h-32 bg-white/5 rounded-full -translate-y-1/2 translate-x-1/2" />
+              <div className="absolute bottom-0 left-0 w-24 h-24 bg-white/5 rounded-full translate-y-1/2 -translate-x-1/2" />
+              
+              <div className="relative flex items-start justify-between">
+                <div className="space-y-1">
+                  <p className="text-xs font-semibold tracking-wider text-white/80 uppercase">{stat.title}</p>
+                  <p className="text-4xl font-bold tracking-tight">{stat.value}</p>
+                  <p className="text-sm text-white/70 mt-2">
+                    {stat.trend && <span className={stat.trendColor}>{stat.trend} </span>}
+                    {stat.subtitle}
+                  </p>
+                </div>
+                <div className={`${stat.iconBg} p-3 rounded-xl shadow-md`}>
+                  <stat.icon className="h-6 w-6 text-white" />
+                </div>
+              </div>
+            </div>
+          ))
+        )}
       </div>
 
       {/* Complaints Table */}
@@ -496,14 +531,33 @@ export function AvailableComplaints() {
               </TableHeader>
               <TableBody>
                 {loading ? (
-                  <TableRow>
-                    <TableCell colSpan={5} className="text-center py-8">
-                      <div className="flex items-center justify-center space-x-3">
-                        <div className="w-5 h-5 border-2 border-t-transparent border-gray-600 rounded-full animate-spin" />
-                        <span className="text-gray-600">Loading...</span>
-                      </div>
-                    </TableCell>
-                  </TableRow>
+                  <>
+                    {[...Array(5)].map((_, i) => (
+                      <TableRow key={i} className="animate-pulse">
+                        <TableCell>
+                          <div className="space-y-2">
+                            <div className="h-4 bg-gray-200 rounded w-3/4"></div>
+                            <div className="h-3 bg-gray-200 rounded w-1/2"></div>
+                          </div>
+                        </TableCell>
+                        <TableCell>
+                          <div className="h-6 bg-gray-200 rounded w-24"></div>
+                        </TableCell>
+                        <TableCell>
+                          <div className="h-6 bg-gray-200 rounded w-16"></div>
+                        </TableCell>
+                        <TableCell>
+                          <div className="h-4 bg-gray-200 rounded w-20"></div>
+                        </TableCell>
+                        <TableCell>
+                          <div className="h-4 bg-gray-200 rounded w-24"></div>
+                        </TableCell>
+                        <TableCell className="text-center">
+                          <div className="h-8 bg-gray-200 rounded w-20 mx-auto"></div>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </>
                 ) : displayedComplaints.length === 0 ? (
                   <TableRow>
                     <TableCell colSpan={5} className="text-center py-8 text-gray-500">
@@ -642,7 +696,7 @@ export function AvailableComplaints() {
               <button
                 onClick={() => setIsModalOpen(false)}
                 aria-label="Close"
-                className="absolute top-3 right-3 rounded-full p-1 hover:bg-gray-100 transition-colors"
+                className="absolute top-3 right-3 rounded-full p-1 hover:bg-gray-100 transition-colors mr-4"
               >
                 <X className="h-4 w-4 text-gray-500" />
               </button>

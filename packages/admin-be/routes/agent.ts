@@ -436,7 +436,9 @@ router.put('/complaints/:id/status', authenticateAgentOnly, async (req: any, res
       data: {
         status: newStatus,
         ...(newStatus === 'COMPLETED' && { dateOfResolution: new Date() }),
-        ...(newStatus === 'ESCALATED_TO_MUNICIPAL_LEVEL' && { escalatedAt: new Date() })
+        // Note: do not set `escalatedAt` here because the Prisma schema doesn't include that field.
+        // Escalation handling (assigning municipal admin, workload adjustments) is handled
+        // by the dedicated `/complaints/:id/escalate` endpoint which updates the complaint appropriately.
       },
       include: {
         User: true, // relation field in schema is `User` (complainant)

@@ -277,17 +277,76 @@ router.put('/complaints/:id/escalate', authenticateMunicipalAdminOnly, async (re
       return res.status(404).json({ success: false, message: 'Complaint not found' });
     }
 
-    const updated = await prisma.complaint.update({
-      where: { id },
-      data: {
-        status: 'ESCALATED_TO_STATE_LEVEL',
-      },
-    });
+    // Determine the state admin to assign to: prefer the municipal admin's linked state admin
+    const muniAdminId = (req as any).admin?.id;
+    let stateAdminId: string | null = null;
+
+    if (muniAdminId) {
+      const muniAdmin = await prisma.departmentMunicipalAdmin.findUnique({
+        where: { id: muniAdminId },
+        select: { managedByStateAdminId: true }
+      });
+      stateAdminId = muniAdmin?.managedByStateAdminId ?? null;
+    }
+
+    // Build update payload for complaint
+    const complaintUpdate: any = {
+      status: 'ESCALATED_TO_STATE_LEVEL',
+    };
+
+    if (stateAdminId) {
+      complaintUpdate.escalatedToStateAdminId = stateAdminId;
+      complaintUpdate.escalationLevel = 'STATE';
+    }
+
+    // Use a transaction: update complaint and increment state admin's escalation count (if assigned)
+    let updatedComplaint;
+    if (stateAdminId) {
+      const [complaintRes] = await prisma.$transaction([
+        prisma.complaint.update({
+          where: { id },
+          data: complaintUpdate,
+          include: {
+            User: true,
+            category: true,
+            location: true,
+            escalatedToStateAdmin: true,
+            managedByMunicipalAdmin: true,
+            assignedAgent: { select: { id: true, fullName: true, officialEmail: true } }
+          }
+        }),
+        prisma.departmentStateAdmin.update({
+          where: { id: stateAdminId },
+          data: { escalationCount: { increment: 1 } }
+        })
+      ]);
+
+      updatedComplaint = complaintRes as any;
+    } else {
+      updatedComplaint = await prisma.complaint.update({
+        where: { id },
+        data: complaintUpdate,
+        include: {
+          User: true,
+          category: true,
+          location: true,
+          escalatedToStateAdmin: true,
+          managedByMunicipalAdmin: true,
+          assignedAgent: { select: { id: true, fullName: true, officialEmail: true } }
+        }
+      });
+    }
+
+    // Map Prisma relation `User` to `complainant` for response consistency
+    const { User, ...complaintRest } = updatedComplaint as any;
+    const complaintForResponse = { ...complaintRest, complainant: User || null };
+
+    console.log(`[municipalEscalate] Complaint ${id} escalated${stateAdminId ? ` to state admin ${stateAdminId}` : ''} by municipal admin ${muniAdminId}`);
 
     return res.json({
       success: true,
-      message: 'Complaint escalated to municipal level successfully',
-      complaint: updated,
+      message: 'Complaint escalated to state level successfully',
+      complaint: complaintForResponse,
     });
   } catch (error: any) {
     console.error('Escalation error:', error);

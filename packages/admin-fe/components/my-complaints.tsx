@@ -76,10 +76,12 @@ export function MyComplaints() {
 
 
   const fetchMyComplaints = async () => {
+    setLoading(true)
     try {
       const token = localStorage.getItem('token')
       if (!token) {
         console.error('No token found')
+        setLoading(false)
         return
       }
 
@@ -276,7 +278,7 @@ export function MyComplaints() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">{headerInfo.title}</h1>
+          {/* <h1 className="text-3xl font-bold text-gray-900">{headerInfo.title}</h1> */}
           <p className="text-gray-500 mt-1">{headerInfo.desc}</p>
         </div>
         <Button 
@@ -321,9 +323,27 @@ export function MyComplaints() {
       <Card className="bg-white shadow-sm border-gray-200">
         <CardContent className="p-0">
           {loading ? (
-            <div className="flex items-center justify-center py-16">
-              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
-              <span className="ml-3 text-gray-500">Loading complaints...</span>
+            <div className="divide-y divide-gray-100">
+              {[...Array(5)].map((_, i) => (
+                <div key={i} className="p-5 animate-pulse">
+                  <div className="flex items-start gap-4">
+                    <div className="mt-1 h-5 w-5 bg-gray-200 rounded-full shrink-0"></div>
+                    <div className="flex-1 space-y-3">
+                      <div className="flex items-center gap-3">
+                        <div className="h-5 bg-gray-200 rounded w-16"></div>
+                        <div className="h-5 bg-gray-200 rounded w-20"></div>
+                        <div className="h-5 bg-gray-200 rounded w-24"></div>
+                      </div>
+                      <div className="h-4 bg-gray-200 rounded w-3/4"></div>
+                      <div className="h-4 bg-gray-200 rounded w-1/2"></div>
+                      <div className="flex items-center gap-4 pt-1">
+                        <div className="h-3 bg-gray-200 rounded w-32"></div>
+                        <div className="h-3 bg-gray-200 rounded w-24"></div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              ))}
             </div>
           ) : filteredComplaints.length === 0 ? (
             <div className="flex flex-col items-center justify-center py-16 text-gray-500">

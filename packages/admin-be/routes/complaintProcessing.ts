@@ -156,7 +156,7 @@ export function startComplaintPolling(db: PrismaClient) {
       await registrationQueueClient.connect();
       const client = registrationQueueClient.getClient();
       const regQueueLen = await client.lLen(REGISTRATION_QUEUE);
-      console.log(`[ComplaintProcessing] Poll cycle - registration queue length: ${regQueueLen}`);
+      // console.log(`[ComplaintProcessing] Poll cycle - registration queue length: ${regQueueLen}`);
 
       const result = await processNextComplaint(db);
       if (result.processed) {

@@ -442,7 +442,7 @@ export function startAutoAssignPolling() {
     try {
       // Log queue status before processing
       const queueLen = await processedComplaintQueueService.getQueueLength();
-      console.log(`[AutoAssign] Poll cycle - processed queue length: ${queueLen}`);
+      // console.log(`[AutoAssign] Poll cycle - processed queue length: ${queueLen}`);
 
       const result = await autoAssignComplaint();
       if (result.success) {

@@ -61,3 +61,49 @@ body {
 * {
   border-color: hsl(var(--border));
 }
+
+/* Analytics icon animations */
+@keyframes thumbsUpJump {
+  0% {
+    transform: rotate(0deg) translateY(0) translateX(0);
+  }
+  30% {
+    transform: rotate(-20deg) translateY(-8px) translateX(-4px);
+  }
+  50% {
+    transform: rotate(-15deg) translateY(-6px) translateX(-3px);
+  }
+  70% {
+    transform: rotate(-10deg) translateY(-3px) translateX(-2px);
+  }
+  100% {
+    transform: rotate(0deg) translateY(0) translateX(0);
+  }
+}
+
+@keyframes lineThrough {
+  0% {
+    width: 0;
+    opacity: 1;
+  }
+  50% {
+    width: 100%;
+    opacity: 1;
+  }
+  100% {
+    width: 100%;
+    opacity: 0;
+  }
+}
+
+@keyframes ekgTrace {
+  0% {
+    stroke-dashoffset: 60;
+  }
+  50% {
+    stroke-dashoffset: 0;
+  }
+  100% {
+    stroke-dashoffset: 0;
+  }
+}
