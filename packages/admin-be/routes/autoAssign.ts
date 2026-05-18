@@ -439,9 +439,19 @@ export function startAutoAssignPolling() {
   console.log('[AutoAssign] Polling started (15s interval)');
 
   autoAssignPollingInterval = setInterval(async () => {
-    const result = await autoAssignComplaint();
-    if (result.success) {
-      console.log('[AutoAssign] Complaint auto-assigned:', result);
+    try {
+      // Log queue status before processing
+      const queueLen = await processedComplaintQueueService.getQueueLength();
+      console.log(`[AutoAssign] Poll cycle - processed queue length: ${queueLen}`);
+
+      const result = await autoAssignComplaint();
+      if (result.success) {
+        console.log('[AutoAssign] Complaint auto-assigned:', result);
+      } else if (result.message !== 'No complaints in processed queue') {
+        console.log('[AutoAssign] Assignment failed:', result.message);
+      }
+    } catch (err) {
+      console.error('[AutoAssign] Poll cycle error:', err);
     }
   }, 15000); // 15 second interval
 }

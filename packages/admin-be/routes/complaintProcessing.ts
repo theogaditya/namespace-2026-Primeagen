@@ -151,9 +151,19 @@ export function startComplaintPolling(db: PrismaClient) {
   console.log("Complaint polling started (10s interval)");
 
   pollingInterval = setInterval(async () => {
-    const result = await processNextComplaint(db);
-    if (result.processed) {
-      console.log("Complaint processed:", result.result);
+    try {
+      // Log registration queue status before processing
+      await registrationQueueClient.connect();
+      const client = registrationQueueClient.getClient();
+      const regQueueLen = await client.lLen(REGISTRATION_QUEUE);
+      console.log(`[ComplaintProcessing] Poll cycle - registration queue length: ${regQueueLen}`);
+
+      const result = await processNextComplaint(db);
+      if (result.processed) {
+        console.log("[ComplaintProcessing] Complaint processed:", result.result);
+      }
+    } catch (err) {
+      console.error("[ComplaintProcessing] Poll cycle error:", err);
     }
   }, 10000);
 }

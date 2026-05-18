@@ -490,8 +490,12 @@ router.put('/complaints/:id/status', authenticateAgentOnly, async (req: any, res
 router.put('/complaints/:id/escalate', authenticateAgentOnly, async (req: any, res: any) => {
   try {
     const { id } = req.params;
-    // Ensure complaint exists
-    const complaint = await prisma.complaint.findUnique({ where: { id } });
+    
+    // Ensure complaint exists and get location info
+    const complaint = await prisma.complaint.findUnique({ 
+      where: { id },
+      include: { location: true }
+    });
     if (!complaint) {
       return res.status(404).json({ success: false, message: 'Complaint not found' });
     }
@@ -506,27 +510,97 @@ router.put('/complaints/:id/escalate', authenticateAgentOnly, async (req: any, r
       return res.status(400).json({ error: 'Agent not active' });
     }
 
-    const updated = await prisma.complaint.update({
-      where: { id },
-      data: {
-        status: 'ESCALATED_TO_MUNICIPAL_LEVEL',
-      },
-    });
-
-    if (agent.currentWorkload > 0) {
-      await prisma.agent.update({
-        where: { id: req.admin.id },
-        data: { currentWorkload: { decrement: 1 } },
+    // Get the district from complaint location or agent's municipality
+    const complaintDistrict = complaint.location?.district || agent.municipality;
+    
+    if (!complaintDistrict) {
+      return res.status(400).json({ 
+        success: false, 
+        message: 'Cannot escalate: complaint has no district information' 
       });
     }
 
+    // Find available municipal admins in the same district
+    const availableAdmins = await prisma.departmentMunicipalAdmin.findMany({
+      where: {
+        municipality: {
+          equals: complaintDistrict,
+          mode: 'insensitive',
+        },
+        status: 'ACTIVE',
+      },
+    });
+
+    // Filter admins who have capacity
+    const adminsWithCapacity = availableAdmins.filter(
+      (admin) => admin.currentWorkload < admin.workloadLimit
+    );
+
+    if (adminsWithCapacity.length === 0) {
+      console.warn(`[Escalate] No available municipal admins in district ${complaintDistrict} for complaint ${id}`);
+      return res.status(400).json({
+        success: false,
+        message: `No available municipal admins in district ${complaintDistrict} to handle escalation`,
+      });
+    }
+
+    // Pick a random municipal admin with capacity
+    const randomIndex = Math.floor(Math.random() * adminsWithCapacity.length);
+    const selectedAdmin = adminsWithCapacity[randomIndex]!;
+
+    // Use transaction to:
+    // 1. Update complaint status and assign to municipal admin (keep assignedAgentId for history)
+    // 2. Decrement agent's workload
+    // 3. Increment municipal admin's workload
+    await prisma.$transaction([
+      prisma.complaint.update({
+        where: { id },
+        data: {
+          status: 'ESCALATED_TO_MUNICIPAL_LEVEL',
+          managedByMunicipalAdminId: selectedAdmin.id,
+          escalationLevel: 'MUNICIPAL_ADMIN',
+          // NOTE: assignedAgentId is NOT cleared - kept for history
+        },
+      }),
+      // Decrement agent workload if assigned
+      ...(complaint.assignedAgentId && agent.currentWorkload > 0 
+        ? [prisma.agent.update({
+            where: { id: req.admin.id },
+            data: { currentWorkload: { decrement: 1 } },
+          })]
+        : []),
+      // Increment municipal admin workload
+      prisma.departmentMunicipalAdmin.update({
+        where: { id: selectedAdmin.id },
+        data: { currentWorkload: { increment: 1 } },
+      }),
+    ]);
+
+    // Fetch updated complaint for response
+    const updatedComplaint = await prisma.complaint.findUnique({
+      where: { id },
+      include: {
+        User: true,
+        category: true,
+        location: true,
+        assignedAgent: {
+          select: { id: true, fullName: true, officialEmail: true }
+        },
+        managedByMunicipalAdmin: {
+          select: { id: true, fullName: true, officialEmail: true }
+        }
+      }
+    });
+
+    console.log(`[Escalate] SUCCESS - Complaint ${id} (seq: ${complaint.seq}) escalated to municipal admin ${selectedAdmin.fullName} (${selectedAdmin.id}) in district ${complaintDistrict}. Agent ${agent.fullName} workload decremented.`);
+
     return res.json({
       success: true,
-      message: 'Complaint escalated to municipal level successfully',
-      complaint: updated,
+      message: `Complaint escalated to municipal admin ${selectedAdmin.fullName} successfully`,
+      complaint: updatedComplaint,
     });
   } catch (error: any) {
-    console.error('Escalation error:', error);
+    console.error('[Escalate] Error:', error);
     return res.status(500).json({
       success: false,
       message: 'Failed to escalate complaint',
