@@ -13,6 +13,21 @@ vi.mock('../lib/redis/processedComplaintQueueService', () => ({
   },
 }));
 
+// Mock blockchain queue service
+const mockBlockchainPushToQueue = vi.fn();
+const mockBlockchainGetQueueLength = vi.fn();
+const mockBlockchainPeekQueue = vi.fn();
+const mockBlockchainPopFromQueue = vi.fn();
+
+vi.mock('../lib/redis/blockchainQueueService', () => ({
+  blockchainQueueService: {
+    pushToQueue: mockBlockchainPushToQueue,
+    getQueueLength: mockBlockchainGetQueueLength,
+    peekQueue: mockBlockchainPeekQueue,
+    popFromQueue: mockBlockchainPopFromQueue,
+  },
+}));
+
 // Mock Prisma client
 const mockComplaintFindUnique = vi.fn();
 const mockComplaintUpdate = vi.fn();
@@ -51,6 +66,8 @@ describe('autoAssignComplaint', () => {
         await op;
       }
     });
+    // Setup blockchain queue mock to resolve successfully
+    mockBlockchainPushToQueue.mockResolvedValue(undefined);
   });
 
   afterEach(() => {
