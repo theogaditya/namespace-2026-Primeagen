@@ -1,6 +1,8 @@
 import { Router } from 'express';
 import { getPrisma } from '../lib/prisma';
 import { processedComplaintQueueService } from '../lib/redis/processedComplaintQueueService';
+import { blockchainQueueService } from '../lib/redis/blockchainQueueService';
+import type { BlockchainQueueData } from '../lib/redis/blockchainQueueService';
 
 const router = Router();
 
@@ -140,6 +142,25 @@ export async function autoAssignComplaint(): Promise<{
       }),
     ]);
 
+    // Push to blockchain queue for immutable record
+    const blockchainData: BlockchainQueueData = {
+      id,
+      seq: complaint.seq,
+      status: 'UNDER_PROCESSING',
+      categoryId: complaint.categoryId,
+      subCategory: complaint.subCategory,
+      assignedDepartment: assignedDepartment,
+      city: complaint.location?.city || '',
+      district: complaintDistrict,
+      assignedTo: {
+        type: 'agent',
+        id: selectedAgent.id,
+        name: selectedAgent.fullName,
+      },
+      assignedAt: new Date().toISOString(),
+    };
+    await blockchainQueueService.pushToQueue(blockchainData);
+
     console.log(`[AutoAssign] Complaint ${id} assigned to agent ${selectedAgent.fullName} (${selectedAgent.id})`);
 
     return {
@@ -202,6 +223,25 @@ export async function autoAssignComplaint(): Promise<{
         },
       }),
     ]);
+
+    // Push to blockchain queue for immutable record
+    const blockchainData: BlockchainQueueData = {
+      id,
+      seq: complaint.seq,
+      status: 'UNDER_PROCESSING',
+      categoryId: complaint.categoryId,
+      subCategory: complaint.subCategory,
+      assignedDepartment: assignedDepartment,
+      city: complaint.location?.city || '',
+      district: complaintDistrict,
+      assignedTo: {
+        type: 'municipal_admin',
+        id: selectedAdmin.id,
+        name: selectedAdmin.fullName,
+      },
+      assignedAt: new Date().toISOString(),
+    };
+    await blockchainQueueService.pushToQueue(blockchainData);
 
     console.log(`[AutoAssign] Complaint ${id} assigned to municipal admin ${selectedAdmin.fullName} (${selectedAdmin.id})`);
 
@@ -314,6 +354,51 @@ router.get('/queue-status', async (_req, res) => {
     });
   } catch (error) {
     console.error('[AutoAssign] Error getting queue status:', error);
+    res.status(500).json({ success: false, message: 'Internal server error', error: String(error) });
+  }
+});
+
+/**
+ * GET /auto-assign/blockchain-queue-status
+ * Get the current status of the blockchain queue
+ */
+router.get('/blockchain-queue-status', async (_req, res) => {
+  try {
+    const queueLength = await blockchainQueueService.getQueueLength();
+    const nextComplaint = await blockchainQueueService.peekQueue();
+    
+    res.status(200).json({
+      success: true,
+      queueLength,
+      nextComplaint,
+    });
+  } catch (error) {
+    console.error('[AutoAssign] Error getting blockchain queue status:', error);
+    res.status(500).json({ success: false, message: 'Internal server error', error: String(error) });
+  }
+});
+
+/**
+ * POST /auto-assign/blockchain-queue-pop
+ * Pop a complaint from the blockchain queue (for blockchain service consumption)
+ */
+router.post('/blockchain-queue-pop', async (_req, res) => {
+  try {
+    const complaint = await blockchainQueueService.popFromQueue();
+    
+    if (complaint) {
+      res.status(200).json({
+        success: true,
+        complaint,
+      });
+    } else {
+      res.status(404).json({
+        success: false,
+        message: 'No complaints in blockchain queue',
+      });
+    }
+  } catch (error) {
+    console.error('[AutoAssign] Error popping from blockchain queue:', error);
     res.status(500).json({ success: false, message: 'Internal server error', error: String(error) });
   }
 });

@@ -3,7 +3,7 @@
 ### 1. Road/Infrastructure
 curl -X POST 'http://localhost:3000/api/complaints' \
   -H 'Content-Type: application/json' \
-  -H 'Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJiMTYyZmQ2Ni04MGFhLTRhYjYtYjljYi1hNmRjNDJiNTAyOTEiLCJlbWFpbCI6InVzZXIubm92MzAuMjAyNUBleGFtcGxlLmNvbSIsIm5hbWUiOiJOb3ZlbWJlciBVc2VyIiwiaWF0IjoxNzY0NjU5OTY1LCJleHAiOjE3NjQ3NDYzNjV9.dUVe5sPO5izNTOAOISTz0ddnTlZtDV3kirFzgHyupro' \
+  -H 'Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJiMTYyZmQ2Ni04MGFhLTRhYjYtYjljYi1hNmRjNDJiNTAyOTEiLCJlbWFpbCI6InVzZXIubm92MzAuMjAyNUBleGFtcGxlLmNvbSIsIm5hbWUiOiJOb3ZlbWJlciBVc2VyIiwiaWF0IjoxNzY0NzY0MjEwLCJleHAiOjE3NjQ4NTA2MTB9.3iUiUEKL-7967xgeA9OLuZYmnnIfRr7ZYaYX-cEq8WA' \
   -d '{
     "categoryId": "ccd444a9-424c-45fe-9136-5a489f1d9bf6",
     "subCategory": "Broken road surface",
@@ -43,23 +43,22 @@ curl -X POST 'http://localhost:3000/api/complaints' \
 ### 3. Electricity
 curl -X POST 'http://localhost:3000/api/complaints' \
   -H 'Content-Type: application/json' \
-  -H 'Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJiMTYyZmQ2Ni04MGFhLTRhYjYtYjljYi1hNmRjNDJiNTAyOTEiLCJlbWFpbCI6InVzZXIubm92MzAuMjAyNUBleGFtcGxlLmNvbSIsIm5hbWUiOiJOb3ZlbWJlciBVc2VyIiwiaWF0IjoxNzY0NjU5OTY1LCJleHAiOjE3NjQ3NDYzNjV9.dUVe5sPO5izNTOAOISTz0ddnTlZtDV3kirFzgHyupro' \
+  -H 'Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJiMTYyZmQ2Ni04MGFhLTRhYjYtYjljYi1hNmRjNDJiNTAyOTEiLCJlbWFpbCI6InVzZXIubm92MzAuMjAyNUBleGFtcGxlLmNvbSIsIm5hbWUiOiJOb3ZlbWJlciBVc2VyIiwiaWF0IjoxNzY0NzY0MjEwLCJleHAiOjE3NjQ4NTA2MTB9.3iUiUEKL-7967xgeA9OLuZYmnnIfRr7ZYaYX-cEq8WA' \
   -d '{
     "categoryId": "ccd444a9-424c-45fe-9136-5a489f1d9bf6",
-    "subCategory": "Frequent power outages",
-    "description": "Electricity supply is interrupted 4-5 times daily in Katras area affecting households and businesses.",
-    "urgency": "HIGH",
+    "subCategory": "Street light not working",
+    "description": "Multiple street lights are not functioning near Hirapur Chowk causing safety issues at night.",
+    "urgency": "MEDIUM",
     "assignedDepartment": "ELECTRICITY_POWER",
     "isPublic": true,
     "location": {
-      "pin": "828113",
+      "pin": "826001",
       "district": "Dhanbad",
-      "city": "Katras",
-      "locality": "Katras Bazar",
-      "street": "Main Market Road"
+      "city": "Dhanbad",
+      "locality": "Hirapur",
+      "street": "Main Road"
     }
   }'
-
 ## Jamshedpur Complaints
 
 ### 1. Municipal Services
