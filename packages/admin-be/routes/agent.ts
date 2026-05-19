@@ -488,32 +488,38 @@ router.put('/complaints/:id/status', authenticateAgentOnly, async (req: any, res
   }
 });
 
-// ----- 6. Escalate Complaint Status -----
+// ----- 6. Escalate Complaint to Municipal Admin -----
 router.put('/complaints/:id/escalate', authenticateAgentOnly, async (req: any, res: any) => {
   try {
     const { id } = req.params;
-    
-    // Ensure complaint exists and get location info
+    const agentId = req.admin.id;
+
+    // 1. Find the complaint with location info
     const complaint = await prisma.complaint.findUnique({ 
       where: { id },
       include: { location: true }
     });
+
     if (!complaint) {
       return res.status(404).json({ success: false, message: 'Complaint not found' });
     }
 
-    // Allow escalation if: complaint is unassigned OR assigned to this agent
-    if (complaint.assignedAgentId && complaint.assignedAgentId !== req.admin.id) {
-      return res.status(403).json({ success: false, message: 'Not authorized to escalate this complaint' });
+    // Verify the agent is assigned to this complaint
+    if (complaint.assignedAgentId !== agentId) {
+      return res.status(403).json({ 
+        success: false, 
+        message: 'Not authorized to escalate this complaint - not assigned to you' 
+      });
     }
 
-    const agent = await prisma.agent.findUnique({ where: { id: req.admin.id } });
+    // Get agent details
+    const agent = await prisma.agent.findUnique({ where: { id: agentId } });
     if (!agent || agent.status !== 'ACTIVE') {
-      return res.status(400).json({ error: 'Agent not active' });
+      return res.status(400).json({ success: false, message: 'Agent not active' });
     }
 
-    // Get the district from complaint location or agent's municipality
-    const complaintDistrict = complaint.location?.district || agent.municipality;
+    // 2. Get the district from complaint location
+    const complaintDistrict = complaint.location?.district;
     
     if (!complaintDistrict) {
       return res.status(400).json({ 
@@ -522,8 +528,9 @@ router.put('/complaints/:id/escalate', authenticateAgentOnly, async (req: any, r
       });
     }
 
-    // Find available municipal admins in the same district
-    const availableAdmins = await prisma.departmentMunicipalAdmin.findMany({
+    // 3. Find a municipal admin whose municipality matches the complaint's district
+    // Order by currentWorkload for load balancing (assign to least busy admin)
+    const municipalAdmin = await prisma.departmentMunicipalAdmin.findFirst({
       where: {
         municipality: {
           equals: complaintDistrict,
@@ -531,75 +538,64 @@ router.put('/complaints/:id/escalate', authenticateAgentOnly, async (req: any, r
         },
         status: 'ACTIVE',
       },
+      orderBy: { currentWorkload: 'asc' },
+      select: { id: true, fullName: true, officialEmail: true }
     });
 
-    // Filter admins who have capacity
-    const adminsWithCapacity = availableAdmins.filter(
-      (admin) => admin.currentWorkload < admin.workloadLimit
-    );
-
-    if (adminsWithCapacity.length === 0) {
-      console.warn(`[Escalate] No available municipal admins in district ${complaintDistrict} for complaint ${id}`);
-      return res.status(400).json({
+    if (!municipalAdmin) {
+      return res.status(404).json({
         success: false,
-        message: `No available municipal admins in district ${complaintDistrict} to handle escalation`,
+        message: `No municipal admin found for district "${complaintDistrict}"`,
       });
     }
 
-    // Pick a random municipal admin with capacity
-    const randomIndex = Math.floor(Math.random() * adminsWithCapacity.length);
-    const selectedAdmin = adminsWithCapacity[randomIndex]!;
-
-    // Use transaction to:
-    // 1. Update complaint status and assign to municipal admin (keep assignedAgentId for history)
-    // 2. Decrement agent's workload
-    // 3. Increment municipal admin's workload
-    await prisma.$transaction([
+    // 4. Use transaction to:
+    //    - Update complaint: set status, assign to municipal admin (keep agent for history)
+    //    - Decrease agent's workload
+    //    - Increase municipal admin's workload
+    const [updatedComplaint] = await prisma.$transaction([
       prisma.complaint.update({
         where: { id },
         data: {
           status: 'ESCALATED_TO_MUNICIPAL_LEVEL',
-          managedByMunicipalAdminId: selectedAdmin.id,
           escalationLevel: 'MUNICIPAL_ADMIN',
-          // NOTE: assignedAgentId is NOT cleared - kept for history
+          managedByMunicipalAdminId: municipalAdmin.id,
+          // NOTE: assignedAgentId is NOT cleared - kept for complaint history
         },
+        include: {
+          User: true,
+          category: true,
+          location: true,
+          assignedAgent: {
+            select: { id: true, fullName: true, officialEmail: true }
+          },
+          managedByMunicipalAdmin: {
+            select: { id: true, fullName: true, officialEmail: true }
+          }
+        }
       }),
-      // Decrement agent workload if assigned
-      ...(complaint.assignedAgentId && agent.currentWorkload > 0 
-        ? [prisma.agent.update({
-            where: { id: req.admin.id },
-            data: { currentWorkload: { decrement: 1 } },
-          })]
-        : []),
-      // Increment municipal admin workload
+      // Decrease agent's workload
+      prisma.agent.update({
+        where: { id: agentId },
+        data: { currentWorkload: { decrement: 1 } },
+      }),
+      // Increase municipal admin's workload
       prisma.departmentMunicipalAdmin.update({
-        where: { id: selectedAdmin.id },
+        where: { id: municipalAdmin.id },
         data: { currentWorkload: { increment: 1 } },
       }),
     ]);
 
-    // Fetch updated complaint for response
-    const updatedComplaint = await prisma.complaint.findUnique({
-      where: { id },
-      include: {
-        User: true,
-        category: true,
-        location: true,
-        assignedAgent: {
-          select: { id: true, fullName: true, officialEmail: true }
-        },
-        managedByMunicipalAdmin: {
-          select: { id: true, fullName: true, officialEmail: true }
-        }
-      }
-    });
+    // Map User to complainant for response consistency
+    const { User, ...complaintRest } = updatedComplaint as any;
+    const complaintForResponse = { ...complaintRest, complainant: User || null };
 
-    console.log(`[Escalate] SUCCESS - Complaint ${id} (seq: ${complaint.seq}) escalated to municipal admin ${selectedAdmin.fullName} (${selectedAdmin.id}) in district ${complaintDistrict}. Agent ${agent.fullName} workload decremented.`);
+    console.log(`[Escalate] Complaint ${id} escalated to municipal admin ${municipalAdmin.fullName} (${municipalAdmin.id}) in district ${complaintDistrict}. Agent ${agent.fullName} workload decremented.`);
 
     return res.json({
       success: true,
-      message: `Complaint escalated to municipal admin ${selectedAdmin.fullName} successfully`,
-      complaint: updatedComplaint,
+      message: `Complaint escalated to municipal admin ${municipalAdmin.fullName} successfully`,
+      complaint: complaintForResponse,
     });
   } catch (error: any) {
     console.error('[Escalate] Error:', error);
