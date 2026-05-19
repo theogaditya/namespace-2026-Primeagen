@@ -10,12 +10,9 @@ export async function GET(request: Request) {
       return NextResponse.json({ error: 'Missing Authorization header' }, { status: 401 })
     }
 
-    const url = new URL(request.url)
-    const page = url.searchParams.get('page') || '1'
-    const limit = url.searchParams.get('limit') || '20'
+    console.log('[api/complaints/locations] Fetching from backend:', `${API_URL}/api/complaints/locations`)
 
-    // Call the new agent endpoint for assigned complaints
-    const backendRes = await fetch(`${API_URL}/api/agent/my-complaints?page=${page}&limit=${limit}`, {
+    const backendRes = await fetch(`${API_URL}/api/complaints/locations`, {
       headers: {
         'Content-Type': 'application/json',
         Authorization: authHeader,
@@ -23,10 +20,13 @@ export async function GET(request: Request) {
     })
 
     const body = await backendRes.text()
+    console.log('[api/complaints/locations] Backend response status:', backendRes.status)
+
     const headers = { 'content-type': 'application/json' }
 
     return new NextResponse(body, { status: backendRes.status, headers })
   } catch (err: any) {
+    console.error('[api/complaints/locations] Error:', err)
     return NextResponse.json({ error: err?.message || String(err) }, { status: 500 })
   }
 }

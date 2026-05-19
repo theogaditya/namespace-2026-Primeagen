@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server'
 
-// Use NEXT_PUBLIC_API_URL when provided, otherwise fallback to admin-be default port 4000
+// Use NEXT_PUBLIC_API_URL when provided, otherwise fallback to admin-be default port
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000'
 
 export async function GET(request: Request) {
@@ -12,10 +12,10 @@ export async function GET(request: Request) {
 
     const url = new URL(request.url)
     const page = url.searchParams.get('page') || '1'
-    const limit = url.searchParams.get('limit') || '20'
+    const limit = url.searchParams.get('limit') || '1000'
 
-    // Call the new agent endpoint for assigned complaints
-    const backendRes = await fetch(`${API_URL}/api/agent/my-complaints?page=${page}&limit=${limit}`, {
+    // Call the backend endpoint for all complaints
+    const backendRes = await fetch(`${API_URL}/api/complaints/all-complaints?page=${page}&limit=${limit}`, {
       headers: {
         'Content-Type': 'application/json',
         Authorization: authHeader,
@@ -27,6 +27,7 @@ export async function GET(request: Request) {
 
     return new NextResponse(body, { status: backendRes.status, headers })
   } catch (err: any) {
+    console.error('[API] Error fetching all complaints:', err)
     return NextResponse.json({ error: err?.message || String(err) }, { status: 500 })
   }
 }

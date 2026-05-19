@@ -10,7 +10,6 @@ import {
   Flag,
   FileText,
   Settings,
-  Shield,
   Menu,
   LogOut,
   User,
@@ -86,6 +85,20 @@ export function AdminLayout({ children }: AdminLayoutProps) {
     { name: "Reports & Reviews", href: "/reports", icon: Flag },
   ]
 
+  // Get page title based on current pathname
+  const getPageTitle = (): string => {
+    if (pathname?.startsWith('/pages/')) {
+      return 'Complaints Management'
+    }
+    if (pathname === '/users') {
+      return 'My Complaints'
+    }
+    if (pathname === '/reports') {
+      return 'Reports & Reviews'
+    }
+    return 'Dashboard'
+  }
+
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Mobile sidebar overlay */}
@@ -95,7 +108,10 @@ export function AdminLayout({ children }: AdminLayoutProps) {
           <div className="fixed inset-y-0 left-0 w-64 bg-white shadow-xl">
             <div className="flex h-full flex-col">
               <div className="flex h-16 items-center justify-between border-b bg-white px-4">
-                <h1 className="text-xl font-bold text-blue-600">SwarajDesK Agent</h1>
+                <div className="flex items-center">
+                  <img src="https://swarajdesk.adityahota.online/logo.png" alt="SwarajDesk logo" className="h-8 w-8 mr-2" />
+                  <h1 className="text-xl font-bold text-blue-600">SwarajDesK Agent</h1>
+                </div>
                 <Button variant="ghost" size="icon" onClick={() => setSidebarOpen(false)}>
                   <X className="h-6 w-6" />
                 </Button>
@@ -113,7 +129,7 @@ export function AdminLayout({ children }: AdminLayoutProps) {
                           ? "bg-blue-50 border-r-2 border-blue-600 text-blue-700"
                           : "text-gray-600 hover:bg-gray-50 hover:text-gray-900",
                         "group flex items-center px-2 py-2 text-sm font-medium rounded-md",
-                      )}
+                      )} 
                     >
                       <item.icon
                         className={cn(
@@ -135,7 +151,10 @@ export function AdminLayout({ children }: AdminLayoutProps) {
       <div className="hidden lg:fixed lg:inset-y-0 lg:flex lg:w-64 lg:flex-col">
         <div className="flex min-h-0 flex-1 flex-col bg-white border-r border-gray-200">
           <div className="flex h-16 items-center justify-center border-b bg-white px-4">
-            <h1 className="text-xl font-bold text-blue-600">SwarajDesk Agent</h1>
+            <div className="flex items-center">
+              <img src="https://swarajdesk.adityahota.online/logo.png" alt="SwarajDesk logo" className="h-8 w-8 mr-2" />
+              <h1 className="text-xl font-bold text-blue-600">Agent Dashboard</h1>
+            </div>
           </div>
           <div className="flex flex-1 flex-col overflow-y-auto">
             <nav className="flex-1 space-y-1 px-2 py-4">
@@ -177,12 +196,8 @@ export function AdminLayout({ children }: AdminLayoutProps) {
           </Button>
 
           <div className="flex flex-1 justify-between px-4">
-            <div className="flex flex-1">
-              <div className="flex w-full md:ml-0">
-                <div className="relative w-full text-gray-400 focus-within:text-gray-600">
-                  {/* Search can be added here */}
-                </div>
-              </div>
+            <div className="flex flex-1 items-center">
+              <h1 className="text-xl font-semibold text-gray-900">{getPageTitle()}</h1>
             </div>
             <div className="ml-4 flex items-center md:ml-6">
               <DropdownMenu>
