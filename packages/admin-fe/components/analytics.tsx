@@ -27,7 +27,6 @@ import {
 import dynamic from "next/dynamic"
 import { Pie } from "@visx/shape"
 import { Group } from "@visx/group"
-import { scaleOrdinal } from "@visx/scale"
 import { animated, useTransition, interpolate } from "@react-spring/web"
 import type { PieArcDatum, ProvidedProps } from "@visx/shape/lib/shapes/Pie"
 
