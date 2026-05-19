@@ -264,66 +264,68 @@ router.put('/complaints/:id/status', authenticateMunicipalAdminOnly, async (req:
   }
 });
 
-// ----- 10. Update Complaint Status -----
+// ----- 10. Escalate Complaint to State Admin -----
 router.put('/complaints/:id/escalate', authenticateMunicipalAdminOnly, async (req: any, res: any) => {
   try {
     const { id } = req.params;
+    const muniAdminId = (req as any).admin?.id;
 
     const complaint = await prisma.complaint.findUnique({
       where: { id },
+      include: { managedByMunicipalAdmin: true }
     });
 
     if (!complaint) {
       return res.status(404).json({ success: false, message: 'Complaint not found' });
     }
 
-    // Determine the state admin to assign to: prefer the municipal admin's linked state admin
-    const muniAdminId = (req as any).admin?.id;
-    let stateAdminId: string | null = null;
+    // Ensure the municipal admin escalating actually manages this complaint
+    if (complaint.managedByMunicipalAdminId && complaint.managedByMunicipalAdminId !== muniAdminId) {
+      return res.status(403).json({ success: false, message: 'Not authorized to escalate this complaint' });
+    }
 
+    // Determine state admin to assign to: prefer the municipal admin's linked state admin
+    let stateAdminId: string | null = null;
     if (muniAdminId) {
       const muniAdmin = await prisma.departmentMunicipalAdmin.findUnique({
         where: { id: muniAdminId },
-        select: { managedByStateAdminId: true }
+        select: { managedByStateAdminId: true, municipality: true }
       });
       stateAdminId = muniAdmin?.managedByStateAdminId ?? null;
+
+      // If a linked state admin is not configured, try to find any active state admin
+      if (!stateAdminId) {
+        const found = await prisma.departmentStateAdmin.findFirst({
+          where: { status: 'ACTIVE' },
+          orderBy: { escalationCount: 'asc' },
+          select: { id: true }
+        });
+        stateAdminId = found?.id ?? null;
+      }
+    } else {
+      const found = await prisma.departmentStateAdmin.findFirst({
+        where: { status: 'ACTIVE' },
+        orderBy: { escalationCount: 'asc' },
+        select: { id: true }
+      });
+      stateAdminId = found?.id ?? null;
     }
 
-    // Build update payload for complaint
+    if (!stateAdminId) {
+      return res.status(404).json({ success: false, message: 'No available state admin found to escalate the complaint' });
+    }
+
+    // Build update payload - preserve municipal admin assignment for history
     const complaintUpdate: any = {
       status: 'ESCALATED_TO_STATE_LEVEL',
+      escalationLevel: 'STATE_ADMIN',
+      escalatedToStateAdminId: stateAdminId,
+      managedByMunicipalAdminId: muniAdminId || complaint.managedByMunicipalAdminId,
     };
 
-    if (stateAdminId) {
-      complaintUpdate.escalatedToStateAdminId = stateAdminId;
-      complaintUpdate.escalationLevel = 'STATE';
-    }
-
-    // Use a transaction: update complaint and increment state admin's escalation count (if assigned)
-    let updatedComplaint;
-    if (stateAdminId) {
-      const [complaintRes] = await prisma.$transaction([
-        prisma.complaint.update({
-          where: { id },
-          data: complaintUpdate,
-          include: {
-            User: true,
-            category: true,
-            location: true,
-            escalatedToStateAdmin: true,
-            managedByMunicipalAdmin: true,
-            assignedAgent: { select: { id: true, fullName: true, officialEmail: true } }
-          }
-        }),
-        prisma.departmentStateAdmin.update({
-          where: { id: stateAdminId },
-          data: { escalationCount: { increment: 1 } }
-        })
-      ]);
-
-      updatedComplaint = complaintRes as any;
-    } else {
-      updatedComplaint = await prisma.complaint.update({
+    // Use a transaction: update complaint, decrement municipal admin workload (if applicable) and increment state admin's escalation count
+    const txOps: any[] = [
+      prisma.complaint.update({
         where: { id },
         data: complaintUpdate,
         include: {
@@ -334,18 +336,36 @@ router.put('/complaints/:id/escalate', authenticateMunicipalAdminOnly, async (re
           managedByMunicipalAdmin: true,
           assignedAgent: { select: { id: true, fullName: true, officialEmail: true } }
         }
-      });
+      }),
+      prisma.departmentStateAdmin.update({
+        where: { id: stateAdminId },
+        data: { escalationCount: { increment: 1 } }
+      })
+    ];
+
+    // If municipal admin exists and has workload > 0, decrement their workload to reflect escalation
+    if (muniAdminId) {
+      const muniAdminRecord = await prisma.departmentMunicipalAdmin.findUnique({ where: { id: muniAdminId }, select: { currentWorkload: true } });
+      if (muniAdminRecord && typeof muniAdminRecord.currentWorkload === 'number' && muniAdminRecord.currentWorkload > 0) {
+        txOps.push(prisma.departmentMunicipalAdmin.update({
+          where: { id: muniAdminId },
+          data: { currentWorkload: { decrement: 1 } }
+        }));
+      }
     }
+
+    const results = await prisma.$transaction(txOps);
+    const updatedComplaint = results[0] as any;
 
     // Map Prisma relation `User` to `complainant` for response consistency
     const { User, ...complaintRest } = updatedComplaint as any;
     const complaintForResponse = { ...complaintRest, complainant: User || null };
 
-    console.log(`[municipalEscalate] Complaint ${id} escalated${stateAdminId ? ` to state admin ${stateAdminId}` : ''} by municipal admin ${muniAdminId}`);
+    console.log(`[municipalEscalate] Complaint ${id} escalated to state admin ${stateAdminId} by municipal admin ${muniAdminId}`);
 
     return res.json({
       success: true,
-      message: 'Complaint escalated to state level successfully',
+      message: `Complaint escalated to state level successfully`,
       complaint: complaintForResponse,
     });
   } catch (error: any) {

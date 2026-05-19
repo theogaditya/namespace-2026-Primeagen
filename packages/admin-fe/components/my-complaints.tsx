@@ -150,19 +150,37 @@ export function MyComplaints() {
       const token = localStorage.getItem("token")
       if (!token) return
 
+      // Check if this is an escalation
+      const isEscalation = newStatus === 'ESCALATED_TO_MUNICIPAL_LEVEL' || newStatus === 'ESCALATED_TO_STATE_LEVEL'
+
       let endpoint = ''
-      switch (adminType) {
-        case 'AGENT':
-          endpoint = `${API_URL}/api/agent/complaints/${complaintId}/status`
-          break
-        case 'MUNICIPAL_ADMIN':
-          endpoint = `${API_URL}/api/municipal-admin/complaints/${complaintId}/status`
-          break
-        case 'STATE_ADMIN':
-          endpoint = `${API_URL}/api/state-admin/complaints/${complaintId}/status`
-          break
-        default:
-          return
+      if (isEscalation) {
+        // Use dedicated escalate endpoint
+        switch (adminType) {
+          case 'AGENT':
+            endpoint = `${API_URL}/api/agent/complaints/${complaintId}/escalate`
+            break
+          case 'MUNICIPAL_ADMIN':
+            endpoint = `${API_URL}/api/municipal-admin/complaints/${complaintId}/escalate`
+            break
+          default:
+            return
+        }
+      } else {
+        // Use status endpoint for regular status updates
+        switch (adminType) {
+          case 'AGENT':
+            endpoint = `${API_URL}/api/agent/complaints/${complaintId}/status`
+            break
+          case 'MUNICIPAL_ADMIN':
+            endpoint = `${API_URL}/api/municipal-admin/complaints/${complaintId}/status`
+            break
+          case 'STATE_ADMIN':
+            endpoint = `${API_URL}/api/state-admin/complaints/${complaintId}/status`
+            break
+          default:
+            return
+        }
       }
 
       const response = await fetch(endpoint, {
@@ -171,7 +189,8 @@ export function MyComplaints() {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify({ status: newStatus }),
+        // Escalate endpoint doesn't need a body, status endpoint needs status
+        body: isEscalation ? undefined : JSON.stringify({ status: newStatus }),
       })
 
       if (response.ok) {
