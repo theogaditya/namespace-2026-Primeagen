@@ -426,6 +426,7 @@ export default function Hotmap() {
     borderRadius: 8,
     overflow: "hidden",
     position: "relative",
+    zIndex: 0,
   };
 
   if (loading) {
@@ -478,7 +479,7 @@ export default function Hotmap() {
             key="hotmap-preview"
             center={focusCenter}
             zoom={focusZoom}
-            style={{ height: "100%", width: "100%" }}
+            style={{ height: "100%", width: "100%", zIndex: 0, position: 'relative' }}
             scrollWheelZoom={true}
             dragging={true}
             zoomControl={true}
@@ -637,7 +638,7 @@ export default function Hotmap() {
                 key="hotmap-modal"
                 center={currentCenter}
                 zoom={currentZoom}
-                style={{ height: "100%", width: "100%" }}
+                style={{ height: "100%", width: "100%", zIndex: 0, position: 'relative' }}
               >
                 {/* <TileLayer
                   url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"

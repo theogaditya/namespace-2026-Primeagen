@@ -1,6 +1,9 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useMemo } from "react"
+import 'leaflet/dist/leaflet.css'
+import { MapContainer, Marker, TileLayer } from 'react-leaflet'
+import L from 'leaflet'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -47,6 +50,9 @@ interface Complaint {
     locality: string
     street: string | null
     pin: string
+    // optional coordinates if backend provides them
+    latitude?: number | null
+    longitude?: number | null
   } | null
   complainant: {
     id: string
@@ -258,6 +264,17 @@ export function AvailableComplaints() {
       .split(/_|\s+/)
       .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
       .join(' ')
+  }
+
+  const formatLocation = (loc: Complaint['location'] | null | undefined) => {
+    if (!loc) return ''
+    const parts: string[] = []
+    if (loc.locality) parts.push(loc.locality)
+    if (loc.street) parts.push(loc.street)
+    if (loc.city) parts.push(loc.city)
+    if (loc.district) parts.push(loc.district)
+    if (loc.pin) parts.push(loc.pin)
+    return parts.join(', ')
   }
 
   const getStatusBadge = (status?: string) => {
@@ -581,9 +598,7 @@ export function AvailableComplaints() {
                       <TableCell>{getUrgencyBadge(complaint.urgency)}</TableCell>
                       <TableCell className="text-sm text-gray-500">
                         {complaint.location ? (
-                          <span>
-                            {complaint.location.locality}, {complaint.location.city}
-                          </span>
+                          <span>{formatLocation(complaint.location) || 'N/A'}</span>
                         ) : (
                           "N/A"
                         )}
@@ -773,6 +788,24 @@ export function AvailableComplaints() {
 
             {/* Scrollable content */}
             <div className="space-y-4 pt-9">
+              {/* Complaint location map (if coordinates available) */}
+              {selectedComplaint?.location && (selectedComplaint.location.latitude != null && selectedComplaint.location.longitude != null) ? (
+                <div>
+                  <h4 className="text-sm font-semibold text-gray-700">Location (map)</h4>
+                  <div className="mt-2 border rounded-md overflow-hidden" style={{ height: 220 }}>
+                    <ComplaintLocationMap
+                      lat={selectedComplaint.location.latitude!}
+                      lng={selectedComplaint.location.longitude!}
+                      label={formatLocation(selectedComplaint.location)}
+                    />
+                  </div>
+                </div>
+              ) : selectedComplaint?.location ? (
+                <div>
+                  <h4 className="text-sm font-semibold text-gray-700">Location</h4>
+                  <p className="text-sm text-gray-500 mt-1">{formatLocation(selectedComplaint.location) || `${selectedComplaint.location.locality || ''} ${selectedComplaint.location.city || ''}`} — coordinates not available</p>
+                </div>
+              ) : null}
               {/* Description */}
               <div>
                 <h4 className="text-sm font-semibold text-gray-700">Description</h4>
@@ -912,5 +945,38 @@ export function AvailableComplaints() {
         </CardContent>
       </Card>
     </div>
+  )
+}
+
+// small helper map for a single complaint location
+function ComplaintLocationMap({ lat, lng, label }: { lat: number; lng: number; label?: string }) {
+  // fix default icon paths for leaflet (webpack/next)
+  // prevent duplicate merge when multiple components load by memoizing
+  useMemo(() => {
+    try {
+      // @ts-ignore
+      delete (L.Icon.Default.prototype as any)._getIconUrl
+      L.Icon.Default.mergeOptions({
+        iconRetinaUrl: require('leaflet/dist/images/marker-icon-2x.png'),
+        iconUrl: require('leaflet/dist/images/marker-icon.png'),
+        shadowUrl: require('leaflet/dist/images/marker-shadow.png'),
+      })
+    } catch (e) {
+      // ignore in environments where require isn't available at runtime
+    }
+  }, [])
+
+  const googleMapsKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY
+  const googleUrl = `https://mt1.google.com/vt/lyrs=m&x={x}&y={y}&z={z}&key=${googleMapsKey}`
+
+  return (
+    <MapContainer center={[lat, lng]} zoom={15} scrollWheelZoom={false} style={{ height: '100%', width: '100%' }}>
+      {googleMapsKey ? (
+        <TileLayer url={googleUrl} attribution='&copy; <a href="https://www.google.com/maps">Google Maps</a>' />
+      ) : (
+        <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" attribution='&copy; OpenStreetMap' />
+      )}
+      <Marker position={[lat, lng]} />
+    </MapContainer>
   )
 }
