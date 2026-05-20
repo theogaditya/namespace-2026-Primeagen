@@ -236,57 +236,155 @@ export default function Hotmap() {
   // Find the area with most complaints
   const findHotspotCenter = (complaintsWithCoords: ComplaintLocation[]): { center: [number, number]; count: number } | null => {
     if (complaintsWithCoords.length === 0) return null;
-
-    // Group by district
-    const districtGroups: Record<string, ComplaintLocation[]> = {};
+    // Build initial clusters by rounded coords
+    const clusterMap: Record<string, ComplaintLocation[]> = {};
     complaintsWithCoords.forEach((c) => {
-      const district = c.location?.district || "Unknown";
-      if (!districtGroups[district]) districtGroups[district] = [];
-      districtGroups[district].push(c);
+      const lat = c.location?.latitude ?? 0;
+      const lng = c.location?.longitude ?? 0;
+      const key = `${lat.toFixed(3)}|${lng.toFixed(3)}`;
+      if (!clusterMap[key]) clusterMap[key] = [];
+      clusterMap[key].push(c);
     });
 
-    // Find district with most complaints
-    let maxDistrict = "";
-    let maxCount = 0;
-    Object.entries(districtGroups).forEach(([district, list]) => {
-      if (list.length > maxCount) {
-        maxCount = list.length;
-        maxDistrict = district;
+    let clusters: { center: [number, number]; complaints: ComplaintLocation[]; count: number }[] = Object.entries(clusterMap).map(([k, list]) => {
+      const [latStr, lngStr] = k.split("|");
+      return { center: [parseFloat(latStr), parseFloat(lngStr)], complaints: list, count: list.length };
+    });
+
+    // haversine helper
+    const toRad = (v: number) => (v * Math.PI) / 180;
+    const metersBetween = (a: [number, number], b: [number, number]) => {
+      const R = 6371000;
+      const dLat = toRad(b[0] - a[0]);
+      const dLon = toRad(b[1] - a[1]);
+      const lat1 = toRad(a[0]);
+      const lat2 = toRad(b[0]);
+      const sinDLat = Math.sin(dLat / 2);
+      const sinDLon = Math.sin(dLon / 2);
+      const aa = sinDLat * sinDLat + Math.cos(lat1) * Math.cos(lat2) * sinDLon * sinDLon;
+      const c = 2 * Math.atan2(Math.sqrt(aa), Math.sqrt(1 - aa));
+      return R * c;
+    };
+
+    const radiusForCount = (count: number) => count * 500 + 1000;
+
+    // merge overlapping clusters
+    let merged = true;
+    while (merged) {
+      merged = false;
+      outer: for (let i = 0; i < clusters.length; i++) {
+        for (let j = i + 1; j < clusters.length; j++) {
+          const a = clusters[i];
+          const b = clusters[j];
+          const dist = metersBetween(a.center, b.center);
+          if (dist <= radiusForCount(a.count) + radiusForCount(b.count)) {
+            const combined = [...a.complaints, ...b.complaints];
+            const avgLat = combined.reduce((s, c) => s + (c.location?.latitude ?? 0), 0) / combined.length;
+            const avgLng = combined.reduce((s, c) => s + (c.location?.longitude ?? 0), 0) / combined.length;
+            clusters[i] = { center: [avgLat, avgLng], complaints: combined, count: combined.length };
+            clusters.splice(j, 1);
+            merged = true;
+            break outer;
+          }
+        }
       }
-    });
+    }
 
-    if (!maxDistrict || maxCount === 0) return null;
-
-    // Calculate center of that district's complaints
-    const districtComplaints = districtGroups[maxDistrict];
-    const avgLat = districtComplaints.reduce((sum, c) => sum + (c.location?.latitude || 0), 0) / districtComplaints.length;
-    const avgLng = districtComplaints.reduce((sum, c) => sum + (c.location?.longitude || 0), 0) / districtComplaints.length;
-
-    return { center: [avgLat, avgLng], count: maxCount };
+    if (clusters.length === 0) return null;
+    // pick the largest cluster
+    clusters.sort((a, b) => b.count - a.count);
+    const top = clusters[0];
+    return { center: [parseFloat(top.center[0].toFixed(6)), parseFloat(top.center[1].toFixed(6))], count: top.count };
   };
 
-  // Cluster complaints by proximity for hotspot visualization
+  // Cluster complaints by rounded lat/lng so circle density equals number of pins at that spot
+  // Merge clusters iteratively when their display circles would intersect
   const hotspotClusters = useMemo((): HotspotCluster[] => {
     if (complaints.length === 0) return [];
 
-    // Group by district for clustering
-    const districtGroups: Record<string, ComplaintLocation[]> = {};
+    const clusterMap: Record<string, { list: ComplaintLocation[]; lat: number; lng: number; districtCounts: Record<string, number> }> = {};
+
     complaints.forEach((c) => {
+      const lat = c.location?.latitude ?? 0;
+      const lng = c.location?.longitude ?? 0;
+      const key = `${lat.toFixed(3)}|${lng.toFixed(3)}`;
+      if (!clusterMap[key]) {
+        clusterMap[key] = { list: [], lat: parseFloat(lat.toFixed(3)), lng: parseFloat(lng.toFixed(3)), districtCounts: {} };
+      }
+      clusterMap[key].list.push(c);
       const district = c.location?.district || "Unknown";
-      if (!districtGroups[district]) districtGroups[district] = [];
-      districtGroups[district].push(c);
+      clusterMap[key].districtCounts[district] = (clusterMap[key].districtCounts[district] || 0) + 1;
     });
 
-    return Object.entries(districtGroups).map(([district, list]) => {
-      const avgLat = list.reduce((sum, c) => sum + (c.location?.latitude || 0), 0) / list.length;
-      const avgLng = list.reduce((sum, c) => sum + (c.location?.longitude || 0), 0) / list.length;
+    // initial clusters
+    let clusters: HotspotCluster[] = Object.entries(clusterMap).map(([_, val]) => {
+      const districtEntries = Object.entries(val.districtCounts);
+      const district = districtEntries.sort((a, b) => b[1] - a[1])[0]?.[0] || "Unknown";
       return {
-        center: [avgLat, avgLng] as [number, number],
-        count: list.length,
-        complaints: list,
+        center: [val.lat, val.lng] as [number, number],
+        count: val.list.length,
+        complaints: val.list,
         district,
       };
     });
+
+    // helper: haversine distance in meters
+    const metersBetween = (a: [number, number], b: [number, number]) => {
+      const toRad = (v: number) => (v * Math.PI) / 180;
+      const R = 6371000; // Earth's radius in meters
+      const dLat = toRad(b[0] - a[0]);
+      const dLon = toRad(b[1] - a[1]);
+      const lat1 = toRad(a[0]);
+      const lat2 = toRad(b[0]);
+      const sinDLat = Math.sin(dLat / 2);
+      const sinDLon = Math.sin(dLon / 2);
+      const aa = sinDLat * sinDLat + Math.cos(lat1) * Math.cos(lat2) * sinDLon * sinDLon;
+      const c = 2 * Math.atan2(Math.sqrt(aa), Math.sqrt(1 - aa));
+      return R * c;
+    };
+
+    const radiusForCount = (count: number) => count * 500 + 1000;
+
+    // merge overlapping clusters iteratively
+    let merged = true;
+    while (merged) {
+      merged = false;
+      outer: for (let i = 0; i < clusters.length; i++) {
+        for (let j = i + 1; j < clusters.length; j++) {
+          const a = clusters[i];
+          const b = clusters[j];
+          const dist = metersBetween(a.center, b.center);
+          const rA = radiusForCount(a.count);
+          const rB = radiusForCount(b.count);
+          if (dist <= rA + rB) {
+            // merge b into a
+            const combined = [...a.complaints, ...b.complaints];
+            // recompute center as average of complaints' coords
+            const avgLat = combined.reduce((s, c) => s + (c.location?.latitude ?? 0), 0) / combined.length;
+            const avgLng = combined.reduce((s, c) => s + (c.location?.longitude ?? 0), 0) / combined.length;
+            // recompute district (most common)
+            const districtCounts: Record<string, number> = {};
+            combined.forEach((c) => {
+              const d = c.location?.district || "Unknown";
+              districtCounts[d] = (districtCounts[d] || 0) + 1;
+            });
+            const district = Object.entries(districtCounts).sort((x, y) => y[1] - x[1])[0]?.[0] || "Unknown";
+            clusters[i] = {
+              center: [parseFloat(avgLat.toFixed(6)), parseFloat(avgLng.toFixed(6))],
+              count: combined.length,
+              complaints: combined,
+              district,
+            };
+            // remove j
+            clusters.splice(j, 1);
+            merged = true;
+            break outer;
+          }
+        }
+      }
+    }
+
+    return clusters;
   }, [complaints]);
 
   // Get circle color based on complaint count
@@ -328,6 +426,7 @@ export default function Hotmap() {
     borderRadius: 8,
     overflow: "hidden",
     position: "relative",
+    zIndex: 0,
   };
 
   if (loading) {
@@ -380,7 +479,7 @@ export default function Hotmap() {
             key="hotmap-preview"
             center={focusCenter}
             zoom={focusZoom}
-            style={{ height: "100%", width: "100%" }}
+            style={{ height: "100%", width: "100%", zIndex: 0, position: 'relative' }}
             scrollWheelZoom={true}
             dragging={true}
             zoomControl={true}
@@ -539,7 +638,7 @@ export default function Hotmap() {
                 key="hotmap-modal"
                 center={currentCenter}
                 zoom={currentZoom}
-                style={{ height: "100%", width: "100%" }}
+                style={{ height: "100%", width: "100%", zIndex: 0, position: 'relative' }}
               >
                 {/* <TileLayer
                   url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"

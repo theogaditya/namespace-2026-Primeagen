@@ -27,9 +27,9 @@ import {
 import dynamic from "next/dynamic"
 import { Pie } from "@visx/shape"
 import { Group } from "@visx/group"
-import { scaleOrdinal } from "@visx/scale"
 import { animated, useTransition, interpolate } from "@react-spring/web"
 import type { PieArcDatum, ProvidedProps } from "@visx/shape/lib/shapes/Pie"
+import ResolutionRateCard from "@/components/ui/ResolutionRateCard"
 
 // Dynamically import Hotmap to avoid SSR issues with Leaflet
 const Hotmap = dynamic(() => import("@/components/Hotmap"), {
@@ -721,6 +721,11 @@ export function Analytics() {
           <Hotmap />
         </CardContent>
       </Card>
+
+        {/* Resolution rates card below the map */}
+        <div className="mt-6">
+          <ResolutionRateCard />
+        </div>
 
       {/* Most Liked Complaint Modal */}
       {showMostLikedModal && analyticsData.mostLikedComplaints.length > 0 && (
