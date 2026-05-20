@@ -38,3 +38,4 @@ gcp-credentials.json
 .DS_Store
 
 /generated/prisma
+.env
