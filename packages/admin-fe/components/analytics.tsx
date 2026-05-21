@@ -204,7 +204,7 @@ function InteractivePieChart({ data, width, height }: InteractivePieChartProps) 
   const totalValue = data.reduce((sum, d) => sum + d.value, 0)
 
   return (
-    <div className="relative">
+    <div className="relative flex flex-col items-center">
       <svg width={width} height={height}>
         <Group top={centerY + margin.top} left={centerX + margin.left}>
           <Pie
@@ -644,10 +644,10 @@ export function Analytics() {
             </CardTitle>
             <p className="text-sm text-gray-500">Registered vs Resolved - Last 7 days</p>
           </CardHeader>
-          <CardContent>
-            <div className="h-[300px]">
+          <CardContent className="pl-0">
+            <div className="h-[380px]">
               <ResponsiveContainer width="100%" height="100%">
-                <LineChart data={analyticsData.complaintsOverTime}>
+                <LineChart data={analyticsData.complaintsOverTime} margin={{ left: 0, right: 20, bottom: 20 }}>
                   <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
                   <XAxis dataKey="date" tick={{ fontSize: 12 }} stroke="#6b7280" />
                   <YAxis tick={{ fontSize: 12 }} stroke="#6b7280" allowDecimals={false} />
@@ -691,8 +691,8 @@ export function Analytics() {
             </CardTitle>
             <p className="text-sm text-gray-500">Breakdown by complaint status</p>
           </CardHeader>
-          <CardContent>
-            <div className="h-[380px] flex items-center justify-center">
+          <CardContent className="flex justify-center">
+            <div className="h-[380px] flex flex-col items-center justify-center">
               {analyticsData.statusDistribution.length > 0 ? (
                 <InteractivePieChart
                   data={analyticsData.statusDistribution}
