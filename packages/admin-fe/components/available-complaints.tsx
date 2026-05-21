@@ -854,8 +854,17 @@ export function AvailableComplaints() {
                   <h4 className="text-sm font-semibold text-gray-700">Location</h4>
                   {selectedComplaint?.location ? (
                     <div className="text-sm text-gray-800 mt-1">
-                      <div>{selectedComplaint.location.locality}, {selectedComplaint.location.city}</div>
-                      <div className="text-xs text-gray-500">PIN: {selectedComplaint.location.pin}</div>
+                      <div>
+                        {[
+                          selectedComplaint.location.street,
+                          selectedComplaint.location.locality,
+                          selectedComplaint.location.city,
+                          selectedComplaint.location.district,
+                        ].filter(Boolean).join(', ') || 'N/A'}
+                      </div>
+                      {selectedComplaint.location.pin && (
+                        <div className="text-xs text-gray-500">PIN: {selectedComplaint.location.pin}</div>
+                      )}
                     </div>
                   ) : (
                     <p className="text-sm text-gray-500 mt-1">N/A</p>
