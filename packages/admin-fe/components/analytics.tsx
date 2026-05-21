@@ -8,7 +8,8 @@ import {
   FileText,
   CheckCircle,
   ThumbsUp,
-  Activity,
+ Activity,
+  Eye,
   X,
   MapPin,
   Calendar,
@@ -338,6 +339,7 @@ export function Analytics() {
 
   useEffect(() => {
     fetchAnalytics()
+    fetchMostLiked()
     // Start animations after 1 second delay (so page fully loads first)
     const startTimer = setTimeout(() => {
       setAnimateIcons(true)
@@ -357,31 +359,51 @@ export function Analytics() {
         return
       }
 
-      // Fetch all complaints using Next.js API route (proxies to backend)
-      const res = await fetch(`/api/complaints/all?page=1&limit=1000`, {
-        headers: { Authorization: `Bearer ${token}` },
-      })
+      // Fetch all complaints using Next.js API route (proxies to backend).
+      // Page through results to ensure we collect all complaints, not just the first page.
+      const complaints: Complaint[] = []
+      const pageSize = 200
+      let page = 1
+      while (true) {
+        const res = await fetch(`/api/complaints/all?page=${page}&limit=${pageSize}`, {
+          headers: { Authorization: `Bearer ${token}` },
+        })
+        console.log(`[Analytics] Fetched complaints page ${page}, status: ${res.status}`)
+        if (!res.ok) {
+          throw new Error(`Failed to fetch complaints (page ${page})`)
+        }
 
-      if (!res.ok) {
-        throw new Error("Failed to fetch complaints")
+        const data = await res.json()
+        const items: Complaint[] = data.complaints || []
+        complaints.push(...items)
+
+        // stop paging when we received fewer than requested or nothing
+        if (items.length < pageSize) break
+
+        page += 1
+        // safety guard to avoid infinite loops
+        if (page > 200) break
       }
-
-      const data = await res.json()
-      const complaints: Complaint[] = data.complaints || []
 
       // Compute analytics
       const total = complaints.length
       const solved = complaints.filter((c) => c.status === "COMPLETED").length
 
-      // Find the highest like count
-      const highestLikes = complaints.reduce((max, c) => 
-        Math.max(max, c.upvoteCount || 0), 0
-      )
-
-      // Find ALL complaints with the highest like count
-      const mostLikedComplaints = highestLikes > 0 
-        ? complaints.filter((c) => (c.upvoteCount || 0) === highestLikes)
-        : []
+      // Find the highest like count and the complaint(s) with that count
+      let highestLikes = 0
+      const mostLikedComplaints: Complaint[] = []
+      for (const c of complaints) {
+        const likes = c.upvoteCount || 0
+        if (likes > highestLikes) {
+          highestLikes = likes
+          // replace list with this single top complaint
+          mostLikedComplaints.length = 0
+          mostLikedComplaints.push(c)
+        } else if (likes === highestLikes && likes > 0) {
+          // tie — include alongside others
+          mostLikedComplaints.push(c)
+        }
+      }
 
       // Dummy data for complaints over time (last 7 days) - showing positive trend
       const now = new Date()
@@ -430,6 +452,34 @@ export function Analytics() {
       console.error("Error fetching analytics:", error)
     } finally {
       setLoading(false)
+    }
+  }
+
+  // Fetch most-liked complaints via proxy API
+  const fetchMostLiked = async () => {
+    try {
+      const token = localStorage.getItem('token')
+      if (!token) return
+
+      const res = await fetch(`/api/complaints/most-liked`, {
+        headers: { Authorization: `Bearer ${token}` },
+      })
+
+      if (!res.ok) {
+        console.error('Failed fetching most-liked complaints')
+        return
+      }
+
+      const json = await res.json()
+      if (json && json.success && Array.isArray(json.data)) {
+        setAnalyticsData((prev) => ({
+          ...prev,
+          mostLikedComplaints: json.data,
+          highestLikeCount: json.highestLikeCount || (json.data[0]?.upvoteCount ?? 0),
+        }))
+      }
+    } catch (err) {
+      console.error('Error fetching most-liked:', err)
     }
   }
 
@@ -565,11 +615,18 @@ export function Analytics() {
               <span className="text-sm text-gray-500">likes</span>
             </div>
             <p className="text-xs text-gray-500 mt-1 truncate">
-              {analyticsData.mostLikedComplaints.length > 0
-                ? analyticsData.mostLikedComplaints.length === 1
-                  ? `#${analyticsData.mostLikedComplaints[0].seq} - Click to view`
-                  : `${analyticsData.mostLikedComplaints.length} complaints - Click to view all`
-                : "No complaints yet"}
+              {analyticsData.mostLikedComplaints.length > 0 ? (
+                analyticsData.mostLikedComplaints.length === 1 ? (
+                  <span className="inline-flex items-center gap-1">
+                    <Eye className="h-3 w-3 text-blue-600" />
+                    <span className="text-blue-600">View</span>
+                  </span>
+                ) : (
+                  `${analyticsData.mostLikedComplaints.length} complaints - Click to view all`
+                )
+              ) : (
+                "No complaints yet"
+              )}
             </p>
           </CardContent>
         </Card>
