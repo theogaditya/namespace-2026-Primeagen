@@ -573,6 +573,95 @@ export default function (prisma: PrismaClient) {
     }
   });
 
+  // Get most-liked complaints (handles ties)
+  router.get('/most-liked', authenticateAdmin, async (req: Request, res: Response) => {
+    try {
+      // Find the complaint with highest upvoteCount
+      const top = await prisma.complaint.findFirst({
+        where: { upvoteCount: { not: 0 } },
+        orderBy: { upvoteCount: 'desc' },
+        select: { upvoteCount: true },
+      });
+
+      if (!top || (top.upvoteCount ?? 0) <= 0) {
+        return res.json({ success: true, data: [] });
+      }
+
+      const highest = top.upvoteCount as number;
+
+      const complaints = await prisma.complaint.findMany({
+        where: { upvoteCount: highest },
+        include: {
+          category: { select: { name: true } },
+          location: true,
+          User: { select: { id: true, name: true, email: true, phoneNumber: true } },
+          assignedAgent: { select: { id: true, fullName: true, officialEmail: true } },
+          managedByMunicipalAdmin: { select: { id: true, fullName: true, officialEmail: true } },
+        },
+        orderBy: { submissionDate: 'desc' },
+      });
+
+      const formatted = complaints.map((complaint) => ({
+        id: complaint.id,
+        seq: complaint.seq,
+        title: complaint.subCategory,
+        description: complaint.description,
+        category: complaint.category?.name || 'Unknown',
+        subCategory: complaint.subCategory,
+        status: complaint.status,
+        escalationLevel: complaint.escalationLevel,
+        urgency: complaint.urgency,
+        department: complaint.assignedDepartment,
+        submissionDate: complaint.submissionDate,
+        lastUpdated: complaint.lastUpdated,
+        dateOfResolution: complaint.dateOfResolution,
+        attachmentUrl: complaint.attachmentUrl,
+        isPublic: complaint.isPublic,
+        upvoteCount: complaint.upvoteCount,
+        isDuplicate: complaint.isDuplicate,
+        sla: complaint.sla,
+        AIstandardizedSubCategory: complaint.AIstandardizedSubCategory || null,
+        AIStandardizedSubcategory: complaint.AIstandardizedSubCategory || null,
+        managedByMunicipalAdmin: complaint.managedByMunicipalAdmin
+          ? {
+              id: complaint.managedByMunicipalAdmin.id,
+              name: complaint.managedByMunicipalAdmin.fullName,
+              email: complaint.managedByMunicipalAdmin.officialEmail,
+            }
+          : null,
+        location: complaint.location
+          ? {
+              district: complaint.location.district,
+              city: complaint.location.city,
+              locality: complaint.location.locality,
+              street: complaint.location.street,
+              pin: complaint.location.pin,
+            }
+          : null,
+        complainant: complaint.User
+          ? {
+              id: complaint.User.id,
+              name: complaint.User.name,
+              email: complaint.User.email,
+              phone: complaint.User.phoneNumber,
+            }
+          : null,
+        assignedAgent: complaint.assignedAgent
+          ? {
+              id: complaint.assignedAgent.id,
+              name: complaint.assignedAgent.fullName,
+              email: complaint.assignedAgent.officialEmail,
+            }
+          : null,
+      }));
+
+      return res.json({ success: true, data: formatted, highestLikeCount: highest });
+    } catch (error) {
+      console.error('Error fetching most-liked complaints:', error);
+      return res.status(500).json({ success: false, message: 'Failed to fetch most-liked complaints' });
+    }
+  });
+
   // Get single complaint by ID (placed last to avoid route shadowing)
   router.get('/:id', authenticateAdmin, async (req: Request, res: Response) => {
     try {
