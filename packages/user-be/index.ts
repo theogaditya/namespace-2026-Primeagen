@@ -11,6 +11,7 @@ import { addUserRouter } from "./routes/adduser";
 import { loginUserRouter } from "./routes/loginUser";
 import { logoutUserRouter } from "./routes/logoutUser";
 import { createComplaintRouter } from "./routes/createComplaint";
+import { getComplaintRouter } from "./routes/getComplaint";
 import { districtsRouter } from "./routes/districts";
 import { categoriesRouter } from "./routes/categories";
 import { createAuthMiddleware } from "./middleware/authRoute";
@@ -69,7 +70,7 @@ export class Server {
   }
 
     private initializeRoutes(): void {
-      // Auth middleware
+      // Auth middleware      this.app.use('/api/complaints/get', authMiddleware, getComplaintRouter(this.db));
       const authMiddleware = createAuthMiddleware(this.db);
       
       // Public routes (no auth required)
@@ -82,6 +83,7 @@ export class Server {
       // Protected routes (auth required)
       this.app.use('/api/users', logoutUserRouter(this.db));
       this.app.use('/api/complaints', authMiddleware, createComplaintRouter(this.db));
+      this.app.use('/api/complaints/get', authMiddleware, getComplaintRouter(this.db));
     }
 
   public getApp(): Express {

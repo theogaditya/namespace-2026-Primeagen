@@ -496,7 +496,7 @@ export default function RegisterComplaintPage() {
   const currentStepConfig = STEPS[currentStep - 1];
 
   return (
-    <div className="min-h-screen relative overflow-hidden bg-linear-to-b from-slate-50 via-white to-slate-100">
+    <div className="min-h-screen relative overflow-hidden bg-linear-to-b from-slate-50 via-white to-slate-100 py-10">
       {/* Animated Background Gradient */}
       <div className="absolute inset-0 -z-10">
         <div className="absolute top-0 left-1/4 w-96 h-96 bg-orange-200/30 rounded-full blur-3xl" />

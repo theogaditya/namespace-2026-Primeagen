@@ -148,3 +148,23 @@ body {
 .animate-shimmer {
   animation: shimmer 2s infinite;
 }
+
+/* Leaflet custom marker styles */
+.custom-marker {
+  background: transparent;
+  border: none;
+}
+
+.leaflet-popup-content-wrapper {
+  border-radius: 12px;
+  padding: 0;
+}
+
+.leaflet-popup-content {
+  margin: 0;
+}
+
+.leaflet-popup-close-button {
+  top: 8px !important;
+  right: 8px !important;
+}

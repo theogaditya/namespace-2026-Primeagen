@@ -7,6 +7,7 @@ import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { OperatingDistrict } from "./types";
+import { GoogleMapPicker } from "@/components/google-map-picker";
 import {
   MapPin,
   Loader2,
@@ -22,9 +23,7 @@ import {
   Map,
 } from "lucide-react";
 
-const GOOGLE_API_KEY = process.env.NEXT_PUBLIC_GOOGLE_API_KEY || "";
-
-// Declare Google Maps types
+// Declare Google Maps types for Places Autocomplete
 declare global {
   interface Window {
     google?: {
@@ -156,21 +155,6 @@ export function Step3Location({
       }
     };
     fetchDistricts();
-  }, []);
-
-  // Load Google Maps script
-  useEffect(() => {
-    if (typeof window !== "undefined" && !window.google?.maps?.places && GOOGLE_API_KEY) {
-      const existingScript = document.getElementById("google-maps-script");
-      if (!existingScript) {
-        const script = document.createElement("script");
-        script.id = "google-maps-script";
-        script.src = `https://maps.googleapis.com/maps/api/js?key=${GOOGLE_API_KEY}&libraries=places&loading=async`;
-        script.async = true;
-        script.defer = true;
-        document.head.appendChild(script);
-      }
-    }
   }, []);
 
   // Validate district against operating districts (case-insensitive)
@@ -328,7 +312,7 @@ export function Step3Location({
             {
               input: searchQuery,
               componentRestrictions: { country: "in" },
-              types: ["geocode"],
+              // Removed types restriction to allow all place types including landmarks, malls, etc.
             },
             (results, status) => {
               setIsLoadingLocality(false);
@@ -337,7 +321,7 @@ export function Step3Location({
                 const filtered = results.filter((r) =>
                   r.description.toLowerCase().includes(formData.district.toLowerCase())
                 );
-                setLocalityPredictions(filtered);
+                setLocalityPredictions(filtered.slice(0, 6)); // Limit to 6 results
                 setShowLocalityDropdown(filtered.length > 0);
               } else {
                 setLocalityPredictions([]);
@@ -720,61 +704,35 @@ export function Step3Location({
         )}
       </motion.div>
 
-      {/* Coordinates */}
+      {/* Interactive Map for Location Selection */}
       <motion.div variants={itemVariants}>
         <div className="p-4 bg-gray-50 rounded-2xl border-2 border-gray-200">
           <div className="flex items-center gap-2 mb-4">
-            <Map className="h-5 w-5 text-gray-500" />
-            <span className="text-sm font-semibold text-gray-700">GPS Coordinates (Optional)</span>
+            <Map className="h-5 w-5 text-emerald-500" />
+            <span className="text-sm font-semibold text-gray-700">
+              Select Location on Map <span className="text-gray-400 font-normal">(Optional)</span>
+            </span>
           </div>
-          <div className="grid grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label htmlFor="latitude" className="text-xs font-medium text-gray-500">
-                Latitude
-              </Label>
-              <Input
-                id="latitude"
-                value={formData.latitude}
-                onChange={(e) => updateField("latitude", e.target.value)}
-                onBlur={() => setFieldTouched("latitude")}
-                placeholder="-90 to 90"
-                type="number"
-                step="any"
-                min="-90"
-                max="90"
-                className={cn(
-                  "h-10 rounded-xl border-2",
-                  touched.latitude && errors.latitude && "border-red-300"
-                )}
-              />
-              {touched.latitude && errors.latitude && (
-                <p className="text-xs text-red-600">{errors.latitude}</p>
-              )}
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="longitude" className="text-xs font-medium text-gray-500">
-                Longitude
-              </Label>
-              <Input
-                id="longitude"
-                value={formData.longitude}
-                onChange={(e) => updateField("longitude", e.target.value)}
-                onBlur={() => setFieldTouched("longitude")}
-                placeholder="-180 to 180"
-                type="number"
-                step="any"
-                min="-180"
-                max="180"
-                className={cn(
-                  "h-10 rounded-xl border-2",
-                  touched.longitude && errors.longitude && "border-red-300"
-                )}
-              />
-              {touched.longitude && errors.longitude && (
-                <p className="text-xs text-red-600">{errors.longitude}</p>
-              )}
-            </div>
-          </div>
+          <p className="text-xs text-gray-500 mb-4">
+            Click on the map, search for a location, or use your current location to set precise coordinates.
+          </p>
+          <GoogleMapPicker
+            latitude={formData.latitude}
+            longitude={formData.longitude}
+            onLocationSelect={(lat, lng) => {
+              updateField("latitude", lat);
+              updateField("longitude", lng);
+            }}
+            district={formData.district}
+            city={formData.city}
+            disabled={!formData.district || !formData.pin || pinValidationStatus !== "valid"}
+          />
+          {(!formData.district || !formData.pin || pinValidationStatus !== "valid") && (
+            <p className="text-xs text-amber-600 flex items-center gap-1 mt-3">
+              <AlertCircle className="h-3 w-3" />
+              Please select district and enter valid PIN first to enable map selection
+            </p>
+          )}
         </div>
       </motion.div>
     </motion.div>
