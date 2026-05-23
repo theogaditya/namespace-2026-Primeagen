@@ -159,6 +159,65 @@ router.post('/create/agent', authenticateMunicipalAdminOnly, async (req, res: an
   }
 });
 
+// ----- Get Complaints Managed by the Authenticated Municipal Admin -----
+router.get('/my-complaints', authenticateMunicipalAdminOnly, async (req: any, res: any) => {
+  try {
+    const municipalAdminId = req.admin.id;
+    const page = parseInt(req.query.page as string) || 1;
+    const limit = parseInt(req.query.limit as string) || 20;
+    const skip = (page - 1) * limit;
+
+    const [complaintsRaw, total] = await Promise.all([
+      prisma.complaint.findMany({
+        where: {
+          managedByMunicipalAdminId: municipalAdminId,
+          status: { not: 'DELETED' },
+        },
+        include: {
+          category: true,
+          User: true,
+          location: true,
+          assignedAgent: {
+            select: { id: true, fullName: true, officialEmail: true },
+          },
+          managedByMunicipalAdmin: {
+            select: { id: true, fullName: true, officialEmail: true },
+          },
+        },
+        orderBy: { submissionDate: 'desc' },
+        skip,
+        take: limit,
+      }),
+      prisma.complaint.count({
+        where: { managedByMunicipalAdminId: municipalAdminId, status: { not: 'DELETED' } },
+      }),
+    ]);
+
+    const complaints = complaintsRaw.map(({ User, ...rest }) => ({
+      ...rest,
+      complainant: User || null,
+    }));
+
+    return res.json({
+      success: true,
+      complaints,
+      pagination: {
+        page,
+        limit,
+        total,
+        totalPages: Math.ceil(total / limit),
+      },
+    });
+  } catch (error: any) {
+    console.error('Error fetching managed complaints:', error);
+    return res.status(500).json({
+      success: false,
+      message: 'Failed to fetch managed complaints',
+      error: process.env.NODE_ENV === 'development' ? error.message : undefined,
+    });
+  }
+});
+
 // ----- 9. Get All Complaints -----
 router.get('/complaints', async (req, res:any) => {
   try {
