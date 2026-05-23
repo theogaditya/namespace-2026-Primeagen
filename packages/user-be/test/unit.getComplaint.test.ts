@@ -25,7 +25,7 @@ const JWT_SECRET = "my123";
 let app: express.Express;
 
 const mockUser = {
-  id: 'uuid-user-1',
+  id: '550e8400-e29b-41d4-a716-446655440001',
   email: 'test@example.com',
   name: 'Test User',
   status: 'ACTIVE',
@@ -33,15 +33,15 @@ const mockUser = {
 };
 
 const mockCategory = {
-  id: 'uuid-category-1',
+  id: '550e8400-e29b-41d4-a716-446655440010',
   name: 'Water Supply',
   subCategories: ['Leakage', 'No Water'],
   assignedDepartment: 'WATER_SUPPLY_SANITATION',
 };
 
 const mockLocation = {
-  id: 'uuid-location-1',
-  complaintId: 'uuid-complaint-1',
+  id: '550e8400-e29b-41d4-a716-446655440020',
+  complaintId: '550e8400-e29b-41d4-a716-446655440100',
   pin: '110001',
   district: 'Central Delhi',
   city: 'New Delhi',
@@ -52,10 +52,10 @@ const mockLocation = {
 };
 
 const mockComplaint = {
-  id: 'uuid-complaint-1',
+  id: '550e8400-e29b-41d4-a716-446655440100',
   seq: 1,
   submissionDate: new Date('2024-01-15'),
-  complainantId: 'uuid-user-1',
+  complainantId: '550e8400-e29b-41d4-a716-446655440001',
   subCategory: 'Water Leakage',
   description: 'There is a major water leakage on the main road',
   urgency: 'HIGH',
@@ -65,7 +65,7 @@ const mockComplaint = {
   isPublic: true,
   assignedAgentId: null,
   assignedDepartment: 'WATER_SUPPLY_SANITATION',
-  categoryId: 'uuid-category-1',
+  categoryId: '550e8400-e29b-41d4-a716-446655440010',
   dateOfResolution: null,
   escalationLevel: null,
   sla: null,
@@ -81,21 +81,21 @@ const mockComplaint = {
 
 const mockPrivateComplaint = {
   ...mockComplaint,
-  id: 'uuid-complaint-2',
+  id: '550e8400-e29b-41d4-a716-446655440101',
   seq: 2,
   isPublic: false,
-  complainantId: 'uuid-user-2', // Different user
+  complainantId: '550e8400-e29b-41d4-a716-446655440002', // Different user
 };
 
 const mockOwnPrivateComplaint = {
   ...mockComplaint,
-  id: 'uuid-complaint-3',
+  id: '550e8400-e29b-41d4-a716-446655440102',
   seq: 3,
   isPublic: false,
-  complainantId: 'uuid-user-1', // Same user
+  complainantId: '550e8400-e29b-41d4-a716-446655440001', // Same user
 };
 
-function generateToken(userId: string = 'uuid-user-1') {
+function generateToken(userId: string = '550e8400-e29b-41d4-a716-446655440001') {
   return jwt.sign(
     { userId, email: 'test@example.com', name: 'Test User' },
     JWT_SECRET,
@@ -318,12 +318,12 @@ describe('GET /api/complaints/get/:id - Get Complaint by ID', () => {
     prismaMock.complaint.findUnique.mockResolvedValue(mockComplaint);
 
     const res = await request(app)
-      .get('/api/complaints/get/uuid-complaint-1')
+      .get('/api/complaints/get/550e8400-e29b-41d4-a716-446655440100')
       .set('Authorization', `Bearer ${token}`);
 
     expect(res.status).toBe(200);
     expect(res.body.success).toBe(true);
-    expect(res.body.data.id).toBe('uuid-complaint-1');
+    expect(res.body.data.id).toBe('550e8400-e29b-41d4-a716-446655440100');
     expect(res.body.message).toBe('Complaint retrieved successfully');
   });
 
@@ -334,12 +334,12 @@ describe('GET /api/complaints/get/:id - Get Complaint by ID', () => {
     prismaMock.complaint.findUnique.mockResolvedValue(mockOwnPrivateComplaint);
 
     const res = await request(app)
-      .get('/api/complaints/get/uuid-complaint-3')
+      .get('/api/complaints/get/550e8400-e29b-41d4-a716-446655440102')
       .set('Authorization', `Bearer ${token}`);
 
     expect(res.status).toBe(200);
     expect(res.body.success).toBe(true);
-    expect(res.body.data.id).toBe('uuid-complaint-3');
+    expect(res.body.data.id).toBe('550e8400-e29b-41d4-a716-446655440102');
   });
 
   it('returns 403 when trying to access others private complaint', async () => {
@@ -349,7 +349,7 @@ describe('GET /api/complaints/get/:id - Get Complaint by ID', () => {
     prismaMock.complaint.findUnique.mockResolvedValue(mockPrivateComplaint);
 
     const res = await request(app)
-      .get('/api/complaints/get/uuid-complaint-2')
+      .get('/api/complaints/get/550e8400-e29b-41d4-a716-446655440101')
       .set('Authorization', `Bearer ${token}`);
 
     expect(res.status).toBe(403);
@@ -364,7 +364,7 @@ describe('GET /api/complaints/get/:id - Get Complaint by ID', () => {
     prismaMock.complaint.findUnique.mockResolvedValue(null);
 
     const res = await request(app)
-      .get('/api/complaints/get/uuid-nonexistent')
+      .get('/api/complaints/get/550e8400-e29b-41d4-a716-446655440999')
       .set('Authorization', `Bearer ${token}`);
 
     expect(res.status).toBe(404);
@@ -387,19 +387,19 @@ describe('GET /api/complaints/get/:id - Get Complaint by ID', () => {
 
 describe('GET /api/complaints/get/user/:userId - Get Complaints by User ID', () => {
   it('returns 200 with public complaints of another user', async () => {
-    const token = generateToken('uuid-user-1');
+    const token = generateToken('550e8400-e29b-41d4-a716-446655440001');
     
     // @ts-ignore - First call for auth middleware
     prismaMock.user.findUnique.mockResolvedValueOnce(mockUser);
     // @ts-ignore - Second call for checking if target user exists
-    prismaMock.user.findUnique.mockResolvedValueOnce({ id: 'uuid-user-2' });
+    prismaMock.user.findUnique.mockResolvedValueOnce({ id: '550e8400-e29b-41d4-a716-446655440002' });
     // @ts-ignore
     prismaMock.complaint.count.mockResolvedValue(1);
     // @ts-ignore - Only public complaint
-    prismaMock.complaint.findMany.mockResolvedValue([{ ...mockComplaint, complainantId: 'uuid-user-2' }]);
+    prismaMock.complaint.findMany.mockResolvedValue([{ ...mockComplaint, complainantId: '550e8400-e29b-41d4-a716-446655440002' }]);
 
     const res = await request(app)
-      .get('/api/complaints/get/user/uuid-user-2')
+      .get('/api/complaints/get/user/550e8400-e29b-41d4-a716-446655440002')
       .set('Authorization', `Bearer ${token}`);
 
     expect(res.status).toBe(200);
@@ -407,19 +407,19 @@ describe('GET /api/complaints/get/user/:userId - Get Complaints by User ID', () 
   });
 
   it('returns 200 with all complaints when viewing own profile', async () => {
-    const token = generateToken('uuid-user-1');
+    const token = generateToken('550e8400-e29b-41d4-a716-446655440001');
     
     // @ts-ignore - First call for auth middleware
     prismaMock.user.findUnique.mockResolvedValueOnce(mockUser);
     // @ts-ignore - Second call for checking if target user exists
-    prismaMock.user.findUnique.mockResolvedValueOnce({ id: 'uuid-user-1' });
+    prismaMock.user.findUnique.mockResolvedValueOnce({ id: '550e8400-e29b-41d4-a716-446655440001' });
     // @ts-ignore
     prismaMock.complaint.count.mockResolvedValue(2);
     // @ts-ignore
     prismaMock.complaint.findMany.mockResolvedValue([mockComplaint, mockOwnPrivateComplaint]);
 
     const res = await request(app)
-      .get('/api/complaints/get/user/uuid-user-1')
+      .get('/api/complaints/get/user/550e8400-e29b-41d4-a716-446655440001')
       .set('Authorization', `Bearer ${token}`);
 
     expect(res.status).toBe(200);
@@ -436,7 +436,7 @@ describe('GET /api/complaints/get/user/:userId - Get Complaints by User ID', () 
     prismaMock.user.findUnique.mockResolvedValueOnce(null);
 
     const res = await request(app)
-      .get('/api/complaints/get/user/uuid-nonexistent')
+      .get('/api/complaints/get/user/550e8400-e29b-41d4-a716-446655440999')
       .set('Authorization', `Bearer ${token}`);
 
     expect(res.status).toBe(404);
@@ -567,7 +567,7 @@ describe('Authentication Tests for Get Complaints', () => {
 
   it('returns 401 when token is expired', async () => {
     const expiredToken = jwt.sign(
-      { userId: 'uuid-user-1', email: 'test@example.com', name: 'Test User' },
+      { userId: '550e8400-e29b-41d4-a716-446655440001', email: 'test@example.com', name: 'Test User' },
       JWT_SECRET,
       { expiresIn: '-1h' }
     );
@@ -621,7 +621,7 @@ describe('Error Handling', () => {
     prismaMock.complaint.findUnique.mockRejectedValue(new Error('Database error'));
 
     const res = await request(app)
-      .get('/api/complaints/get/uuid-complaint-1')
+      .get('/api/complaints/get/550e8400-e29b-41d4-a716-446655440100')
       .set('Authorization', `Bearer ${token}`);
 
     expect(res.status).toBe(500);

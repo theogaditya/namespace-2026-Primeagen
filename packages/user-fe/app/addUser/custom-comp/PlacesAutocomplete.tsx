@@ -6,28 +6,6 @@ import { Label } from "@/components/ui/label";
 import { cn } from "@/lib/utils";
 import { CheckCircle, XCircle, AlertCircle, MapPin, Loader2, AlertTriangle } from "lucide-react";
 
-// Declare Google Maps types
-declare global {
-  interface Window {
-    google?: {
-      maps?: {
-        places?: {
-          AutocompleteService: new () => {
-            getPlacePredictions: (
-              request: {
-                input: string;
-                componentRestrictions?: { country: string };
-                types?: string[];
-              },
-              callback: (predictions: Prediction[] | null, status: string) => void
-            ) => void;
-          };
-        };
-      };
-    };
-  }
-}
-
 interface PlacesAutocompleteProps {
   label: string;
   value: string;

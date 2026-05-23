@@ -23,28 +23,6 @@ import {
   Map,
 } from "lucide-react";
 
-// Declare Google Maps types for Places Autocomplete
-declare global {
-  interface Window {
-    google?: {
-      maps?: {
-        places?: {
-          AutocompleteService: new () => {
-            getPlacePredictions: (
-              request: {
-                input: string;
-                componentRestrictions?: { country: string };
-                types?: string[];
-              },
-              callback: (predictions: Prediction[] | null, status: string) => void
-            ) => void;
-          };
-        };
-      };
-    };
-  }
-}
-
 interface Prediction {
   place_id: string;
   description: string;
