@@ -546,5 +546,137 @@ router.patch('/delete/:id', async (req, res:any) => {
 
 // ----- 11. Escalate A Complaint ----- 
 
+// ----- 12. Get My Complaints (Escalated to Super Admin) -----
+router.get('/my-complaints', authenticateSuperAdminOnly, async (req: any, res: any) => {
+  try {
+    const superAdminId = req.admin.id;
+
+    // Fetch complaints that have been escalated to state level (Super Admin handles state-level escalations)
+    const complaintsRaw = await prisma.complaint.findMany({
+      where: {
+        OR: [
+          { status: 'ESCALATED_TO_STATE_LEVEL' },
+          { escalatedToStateAdminId: { not: null } }
+        ]
+      },
+      include: {
+        category: true,
+        User: true,
+        location: true,
+        assignedAgent: {
+          select: {
+            id: true,
+            fullName: true,
+            officialEmail: true
+          }
+        }
+      },
+      orderBy: {
+        submissionDate: 'desc'
+      }
+    });
+
+    // Map Prisma relation `User` to `complainant` for response consistency
+    const complaints = complaintsRaw.map(({ User, ...rest }) => ({
+      ...rest,
+      complainant: User || null
+    }));
+
+    return res.json({ success: true, complaints });
+  } catch (error: any) {
+    console.error('Error fetching super admin complaints:', error);
+    return res.status(500).json({ 
+      success: false, 
+      message: 'Failed to fetch complaints',
+      error: process.env.NODE_ENV === 'development' ? error.message : undefined
+    });
+  }
+});
+
+// ----- 13. Update Complaint Status -----
+router.put('/complaints/:id/status', authenticateSuperAdminOnly, async (req: any, res: any) => {
+  try {
+    const { id } = req.params;
+    const { status } = req.body;
+
+    const validStatuses = [
+      'REGISTERED',
+      'UNDER_PROCESSING',
+      'FORWARDED',
+      'ON_HOLD',
+      'COMPLETED',
+      'REJECTED',
+      'ESCALATED_TO_MUNICIPAL_LEVEL',
+      'ESCALATED_TO_STATE_LEVEL'
+    ];
+
+    if (!status || !validStatuses.includes(status)) {
+      return res.status(400).json({ 
+        success: false, 
+        message: 'Invalid status. Valid statuses are: ' + validStatuses.join(', ')
+      });
+    }
+
+    const existingComplaint = await prisma.complaint.findUnique({
+      where: { id }
+    });
+
+    if (!existingComplaint) {
+      return res.status(404).json({ 
+        success: false, 
+        message: 'Complaint not found' 
+      });
+    }
+
+    const updatedComplaintRaw = await prisma.complaint.update({
+      where: { id },
+      data: { 
+        status,
+        ...(status === 'COMPLETED' && { dateOfResolution: new Date() })
+      },
+      include: {
+        User: true,
+        category: true,
+        location: true,
+        upvotes: true,
+        assignedAgent: {
+          select: {
+            id: true,
+            fullName: true,
+            officialEmail: true
+          }
+        }
+      }
+    });
+
+    if (status === 'COMPLETED' && existingComplaint.assignedAgentId) {
+      await prisma.agent.update({
+        where: { id: existingComplaint.assignedAgentId },
+        data: {
+          currentWorkload: { decrement: 1 }
+        }
+      });
+    }
+
+    // Map Prisma relation `User` to `complainant` for response consistency
+    const { User, ...complaintRest } = updatedComplaintRaw as any;
+    const updatedComplaint = { ...complaintRest, complainant: User || null };
+
+    return res.json({ 
+      success: true, 
+      message: 'Complaint status updated successfully',
+      complaint: updatedComplaint 
+    });
+
+  } catch (error: any) {
+    console.error('Error updating complaint status:', error);
+    return res.status(500).json({ 
+      success: false, 
+      message: 'Failed to update complaint status',
+      error: process.env.NODE_ENV === 'development' ? error.message : undefined
+    });
+  }
+});
+
   return router;
 }
