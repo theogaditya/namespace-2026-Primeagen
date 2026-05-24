@@ -21,6 +21,11 @@ export default function MunicipalPage() {
         {activeTab === 'my-complaints' && <MunicipalMyComplaints />}
         {activeTab === 'reports' && <MunicipalAnalytics />}
         {activeTab === 'agent-management' && <AgentManagement />}
+        {activeTab === 'agent-management' && (
+          <div className="p-6">
+            <div className="text-gray-600">Agent management</div>
+          </div>
+        )}
       </MunicipalAdminLayout>
     </AuthGuard>
   )

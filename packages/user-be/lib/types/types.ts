@@ -88,3 +88,76 @@ export interface CreateComplaint {
   isPublic: boolean;
   location: ComplaintLocation;
 }
+
+// Response types for complaint queries
+export interface ComplaintLocationResponse {
+  id: string;
+  complaintId: string;
+  pin: string;
+  district: string;
+  city: string;
+  locality: string;
+  street: string | null;
+  latitude: number | null;
+  longitude: number | null;
+}
+
+export interface ComplaintUserResponse {
+  id: string;
+  name: string;
+  email: string;
+  phoneNumber: string;
+}
+
+export interface ComplaintCategoryResponse {
+  id: string;
+  name: string;
+  subCategories: string[];
+  assignedDepartment: string;
+}
+
+export interface ComplaintResponse {
+  id: string;
+  seq: number;
+  submissionDate: Date;
+  complainantId: string | null;
+  subCategory: string;
+  description: string;
+  urgency: ComplaintUrgency;
+  attachmentUrl: string | null;
+  status: ComplaintStatus;
+  upvoteCount: number;
+  isPublic: boolean;
+  assignedAgentId: string | null;
+  assignedDepartment: string;
+  categoryId: string;
+  dateOfResolution: Date | null;
+  escalationLevel: string | null;
+  sla: string | null;
+  AIabusedFlag: boolean | null;
+  AIimageVarificationStatus: boolean | null;
+  AIstandardizedSubCategory: string | null;
+  lastUpdated: Date;
+  isDuplicate: boolean | null;
+  location: ComplaintLocationResponse | null;
+  User: ComplaintUserResponse | null;
+  category: ComplaintCategoryResponse;
+}
+
+export interface ComplaintListResponse {
+  success: boolean;
+  message: string;
+  data: ComplaintResponse[];
+  pagination?: {
+    total: number;
+    page: number;
+    limit: number;
+    totalPages: number;
+  };
+}
+
+export interface SingleComplaintResponse {
+  success: boolean;
+  message: string;
+  data: ComplaintResponse | null;
+}

@@ -19,6 +19,11 @@ export default function SuperPage() {
         {activeTab === 'dashboard' && <SuperAvailableComplaints />}
         {activeTab === 'reports' && <SuperAnalytics />}
         {activeTab === 'Admin-Management' && <AdminManagement />}
+        {activeTab === 'Admin-Management' && (
+          <div className="p-6">
+            <div className="text-gray-600">Admins And Agents Management - Coming Soon</div>
+          </div>
+        )}
       </SuperAdminLayout>
     </AuthGuard>
   )

@@ -19,10 +19,10 @@ const adminTypeLabels: Record<AdminType, string> = {
 }
 
 const adminTypeRoutes: Record<AdminType, string> = {
-  SUPER_ADMIN: "/pages/Super",
-  STATE_ADMIN: "/pages/State",
-  MUNICIPAL_ADMIN: "/pages/Municipal",
-  AGENT: "/pages/Agent",
+  SUPER_ADMIN: "/Super",
+  STATE_ADMIN: "/State",
+  MUNICIPAL_ADMIN: "/Municipal",
+  AGENT: "/Agent",
 }
 
 export function LoginForm() {

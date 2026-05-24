@@ -30,15 +30,15 @@ import {
 const getDashboardPath = (adminType: string | null): string => {
   switch (adminType) {
     case 'AGENT':
-      return '/pages/Agent'
+      return '/Agent'
     case 'MUNICIPAL_ADMIN':
-      return '/pages/Municipal'
+      return '/Municipal'
     case 'STATE_ADMIN':
-      return '/pages/State'
+      return '/State'
     case 'SUPER_ADMIN':
-      return '/pages/Super'
+      return '/Super'
     default:
-      return '/pages/Agent'
+      return '/Agent'
   }
 }
 

@@ -234,5 +234,48 @@ router.put('/complaints/:id/escalate', authenticateStateAdminOnly, async (req: a
   }
 });
 
+// ----- 6. Get My Complaints (Escalated to this State Admin) -----
+router.get('/my-complaints', authenticateStateAdminOnly, async (req: any, res: any) => {
+  try {
+    const stateAdminId = req.admin.id;
+
+    const complaintsRaw = await prisma.complaint.findMany({
+      where: {
+        escalatedToStateAdminId: stateAdminId,
+      },
+      include: {
+        category: true,
+        User: true,
+        location: true,
+        assignedAgent: {
+          select: {
+            id: true,
+            fullName: true,
+            officialEmail: true
+          }
+        }
+      },
+      orderBy: {
+        submissionDate: 'desc'
+      }
+    });
+
+    // Map Prisma relation `User` to `complainant` for response consistency
+    const complaints = complaintsRaw.map(({ User, ...rest }) => ({
+      ...rest,
+      complainant: User || null
+    }));
+
+    return res.json({ success: true, complaints });
+  } catch (error: any) {
+    console.error('Error fetching state admin complaints:', error);
+    return res.status(500).json({ 
+      success: false, 
+      message: 'Failed to fetch complaints',
+      error: process.env.NODE_ENV === 'development' ? error.message : undefined
+    });
+  }
+});
+
   return router;
 }

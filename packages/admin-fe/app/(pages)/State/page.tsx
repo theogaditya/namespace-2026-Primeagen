@@ -21,6 +21,11 @@ export default function StatePage() {
         {activeTab === 'my-complaints' && <StateMyComplaints />}
         {activeTab === 'reports' && <StateAnalytics />}
         {activeTab === 'municipal-management' && <MunicipalAdminManagement />}
+        {activeTab === 'municipal-management' && (
+          <div className="p-6">
+            <div className="text-gray-600">Municipal Admin Management - Coming Soon</div>
+          </div>
+        )}
       </StateAdminLayout>
     </AuthGuard>
   )
