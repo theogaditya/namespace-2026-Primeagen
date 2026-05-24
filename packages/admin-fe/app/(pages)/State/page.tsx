@@ -9,6 +9,7 @@ import { AuthGuard } from "@/components/auth-guard"
 const StateAvailableComplaints = dynamic(() => import('./components/state-available-complaints').then(m => m.StateAvailableComplaints), { ssr: false })
 const StateMyComplaints = dynamic(() => import('./components/state-my-complaints').then(m => m.StateMyComplaints), { ssr: false })
 const StateAnalytics = dynamic(() => import('./components/state-analytics').then(m => m.StateAnalytics), { ssr: false })
+const MunicipalAdminManagement = dynamic(() => import('./components/MunicipalAdminManagement').then(m => m.MunicipalAdminManagement), { ssr: false })
 
 export default function StatePage() {
   const [activeTab, setActiveTab] = useState<'dashboard' | 'my-complaints' | 'reports' | 'municipal-management'>('dashboard')
@@ -19,6 +20,7 @@ export default function StatePage() {
         {activeTab === 'dashboard' && <StateAvailableComplaints />}
         {activeTab === 'my-complaints' && <StateMyComplaints />}
         {activeTab === 'reports' && <StateAnalytics />}
+        {activeTab === 'municipal-management' && <MunicipalAdminManagement />}
         {activeTab === 'municipal-management' && (
           <div className="p-6">
             <div className="text-gray-600">Municipal Admin Management - Coming Soon</div>

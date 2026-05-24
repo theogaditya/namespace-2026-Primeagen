@@ -9,6 +9,7 @@ import { AuthGuard } from "@/components/auth-guard"
 const MunicipalAvailableComplaints = dynamic(() => import('./components/municipal-available-complaints').then(m => m.MunicipalAvailableComplaints), { ssr: false })
 const MunicipalMyComplaints = dynamic(() => import('./components/municipal-my-complaints').then(m => m.MunicipalMyComplaints), { ssr: false })
 const MunicipalAnalytics = dynamic(() => import('./components/municipal-analytics').then(m => m.MunicipalAnalytics), { ssr: false })
+const AgentManagement = dynamic(() => import('./components/AgentManagement').then(m => m.AgentManagement), { ssr: false })
 
 export default function MunicipalPage() {
   const [activeTab, setActiveTab] = useState<'dashboard' | 'my-complaints' | 'reports' | 'agent-management'>('dashboard')
@@ -19,6 +20,7 @@ export default function MunicipalPage() {
         {activeTab === 'dashboard' && <MunicipalAvailableComplaints />}
         {activeTab === 'my-complaints' && <MunicipalMyComplaints />}
         {activeTab === 'reports' && <MunicipalAnalytics />}
+        {activeTab === 'agent-management' && <AgentManagement />}
         {activeTab === 'agent-management' && (
           <div className="p-6">
             <div className="text-gray-600">Agent management</div>
