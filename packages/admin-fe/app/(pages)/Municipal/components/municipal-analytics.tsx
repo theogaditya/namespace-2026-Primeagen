@@ -757,9 +757,9 @@ export function MunicipalAnalytics() {
         </CardContent>
       </Card>
 
-      {/* Resolution rates card below the map */}
+      {/* Resolution rates card below the map - Municipal sees Agent and Co-assigned only */}
       <div className="mt-6">
-        <ResolutionRateCard />
+        <ResolutionRateCard visibleLines={{ agents: true, coAssigned: true, municipal: false }} />
       </div>
 
       {/* Most Liked Complaint Modal */}

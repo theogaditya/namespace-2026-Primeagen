@@ -3,7 +3,7 @@
 import type React from "react"
 
 import { useState, useEffect } from "react"
-import { useRouter, usePathname } from "next/navigation"
+import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import {
   BarChart3,
@@ -14,8 +14,8 @@ import {
   LogOut,
   User,
   X,
+  Users,
 } from "lucide-react"
-import Link from "next/link"
 import { cn } from "@/lib/utils"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import {
@@ -27,30 +27,16 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 
-const getDashboardPath = (adminType: string | null): string => {
-  switch (adminType) {
-    case 'AGENT':
-      return '/Agent'
-    case 'MUNICIPAL_ADMIN':
-      return '/Municipal'
-    case 'STATE_ADMIN':
-      return '/State'
-    case 'SUPER_ADMIN':
-      return '/Super'
-    default:
-      return '/Agent'
-  }
-}
-
-interface AdminLayoutProps {
+interface StateAdminLayoutProps {
   children: React.ReactNode
+  activeTab?: 'dashboard' | 'my-complaints' | 'reports' | 'municipal-management'
+  onTabChange?: (tab: 'dashboard' | 'my-complaints' | 'reports' | 'municipal-management') => void
 }
 
-export function AdminLayout({ children }: AdminLayoutProps) {
+export function StateAdminLayout({ children, activeTab = 'dashboard', onTabChange }: StateAdminLayoutProps) {
   const [sidebarOpen, setSidebarOpen] = useState(false)
   const [adminData, setAdminData] = useState<{ fullName?: string; officialEmail?: string; id?: string; adminType?: string } | null>(null)
   const router = useRouter()
-  const pathname = usePathname()
 
   useEffect(() => {
     try {
@@ -69,34 +55,33 @@ export function AdminLayout({ children }: AdminLayoutProps) {
     }
   }, [])
 
-  // Check if a nav item is currently active
-  const isActive = (href: string): boolean => {
-    if (href.startsWith('/pages/')) {
-      // Dashboard pages - match if pathname starts with /pages/
-      return pathname?.startsWith('/pages/') || false
-    }
-    return pathname === href
-  }
-
-  // Build navigation with dynamic dashboard path
+  // Build navigation - all tabs are internal (no external routes)
   const navItems = [
-    { name: "Dashboard", href: getDashboardPath(adminData?.adminType || null), icon: BarChart3 },
-    { name: "My Complaints", href: "/users", icon: FileText },
-    { name: "Reports & Reviews", href: "/reports", icon: Flag },
+    { name: "Dashboard", icon: BarChart3, tabKey: 'dashboard' as const },
+    { name: "My Complaints", icon: FileText, tabKey: 'my-complaints' as const },
+    { name: "Reports & Reviews", icon: Flag, tabKey: 'reports' as const },
+    { name: "Municipal Management", icon: Users, tabKey: 'municipal-management' as const },
   ]
 
-  // Get page title based on current pathname
+  // Get page title based on current tab
   const getPageTitle = (): string => {
-    if (pathname?.startsWith('/pages/')) {
-      return 'Complaints Management'
+    switch (activeTab) {
+      case 'dashboard':
+        return 'Complaints Management'
+      case 'my-complaints':
+        return 'My Complaints'
+      case 'reports':
+        return 'Reports & Reviews'
+      case 'municipal-management':
+        return 'Municipal Management'
+      default:
+        return 'Dashboard'
     }
-    if (pathname === '/users') {
-      return 'My Complaints'
-    }
-    if (pathname === '/reports') {
-      return 'Reports & Reviews'
-    }
-    return 'Dashboard'
+  }
+
+  const handleNavClick = (tabKey: 'dashboard' | 'my-complaints' | 'reports' | 'municipal-management') => {
+    onTabChange?.(tabKey)
+    setSidebarOpen(false)
   }
 
   return (
@@ -110,7 +95,7 @@ export function AdminLayout({ children }: AdminLayoutProps) {
               <div className="flex h-16 items-center justify-between border-b bg-white px-4">
                 <div className="flex items-center">
                   <img src="https://swarajdesk.adityahota.online/logo.png" alt="SwarajDesk logo" className="h-8 w-8 mr-2" />
-                  <h1 className="text-xl font-bold text-blue-600">SwarajDesK Agent</h1>
+                  <h1 className="text-xl font-bold text-purple-600">State Admin</h1>
                 </div>
                 <Button variant="ghost" size="icon" onClick={() => setSidebarOpen(false)}>
                   <X className="h-6 w-6" />
@@ -118,27 +103,26 @@ export function AdminLayout({ children }: AdminLayoutProps) {
               </div>
               <nav className="flex-1 space-y-1 bg-white px-2 py-4">
                 {navItems.map((item) => {
-                  const active = isActive(item.href)
+                  const active = activeTab === item.tabKey
                   return (
-                    <Link
+                    <button
                       key={item.name}
-                      href={item.href}
-                      onClick={() => setSidebarOpen(false)}
+                      onClick={() => handleNavClick(item.tabKey)}
                       className={cn(
                         active
-                          ? "bg-blue-50 border-r-2 border-blue-600 text-blue-700"
+                          ? "bg-purple-50 border-r-2 border-purple-600 text-purple-700"
                           : "text-gray-600 hover:bg-gray-50 hover:text-gray-900",
-                        "group flex items-center px-2 py-2 text-sm font-medium rounded-md",
+                        "group flex items-center px-2 py-2 text-sm font-medium rounded-md w-full text-left",
                       )} 
                     >
                       <item.icon
                         className={cn(
-                          active ? "text-blue-500" : "text-gray-400 group-hover:text-gray-500",
+                          active ? "text-purple-500" : "text-gray-400 group-hover:text-gray-500",
                           "mr-3 h-5 w-5 shrink-0",
                         )}
                       />
                       {item.name}
-                    </Link>
+                    </button>
                   )
                 })}
               </nav>
@@ -153,32 +137,32 @@ export function AdminLayout({ children }: AdminLayoutProps) {
           <div className="flex h-16 items-center justify-center border-b bg-white px-4">
             <div className="flex items-center">
               <img src="https://swarajdesk.adityahota.online/logo.png" alt="SwarajDesk logo" className="h-8 w-8 mr-2" />
-              <h1 className="text-xl font-bold text-blue-600">Agent Dashboard</h1>
+              <h1 className="text-xl font-bold text-purple-600">State Admin</h1>
             </div>
           </div>
           <div className="flex flex-1 flex-col overflow-y-auto">
             <nav className="flex-1 space-y-1 px-2 py-4">
               {navItems.map((item) => {
-                const active = isActive(item.href)
+                const active = activeTab === item.tabKey
                 return (
-                  <Link
+                  <button
                     key={item.name}
-                    href={item.href}
+                    onClick={() => handleNavClick(item.tabKey)}
                     className={cn(
                       active
-                        ? "bg-blue-50 border-r-2 border-blue-600 text-blue-700"
+                        ? "bg-purple-50 border-r-2 border-purple-600 text-purple-700"
                         : "text-gray-600 hover:bg-gray-50 hover:text-gray-900",
-                      "group flex items-center px-2 py-2 text-sm font-medium rounded-md",
+                      "group flex items-center px-2 py-2 text-sm font-medium rounded-md w-full text-left",
                     )}
                   >
                     <item.icon
                       className={cn(
-                        active ? "text-blue-500" : "text-gray-400 group-hover:text-gray-500",
+                        active ? "text-purple-500" : "text-gray-400 group-hover:text-gray-500",
                         "mr-3 h-5 w-5 shrink-0",
                       )}
                     />
                     {item.name}
-                  </Link>
+                  </button>
                 )
               })}
             </nav>
