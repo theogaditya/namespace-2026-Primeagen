@@ -4,6 +4,7 @@ import { useState, useEffect } from "react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
+import { Switch } from "@/components/ui/switch"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Users, RefreshCw, Loader2, UserPlus } from "lucide-react"
 import { AddAgentForm } from "./AddAgentForm"
@@ -24,6 +25,7 @@ export function AgentManagement() {
   const [agents, setAgents] = useState<Agent[]>([])
   const [loading, setLoading] = useState(true)
   const [showForm, setShowForm] = useState(false)
+  const [updatingStatus, setUpdatingStatus] = useState<string | null>(null)
 
   const fetchAgents = async () => {
     setLoading(true)
@@ -56,6 +58,35 @@ export function AgentManagement() {
     // Refresh the agents list when a new agent is created
     fetchAgents()
     setShowForm(false)
+  }
+
+  const handleToggleStatus = async (agentId: string, currentStatus: string) => {
+    setUpdatingStatus(agentId)
+    try {
+      const token = localStorage.getItem("token")
+      if (!token) return
+
+      const newStatus = currentStatus === "ACTIVE" ? "INACTIVE" : "ACTIVE"
+      
+      const response = await fetch(`${API_URL}/api/municipal-admin/${agentId}/status`, {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ status: newStatus }),
+      })
+
+      if (response.ok) {
+        setAgents(agents.map(agent => 
+          agent.id === agentId ? { ...agent, status: newStatus } : agent
+        ))
+      }
+    } catch (err) {
+      console.error("Error updating agent status:", err)
+    } finally {
+      setUpdatingStatus(null)
+    }
   }
 
   const getStatusBadge = (status: string) => {
@@ -162,13 +193,14 @@ export function AgentManagement() {
                 </div>
               ) : (
                 <div className="rounded-md border">
-                  <Table>
+                  <Table className="table-fixed">
                     <TableHeader>
                       <TableRow>
-                        <TableHead>Name</TableHead>
-                        <TableHead>Email</TableHead>
-                        <TableHead>Department</TableHead>
-                        <TableHead>Status</TableHead>
+                        <TableHead className="w-[20%]">Name</TableHead>
+                        <TableHead className="w-[25%]">Email</TableHead>
+                        <TableHead className="w-[20%]">Department</TableHead>
+                        <TableHead className="w-[15%]">Status</TableHead>
+                        <TableHead className="w-[20%]">Actions</TableHead>
                       </TableRow>
                     </TableHeader>
                     <TableBody>
@@ -182,6 +214,23 @@ export function AgentManagement() {
                             <Badge variant="outline">{formatDepartment(agent.department)}</Badge>
                           </TableCell>
                           <TableCell>{getStatusBadge(agent.status)}</TableCell>
+                          <TableCell>
+                            <div className="flex items-center gap-3">
+                              <div className="w-5 h-5 flex items-center justify-center">
+                                {updatingStatus === agent.id && (
+                                  <Loader2 className="h-4 w-4 animate-spin text-blue-600" />
+                                )}
+                              </div>
+                              <Switch
+                                checked={agent.status === "ACTIVE"}
+                                onCheckedChange={() => handleToggleStatus(agent.id, agent.status)}
+                                disabled={updatingStatus === agent.id}
+                              />
+                              <span className="text-sm text-gray-500 w-16">
+                                {agent.status === "ACTIVE" ? "Active" : "Inactive"}
+                              </span>
+                            </div>
+                          </TableCell>
                         </TableRow>
                       ))}
                     </TableBody>
