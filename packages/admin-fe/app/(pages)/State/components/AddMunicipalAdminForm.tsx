@@ -108,7 +108,7 @@ export function AddMunicipalAdminForm({ onSuccess, onCancel }: AddMunicipalAdmin
         return
       }
 
-      const response = await fetch(`${API_URL}/api/state-admin/create/municipal-admin`, {
+      const response = await fetch(`${API_URL}/api/state-admin/municipal-admins`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

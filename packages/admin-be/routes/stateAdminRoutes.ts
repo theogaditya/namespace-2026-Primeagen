@@ -277,5 +277,124 @@ router.get('/my-complaints', authenticateStateAdminOnly, async (req: any, res: a
   }
 });
 
+// ----- 7. Get All Municipal Admins (Created by this State Admin or unassigned) -----
+router.get('/municipal-admins', authenticateStateAdminOnly, async (req: any, res: any) => {
+  try {
+    const stateAdminId = req.admin.id;
+
+    // Get municipal admins managed by this state admin OR unassigned ones
+    const municipalAdmins = await prisma.departmentMunicipalAdmin.findMany({
+      where: {
+        OR: [
+          { managedByStateAdminId: stateAdminId },
+          { managedByStateAdminId: null }
+        ]
+      },
+      select: {
+        id: true,
+        adminId: true,
+        fullName: true,
+        officialEmail: true,
+        phoneNumber: true,
+        department: true,
+        municipality: true,
+        accessLevel: true,
+        status: true,
+        workloadLimit: true,
+        currentWorkload: true,
+        dateOfCreation: true,
+        managedByStateAdminId: true,
+      },
+      orderBy: {
+        dateOfCreation: 'desc'
+      }
+    });
+
+    return res.json({ success: true, data: municipalAdmins });
+  } catch (error: any) {
+    console.error('Error fetching municipal admins:', error);
+    return res.status(500).json({ 
+      success: false, 
+      message: 'Failed to fetch municipal admins',
+      error: process.env.NODE_ENV === 'development' ? error.message : undefined
+    });
+  }
+});
+
+// ----- 8. Create Municipal Admin -----
+router.post('/municipal-admins', authenticateStateAdminOnly, async (req: any, res: any) => {
+  try {
+    const stateAdminId = req.admin.id;
+    const { fullName, officialEmail, password, phoneNumber, department, municipality } = req.body;
+
+    // Validate required fields
+    if (!fullName || !officialEmail || !password) {
+      return res.status(400).json({ 
+        success: false, 
+        message: 'Full name, email, and password are required' 
+      });
+    }
+
+    // Check if email already exists
+    const existingAdmin = await prisma.departmentMunicipalAdmin.findUnique({
+      where: { officialEmail }
+    });
+
+    if (existingAdmin) {
+      return res.status(400).json({ 
+        success: false, 
+        message: 'An admin with this email already exists' 
+      });
+    }
+
+    // Hash password
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    // Generate admin ID
+    const adminId = `MA-${Date.now().toString(36).toUpperCase()}`;
+
+    // Create municipal admin
+    const newAdmin = await prisma.departmentMunicipalAdmin.create({
+      data: {
+        adminId,
+        fullName,
+        officialEmail,
+        password: hashedPassword,
+        phoneNumber: phoneNumber || '',
+        department: department || 'GENERAL',
+        municipality: municipality || '',
+        accessLevel: 'DEPT_MUNICIPAL_ADMIN',
+        status: 'ACTIVE',
+        managedByStateAdminId: stateAdminId,
+      },
+      select: {
+        id: true,
+        adminId: true,
+        fullName: true,
+        officialEmail: true,
+        phoneNumber: true,
+        department: true,
+        municipality: true,
+        accessLevel: true,
+        status: true,
+        dateOfCreation: true,
+      }
+    });
+
+    return res.status(201).json({ 
+      success: true, 
+      message: 'Municipal admin created successfully',
+      data: newAdmin 
+    });
+  } catch (error: any) {
+    console.error('Error creating municipal admin:', error);
+    return res.status(500).json({ 
+      success: false, 
+      message: 'Failed to create municipal admin',
+      error: process.env.NODE_ENV === 'development' ? error.message : undefined
+    });
+  }
+});
+
   return router;
 }
