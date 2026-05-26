@@ -74,11 +74,11 @@ export function LoginForm() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 via-white to-orange-50 p-4 py-8">
-      <Card className="w-full max-w-md mx-auto bg-white border-0 shadow-2xl rounded-3xl overflow-hidden">
-        <div className="bg-gradient-to-b from-blue-900 via-blue-800 to-blue-900 px-6 pt-12 pb-8 text-center">
+    <div className="w-full px-4 sm:px-6">
+      <Card className="w-full max-w-sm sm:max-w-md md:max-w-lg lg:max-w-xl mx-auto bg-white border-0 shadow-2xl rounded-3xl overflow-hidden">
+        <div className="bg-gradient-to-b from-blue-900 via-blue-800 to-blue-900 px-5 sm:px-6 pt-8 sm:pt-12 pb-6 sm:pb-8 text-center">
           <div className="flex justify-center mb-3">
-            <div className="w-20 h-20 bg-white rounded-full p-2 shadow-lg flex items-center justify-center">
+            <div className="w-16 h-16 sm:w-20 sm:h-20 bg-white rounded-full p-2 shadow-lg flex items-center justify-center">
               <img
                 src="https://upload.wikimedia.org/wikipedia/commons/5/55/Emblem_of_India.svg"
                 alt="National Emblem of India"
@@ -86,21 +86,21 @@ export function LoginForm() {
               />
             </div>
           </div>
-          <h1 className="text-white text-xl font-bold tracking-wide">भारत सरकार</h1>
-          <p className="text-blue-200 text-xs mt-1 font-medium tracking-wider">Government of India</p>
+          <h1 className="text-white text-lg sm:text-xl font-bold tracking-wide">भारत सरकार</h1>
+          <p className="text-blue-200 text-xs sm:text-sm mt-1 font-medium tracking-wider">Government of India</p>
         </div>
 
         <CardHeader className="text-center pt-2 pb-2">
           <div className="flex items-center justify-center gap-2 mb-2">
             <ShieldCheck className="w-6 h-6 text-blue-800" />
-            <CardTitle className="text-2xl font-bold text-blue-900">Admin Portal</CardTitle>
+            <CardTitle className="text-xl sm:text-2xl font-bold text-blue-900">Admin Portal</CardTitle>
           </div>
           <CardDescription className="text-gray-600">
             Authorized personnel only. Enter your credentials to access the portal.
           </CardDescription>
         </CardHeader>
 
-        <CardContent className="px-6 pb-8">
+        <CardContent className="px-4 sm:px-6 pb-6 sm:pb-8">
           <form onSubmit={handleSubmit} className="space-y-5">
             {error && (
               <div className="bg-red-50 border border-red-200 text-red-600 p-3 rounded-lg text-sm flex items-center gap-2">
@@ -120,7 +120,7 @@ export function LoginForm() {
                 Admin Type
               </Label>
               <Select value={adminType} onValueChange={(value) => setAdminType(value as AdminType)}>
-                <SelectTrigger className="h-12 bg-white border-gray-300 focus:border-blue-500 focus:ring-blue-500 rounded-xl">
+                <SelectTrigger className="h-10 sm:h-12 bg-white border-gray-300 focus:border-blue-500 focus:ring-blue-500 rounded-xl text-sm sm:text-base">
                   <SelectValue placeholder="Select admin type" />
                 </SelectTrigger>
                 <SelectContent>
@@ -144,7 +144,7 @@ export function LoginForm() {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
-                className="h-12 bg-white border-gray-300 focus:border-blue-500 focus:ring-blue-500 rounded-xl"
+                className="h-10 sm:h-12 bg-white border-gray-300 focus:border-blue-500 focus:ring-blue-500 rounded-xl text-sm sm:text-base"
               />
             </div>
 
@@ -160,7 +160,7 @@ export function LoginForm() {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   required
-                  className="h-12 bg-white border-gray-300 focus:border-blue-500 focus:ring-blue-500 pr-12 rounded-xl"
+                  className="h-10 sm:h-12 bg-white border-gray-300 focus:border-blue-500 focus:ring-blue-500 pr-12 rounded-xl text-sm sm:text-base"
                 />
                 <button
                   type="button"
@@ -179,7 +179,7 @@ export function LoginForm() {
 
             <Button
               type="submit"
-              className="w-full h-12 bg-gradient-to-r from-blue-800 to-blue-700 hover:from-blue-900 hover:to-blue-800 text-white font-semibold text-base rounded-xl shadow-lg transition-all duration-200"
+              className="w-full h-10 sm:h-12 bg-gradient-to-r from-blue-800 to-blue-700 hover:from-blue-900 hover:to-blue-800 text-white font-semibold text-sm sm:text-base rounded-xl shadow-lg transition-all duration-200"
               disabled={isLoading}
             >
               {isLoading ? (
