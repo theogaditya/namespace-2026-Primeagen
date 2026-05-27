@@ -46,7 +46,7 @@ export function Modal({ isOpen, onClose, children, title, className }: ModalProp
         className={cn(
           // Responsive modal sizing: mobile-friendly margins and progressive max-widths
           // Added py-6 for uniform top/bottom padding inside modal
-          "relative z-50 w-full max-h-[90vh] flex flex-col rounded-lg bg-white shadow-lg mx-4 sm:mx-0 sm:max-w-md md:max-w-2xl lg:max-w-3xl xl:max-w-4xl py-6",
+          "relative z-50 w-full max-h-[90vh] flex flex-col rounded-lg bg-white shadow-lg mx-4 sm:mx-0 sm:max-w-md md:max-w-2xl lg:max-w-3xl xl:max-w-4xl py-6 overflow-y-auto",
           className
         )}
       >
@@ -63,8 +63,8 @@ export function Modal({ isOpen, onClose, children, title, className }: ModalProp
           </div>
         )}
         
-        {/* Scrollable Body: sticky headers inside children use -mx-6 px-6 -mt-6 pt-6 pattern to stay flush while preserving outer padding */}
-        <div className="flex-1 overflow-y-auto px-6">
+        {/* Body content */}
+        <div className="flex-1 px-6">
           {children}
         </div>
       </div>
