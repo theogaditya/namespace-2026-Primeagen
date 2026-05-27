@@ -450,14 +450,14 @@ export function StateAnalytics() {
       </div>
 
       {/* Charts Row */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <Card>
-          <CardHeader>
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 items-stretch">
+        <Card className="overflow-hidden flex flex-col">
+          <CardHeader className="pb-2">
             <CardTitle className="text-lg font-semibold text-gray-900">Complaints Trend</CardTitle>
             <p className="text-sm text-gray-500">Registered vs Resolved - Last 7 days</p>
           </CardHeader>
-          <CardContent className="pl-0">
-            <div className="h-[380px]">
+          <CardContent className="pl-0 pr-4 flex-1 flex flex-col justify-center">
+            <div className="h-[280px]">
               <ResponsiveContainer width="100%" height="100%">
                 <LineChart data={analyticsData.complaintsOverTime} margin={{ left: 0, right: 20, bottom: 20 }}>
                   <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
@@ -473,14 +473,14 @@ export function StateAnalytics() {
           </CardContent>
         </Card>
 
-        <Card>
-          <CardHeader>
+        <Card className="overflow-hidden flex flex-col">
+          <CardHeader className="pb-2">
             <CardTitle className="text-lg font-semibold text-gray-900">Status Distribution</CardTitle>
             <p className="text-sm text-gray-500">Current complaint status breakdown</p>
           </CardHeader>
-          <CardContent>
-            <div className="h-[380px] flex items-center justify-center">
-              <InteractivePieChart data={analyticsData.statusDistribution} width={350} height={350} />
+          <CardContent className="flex-1 flex flex-col justify-center">
+            <div className="flex flex-col items-center justify-center">
+              <InteractivePieChart data={analyticsData.statusDistribution} width={240} height={240} />
             </div>
           </CardContent>
         </Card>

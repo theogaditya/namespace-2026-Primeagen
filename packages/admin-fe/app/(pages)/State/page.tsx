@@ -23,7 +23,7 @@ export default function StatePage() {
         {activeTab === 'municipal-management' && <MunicipalAdminManagement />}
         {activeTab === 'municipal-management' && (
           <div className="p-6">
-            <div className="text-gray-600">Municipal Admin Management - Coming Soon</div>
+            <div className="text-gray-600">Municipal Admin Department</div>
           </div>
         )}
       </StateAdminLayout>
