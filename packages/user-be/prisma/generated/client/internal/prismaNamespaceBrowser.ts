@@ -66,8 +66,9 @@ export const ModelName = {
   NewsUpdate: 'NewsUpdate',
   AuditLog: 'AuditLog',
   RegionalWorkflow: 'RegionalWorkflow',
-  OpratingStates: 'OpratingStates',
-  OpratingDistricts: 'OpratingDistricts'
+  Chat: 'Chat',
+  operating_states: 'operating_states',
+  operating_districts: 'operating_districts'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -365,23 +366,37 @@ export const RegionalWorkflowScalarFieldEnum = {
 export type RegionalWorkflowScalarFieldEnum = (typeof RegionalWorkflowScalarFieldEnum)[keyof typeof RegionalWorkflowScalarFieldEnum]
 
 
-export const OpratingStatesScalarFieldEnum = {
+export const ChatScalarFieldEnum = {
+  id: 'id',
+  message: 'message',
+  userId: 'userId',
+  adminId: 'adminId',
+  adminRole: 'adminRole',
+  imageUrl: 'imageUrl',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type ChatScalarFieldEnum = (typeof ChatScalarFieldEnum)[keyof typeof ChatScalarFieldEnum]
+
+
+export const Operating_statesScalarFieldEnum = {
   id: 'id',
   name: 'name',
   country: 'country'
 } as const
 
-export type OpratingStatesScalarFieldEnum = (typeof OpratingStatesScalarFieldEnum)[keyof typeof OpratingStatesScalarFieldEnum]
+export type Operating_statesScalarFieldEnum = (typeof Operating_statesScalarFieldEnum)[keyof typeof Operating_statesScalarFieldEnum]
 
 
-export const OpratingDistrictsScalarFieldEnum = {
+export const Operating_districtsScalarFieldEnum = {
   id: 'id',
   stateId: 'stateId',
   name: 'name',
   state: 'state'
 } as const
 
-export type OpratingDistrictsScalarFieldEnum = (typeof OpratingDistrictsScalarFieldEnum)[keyof typeof OpratingDistrictsScalarFieldEnum]
+export type Operating_districtsScalarFieldEnum = (typeof Operating_districtsScalarFieldEnum)[keyof typeof Operating_districtsScalarFieldEnum]
 
 
 export const SortOrder = {

@@ -602,7 +602,7 @@ export type ComplaintCreateInput = {
   isDuplicate?: boolean | null
   assignedAgent?: Prisma.AgentCreateNestedOneWithoutAssignedComplaintsInput
   category: Prisma.CategoryCreateNestedOneWithoutComplaintsInput
-  User?: Prisma.UserCreateNestedOneWithoutComplaintInput
+  User?: Prisma.UserCreateNestedOneWithoutComplaintsInput
   crossDeptIssueSuperMunicipal?: Prisma.SuperMunicipalAdminCreateNestedOneWithoutCrossDepartmentIssuesInput
   escalatedToStateAdmin?: Prisma.DepartmentStateAdminCreateNestedOneWithoutEscalatedComplaintsInput
   escalatedToSuperStateAdmin?: Prisma.SuperStateAdminCreateNestedOneWithoutEscalatedComplaintsInput
@@ -671,7 +671,7 @@ export type ComplaintUpdateInput = {
   isDuplicate?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   assignedAgent?: Prisma.AgentUpdateOneWithoutAssignedComplaintsNestedInput
   category?: Prisma.CategoryUpdateOneRequiredWithoutComplaintsNestedInput
-  User?: Prisma.UserUpdateOneWithoutComplaintNestedInput
+  User?: Prisma.UserUpdateOneWithoutComplaintsNestedInput
   crossDeptIssueSuperMunicipal?: Prisma.SuperMunicipalAdminUpdateOneWithoutCrossDepartmentIssuesNestedInput
   escalatedToStateAdmin?: Prisma.DepartmentStateAdminUpdateOneWithoutEscalatedComplaintsNestedInput
   escalatedToSuperStateAdmin?: Prisma.SuperStateAdminUpdateOneWithoutEscalatedComplaintsNestedInput
@@ -1546,7 +1546,7 @@ export type ComplaintCreateWithoutAssignedAgentInput = {
   lastUpdated?: Date | string
   isDuplicate?: boolean | null
   category: Prisma.CategoryCreateNestedOneWithoutComplaintsInput
-  User?: Prisma.UserCreateNestedOneWithoutComplaintInput
+  User?: Prisma.UserCreateNestedOneWithoutComplaintsInput
   crossDeptIssueSuperMunicipal?: Prisma.SuperMunicipalAdminCreateNestedOneWithoutCrossDepartmentIssuesInput
   escalatedToStateAdmin?: Prisma.DepartmentStateAdminCreateNestedOneWithoutEscalatedComplaintsInput
   escalatedToSuperStateAdmin?: Prisma.SuperStateAdminCreateNestedOneWithoutEscalatedComplaintsInput
@@ -1625,7 +1625,7 @@ export type ComplaintCreateWithoutCoAssignedAgentsInput = {
   isDuplicate?: boolean | null
   assignedAgent?: Prisma.AgentCreateNestedOneWithoutAssignedComplaintsInput
   category: Prisma.CategoryCreateNestedOneWithoutComplaintsInput
-  User?: Prisma.UserCreateNestedOneWithoutComplaintInput
+  User?: Prisma.UserCreateNestedOneWithoutComplaintsInput
   crossDeptIssueSuperMunicipal?: Prisma.SuperMunicipalAdminCreateNestedOneWithoutCrossDepartmentIssuesInput
   escalatedToStateAdmin?: Prisma.DepartmentStateAdminCreateNestedOneWithoutEscalatedComplaintsInput
   escalatedToSuperStateAdmin?: Prisma.SuperStateAdminCreateNestedOneWithoutEscalatedComplaintsInput
@@ -1730,7 +1730,7 @@ export type ComplaintCreateWithoutManagedByMunicipalAdminInput = {
   isDuplicate?: boolean | null
   assignedAgent?: Prisma.AgentCreateNestedOneWithoutAssignedComplaintsInput
   category: Prisma.CategoryCreateNestedOneWithoutComplaintsInput
-  User?: Prisma.UserCreateNestedOneWithoutComplaintInput
+  User?: Prisma.UserCreateNestedOneWithoutComplaintsInput
   crossDeptIssueSuperMunicipal?: Prisma.SuperMunicipalAdminCreateNestedOneWithoutCrossDepartmentIssuesInput
   escalatedToStateAdmin?: Prisma.DepartmentStateAdminCreateNestedOneWithoutEscalatedComplaintsInput
   escalatedToSuperStateAdmin?: Prisma.SuperStateAdminCreateNestedOneWithoutEscalatedComplaintsInput
@@ -1808,7 +1808,7 @@ export type ComplaintCreateWithoutModeratedByMunicipalAdminInput = {
   isDuplicate?: boolean | null
   assignedAgent?: Prisma.AgentCreateNestedOneWithoutAssignedComplaintsInput
   category: Prisma.CategoryCreateNestedOneWithoutComplaintsInput
-  User?: Prisma.UserCreateNestedOneWithoutComplaintInput
+  User?: Prisma.UserCreateNestedOneWithoutComplaintsInput
   crossDeptIssueSuperMunicipal?: Prisma.SuperMunicipalAdminCreateNestedOneWithoutCrossDepartmentIssuesInput
   escalatedToStateAdmin?: Prisma.DepartmentStateAdminCreateNestedOneWithoutEscalatedComplaintsInput
   escalatedToSuperStateAdmin?: Prisma.SuperStateAdminCreateNestedOneWithoutEscalatedComplaintsInput
@@ -1918,7 +1918,7 @@ export type ComplaintCreateWithoutCrossDeptIssueSuperMunicipalInput = {
   isDuplicate?: boolean | null
   assignedAgent?: Prisma.AgentCreateNestedOneWithoutAssignedComplaintsInput
   category: Prisma.CategoryCreateNestedOneWithoutComplaintsInput
-  User?: Prisma.UserCreateNestedOneWithoutComplaintInput
+  User?: Prisma.UserCreateNestedOneWithoutComplaintsInput
   escalatedToStateAdmin?: Prisma.DepartmentStateAdminCreateNestedOneWithoutEscalatedComplaintsInput
   escalatedToSuperStateAdmin?: Prisma.SuperStateAdminCreateNestedOneWithoutEscalatedComplaintsInput
   managedByMunicipalAdmin?: Prisma.DepartmentMunicipalAdminCreateNestedOneWithoutManagedComplaintsInput
@@ -2012,7 +2012,7 @@ export type ComplaintCreateWithoutEscalatedToStateAdminInput = {
   isDuplicate?: boolean | null
   assignedAgent?: Prisma.AgentCreateNestedOneWithoutAssignedComplaintsInput
   category: Prisma.CategoryCreateNestedOneWithoutComplaintsInput
-  User?: Prisma.UserCreateNestedOneWithoutComplaintInput
+  User?: Prisma.UserCreateNestedOneWithoutComplaintsInput
   crossDeptIssueSuperMunicipal?: Prisma.SuperMunicipalAdminCreateNestedOneWithoutCrossDepartmentIssuesInput
   escalatedToSuperStateAdmin?: Prisma.SuperStateAdminCreateNestedOneWithoutEscalatedComplaintsInput
   managedByMunicipalAdmin?: Prisma.DepartmentMunicipalAdminCreateNestedOneWithoutManagedComplaintsInput
@@ -2106,7 +2106,7 @@ export type ComplaintCreateWithoutEscalatedToSuperStateAdminInput = {
   isDuplicate?: boolean | null
   assignedAgent?: Prisma.AgentCreateNestedOneWithoutAssignedComplaintsInput
   category: Prisma.CategoryCreateNestedOneWithoutComplaintsInput
-  User?: Prisma.UserCreateNestedOneWithoutComplaintInput
+  User?: Prisma.UserCreateNestedOneWithoutComplaintsInput
   crossDeptIssueSuperMunicipal?: Prisma.SuperMunicipalAdminCreateNestedOneWithoutCrossDepartmentIssuesInput
   escalatedToStateAdmin?: Prisma.DepartmentStateAdminCreateNestedOneWithoutEscalatedComplaintsInput
   managedByMunicipalAdmin?: Prisma.DepartmentMunicipalAdminCreateNestedOneWithoutManagedComplaintsInput
@@ -2200,7 +2200,7 @@ export type ComplaintCreateWithoutManagedBySuperAdminInput = {
   isDuplicate?: boolean | null
   assignedAgent?: Prisma.AgentCreateNestedOneWithoutAssignedComplaintsInput
   category: Prisma.CategoryCreateNestedOneWithoutComplaintsInput
-  User?: Prisma.UserCreateNestedOneWithoutComplaintInput
+  User?: Prisma.UserCreateNestedOneWithoutComplaintsInput
   crossDeptIssueSuperMunicipal?: Prisma.SuperMunicipalAdminCreateNestedOneWithoutCrossDepartmentIssuesInput
   escalatedToStateAdmin?: Prisma.DepartmentStateAdminCreateNestedOneWithoutEscalatedComplaintsInput
   escalatedToSuperStateAdmin?: Prisma.SuperStateAdminCreateNestedOneWithoutEscalatedComplaintsInput
@@ -2293,7 +2293,7 @@ export type ComplaintCreateWithoutCategoryInput = {
   lastUpdated?: Date | string
   isDuplicate?: boolean | null
   assignedAgent?: Prisma.AgentCreateNestedOneWithoutAssignedComplaintsInput
-  User?: Prisma.UserCreateNestedOneWithoutComplaintInput
+  User?: Prisma.UserCreateNestedOneWithoutComplaintsInput
   crossDeptIssueSuperMunicipal?: Prisma.SuperMunicipalAdminCreateNestedOneWithoutCrossDepartmentIssuesInput
   escalatedToStateAdmin?: Prisma.DepartmentStateAdminCreateNestedOneWithoutEscalatedComplaintsInput
   escalatedToSuperStateAdmin?: Prisma.SuperStateAdminCreateNestedOneWithoutEscalatedComplaintsInput
@@ -2388,7 +2388,7 @@ export type ComplaintCreateWithoutLocationInput = {
   isDuplicate?: boolean | null
   assignedAgent?: Prisma.AgentCreateNestedOneWithoutAssignedComplaintsInput
   category: Prisma.CategoryCreateNestedOneWithoutComplaintsInput
-  User?: Prisma.UserCreateNestedOneWithoutComplaintInput
+  User?: Prisma.UserCreateNestedOneWithoutComplaintsInput
   crossDeptIssueSuperMunicipal?: Prisma.SuperMunicipalAdminCreateNestedOneWithoutCrossDepartmentIssuesInput
   escalatedToStateAdmin?: Prisma.DepartmentStateAdminCreateNestedOneWithoutEscalatedComplaintsInput
   escalatedToSuperStateAdmin?: Prisma.SuperStateAdminCreateNestedOneWithoutEscalatedComplaintsInput
@@ -2471,7 +2471,7 @@ export type ComplaintUpdateWithoutLocationInput = {
   isDuplicate?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   assignedAgent?: Prisma.AgentUpdateOneWithoutAssignedComplaintsNestedInput
   category?: Prisma.CategoryUpdateOneRequiredWithoutComplaintsNestedInput
-  User?: Prisma.UserUpdateOneWithoutComplaintNestedInput
+  User?: Prisma.UserUpdateOneWithoutComplaintsNestedInput
   crossDeptIssueSuperMunicipal?: Prisma.SuperMunicipalAdminUpdateOneWithoutCrossDepartmentIssuesNestedInput
   escalatedToStateAdmin?: Prisma.DepartmentStateAdminUpdateOneWithoutEscalatedComplaintsNestedInput
   escalatedToSuperStateAdmin?: Prisma.SuperStateAdminUpdateOneWithoutEscalatedComplaintsNestedInput
@@ -2539,7 +2539,7 @@ export type ComplaintCreateWithoutUpvotesInput = {
   isDuplicate?: boolean | null
   assignedAgent?: Prisma.AgentCreateNestedOneWithoutAssignedComplaintsInput
   category: Prisma.CategoryCreateNestedOneWithoutComplaintsInput
-  User?: Prisma.UserCreateNestedOneWithoutComplaintInput
+  User?: Prisma.UserCreateNestedOneWithoutComplaintsInput
   crossDeptIssueSuperMunicipal?: Prisma.SuperMunicipalAdminCreateNestedOneWithoutCrossDepartmentIssuesInput
   escalatedToStateAdmin?: Prisma.DepartmentStateAdminCreateNestedOneWithoutEscalatedComplaintsInput
   escalatedToSuperStateAdmin?: Prisma.SuperStateAdminCreateNestedOneWithoutEscalatedComplaintsInput
@@ -2622,7 +2622,7 @@ export type ComplaintUpdateWithoutUpvotesInput = {
   isDuplicate?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   assignedAgent?: Prisma.AgentUpdateOneWithoutAssignedComplaintsNestedInput
   category?: Prisma.CategoryUpdateOneRequiredWithoutComplaintsNestedInput
-  User?: Prisma.UserUpdateOneWithoutComplaintNestedInput
+  User?: Prisma.UserUpdateOneWithoutComplaintsNestedInput
   crossDeptIssueSuperMunicipal?: Prisma.SuperMunicipalAdminUpdateOneWithoutCrossDepartmentIssuesNestedInput
   escalatedToStateAdmin?: Prisma.DepartmentStateAdminUpdateOneWithoutEscalatedComplaintsNestedInput
   escalatedToSuperStateAdmin?: Prisma.SuperStateAdminUpdateOneWithoutEscalatedComplaintsNestedInput
@@ -2690,7 +2690,7 @@ export type ComplaintCreateWithoutAuditLogsInput = {
   isDuplicate?: boolean | null
   assignedAgent?: Prisma.AgentCreateNestedOneWithoutAssignedComplaintsInput
   category: Prisma.CategoryCreateNestedOneWithoutComplaintsInput
-  User?: Prisma.UserCreateNestedOneWithoutComplaintInput
+  User?: Prisma.UserCreateNestedOneWithoutComplaintsInput
   crossDeptIssueSuperMunicipal?: Prisma.SuperMunicipalAdminCreateNestedOneWithoutCrossDepartmentIssuesInput
   escalatedToStateAdmin?: Prisma.DepartmentStateAdminCreateNestedOneWithoutEscalatedComplaintsInput
   escalatedToSuperStateAdmin?: Prisma.SuperStateAdminCreateNestedOneWithoutEscalatedComplaintsInput
@@ -2773,7 +2773,7 @@ export type ComplaintUpdateWithoutAuditLogsInput = {
   isDuplicate?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   assignedAgent?: Prisma.AgentUpdateOneWithoutAssignedComplaintsNestedInput
   category?: Prisma.CategoryUpdateOneRequiredWithoutComplaintsNestedInput
-  User?: Prisma.UserUpdateOneWithoutComplaintNestedInput
+  User?: Prisma.UserUpdateOneWithoutComplaintsNestedInput
   crossDeptIssueSuperMunicipal?: Prisma.SuperMunicipalAdminUpdateOneWithoutCrossDepartmentIssuesNestedInput
   escalatedToStateAdmin?: Prisma.DepartmentStateAdminUpdateOneWithoutEscalatedComplaintsNestedInput
   escalatedToSuperStateAdmin?: Prisma.SuperStateAdminUpdateOneWithoutEscalatedComplaintsNestedInput
@@ -2996,7 +2996,7 @@ export type ComplaintUpdateWithoutAssignedAgentInput = {
   lastUpdated?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   isDuplicate?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   category?: Prisma.CategoryUpdateOneRequiredWithoutComplaintsNestedInput
-  User?: Prisma.UserUpdateOneWithoutComplaintNestedInput
+  User?: Prisma.UserUpdateOneWithoutComplaintsNestedInput
   crossDeptIssueSuperMunicipal?: Prisma.SuperMunicipalAdminUpdateOneWithoutCrossDepartmentIssuesNestedInput
   escalatedToStateAdmin?: Prisma.DepartmentStateAdminUpdateOneWithoutEscalatedComplaintsNestedInput
   escalatedToSuperStateAdmin?: Prisma.SuperStateAdminUpdateOneWithoutEscalatedComplaintsNestedInput
@@ -3094,7 +3094,7 @@ export type ComplaintUpdateWithoutCoAssignedAgentsInput = {
   isDuplicate?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   assignedAgent?: Prisma.AgentUpdateOneWithoutAssignedComplaintsNestedInput
   category?: Prisma.CategoryUpdateOneRequiredWithoutComplaintsNestedInput
-  User?: Prisma.UserUpdateOneWithoutComplaintNestedInput
+  User?: Prisma.UserUpdateOneWithoutComplaintsNestedInput
   crossDeptIssueSuperMunicipal?: Prisma.SuperMunicipalAdminUpdateOneWithoutCrossDepartmentIssuesNestedInput
   escalatedToStateAdmin?: Prisma.DepartmentStateAdminUpdateOneWithoutEscalatedComplaintsNestedInput
   escalatedToSuperStateAdmin?: Prisma.SuperStateAdminUpdateOneWithoutEscalatedComplaintsNestedInput
@@ -3252,7 +3252,7 @@ export type ComplaintUpdateWithoutManagedByMunicipalAdminInput = {
   isDuplicate?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   assignedAgent?: Prisma.AgentUpdateOneWithoutAssignedComplaintsNestedInput
   category?: Prisma.CategoryUpdateOneRequiredWithoutComplaintsNestedInput
-  User?: Prisma.UserUpdateOneWithoutComplaintNestedInput
+  User?: Prisma.UserUpdateOneWithoutComplaintsNestedInput
   crossDeptIssueSuperMunicipal?: Prisma.SuperMunicipalAdminUpdateOneWithoutCrossDepartmentIssuesNestedInput
   escalatedToStateAdmin?: Prisma.DepartmentStateAdminUpdateOneWithoutEscalatedComplaintsNestedInput
   escalatedToSuperStateAdmin?: Prisma.SuperStateAdminUpdateOneWithoutEscalatedComplaintsNestedInput
@@ -3349,7 +3349,7 @@ export type ComplaintUpdateWithoutModeratedByMunicipalAdminInput = {
   isDuplicate?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   assignedAgent?: Prisma.AgentUpdateOneWithoutAssignedComplaintsNestedInput
   category?: Prisma.CategoryUpdateOneRequiredWithoutComplaintsNestedInput
-  User?: Prisma.UserUpdateOneWithoutComplaintNestedInput
+  User?: Prisma.UserUpdateOneWithoutComplaintsNestedInput
   crossDeptIssueSuperMunicipal?: Prisma.SuperMunicipalAdminUpdateOneWithoutCrossDepartmentIssuesNestedInput
   escalatedToStateAdmin?: Prisma.DepartmentStateAdminUpdateOneWithoutEscalatedComplaintsNestedInput
   escalatedToSuperStateAdmin?: Prisma.SuperStateAdminUpdateOneWithoutEscalatedComplaintsNestedInput
@@ -3476,7 +3476,7 @@ export type ComplaintUpdateWithoutCrossDeptIssueSuperMunicipalInput = {
   isDuplicate?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   assignedAgent?: Prisma.AgentUpdateOneWithoutAssignedComplaintsNestedInput
   category?: Prisma.CategoryUpdateOneRequiredWithoutComplaintsNestedInput
-  User?: Prisma.UserUpdateOneWithoutComplaintNestedInput
+  User?: Prisma.UserUpdateOneWithoutComplaintsNestedInput
   escalatedToStateAdmin?: Prisma.DepartmentStateAdminUpdateOneWithoutEscalatedComplaintsNestedInput
   escalatedToSuperStateAdmin?: Prisma.SuperStateAdminUpdateOneWithoutEscalatedComplaintsNestedInput
   managedByMunicipalAdmin?: Prisma.DepartmentMunicipalAdminUpdateOneWithoutManagedComplaintsNestedInput
@@ -3603,7 +3603,7 @@ export type ComplaintUpdateWithoutEscalatedToStateAdminInput = {
   isDuplicate?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   assignedAgent?: Prisma.AgentUpdateOneWithoutAssignedComplaintsNestedInput
   category?: Prisma.CategoryUpdateOneRequiredWithoutComplaintsNestedInput
-  User?: Prisma.UserUpdateOneWithoutComplaintNestedInput
+  User?: Prisma.UserUpdateOneWithoutComplaintsNestedInput
   crossDeptIssueSuperMunicipal?: Prisma.SuperMunicipalAdminUpdateOneWithoutCrossDepartmentIssuesNestedInput
   escalatedToSuperStateAdmin?: Prisma.SuperStateAdminUpdateOneWithoutEscalatedComplaintsNestedInput
   managedByMunicipalAdmin?: Prisma.DepartmentMunicipalAdminUpdateOneWithoutManagedComplaintsNestedInput
@@ -3730,7 +3730,7 @@ export type ComplaintUpdateWithoutEscalatedToSuperStateAdminInput = {
   isDuplicate?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   assignedAgent?: Prisma.AgentUpdateOneWithoutAssignedComplaintsNestedInput
   category?: Prisma.CategoryUpdateOneRequiredWithoutComplaintsNestedInput
-  User?: Prisma.UserUpdateOneWithoutComplaintNestedInput
+  User?: Prisma.UserUpdateOneWithoutComplaintsNestedInput
   crossDeptIssueSuperMunicipal?: Prisma.SuperMunicipalAdminUpdateOneWithoutCrossDepartmentIssuesNestedInput
   escalatedToStateAdmin?: Prisma.DepartmentStateAdminUpdateOneWithoutEscalatedComplaintsNestedInput
   managedByMunicipalAdmin?: Prisma.DepartmentMunicipalAdminUpdateOneWithoutManagedComplaintsNestedInput
@@ -3857,7 +3857,7 @@ export type ComplaintUpdateWithoutManagedBySuperAdminInput = {
   isDuplicate?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   assignedAgent?: Prisma.AgentUpdateOneWithoutAssignedComplaintsNestedInput
   category?: Prisma.CategoryUpdateOneRequiredWithoutComplaintsNestedInput
-  User?: Prisma.UserUpdateOneWithoutComplaintNestedInput
+  User?: Prisma.UserUpdateOneWithoutComplaintsNestedInput
   crossDeptIssueSuperMunicipal?: Prisma.SuperMunicipalAdminUpdateOneWithoutCrossDepartmentIssuesNestedInput
   escalatedToStateAdmin?: Prisma.DepartmentStateAdminUpdateOneWithoutEscalatedComplaintsNestedInput
   escalatedToSuperStateAdmin?: Prisma.SuperStateAdminUpdateOneWithoutEscalatedComplaintsNestedInput
@@ -3983,7 +3983,7 @@ export type ComplaintUpdateWithoutCategoryInput = {
   lastUpdated?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   isDuplicate?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   assignedAgent?: Prisma.AgentUpdateOneWithoutAssignedComplaintsNestedInput
-  User?: Prisma.UserUpdateOneWithoutComplaintNestedInput
+  User?: Prisma.UserUpdateOneWithoutComplaintsNestedInput
   crossDeptIssueSuperMunicipal?: Prisma.SuperMunicipalAdminUpdateOneWithoutCrossDepartmentIssuesNestedInput
   escalatedToStateAdmin?: Prisma.DepartmentStateAdminUpdateOneWithoutEscalatedComplaintsNestedInput
   escalatedToSuperStateAdmin?: Prisma.SuperStateAdminUpdateOneWithoutEscalatedComplaintsNestedInput
