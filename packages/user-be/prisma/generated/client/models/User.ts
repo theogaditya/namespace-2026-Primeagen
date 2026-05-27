@@ -610,10 +610,12 @@ export type UserCreateNestedOneWithoutChatsInput = {
   connect?: Prisma.UserWhereUniqueInput
 }
 
-export type UserUpdateOneRequiredWithoutChatsNestedInput = {
+export type UserUpdateOneWithoutChatsNestedInput = {
   create?: Prisma.XOR<Prisma.UserCreateWithoutChatsInput, Prisma.UserUncheckedCreateWithoutChatsInput>
   connectOrCreate?: Prisma.UserCreateOrConnectWithoutChatsInput
   upsert?: Prisma.UserUpsertWithoutChatsInput
+  disconnect?: Prisma.UserWhereInput | boolean
+  delete?: Prisma.UserWhereInput | boolean
   connect?: Prisma.UserWhereUniqueInput
   update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutChatsInput, Prisma.UserUpdateWithoutChatsInput>, Prisma.UserUncheckedUpdateWithoutChatsInput>
 }

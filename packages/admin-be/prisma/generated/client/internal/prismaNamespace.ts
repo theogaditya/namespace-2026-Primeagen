@@ -2074,9 +2074,10 @@ export type RegionalWorkflowScalarFieldEnum = (typeof RegionalWorkflowScalarFiel
 export const ChatScalarFieldEnum = {
   id: 'id',
   message: 'message',
+  complaintId: 'complaintId',
   userId: 'userId',
-  adminId: 'adminId',
-  adminRole: 'adminRole',
+  agentId: 'agentId',
+  senderType: 'senderType',
   imageUrl: 'imageUrl',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
@@ -2282,16 +2283,16 @@ export type ListEnumComplaintStatusFieldRefInput<$PrismaModel> = FieldRefInputTy
 
 
 /**
- * Reference to a field of type 'AdminRole'
+ * Reference to a field of type 'SenderType'
  */
-export type EnumAdminRoleFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'AdminRole'>
+export type EnumSenderTypeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'SenderType'>
     
 
 
 /**
- * Reference to a field of type 'AdminRole[]'
+ * Reference to a field of type 'SenderType[]'
  */
-export type ListEnumAdminRoleFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'AdminRole[]'>
+export type ListEnumSenderTypeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'SenderType[]'>
     
 
 /**

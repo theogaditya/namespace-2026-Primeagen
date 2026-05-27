@@ -344,21 +344,21 @@ export type BoolNullableWithAggregatesFilter<$PrismaModel = never> = {
   _max?: Prisma.NestedBoolNullableFilter<$PrismaModel>
 }
 
-export type EnumAdminRoleNullableFilter<$PrismaModel = never> = {
-  equals?: $Enums.AdminRole | Prisma.EnumAdminRoleFieldRefInput<$PrismaModel> | null
-  in?: $Enums.AdminRole[] | Prisma.ListEnumAdminRoleFieldRefInput<$PrismaModel> | null
-  notIn?: $Enums.AdminRole[] | Prisma.ListEnumAdminRoleFieldRefInput<$PrismaModel> | null
-  not?: Prisma.NestedEnumAdminRoleNullableFilter<$PrismaModel> | $Enums.AdminRole | null
+export type EnumSenderTypeFilter<$PrismaModel = never> = {
+  equals?: $Enums.SenderType | Prisma.EnumSenderTypeFieldRefInput<$PrismaModel>
+  in?: $Enums.SenderType[] | Prisma.ListEnumSenderTypeFieldRefInput<$PrismaModel>
+  notIn?: $Enums.SenderType[] | Prisma.ListEnumSenderTypeFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumSenderTypeFilter<$PrismaModel> | $Enums.SenderType
 }
 
-export type EnumAdminRoleNullableWithAggregatesFilter<$PrismaModel = never> = {
-  equals?: $Enums.AdminRole | Prisma.EnumAdminRoleFieldRefInput<$PrismaModel> | null
-  in?: $Enums.AdminRole[] | Prisma.ListEnumAdminRoleFieldRefInput<$PrismaModel> | null
-  notIn?: $Enums.AdminRole[] | Prisma.ListEnumAdminRoleFieldRefInput<$PrismaModel> | null
-  not?: Prisma.NestedEnumAdminRoleNullableWithAggregatesFilter<$PrismaModel> | $Enums.AdminRole | null
-  _count?: Prisma.NestedIntNullableFilter<$PrismaModel>
-  _min?: Prisma.NestedEnumAdminRoleNullableFilter<$PrismaModel>
-  _max?: Prisma.NestedEnumAdminRoleNullableFilter<$PrismaModel>
+export type EnumSenderTypeWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.SenderType | Prisma.EnumSenderTypeFieldRefInput<$PrismaModel>
+  in?: $Enums.SenderType[] | Prisma.ListEnumSenderTypeFieldRefInput<$PrismaModel>
+  notIn?: $Enums.SenderType[] | Prisma.ListEnumSenderTypeFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumSenderTypeWithAggregatesFilter<$PrismaModel> | $Enums.SenderType
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumSenderTypeFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumSenderTypeFilter<$PrismaModel>
 }
 
 export type NestedStringFilter<$PrismaModel = never> = {
@@ -693,21 +693,21 @@ export type NestedBoolNullableWithAggregatesFilter<$PrismaModel = never> = {
   _max?: Prisma.NestedBoolNullableFilter<$PrismaModel>
 }
 
-export type NestedEnumAdminRoleNullableFilter<$PrismaModel = never> = {
-  equals?: $Enums.AdminRole | Prisma.EnumAdminRoleFieldRefInput<$PrismaModel> | null
-  in?: $Enums.AdminRole[] | Prisma.ListEnumAdminRoleFieldRefInput<$PrismaModel> | null
-  notIn?: $Enums.AdminRole[] | Prisma.ListEnumAdminRoleFieldRefInput<$PrismaModel> | null
-  not?: Prisma.NestedEnumAdminRoleNullableFilter<$PrismaModel> | $Enums.AdminRole | null
+export type NestedEnumSenderTypeFilter<$PrismaModel = never> = {
+  equals?: $Enums.SenderType | Prisma.EnumSenderTypeFieldRefInput<$PrismaModel>
+  in?: $Enums.SenderType[] | Prisma.ListEnumSenderTypeFieldRefInput<$PrismaModel>
+  notIn?: $Enums.SenderType[] | Prisma.ListEnumSenderTypeFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumSenderTypeFilter<$PrismaModel> | $Enums.SenderType
 }
 
-export type NestedEnumAdminRoleNullableWithAggregatesFilter<$PrismaModel = never> = {
-  equals?: $Enums.AdminRole | Prisma.EnumAdminRoleFieldRefInput<$PrismaModel> | null
-  in?: $Enums.AdminRole[] | Prisma.ListEnumAdminRoleFieldRefInput<$PrismaModel> | null
-  notIn?: $Enums.AdminRole[] | Prisma.ListEnumAdminRoleFieldRefInput<$PrismaModel> | null
-  not?: Prisma.NestedEnumAdminRoleNullableWithAggregatesFilter<$PrismaModel> | $Enums.AdminRole | null
-  _count?: Prisma.NestedIntNullableFilter<$PrismaModel>
-  _min?: Prisma.NestedEnumAdminRoleNullableFilter<$PrismaModel>
-  _max?: Prisma.NestedEnumAdminRoleNullableFilter<$PrismaModel>
+export type NestedEnumSenderTypeWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.SenderType | Prisma.EnumSenderTypeFieldRefInput<$PrismaModel>
+  in?: $Enums.SenderType[] | Prisma.ListEnumSenderTypeFieldRefInput<$PrismaModel>
+  notIn?: $Enums.SenderType[] | Prisma.ListEnumSenderTypeFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumSenderTypeWithAggregatesFilter<$PrismaModel> | $Enums.SenderType
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumSenderTypeFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumSenderTypeFilter<$PrismaModel>
 }
 
 

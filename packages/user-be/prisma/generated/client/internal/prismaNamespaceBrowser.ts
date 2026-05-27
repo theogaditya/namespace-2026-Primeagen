@@ -370,11 +370,12 @@ export const ChatScalarFieldEnum = {
   id: 'id',
   message: 'message',
   userId: 'userId',
-  adminId: 'adminId',
-  adminRole: 'adminRole',
   imageUrl: 'imageUrl',
   createdAt: 'createdAt',
-  updatedAt: 'updatedAt'
+  updatedAt: 'updatedAt',
+  agentId: 'agentId',
+  complaintId: 'complaintId',
+  senderType: 'senderType'
 } as const
 
 export type ChatScalarFieldEnum = (typeof ChatScalarFieldEnum)[keyof typeof ChatScalarFieldEnum]

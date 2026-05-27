@@ -2075,11 +2075,12 @@ export const ChatScalarFieldEnum = {
   id: 'id',
   message: 'message',
   userId: 'userId',
-  adminId: 'adminId',
-  adminRole: 'adminRole',
   imageUrl: 'imageUrl',
   createdAt: 'createdAt',
-  updatedAt: 'updatedAt'
+  updatedAt: 'updatedAt',
+  agentId: 'agentId',
+  complaintId: 'complaintId',
+  senderType: 'senderType'
 } as const
 
 export type ChatScalarFieldEnum = (typeof ChatScalarFieldEnum)[keyof typeof ChatScalarFieldEnum]
@@ -2282,16 +2283,16 @@ export type ListEnumComplaintStatusFieldRefInput<$PrismaModel> = FieldRefInputTy
 
 
 /**
- * Reference to a field of type 'AdminRole'
+ * Reference to a field of type 'SenderType'
  */
-export type EnumAdminRoleFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'AdminRole'>
+export type EnumSenderTypeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'SenderType'>
     
 
 
 /**
- * Reference to a field of type 'AdminRole[]'
+ * Reference to a field of type 'SenderType[]'
  */
-export type ListEnumAdminRoleFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'AdminRole[]'>
+export type ListEnumSenderTypeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'SenderType[]'>
     
 
 /**

@@ -9,66 +9,139 @@ export default function (prisma: PrismaClient) {
   const router = Router()
   const chatService = ChatService(prisma)
 
-  // Create a new chat message (admins only)
-  router.post('/create', authenticateAdmin, async (req: Request, res: Response) => {
+  /**
+   * Get all chat messages for a specific complaint
+   * GET /api/chat/:complaintId
+   */
+  router.get('/:complaintId', authenticateAdmin, async (req: Request, res: Response) => {
     try {
-      const { message, userId, adminId, adminRole, imageUrl } = req.body
+      const authReq = req as AuthenticatedRequest
+      const { complaintId } = req.params
+      const { page = '1', limit = '100' } = req.query
 
-      if (!message || !userId) {
-        return res.status(400).json({ success: false, message: 'message and userId are required' })
+      if (!complaintId) {
+        return res.status(400).json({ success: false, message: 'complaintId is required' })
       }
 
-      const chat = await chatService.createChat({ message, userId, adminId, adminRole, imageUrl })
-
-      return res.json({ success: true, data: chat })
-    } catch (err) {
-      console.error('Error creating chat:', err)
-      return res.status(500).json({ success: false, message: 'Failed to create chat' })
-    }
-  })
-
-  // Get chats for a user (admins only) - ordered by createdAt ascending
-  router.get('/list', authenticateAdmin, async (req: Request, res: Response) => {
-    try {
-      const { userId, adminId } = req.query
-
-      if (!userId && !adminId) {
-        return res.status(400).json({ success: false, message: 'userId or adminId query parameter required' })
+      // Verify agent has access to this complaint
+      const agentId = authReq.admin?.id
+      if (authReq.admin?.adminType === 'AGENT' && agentId) {
+        const hasAccess = await chatService.canAgentChatOnComplaint(agentId, complaintId)
+        if (!hasAccess) {
+          return res.status(403).json({ success: false, message: 'You do not have access to this complaint chat' })
+        }
       }
 
-      const where: any = {}
-      if (userId) where.userId = userId as string
-      if (adminId) where.adminId = adminId as string
+      const result = await chatService.getChatsForComplaint({
+        complaintId,
+        page: parseInt(page as string, 10),
+        limit: parseInt(limit as string, 10),
+      })
 
-      const chats = await chatService.listChats({ userId: where.userId, adminId: where.adminId, order: 'asc' })
-
-      return res.json({ success: true, data: chats })
+      return res.json({ success: true, data: result.chats, pagination: result.pagination })
     } catch (err) {
       console.error('Error fetching chats:', err)
       return res.status(500).json({ success: false, message: 'Failed to fetch chats' })
     }
   })
 
-  // Get list of users the authenticated admin has chatted with (latest message per user)
-  router.get('/admins', authenticateAdmin, async (req: Request, res: Response) => {
+  /**
+   * Create a new chat message for a specific complaint (agent sends message)
+   * POST /api/chat/:complaintId
+   */
+  router.post('/:complaintId', authenticateAdmin, async (req: Request, res: Response) => {
     try {
-      // Prefer admin id from authenticated token; fallback to query param for testing
       const authReq = req as AuthenticatedRequest
-      const adminIdFromToken = authReq?.admin?.id
-      const adminIdQuery = req.query.adminId as string | undefined
+      const { complaintId } = req.params
+      const { message, imageUrl } = req.body
 
-      const adminId = adminIdFromToken || adminIdQuery
-
-      if (!adminId) {
-        return res.status(400).json({ success: false, message: 'adminId required (authenticated admin or adminId query param)' })
+      if (!message) {
+        return res.status(400).json({ success: false, message: 'message is required' })
       }
 
-      const users = await chatService.listUsersForAdmin(adminId as string)
+      if (!complaintId) {
+        return res.status(400).json({ success: false, message: 'complaintId is required' })
+      }
 
-      return res.json({ success: true, data: users })
+      const agentId = authReq.admin?.id
+      if (!agentId) {
+        return res.status(401).json({ success: false, message: 'Agent not authenticated' })
+      }
+
+      // Verify agent has access to this complaint
+      if (authReq.admin?.adminType === 'AGENT') {
+        const hasAccess = await chatService.canAgentChatOnComplaint(agentId, complaintId)
+        if (!hasAccess) {
+          return res.status(403).json({ success: false, message: 'You are not assigned to this complaint' })
+        }
+      }
+
+      const chat = await chatService.createChat({
+        message,
+        complaintId,
+        agentId,
+        senderType: 'AGENT' as any,
+        imageUrl,
+      })
+
+      return res.status(201).json({ success: true, data: chat })
     } catch (err) {
-      console.error('Error fetching users for admin chats:', err)
-      return res.status(500).json({ success: false, message: 'Failed to fetch users list' })
+      console.error('Error creating chat:', err)
+      return res.status(500).json({ success: false, message: 'Failed to create chat' })
+    }
+  })
+
+  /**
+   * Get chat count for a complaint
+   * GET /api/chat/:complaintId/count
+   */
+  router.get('/:complaintId/count', authenticateAdmin, async (req: Request, res: Response) => {
+    try {
+      const { complaintId } = req.params
+
+      if (!complaintId) {
+        return res.status(400).json({ success: false, message: 'complaintId is required' })
+      }
+
+      const count = await chatService.getChatCountForComplaint(complaintId)
+
+      return res.json({ success: true, data: { count } })
+    } catch (err) {
+      console.error('Error fetching chat count:', err)
+      return res.status(500).json({ success: false, message: 'Failed to fetch chat count' })
+    }
+  })
+
+  /**
+   * Delete a chat message (only the sender can delete)
+   * DELETE /api/chat/message/:messageId
+   */
+  router.delete('/message/:messageId', authenticateAdmin, async (req: Request, res: Response) => {
+    try {
+      const authReq = req as AuthenticatedRequest
+      const { messageId } = req.params
+      const agentId = authReq.admin?.id
+
+      if (!messageId) {
+        return res.status(400).json({ success: false, message: 'messageId is required' })
+      }
+
+      // Verify the message belongs to this agent
+      const existingChat = await chatService.getChatById(messageId)
+      if (!existingChat) {
+        return res.status(404).json({ success: false, message: 'Message not found' })
+      }
+
+      if (existingChat.agentId !== agentId) {
+        return res.status(403).json({ success: false, message: 'You can only delete your own messages' })
+      }
+
+      await chatService.deleteChat(messageId)
+
+      return res.json({ success: true, message: 'Message deleted successfully' })
+    } catch (err) {
+      console.error('Error deleting chat:', err)
+      return res.status(500).json({ success: false, message: 'Failed to delete chat' })
     }
   })
 
