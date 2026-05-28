@@ -19,6 +19,8 @@ import Link from "next/link";
 import { SwarajAIChat } from "@/components/swaraj-ai-chat";
 import { LikeProvider } from "@/contexts/LikeContext";
 import { PullToRefresh } from "@/components/ui/pull-to-refresh";
+import { NewBadgeNotification } from "@/components/badges/NewBadgeNotification";
+import { Footer7 } from "@/components/footer";
 
 // Animation variants
 const containerVariants = {
@@ -527,6 +529,12 @@ export default function DashboardPage() {
 
       {/* Swaraj AI Chat - Floating chatbot */}
       <SwarajAIChat />
+
+      {/* Badge Achievement Notification */}
+      <NewBadgeNotification />
+
+      {/* Footer */}
+      <Footer7 />
 
       {/* Bottom padding for mobile */}
       <div className="h-24 lg:hidden" />

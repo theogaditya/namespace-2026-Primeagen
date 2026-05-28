@@ -13,6 +13,7 @@ import {
   Shield,
   Sparkles,
 } from "lucide-react";
+import { BadgeShowcase } from "@/components/badges/BadgeShowcase";
 
 interface ProfileCardProps {
   userData: UserData | null;
@@ -91,7 +92,13 @@ export function ProfileCard({ userData, isLoading = false }: ProfileCardProps) {
           <div className="p-1.5 rounded-lg bg-blue-50">
             <Phone className="w-3.5 h-3.5 text-blue-600" />
           </div>
-          <span className="text-gray-700">{userData.phoneNumber}</span>
+          <span className="text-gray-700">
+            {userData.phoneNumber.startsWith('+91') 
+              ? `+91 ${userData.phoneNumber.slice(3)}` 
+              : userData.phoneNumber.startsWith('91') 
+                ? `+91 ${userData.phoneNumber.slice(2)}`
+                : `+91 ${userData.phoneNumber}`}
+          </span>
         </div>
 
         {/* Location */}
@@ -142,6 +149,13 @@ export function ProfileCard({ userData, isLoading = false }: ProfileCardProps) {
           />
           Account {userData.status === "ACTIVE" ? "Active" : userData.status}
         </span>
+      </div>
+
+      {/* Achievements/Badges Section - Eye-catching */}
+      <div className="mt-4 pt-4 border-t border-gray-100">
+        <div className="p-3 bg-linear-to-br from-amber-50/80 via-orange-50/50 to-yellow-50/80 rounded-xl border border-amber-100/50">
+          <BadgeShowcase compact maxDisplay={4} showViewAll />
+        </div>
       </div>
     </motion.div>
   );

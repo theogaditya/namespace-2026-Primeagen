@@ -4,6 +4,7 @@ import { processedComplaintQueueService } from "../lib/redis/processedComplaintQ
 import { PrismaClient } from "../prisma/generated/client/client";
 import { complaintProcessingSchema } from "../lib/schemas/validation.complaint.processing";
 import { standardizeSubCategory } from "../lib/gcp/gcp";
+import { getBadgeService } from "../lib/badges/badgeService";
 import dotenv from "dotenv";
 
 dotenv.config();
@@ -102,6 +103,21 @@ export async function processNextComplaint(db: PrismaClient): Promise<{ processe
 
     // Pop from registration queue
     await client.lPop(REGISTRATION_QUEUE);
+
+    // Check and award badges after complaint creation
+    try {
+      const badgeService = getBadgeService(db);
+      const newBadges = await badgeService.checkBadgesAfterComplaint(
+        complaintData.userId,
+        complaintData.assignedDepartment
+      );
+      if (newBadges.length > 0) {
+        console.log(`[BadgeService] Awarded ${newBadges.length} badge(s) to user ${complaintData.userId}:`, 
+          newBadges.map(b => b.badge.name).join(", "));
+      }
+    } catch (badgeError) {
+      console.error("Badge check failed (non-blocking):", badgeError);
+    }
 
     // Only push to processed queue if NOT a duplicate
     if (!isDuplicate) {

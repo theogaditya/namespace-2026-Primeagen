@@ -25,12 +25,13 @@ curl -X POST http://localhost:3000/api/users/signup \
     }
   }'
 
+
 ## login user
 curl -X POST http://localhost:3000/api/users/login \
   -H "Content-Type: application/json" \
   -d '{
-    "email": "user.nov30.2025@example.com",
-    "password": "Test@12345"
+    "email": "adityahota99@gmail.com",
+    "password": "12345678"
   }'
 
 ## logout 

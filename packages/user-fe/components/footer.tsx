@@ -65,77 +65,10 @@ export const Footer7 = ({
   legalLinks = defaultLegalLinks,
 }: Footer7Props) => {
   return (
-    <footer className="bg-gray-50 dark:bg-gray-900 py-16">
-
-      <div className="container mx-auto px-4 max-w-7xl">
-        <div>
+    <div>
+             <div>
           <LanguageSelector />
         </div>
-        <div className="flex flex-col lg:flex-row justify-between gap-12 lg:items-start">
-          {/* Logo + Description + Social */}
-          <div className="flex flex-col items-center lg:items-start max-w-sm text-center lg:text-left">
-            <a href={logo.url} aria-label="Homepage" className="inline-flex items-center gap-3 mb-4 scale-110">
-              <img src={logo.src} alt={logo.alt} title={logo.title} className="h-20 w-auto" />
-              <span className="text-2xl font-semibold text-gray-900 dark:text-white">{logo.title}</span>
-            </a>
-            <p className="mb-6 text-gray-600 dark:text-gray-400">{description}</p>
-            <ul className="flex space-x-6">
-              {socialLinks.map(({ icon, href, label }, idx) => (
-                <li key={idx}>
-                  <a
-                    href={href}
-                    aria-label={label}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-gray-600 hover:text-blue-600 dark:text-gray-400 dark:hover:text-blue-400 transition-colors"
-                  >
-                    {icon}
-                  </a>
-                </li>
-              ))}
-            </ul>
-          </div>
-
-
-          {/* Links Sections */}
-          <div className="grid grid-cols-2 gap-30">
-            {sections.map(({ title, links }, idx) => (
-              <nav key={idx} aria-label={title}>
-                <h3 className="mb-5 text-lg font-semibold text-gray-900 dark:text-white">{title}</h3>
-                <ul className="space-y-3">
-                  {links.map(({ name, href }, linkIdx) => (
-                    <li key={linkIdx}>
-                      <a
-                        href={href}
-                        className="text-gray-600 hover:text-blue-600 dark:text-gray-400 dark:hover:text-blue-400 font-medium transition-colors"
-                      >
-                        {name}
-                      </a>
-                    </li>
-                  ))}
-                </ul>
-              </nav>
-            ))}
-          </div>
-        </div>
-
-        {/* Bottom legal & copyright */}
-        <div className="mt-16 pt-8 border-t border-gray-200 dark:border-gray-700 flex flex-col-reverse md:flex-row justify-between items-center text-sm text-gray-500 dark:text-gray-400 gap-4">
-          <p>{copyright}</p>
-          <ul className="flex space-x-6">
-            {legalLinks.map(({ name, href }, idx) => (
-              <li key={idx}>
-                <a
-                  href={href}
-                  className="hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
-                >
-                  {name}
-                </a>
-              </li>
-            ))}
-          </ul>
-        </div>
-      </div>
-    </footer>
+    </div>
   );
 };

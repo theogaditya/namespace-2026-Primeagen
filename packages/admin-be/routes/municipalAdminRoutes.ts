@@ -4,6 +4,7 @@ import bcrypt from 'bcrypt';
 import { PrismaClient } from '../prisma/generated/client/client';
 import { agentSchema } from '../lib/schemas/agentSchema';
 import { authenticateMunicipalAdminOnly } from '../middleware/unifiedAuth';
+import { getBadgeService } from '../lib/badges/badgeService';
 
 export default function(prisma: PrismaClient) {
   const router = express.Router();
@@ -306,6 +307,20 @@ router.put('/complaints/:id/status', authenticateMunicipalAdminOnly, async (req:
           currentWorkload: { decrement: 1 }
         }
       });
+
+      // Award resolution badges to the complainant
+      if (existingComplaint.complainantId) {
+        try {
+          const badgeService = getBadgeService(prisma);
+          const newBadges = await badgeService.checkBadgesAfterResolution(existingComplaint.complainantId);
+          if (newBadges.length > 0) {
+            console.log(`[BadgeService] Awarded ${newBadges.length} resolution badge(s) to user ${existingComplaint.complainantId}:`,
+              newBadges.map(b => b.badge.name).join(", "));
+          }
+        } catch (badgeError) {
+          console.error("Badge check failed (non-blocking):", badgeError);
+        }
+      }
     }
 
     // Map Prisma relation `User` to `complainant` for response consistency

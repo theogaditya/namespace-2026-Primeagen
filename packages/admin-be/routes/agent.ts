@@ -5,6 +5,7 @@ import { PrismaClient } from '../prisma/generated/client/client';
 import { loginSchema } from '../lib/schemas/agentSchema';
 import { authenticateAgentOnly } from '../middleware/unifiedAuth';
 import { getProcessedQueueLength, peekProcessedQueue } from '../lib/redis/assignQueue';
+import { getBadgeService } from '../lib/badges/badgeService';
 
 let isAssignmentPolling = false;
 let assignmentPollingInterval: NodeJS.Timeout | null = null;
@@ -469,6 +470,20 @@ router.put('/complaints/:id/status', authenticateAgentOnly, async (req: any, res
           currentWorkload: { decrement: 1 }
         }
       });
+
+      // Award resolution badges to the complainant
+      if (existingComplaint.complainantId) {
+        try {
+          const badgeService = getBadgeService(prisma);
+          const newBadges = await badgeService.checkBadgesAfterResolution(existingComplaint.complainantId);
+          if (newBadges.length > 0) {
+            console.log(`[BadgeService] Awarded ${newBadges.length} resolution badge(s) to user ${existingComplaint.complainantId}:`,
+              newBadges.map(b => b.badge.name).join(", "));
+          }
+        } catch (badgeError) {
+          console.error("Badge check failed (non-blocking):", badgeError);
+        }
+      }
     }
 
     // Map Prisma relation `User` to `complainant` for response consistency

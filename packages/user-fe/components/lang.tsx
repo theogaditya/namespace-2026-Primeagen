@@ -52,13 +52,12 @@ export default function LanguageSelector() {
 
   // This is the div where the Google Translate dropdown will be rendered
   return (
-     <div className="w-full">
-      <p className="mb-4 text-lg font-semibold text-gray-900 dark:text-white">
+     <div>
+      {/* <p className="mb-4 text-lg font-semibold text-gray-900 dark:text-white">
         Choose your language from the dropdown below
-      </p>
+      </p> */}
       <div 
         id="google_translate_element" 
-        className="inline-block bg-white dark:bg-gray-800 rounded-md shadow-sm border border-gray-300 dark:border-gray-700 p-2"
       />
     </div>
   );

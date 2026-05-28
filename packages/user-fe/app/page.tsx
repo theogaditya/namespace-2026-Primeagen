@@ -36,7 +36,7 @@ export default function Home() {
       <Features />
       <AIInputWithSuggestionsDemo />
       <CTASection />
-      <Footer7/>
+      {/* <Footer7/> */}
     </div>
   );
 }

@@ -26,6 +26,7 @@ model User {
   chats                 Chat[]
   upvotes               Upvote[]
   location              UserLocation?
+  badges                UserBadge[]
 }
 
 model UserLocation {
@@ -329,13 +330,13 @@ model Chat {
   agentId     String?
   complaintId String
   senderType  SenderType
-  agent       Agent?     @relation(fields: [agentId], references: [id])
-  complaint   Complaint  @relation(fields: [complaintId], references: [id], onDelete: Cascade)
+  Agent       Agent?     @relation(fields: [agentId], references: [id])
+  Complaint   Complaint  @relation(fields: [complaintId], references: [id], onDelete: Cascade)
   user        User?      @relation(fields: [userId], references: [id])
 
-  @@index([complaintId])
   @@index([userId])
   @@index([agentId])
+  @@index([complaintId])
   @@map("chats")
 }
 
@@ -352,11 +353,6 @@ model operating_districts {
   name             String
   state            String
   operating_states operating_states @relation(fields: [stateId], references: [id], onDelete: Cascade)
-}
-
-enum SenderType {
-  USER
-  AGENT
 }
 
 enum userStatus {
@@ -422,4 +418,64 @@ enum ComplaintUrgency {
   MEDIUM
   HIGH
   CRITICAL
+}
+
+enum SenderType {
+  USER
+  AGENT
+}
+
+// ============================================
+// Gamification - Badge System
+// ============================================
+
+model Badge {
+  id          String        @id @default(uuid())
+  slug        String        @unique // e.g., "first_step", "trending_voice"
+  name        String        // Display name
+  description String        // How to earn it
+  icon        String        // Lucide icon name
+  category    BadgeCategory
+  rarity      BadgeRarity
+  threshold   Int           // Number required to earn (e.g., 5 complaints)
+  createdAt   DateTime      @default(now())
+
+  // Relations
+  userBadges UserBadge[]
+
+  @@index([category])
+  @@index([rarity])
+  @@map("badges")
+}
+
+model UserBadge {
+  id       String   @id @default(uuid())
+  userId   String
+  badgeId  String
+  earnedAt DateTime @default(now())
+  notified Boolean  @default(false) // Has user been notified?
+
+  // Relations
+  user  User  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  badge Badge @relation(fields: [badgeId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, badgeId])
+  @@index([userId])
+  @@index([earnedAt])
+  @@map("user_badges")
+}
+
+enum BadgeCategory {
+  FILING              // Complaint filing milestones
+  ENGAGEMENT          // Likes and community interaction
+  RESOLUTION          // Complaints getting resolved
+  CATEGORY_SPECIALIST // Department/category specialists
+}
+
+enum BadgeRarity {
+  COMMON
+  UNCOMMON
+  RARE
+  EPIC
+  LEGENDARY
 }

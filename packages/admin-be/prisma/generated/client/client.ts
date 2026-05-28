@@ -129,3 +129,13 @@ export type operating_states = Prisma.operating_statesModel
  * 
  */
 export type operating_districts = Prisma.operating_districtsModel
+/**
+ * Model badges
+ * 
+ */
+export type badges = Prisma.badgesModel
+/**
+ * Model user_badges
+ * 
+ */
+export type user_badges = Prisma.user_badgesModel

@@ -7,7 +7,7 @@ export function districtsRouter(db: PrismaClient): Router {
   // GET /api/districts - Get all operating districts
   router.get("/", async (req: Request, res: Response) => {
     try {
-      const districts = await db.opratingDistricts.findMany({
+      const districts = await db.operating_districts.findMany({
         select: {
           id: true,
           name: true,
@@ -45,7 +45,7 @@ export function districtsRouter(db: PrismaClient): Router {
       }
 
       // Case-insensitive search using Prisma's mode: 'insensitive'
-      const district = await db.opratingDistricts.findFirst({
+      const district = await db.operating_districts.findFirst({
         where: {
           name: {
             equals: name,

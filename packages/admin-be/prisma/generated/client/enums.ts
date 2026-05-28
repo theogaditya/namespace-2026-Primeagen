@@ -101,3 +101,24 @@ export const ComplaintUrgency = {
 } as const
 
 export type ComplaintUrgency = (typeof ComplaintUrgency)[keyof typeof ComplaintUrgency]
+
+
+export const BadgeCategory = {
+  FILING: 'FILING',
+  ENGAGEMENT: 'ENGAGEMENT',
+  RESOLUTION: 'RESOLUTION',
+  CATEGORY_SPECIALIST: 'CATEGORY_SPECIALIST'
+} as const
+
+export type BadgeCategory = (typeof BadgeCategory)[keyof typeof BadgeCategory]
+
+
+export const BadgeRarity = {
+  COMMON: 'COMMON',
+  UNCOMMON: 'UNCOMMON',
+  RARE: 'RARE',
+  EPIC: 'EPIC',
+  LEGENDARY: 'LEGENDARY'
+} as const
+
+export type BadgeRarity = (typeof BadgeRarity)[keyof typeof BadgeRarity]

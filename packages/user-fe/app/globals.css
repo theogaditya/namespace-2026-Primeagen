@@ -168,3 +168,28 @@ body {
   top: 8px !important;
   right: 8px !important;
 }
+
+/* Google Translate Bar Override - Hide it and prevent body shift */
+.goog-te-banner-frame {
+  display: none !important;
+}
+
+.skiptranslate {
+  display: none !important;
+}
+
+body {
+  top: 0 !important;
+  position: static !important;
+}
+
+/* Ensure our navbar stays on top of everything */
+.goog-te-menu-frame {
+  z-index: 999999 !important;
+}
+
+/* Style the Google Translate dropdown when it appears */
+.goog-te-menu2 {
+  max-height: 300px !important;
+  overflow-y: auto !important;
+}

@@ -171,7 +171,23 @@ export function Step3Location({
     const value = e.target.value;
     updateField("district", value);
     setDistrictSearchTerm(value);
-    setDistrictValidationStatus("idle");
+    
+    // Show dropdown with suggestions as user types
+    if (value.length > 0) {
+      setShowDistrictList(true);
+      // Check if any districts match while typing
+      const matches = districts.filter((d) =>
+        d.name.toLowerCase().includes(value.toLowerCase())
+      );
+      if (matches.length === 0 && value.length >= 2) {
+        setDistrictValidationStatus("invalid");
+      } else {
+        setDistrictValidationStatus("idle");
+      }
+    } else {
+      setShowDistrictList(false);
+      setDistrictValidationStatus("idle");
+    }
     
     // Clear PIN and city when district changes
     if (value !== formData.district) {
@@ -341,9 +357,9 @@ export function Step3Location({
     setErrors((prev) => ({ ...prev, locality: undefined }));
   };
 
-  // Filter districts for dropdown
+  // Filter districts for dropdown - use formData.district for live filtering
   const filteredDistricts = districts.filter((d) =>
-    d.name.toLowerCase().includes(districtSearchTerm.toLowerCase())
+    d.name.toLowerCase().includes(formData.district.toLowerCase())
   );
 
   return (
@@ -363,7 +379,7 @@ export function Step3Location({
       </motion.div>
 
       {/* District Input */}
-      <motion.div className="space-y-2" variants={itemVariants}>
+      <motion.div className="space-y-2 relative" variants={itemVariants}>
         <div className="flex items-center justify-between">
           <Label
             htmlFor="district"
@@ -394,8 +410,17 @@ export function Step3Location({
             id="district"
             value={formData.district}
             onChange={handleDistrictChange}
-            onBlur={handleDistrictBlur}
-            onFocus={() => districtSearchTerm && setShowDistrictList(true)}
+            onBlur={(e) => {
+              // Delay blur to allow click on dropdown items
+              setTimeout(() => {
+                handleDistrictBlur();
+                // Only hide if not clicking on dropdown
+                if (!e.relatedTarget?.closest('.district-dropdown')) {
+                  setShowDistrictList(false);
+                }
+              }, 150);
+            }}
+            onFocus={() => setShowDistrictList(true)}
             placeholder="Enter or select your district"
             className={cn(
               "pl-11 pr-12 h-12 rounded-xl border-2 text-base transition-all",
@@ -441,11 +466,13 @@ export function Step3Location({
               animate={{ opacity: 1, y: 0, scale: 1 }}
               exit={{ opacity: 0, y: -10, scale: 0.98 }}
               transition={{ type: "spring", stiffness: 300, damping: 25 }}
-              className="absolute z-50 mt-2 w-full bg-white border-2 border-gray-200 rounded-2xl shadow-2xl max-h-64 overflow-hidden"
+              className="district-dropdown absolute left-0 right-0 z-50 mt-1 bg-white border-2 border-gray-200 rounded-2xl shadow-2xl max-h-64 overflow-hidden"
             >
               <div className="sticky top-0 bg-gray-50 px-4 py-3 border-b flex items-center justify-between">
                 <span className="text-sm font-semibold text-gray-700">
-                  Available Districts ({filteredDistricts.length})
+                  {filteredDistricts.length > 0 
+                    ? `Available Districts (${filteredDistricts.length})`
+                    : "No Matches Found"}
                 </span>
                 <button
                   type="button"
@@ -462,31 +489,62 @@ export function Step3Location({
                     Loading districts...
                   </div>
                 ) : filteredDistricts.length === 0 ? (
-                  <div className="p-6 text-center text-gray-500">
-                    No districts found
+                  <div className="p-6 text-center">
+                    <XCircle className="h-8 w-8 mx-auto mb-2 text-red-400" />
+                    <p className="text-red-600 font-medium">
+                      {formData.district 
+                        ? `"${formData.district}" is not available`
+                        : "No districts found"}
+                    </p>
+                    <p className="text-gray-500 text-sm mt-1">
+                      Please select from available operating districts
+                    </p>
                   </div>
                 ) : (
-                  filteredDistricts.map((district, index) => (
-                    <motion.button
-                      key={district.id}
-                      type="button"
-                      onClick={() => handleDistrictSelect(district)}
-                      initial={{ opacity: 0, x: -10 }}
-                      animate={{ opacity: 1, x: 0 }}
-                      transition={{ delay: index * 0.02 }}
-                      className="w-full px-4 py-3 text-left hover:bg-emerald-50 transition-colors flex items-center justify-between group"
-                    >
-                      <div className="flex items-center gap-3">
-                        <div className="p-1.5 bg-gray-100 rounded-lg group-hover:bg-emerald-100 transition-colors">
-                          <Building className="h-4 w-4 text-gray-500 group-hover:text-emerald-600" />
+                  filteredDistricts.map((district, index) => {
+                    // Highlight matching text
+                    const searchTerm = formData.district.toLowerCase();
+                    const districtName = district.name;
+                    const matchIndex = districtName.toLowerCase().indexOf(searchTerm);
+                    
+                    let highlightedName;
+                    if (matchIndex >= 0 && searchTerm.length > 0) {
+                      const before = districtName.slice(0, matchIndex);
+                      const match = districtName.slice(matchIndex, matchIndex + searchTerm.length);
+                      const after = districtName.slice(matchIndex + searchTerm.length);
+                      highlightedName = (
+                        <>
+                          {before}
+                          <span className="bg-emerald-200 text-emerald-800 rounded px-0.5">{match}</span>
+                          {after}
+                        </>
+                      );
+                    } else {
+                      highlightedName = districtName;
+                    }
+                    
+                    return (
+                      <motion.button
+                        key={district.id}
+                        type="button"
+                        onClick={() => handleDistrictSelect(district)}
+                        initial={{ opacity: 0, x: -10 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        transition={{ delay: index * 0.02 }}
+                        className="w-full px-4 py-3 text-left hover:bg-emerald-50 transition-colors flex items-center justify-between group"
+                      >
+                        <div className="flex items-center gap-3">
+                          <div className="p-1.5 bg-gray-100 rounded-lg group-hover:bg-emerald-100 transition-colors">
+                            <Building className="h-4 w-4 text-gray-500 group-hover:text-emerald-600" />
+                          </div>
+                          <span className="font-medium text-gray-800">{highlightedName}</span>
                         </div>
-                        <span className="font-medium text-gray-800">{district.name}</span>
-                      </div>
-                      <span className="text-xs text-gray-400 bg-gray-100 px-2 py-1 rounded-lg">
-                        {district.state}
-                      </span>
-                    </motion.button>
-                  ))
+                        <span className="text-xs text-gray-400 bg-gray-100 px-2 py-1 rounded-lg">
+                          {district.state}
+                        </span>
+                      </motion.button>
+                    );
+                  })
                 )}
               </div>
             </motion.div>

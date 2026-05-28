@@ -361,6 +361,40 @@ export type EnumSenderTypeWithAggregatesFilter<$PrismaModel = never> = {
   _max?: Prisma.NestedEnumSenderTypeFilter<$PrismaModel>
 }
 
+export type EnumBadgeCategoryFilter<$PrismaModel = never> = {
+  equals?: $Enums.BadgeCategory | Prisma.EnumBadgeCategoryFieldRefInput<$PrismaModel>
+  in?: $Enums.BadgeCategory[] | Prisma.ListEnumBadgeCategoryFieldRefInput<$PrismaModel>
+  notIn?: $Enums.BadgeCategory[] | Prisma.ListEnumBadgeCategoryFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumBadgeCategoryFilter<$PrismaModel> | $Enums.BadgeCategory
+}
+
+export type EnumBadgeRarityFilter<$PrismaModel = never> = {
+  equals?: $Enums.BadgeRarity | Prisma.EnumBadgeRarityFieldRefInput<$PrismaModel>
+  in?: $Enums.BadgeRarity[] | Prisma.ListEnumBadgeRarityFieldRefInput<$PrismaModel>
+  notIn?: $Enums.BadgeRarity[] | Prisma.ListEnumBadgeRarityFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumBadgeRarityFilter<$PrismaModel> | $Enums.BadgeRarity
+}
+
+export type EnumBadgeCategoryWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.BadgeCategory | Prisma.EnumBadgeCategoryFieldRefInput<$PrismaModel>
+  in?: $Enums.BadgeCategory[] | Prisma.ListEnumBadgeCategoryFieldRefInput<$PrismaModel>
+  notIn?: $Enums.BadgeCategory[] | Prisma.ListEnumBadgeCategoryFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumBadgeCategoryWithAggregatesFilter<$PrismaModel> | $Enums.BadgeCategory
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumBadgeCategoryFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumBadgeCategoryFilter<$PrismaModel>
+}
+
+export type EnumBadgeRarityWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.BadgeRarity | Prisma.EnumBadgeRarityFieldRefInput<$PrismaModel>
+  in?: $Enums.BadgeRarity[] | Prisma.ListEnumBadgeRarityFieldRefInput<$PrismaModel>
+  notIn?: $Enums.BadgeRarity[] | Prisma.ListEnumBadgeRarityFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumBadgeRarityWithAggregatesFilter<$PrismaModel> | $Enums.BadgeRarity
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumBadgeRarityFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumBadgeRarityFilter<$PrismaModel>
+}
+
 export type NestedStringFilter<$PrismaModel = never> = {
   equals?: string | Prisma.StringFieldRefInput<$PrismaModel>
   in?: string[] | Prisma.ListStringFieldRefInput<$PrismaModel>
@@ -708,6 +742,40 @@ export type NestedEnumSenderTypeWithAggregatesFilter<$PrismaModel = never> = {
   _count?: Prisma.NestedIntFilter<$PrismaModel>
   _min?: Prisma.NestedEnumSenderTypeFilter<$PrismaModel>
   _max?: Prisma.NestedEnumSenderTypeFilter<$PrismaModel>
+}
+
+export type NestedEnumBadgeCategoryFilter<$PrismaModel = never> = {
+  equals?: $Enums.BadgeCategory | Prisma.EnumBadgeCategoryFieldRefInput<$PrismaModel>
+  in?: $Enums.BadgeCategory[] | Prisma.ListEnumBadgeCategoryFieldRefInput<$PrismaModel>
+  notIn?: $Enums.BadgeCategory[] | Prisma.ListEnumBadgeCategoryFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumBadgeCategoryFilter<$PrismaModel> | $Enums.BadgeCategory
+}
+
+export type NestedEnumBadgeRarityFilter<$PrismaModel = never> = {
+  equals?: $Enums.BadgeRarity | Prisma.EnumBadgeRarityFieldRefInput<$PrismaModel>
+  in?: $Enums.BadgeRarity[] | Prisma.ListEnumBadgeRarityFieldRefInput<$PrismaModel>
+  notIn?: $Enums.BadgeRarity[] | Prisma.ListEnumBadgeRarityFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumBadgeRarityFilter<$PrismaModel> | $Enums.BadgeRarity
+}
+
+export type NestedEnumBadgeCategoryWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.BadgeCategory | Prisma.EnumBadgeCategoryFieldRefInput<$PrismaModel>
+  in?: $Enums.BadgeCategory[] | Prisma.ListEnumBadgeCategoryFieldRefInput<$PrismaModel>
+  notIn?: $Enums.BadgeCategory[] | Prisma.ListEnumBadgeCategoryFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumBadgeCategoryWithAggregatesFilter<$PrismaModel> | $Enums.BadgeCategory
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumBadgeCategoryFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumBadgeCategoryFilter<$PrismaModel>
+}
+
+export type NestedEnumBadgeRarityWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.BadgeRarity | Prisma.EnumBadgeRarityFieldRefInput<$PrismaModel>
+  in?: $Enums.BadgeRarity[] | Prisma.ListEnumBadgeRarityFieldRefInput<$PrismaModel>
+  notIn?: $Enums.BadgeRarity[] | Prisma.ListEnumBadgeRarityFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumBadgeRarityWithAggregatesFilter<$PrismaModel> | $Enums.BadgeRarity
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumBadgeRarityFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumBadgeRarityFilter<$PrismaModel>
 }
 
 

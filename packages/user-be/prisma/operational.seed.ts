@@ -1,11 +1,17 @@
 import { getPrisma } from "../lib/prisma";
+import { randomUUID } from "crypto";
 
 const prisma = getPrisma();
 
 async function main() {
-  let jharkhand = await prisma.opratingStates.findFirst({ where: { name: 'Jharkhand' } });
+  let jharkhand = await prisma.operating_states.findFirst({ where: { name: 'Jharkhand' } });
   if (!jharkhand) {
-    jharkhand = await prisma.opratingStates.create({ data: { name: 'Jharkhand' } });
+    jharkhand = await prisma.operating_states.create({ 
+      data: { 
+        id: randomUUID(),
+        name: 'Jharkhand' 
+      } 
+    });
     console.log('Created state:', jharkhand.name);
   } else {
     console.log('State already exists:', jharkhand.name);
@@ -14,7 +20,7 @@ async function main() {
   const districts = ['Ranchi', 'Jamshedpur', 'Dhanbad'];
 
   for (const districtName of districts) {
-    const existing = await prisma.opratingDistricts.findFirst({
+    const existing = await prisma.operating_districts.findFirst({
       where: { name: districtName, stateId: jharkhand.id },
     });
 
@@ -23,8 +29,9 @@ async function main() {
       continue;
     }
 
-    const created = await prisma.opratingDistricts.create({
+    const created = await prisma.operating_districts.create({
       data: {
+        id: randomUUID(),
         name: districtName,
         state: jharkhand.name,
         stateId: jharkhand.id,

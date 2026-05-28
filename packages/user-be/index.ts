@@ -16,6 +16,8 @@ import { districtsRouter } from "./routes/districts";
 import { categoriesRouter } from "./routes/categories";
 import { createAuthMiddleware } from "./middleware/authRoute";
 import { chatRouter } from "./routes/chat";
+import { createBadgeRouter } from "./routes/badges";
+import { createUserProfileRouter } from "./routes/userProfile";
 
 dotenv.config();
 
@@ -50,6 +52,7 @@ export class Server {
     this.app.use(compression());
 
     const devWhitelist = [this.frontEndUser, this.backEndUser, this.worker, this.frontEndAdmin, this.backEndAdmin]
+    //const devWhitelist = ["*"]
 
     const corsOptions = {
       origin: (origin: any, cb: any) => {
@@ -80,6 +83,7 @@ export class Server {
       this.app.use('/api/users', loginUserRouter(this.db));
       this.app.use('/api/districts', districtsRouter(this.db));
       this.app.use('/api/categories', categoriesRouter(this.db));
+      this.app.use('/api/user', createUserProfileRouter(this.db)); // Public user profile route
       
       // Protected routes (auth required)
       this.app.use('/api/users', logoutUserRouter(this.db));
@@ -87,6 +91,8 @@ export class Server {
       this.app.use('/api/complaints/get', authMiddleware, getComplaintRouter(this.db));
       // User chat routes (authenticated)
       this.app.use('/api/chat', authMiddleware, chatRouter(this.db));
+      // Badge routes (authenticated)
+      this.app.use('/api/badges', authMiddleware, createBadgeRouter());
     }
 
   public getApp(): Express {

@@ -33,6 +33,7 @@ import {
 import { ComplaintHeatmap } from "./ComplaintHeatmap";
 import { useLikes, useComplaintLike } from "@/contexts/LikeContext";
 import { PullToRefresh } from "@/components/ui/pull-to-refresh";
+import { UserProfilePopup } from "./UserProfilePopup";
 
 // Sub-tab types for community feed
 export type CommunitySubTab = "for-you" | "trending" | "recent" | "heatmap" | "search";
@@ -65,9 +66,11 @@ const containerVariants = {
 function CommunityComplaintCard({
   complaint,
   onClick,
+  onUserClick,
 }: {
   complaint: Complaint;
   onClick: () => void;
+  onUserClick: (userId: string, userName: string) => void;
 }) {
   const { liked, count, isLiking, toggle } = useComplaintLike(complaint.id);
   const [showCopied, setShowCopied] = useState(false);
@@ -114,6 +117,13 @@ function CommunityComplaintCard({
     }
   };
 
+  const handleUserClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (complaint.User?.id && complaint.User?.name) {
+      onUserClick(complaint.User.id, complaint.User.name);
+    }
+  };
+
   return (
     <motion.article
       variants={cardVariants}
@@ -123,18 +133,24 @@ function CommunityComplaintCard({
       <div className="px-4 py-4">
         {/* Header - User info and timestamp */}
         <div className="flex items-start gap-3">
-          {/* Avatar */}
-          <div className="w-10 h-10 rounded-full bg-linear-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white font-semibold text-sm shrink-0">
+          {/* Avatar - Clickable */}
+          <button
+            onClick={handleUserClick}
+            className="w-10 h-10 rounded-full bg-linear-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white font-semibold text-sm shrink-0 hover:ring-2 hover:ring-blue-300 hover:ring-offset-2 transition-all"
+          >
             {complaint.User?.name?.[0]?.toUpperCase() || "A"}
-          </div>
+          </button>
 
           {/* Content */}
           <div className="flex-1 min-w-0">
             {/* User info row */}
             <div className="flex items-center gap-2 flex-wrap">
-              <span className="font-semibold text-gray-900 text-sm">
+              <button
+                onClick={handleUserClick}
+                className="font-semibold text-gray-900 text-sm hover:text-blue-600 hover:underline transition-colors"
+              >
                 {complaint.User?.name || "Anonymous User"}
-              </span>
+              </button>
               <span className="text-gray-400 text-sm">·</span>
               <span className="text-gray-500 text-sm">
                 {getRelativeTime(complaint.submissionDate)}
@@ -415,8 +431,25 @@ export function CommunityFeed({ authToken, onComplaintClick }: CommunityFeedProp
   const [searchResults, setSearchResults] = useState<Complaint[]>([]);
   const [isSearching, setIsSearching] = useState(false);
   
+  // User profile popup state
+  const [profilePopup, setProfilePopup] = useState<{
+    isOpen: boolean;
+    userId: string;
+    userName: string;
+  }>({ isOpen: false, userId: "", userName: "" });
+  
   // Get like context for initialization and connection status
   const { initializeLikes, isConnected, isAuthenticated } = useLikes();
+
+  // Handle user profile click
+  const handleUserClick = useCallback((userId: string, userName: string) => {
+    setProfilePopup({ isOpen: true, userId, userName });
+  }, []);
+
+  // Close profile popup
+  const closeProfilePopup = useCallback(() => {
+    setProfilePopup({ isOpen: false, userId: "", userName: "" });
+  }, []);
 
   // Fetch complaints based on active tab
   const fetchComplaints = useCallback(async () => {
@@ -633,6 +666,7 @@ export function CommunityFeed({ authToken, onComplaintClick }: CommunityFeedProp
                 key={complaint.id}
                 complaint={complaint}
                 onClick={() => onComplaintClick(complaint)}
+                onUserClick={handleUserClick}
               />
             ))}
           </motion.div>
@@ -649,6 +683,14 @@ export function CommunityFeed({ authToken, onComplaintClick }: CommunityFeedProp
         </div>
       )}
       </PullToRefresh>
+
+      {/* User Profile Popup */}
+      <UserProfilePopup
+        userId={profilePopup.userId}
+        userName={profilePopup.userName}
+        isOpen={profilePopup.isOpen}
+        onClose={closeProfilePopup}
+      />
     </div>
   );
 }

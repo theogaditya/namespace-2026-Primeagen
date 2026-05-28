@@ -214,8 +214,8 @@ export type ChatWhereInput = {
   agentId?: Prisma.StringNullableFilter<"Chat"> | string | null
   complaintId?: Prisma.StringFilter<"Chat"> | string
   senderType?: Prisma.EnumSenderTypeFilter<"Chat"> | $Enums.SenderType
-  agent?: Prisma.XOR<Prisma.AgentNullableScalarRelationFilter, Prisma.AgentWhereInput> | null
-  complaint?: Prisma.XOR<Prisma.ComplaintScalarRelationFilter, Prisma.ComplaintWhereInput>
+  Agent?: Prisma.XOR<Prisma.AgentNullableScalarRelationFilter, Prisma.AgentWhereInput> | null
+  Complaint?: Prisma.XOR<Prisma.ComplaintScalarRelationFilter, Prisma.ComplaintWhereInput>
   user?: Prisma.XOR<Prisma.UserNullableScalarRelationFilter, Prisma.UserWhereInput> | null
 }
 
@@ -229,8 +229,8 @@ export type ChatOrderByWithRelationInput = {
   agentId?: Prisma.SortOrderInput | Prisma.SortOrder
   complaintId?: Prisma.SortOrder
   senderType?: Prisma.SortOrder
-  agent?: Prisma.AgentOrderByWithRelationInput
-  complaint?: Prisma.ComplaintOrderByWithRelationInput
+  Agent?: Prisma.AgentOrderByWithRelationInput
+  Complaint?: Prisma.ComplaintOrderByWithRelationInput
   user?: Prisma.UserOrderByWithRelationInput
 }
 
@@ -247,8 +247,8 @@ export type ChatWhereUniqueInput = Prisma.AtLeast<{
   agentId?: Prisma.StringNullableFilter<"Chat"> | string | null
   complaintId?: Prisma.StringFilter<"Chat"> | string
   senderType?: Prisma.EnumSenderTypeFilter<"Chat"> | $Enums.SenderType
-  agent?: Prisma.XOR<Prisma.AgentNullableScalarRelationFilter, Prisma.AgentWhereInput> | null
-  complaint?: Prisma.XOR<Prisma.ComplaintScalarRelationFilter, Prisma.ComplaintWhereInput>
+  Agent?: Prisma.XOR<Prisma.AgentNullableScalarRelationFilter, Prisma.AgentWhereInput> | null
+  Complaint?: Prisma.XOR<Prisma.ComplaintScalarRelationFilter, Prisma.ComplaintWhereInput>
   user?: Prisma.XOR<Prisma.UserNullableScalarRelationFilter, Prisma.UserWhereInput> | null
 }, "id">
 
@@ -289,8 +289,8 @@ export type ChatCreateInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   senderType: $Enums.SenderType
-  agent?: Prisma.AgentCreateNestedOneWithoutChatsInput
-  complaint: Prisma.ComplaintCreateNestedOneWithoutChatsInput
+  Agent?: Prisma.AgentCreateNestedOneWithoutChatsInput
+  Complaint: Prisma.ComplaintCreateNestedOneWithoutChatsInput
   user?: Prisma.UserCreateNestedOneWithoutChatsInput
 }
 
@@ -313,8 +313,8 @@ export type ChatUpdateInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   senderType?: Prisma.EnumSenderTypeFieldUpdateOperationsInput | $Enums.SenderType
-  agent?: Prisma.AgentUpdateOneWithoutChatsNestedInput
-  complaint?: Prisma.ComplaintUpdateOneRequiredWithoutChatsNestedInput
+  Agent?: Prisma.AgentUpdateOneWithoutChatsNestedInput
+  Complaint?: Prisma.ComplaintUpdateOneRequiredWithoutChatsNestedInput
   user?: Prisma.UserUpdateOneWithoutChatsNestedInput
 }
 
@@ -546,8 +546,8 @@ export type ChatCreateWithoutUserInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   senderType: $Enums.SenderType
-  agent?: Prisma.AgentCreateNestedOneWithoutChatsInput
-  complaint: Prisma.ComplaintCreateNestedOneWithoutChatsInput
+  Agent?: Prisma.AgentCreateNestedOneWithoutChatsInput
+  Complaint: Prisma.ComplaintCreateNestedOneWithoutChatsInput
 }
 
 export type ChatUncheckedCreateWithoutUserInput = {
@@ -609,7 +609,7 @@ export type ChatCreateWithoutAgentInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   senderType: $Enums.SenderType
-  complaint: Prisma.ComplaintCreateNestedOneWithoutChatsInput
+  Complaint: Prisma.ComplaintCreateNestedOneWithoutChatsInput
   user?: Prisma.UserCreateNestedOneWithoutChatsInput
 }
 
@@ -657,7 +657,7 @@ export type ChatCreateWithoutComplaintInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   senderType: $Enums.SenderType
-  agent?: Prisma.AgentCreateNestedOneWithoutChatsInput
+  Agent?: Prisma.AgentCreateNestedOneWithoutChatsInput
   user?: Prisma.UserCreateNestedOneWithoutChatsInput
 }
 
@@ -716,8 +716,8 @@ export type ChatUpdateWithoutUserInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   senderType?: Prisma.EnumSenderTypeFieldUpdateOperationsInput | $Enums.SenderType
-  agent?: Prisma.AgentUpdateOneWithoutChatsNestedInput
-  complaint?: Prisma.ComplaintUpdateOneRequiredWithoutChatsNestedInput
+  Agent?: Prisma.AgentUpdateOneWithoutChatsNestedInput
+  Complaint?: Prisma.ComplaintUpdateOneRequiredWithoutChatsNestedInput
 }
 
 export type ChatUncheckedUpdateWithoutUserInput = {
@@ -760,7 +760,7 @@ export type ChatUpdateWithoutAgentInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   senderType?: Prisma.EnumSenderTypeFieldUpdateOperationsInput | $Enums.SenderType
-  complaint?: Prisma.ComplaintUpdateOneRequiredWithoutChatsNestedInput
+  Complaint?: Prisma.ComplaintUpdateOneRequiredWithoutChatsNestedInput
   user?: Prisma.UserUpdateOneWithoutChatsNestedInput
 }
 
@@ -804,7 +804,7 @@ export type ChatUpdateWithoutComplaintInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   senderType?: Prisma.EnumSenderTypeFieldUpdateOperationsInput | $Enums.SenderType
-  agent?: Prisma.AgentUpdateOneWithoutChatsNestedInput
+  Agent?: Prisma.AgentUpdateOneWithoutChatsNestedInput
   user?: Prisma.UserUpdateOneWithoutChatsNestedInput
 }
 
@@ -842,8 +842,8 @@ export type ChatSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
   agentId?: boolean
   complaintId?: boolean
   senderType?: boolean
-  agent?: boolean | Prisma.Chat$agentArgs<ExtArgs>
-  complaint?: boolean | Prisma.ComplaintDefaultArgs<ExtArgs>
+  Agent?: boolean | Prisma.Chat$AgentArgs<ExtArgs>
+  Complaint?: boolean | Prisma.ComplaintDefaultArgs<ExtArgs>
   user?: boolean | Prisma.Chat$userArgs<ExtArgs>
 }, ExtArgs["result"]["chat"]>
 
@@ -857,8 +857,8 @@ export type ChatSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensio
   agentId?: boolean
   complaintId?: boolean
   senderType?: boolean
-  agent?: boolean | Prisma.Chat$agentArgs<ExtArgs>
-  complaint?: boolean | Prisma.ComplaintDefaultArgs<ExtArgs>
+  Agent?: boolean | Prisma.Chat$AgentArgs<ExtArgs>
+  Complaint?: boolean | Prisma.ComplaintDefaultArgs<ExtArgs>
   user?: boolean | Prisma.Chat$userArgs<ExtArgs>
 }, ExtArgs["result"]["chat"]>
 
@@ -872,8 +872,8 @@ export type ChatSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensio
   agentId?: boolean
   complaintId?: boolean
   senderType?: boolean
-  agent?: boolean | Prisma.Chat$agentArgs<ExtArgs>
-  complaint?: boolean | Prisma.ComplaintDefaultArgs<ExtArgs>
+  Agent?: boolean | Prisma.Chat$AgentArgs<ExtArgs>
+  Complaint?: boolean | Prisma.ComplaintDefaultArgs<ExtArgs>
   user?: boolean | Prisma.Chat$userArgs<ExtArgs>
 }, ExtArgs["result"]["chat"]>
 
@@ -891,26 +891,26 @@ export type ChatSelectScalar = {
 
 export type ChatOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "message" | "userId" | "imageUrl" | "createdAt" | "updatedAt" | "agentId" | "complaintId" | "senderType", ExtArgs["result"]["chat"]>
 export type ChatInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  agent?: boolean | Prisma.Chat$agentArgs<ExtArgs>
-  complaint?: boolean | Prisma.ComplaintDefaultArgs<ExtArgs>
+  Agent?: boolean | Prisma.Chat$AgentArgs<ExtArgs>
+  Complaint?: boolean | Prisma.ComplaintDefaultArgs<ExtArgs>
   user?: boolean | Prisma.Chat$userArgs<ExtArgs>
 }
 export type ChatIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  agent?: boolean | Prisma.Chat$agentArgs<ExtArgs>
-  complaint?: boolean | Prisma.ComplaintDefaultArgs<ExtArgs>
+  Agent?: boolean | Prisma.Chat$AgentArgs<ExtArgs>
+  Complaint?: boolean | Prisma.ComplaintDefaultArgs<ExtArgs>
   user?: boolean | Prisma.Chat$userArgs<ExtArgs>
 }
 export type ChatIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  agent?: boolean | Prisma.Chat$agentArgs<ExtArgs>
-  complaint?: boolean | Prisma.ComplaintDefaultArgs<ExtArgs>
+  Agent?: boolean | Prisma.Chat$AgentArgs<ExtArgs>
+  Complaint?: boolean | Prisma.ComplaintDefaultArgs<ExtArgs>
   user?: boolean | Prisma.Chat$userArgs<ExtArgs>
 }
 
 export type $ChatPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   name: "Chat"
   objects: {
-    agent: Prisma.$AgentPayload<ExtArgs> | null
-    complaint: Prisma.$ComplaintPayload<ExtArgs>
+    Agent: Prisma.$AgentPayload<ExtArgs> | null
+    Complaint: Prisma.$ComplaintPayload<ExtArgs>
     user: Prisma.$UserPayload<ExtArgs> | null
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
@@ -1317,8 +1317,8 @@ readonly fields: ChatFieldRefs;
  */
 export interface Prisma__ChatClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
-  agent<T extends Prisma.Chat$agentArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Chat$agentArgs<ExtArgs>>): Prisma.Prisma__AgentClient<runtime.Types.Result.GetResult<Prisma.$AgentPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
-  complaint<T extends Prisma.ComplaintDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.ComplaintDefaultArgs<ExtArgs>>): Prisma.Prisma__ComplaintClient<runtime.Types.Result.GetResult<Prisma.$ComplaintPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+  Agent<T extends Prisma.Chat$AgentArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Chat$AgentArgs<ExtArgs>>): Prisma.Prisma__AgentClient<runtime.Types.Result.GetResult<Prisma.$AgentPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+  Complaint<T extends Prisma.ComplaintDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.ComplaintDefaultArgs<ExtArgs>>): Prisma.Prisma__ComplaintClient<runtime.Types.Result.GetResult<Prisma.$ComplaintPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   user<T extends Prisma.Chat$userArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Chat$userArgs<ExtArgs>>): Prisma.Prisma__UserClient<runtime.Types.Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
@@ -1754,9 +1754,9 @@ export type ChatDeleteManyArgs<ExtArgs extends runtime.Types.Extensions.Internal
 }
 
 /**
- * Chat.agent
+ * Chat.Agent
  */
-export type Chat$agentArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+export type Chat$AgentArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   /**
    * Select specific fields to fetch from the Agent
    */

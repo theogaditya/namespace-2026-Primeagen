@@ -68,7 +68,9 @@ export const ModelName = {
   RegionalWorkflow: 'RegionalWorkflow',
   Chat: 'Chat',
   operating_states: 'operating_states',
-  operating_districts: 'operating_districts'
+  operating_districts: 'operating_districts',
+  badges: 'badges',
+  user_badges: 'user_badges'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -369,13 +371,13 @@ export type RegionalWorkflowScalarFieldEnum = (typeof RegionalWorkflowScalarFiel
 export const ChatScalarFieldEnum = {
   id: 'id',
   message: 'message',
-  complaintId: 'complaintId',
   userId: 'userId',
-  agentId: 'agentId',
-  senderType: 'senderType',
   imageUrl: 'imageUrl',
   createdAt: 'createdAt',
-  updatedAt: 'updatedAt'
+  updatedAt: 'updatedAt',
+  agentId: 'agentId',
+  complaintId: 'complaintId',
+  senderType: 'senderType'
 } as const
 
 export type ChatScalarFieldEnum = (typeof ChatScalarFieldEnum)[keyof typeof ChatScalarFieldEnum]
@@ -398,6 +400,32 @@ export const Operating_districtsScalarFieldEnum = {
 } as const
 
 export type Operating_districtsScalarFieldEnum = (typeof Operating_districtsScalarFieldEnum)[keyof typeof Operating_districtsScalarFieldEnum]
+
+
+export const BadgesScalarFieldEnum = {
+  id: 'id',
+  slug: 'slug',
+  name: 'name',
+  description: 'description',
+  icon: 'icon',
+  category: 'category',
+  rarity: 'rarity',
+  threshold: 'threshold',
+  createdAt: 'createdAt'
+} as const
+
+export type BadgesScalarFieldEnum = (typeof BadgesScalarFieldEnum)[keyof typeof BadgesScalarFieldEnum]
+
+
+export const User_badgesScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  badgeId: 'badgeId',
+  earnedAt: 'earnedAt',
+  notified: 'notified'
+} as const
+
+export type User_badgesScalarFieldEnum = (typeof User_badgesScalarFieldEnum)[keyof typeof User_badgesScalarFieldEnum]
 
 
 export const SortOrder = {
