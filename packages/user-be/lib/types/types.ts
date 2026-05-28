@@ -142,6 +142,7 @@ export interface ComplaintResponse {
   location: ComplaintLocationResponse | null;
   User: ComplaintUserResponse | null;
   category: ComplaintCategoryResponse;
+  hasLiked?: boolean; // Whether the current user has liked this complaint
 }
 
 export interface ComplaintListResponse {
