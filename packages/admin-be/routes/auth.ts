@@ -47,6 +47,13 @@ export default function (prisma: PrismaClient) {
             where: { officialEmail }
           });
           if (admin) {
+            // Check if admin is inactive
+            if (admin.status === 'INACTIVE') {
+              return res.status(403).json({
+                success: false,
+                message: 'Your account is inactive. Please contact Super Admin.'
+              });
+            }
             tokenPayload = {
               id: admin.id,
               email: admin.officialEmail,
@@ -61,6 +68,13 @@ export default function (prisma: PrismaClient) {
             where: { officialEmail }
           });
           if (admin) {
+            // Check if admin is inactive
+            if (admin.status === 'INACTIVE') {
+              return res.status(403).json({
+                success: false,
+                message: 'Your account is inactive. Please contact State Admin.'
+              });
+            }
             tokenPayload = {
               id: admin.id,
               email: admin.officialEmail,
@@ -73,11 +87,17 @@ export default function (prisma: PrismaClient) {
         case 'AGENT':
           admin = await prisma.agent.findFirst({
             where: {
-              officialEmail,
-              status: 'ACTIVE'
+              officialEmail
             }
           });
           if (admin) {
+            // Check if agent is inactive
+            if (admin.status === 'INACTIVE') {
+              return res.status(403).json({
+                success: false,
+                message: 'Your account is inactive. Please contact Municipal Admin.'
+              });
+            }
             tokenPayload = {
               id: admin.id,
               email: admin.officialEmail,

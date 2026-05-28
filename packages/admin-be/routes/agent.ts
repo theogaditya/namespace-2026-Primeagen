@@ -62,10 +62,10 @@ router.post('/login', async (req, res: any) => {
   const { officialEmail, password } = parse.data;
 
   try {
+    // First find agent by email only
     const agent = await prisma.agent.findFirst({
       where: {
         officialEmail,
-        status: 'ACTIVE' 
       },
       select: {
         id: true,
@@ -90,6 +90,13 @@ router.post('/login', async (req, res: any) => {
     if (!agent) {
       return res.status(401).json({ 
         message: 'Invalid credentials' 
+      });
+    }
+
+    // Check if agent is inactive
+    if (agent.status === 'INACTIVE') {
+      return res.status(403).json({ 
+        message: 'Your account is inactive. Please contact Municipal Admin.' 
       });
     }
 

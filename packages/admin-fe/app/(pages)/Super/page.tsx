@@ -21,7 +21,7 @@ export default function SuperPage() {
         {activeTab === 'Admin-Management' && <AdminManagement />}
         {activeTab === 'Admin-Management' && (
           <div className="p-6">
-            <div className="text-gray-600">Admins And Agents Management - Coming Soon</div>
+            <div className="text-gray-600"></div>
           </div>
         )}
       </SuperAdminLayout>
