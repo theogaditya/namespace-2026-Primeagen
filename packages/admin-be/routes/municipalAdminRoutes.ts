@@ -19,6 +19,11 @@ router.post('/login', async (req, res: any) => {
     return res.status(404).json({ success: false, message: 'Admin not found' });
   }
 
+  // Check if admin is inactive
+  if (admin.status === 'INACTIVE') {
+    return res.status(403).json({ success: false, message: 'Your account is inactive. Please contact State Admin.' });
+  }
+
   const isMatch = await bcrypt.compare(password, admin.password);
   if (!isMatch) {
     return res.status(401).json({ success: false, message: 'Invalid credentials' });

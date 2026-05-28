@@ -678,5 +678,105 @@ router.put('/complaints/:id/status', authenticateSuperAdminOnly, async (req: any
   }
 });
 
+// ----- Update State Admin Status (Activate/Deactivate) -----
+router.patch('/state-admins/:id/status', authenticateSuperAdminOnly, async (req: any, res: any) => {
+  try {
+    const { id } = req.params;
+    const { status } = req.body;
+
+    if (!status || !['ACTIVE', 'INACTIVE'].includes(status)) {
+      return res.status(400).json({ 
+        success: false, 
+        message: 'Invalid status. Must be ACTIVE or INACTIVE' 
+      });
+    }
+
+    const stateAdmin = await prisma.departmentStateAdmin.findUnique({
+      where: { id }
+    });
+
+    if (!stateAdmin) {
+      return res.status(404).json({ 
+        success: false, 
+        message: 'State admin not found' 
+      });
+    }
+
+    const updatedAdmin = await prisma.departmentStateAdmin.update({
+      where: { id },
+      data: { status },
+      select: {
+        id: true,
+        fullName: true,
+        officialEmail: true,
+        status: true,
+      }
+    });
+
+    return res.json({ 
+      success: true, 
+      message: `State admin ${status === 'ACTIVE' ? 'activated' : 'deactivated'} successfully`,
+      data: updatedAdmin 
+    });
+  } catch (error: any) {
+    console.error('Error updating state admin status:', error);
+    return res.status(500).json({ 
+      success: false, 
+      message: 'Failed to update state admin status',
+      error: process.env.NODE_ENV === 'development' ? error.message : undefined
+    });
+  }
+});
+
+// ----- Update Municipal Admin Status (Activate/Deactivate) -----
+router.patch('/municipal-admins/:id/status', authenticateSuperAdminOnly, async (req: any, res: any) => {
+  try {
+    const { id } = req.params;
+    const { status } = req.body;
+
+    if (!status || !['ACTIVE', 'INACTIVE'].includes(status)) {
+      return res.status(400).json({ 
+        success: false, 
+        message: 'Invalid status. Must be ACTIVE or INACTIVE' 
+      });
+    }
+
+    const municipalAdmin = await prisma.departmentMunicipalAdmin.findUnique({
+      where: { id }
+    });
+
+    if (!municipalAdmin) {
+      return res.status(404).json({ 
+        success: false, 
+        message: 'Municipal admin not found' 
+      });
+    }
+
+    const updatedAdmin = await prisma.departmentMunicipalAdmin.update({
+      where: { id },
+      data: { status },
+      select: {
+        id: true,
+        fullName: true,
+        officialEmail: true,
+        status: true,
+      }
+    });
+
+    return res.json({ 
+      success: true, 
+      message: `Municipal admin ${status === 'ACTIVE' ? 'activated' : 'deactivated'} successfully`,
+      data: updatedAdmin 
+    });
+  } catch (error: any) {
+    console.error('Error updating municipal admin status:', error);
+    return res.status(500).json({ 
+      success: false, 
+      message: 'Failed to update municipal admin status',
+      error: process.env.NODE_ENV === 'development' ? error.message : undefined
+    });
+  }
+});
+
   return router;
 }

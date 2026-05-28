@@ -21,6 +21,11 @@ router.post('/login', async (req, res:any) => {
     return res.status(404).json({ success: false, message: 'Admin not found' });
   }
 
+  // Check if admin is inactive
+  if (admin.status === 'INACTIVE') {
+    return res.status(403).json({ success: false, message: 'Your account is inactive. Please contact Super Admin.' });
+  }
+
   const isMatch = await bcrypt.compare(password, admin.password);
   if (!isMatch) {
     return res.status(401).json({ success: false, message: 'Invalid credentials' });
@@ -391,6 +396,64 @@ router.post('/municipal-admins', authenticateStateAdminOnly, async (req: any, re
     return res.status(500).json({ 
       success: false, 
       message: 'Failed to create municipal admin',
+      error: process.env.NODE_ENV === 'development' ? error.message : undefined
+    });
+  }
+});
+
+// ----- 9. Update Municipal Admin Status (Activate/Deactivate) -----
+router.patch('/municipal-admins/:id/status', authenticateStateAdminOnly, async (req: any, res: any) => {
+  try {
+    const { id } = req.params;
+    const { status } = req.body;
+    const stateAdminId = req.admin.id;
+
+    if (!status || !['ACTIVE', 'INACTIVE'].includes(status)) {
+      return res.status(400).json({ 
+        success: false, 
+        message: 'Invalid status. Must be ACTIVE or INACTIVE' 
+      });
+    }
+
+    // Verify the municipal admin belongs to this state admin
+    const municipalAdmin = await prisma.departmentMunicipalAdmin.findFirst({
+      where: {
+        id,
+        OR: [
+          { managedByStateAdminId: stateAdminId },
+          { managedByStateAdminId: null }
+        ]
+      }
+    });
+
+    if (!municipalAdmin) {
+      return res.status(404).json({ 
+        success: false, 
+        message: 'Municipal admin not found or not under your management' 
+      });
+    }
+
+    const updatedAdmin = await prisma.departmentMunicipalAdmin.update({
+      where: { id },
+      data: { status },
+      select: {
+        id: true,
+        fullName: true,
+        officialEmail: true,
+        status: true,
+      }
+    });
+
+    return res.json({ 
+      success: true, 
+      message: `Municipal admin ${status === 'ACTIVE' ? 'activated' : 'deactivated'} successfully`,
+      data: updatedAdmin 
+    });
+  } catch (error: any) {
+    console.error('Error updating municipal admin status:', error);
+    return res.status(500).json({ 
+      success: false, 
+      message: 'Failed to update municipal admin status',
       error: process.env.NODE_ENV === 'development' ? error.message : undefined
     });
   }

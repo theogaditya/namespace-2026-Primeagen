@@ -13,6 +13,7 @@ import {
   TableRow,
 } from "@/components/ui/table"
 import { Users, UserPlus, RefreshCw, Building2, Shield, Loader2 } from "lucide-react"
+import { Switch } from "@/components/ui/switch"
 import { AddMunicipalAdminForm } from "./AddMunicipalAdminForm"
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000"
@@ -37,6 +38,7 @@ export function MunicipalAdminManagement() {
   const [loading, setLoading] = useState(true)
   const [showForm, setShowForm] = useState(false)
   const [refreshing, setRefreshing] = useState(false)
+  const [updatingStatus, setUpdatingStatus] = useState<string | null>(null)
 
   const fetchMunicipalAdmins = useCallback(async () => {
     try {
@@ -80,6 +82,35 @@ export function MunicipalAdminManagement() {
   const handleFormSuccess = () => {
     setShowForm(false)
     fetchMunicipalAdmins() // Real-time refresh after creating
+  }
+
+  const handleToggleStatus = async (adminId: string, currentStatus: string) => {
+    setUpdatingStatus(adminId)
+    try {
+      const token = localStorage.getItem("token")
+      if (!token) return
+
+      const newStatus = currentStatus === "ACTIVE" ? "INACTIVE" : "ACTIVE"
+      
+      const response = await fetch(`${API_URL}/api/state-admin/municipal-admins/${adminId}/status`, {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ status: newStatus }),
+      })
+
+      if (response.ok) {
+        setAdmins(admins.map(admin => 
+          admin.id === adminId ? { ...admin, status: newStatus } : admin
+        ))
+      }
+    } catch (err) {
+      console.error("Error updating admin status:", err)
+    } finally {
+      setUpdatingStatus(null)
+    }
   }
 
   const formatDepartment = (dept?: string) => {
@@ -205,6 +236,7 @@ export function MunicipalAdminManagement() {
                       <TableHead className="font-semibold text-gray-700">Department</TableHead>
                       <TableHead className="font-semibold text-gray-700">Status</TableHead>
                       <TableHead className="font-semibold text-gray-700">Workload</TableHead>
+                      <TableHead className="font-semibold text-gray-700">Actions</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
@@ -234,6 +266,23 @@ export function MunicipalAdminManagement() {
                         </TableCell>
                         <TableCell className="text-gray-600">
                           {admin.currentWorkload ?? 0} / {admin.workloadLimit ?? 10}
+                        </TableCell>
+                        <TableCell>
+                          <div className="flex items-center gap-3">
+                            <div className="w-5 h-5 flex items-center justify-center">
+                              {updatingStatus === admin.id && (
+                                <Loader2 className="h-4 w-4 animate-spin text-purple-600" />
+                              )}
+                            </div>
+                            <Switch
+                              checked={admin.status === "ACTIVE"}
+                              onCheckedChange={() => handleToggleStatus(admin.id, admin.status || "INACTIVE")}
+                              disabled={updatingStatus === admin.id}
+                            />
+                            <span className="text-sm text-gray-500 w-16">
+                              {admin.status === "ACTIVE" ? "Active" : "Inactive"}
+                            </span>
+                          </div>
                         </TableCell>
                       </TableRow>
                     ))}

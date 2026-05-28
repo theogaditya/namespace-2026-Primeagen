@@ -20,6 +20,7 @@ import {
   TableRow,
 } from "@/components/ui/table"
 import { Users, UserPlus, RefreshCw, Shield, Building2, MapPin, Loader2, Filter } from "lucide-react"
+import { Switch } from "@/components/ui/switch"
 import { AddAdminForm } from "./AddAdminForm"
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000"
@@ -43,6 +44,7 @@ export function AdminManagement() {
   const [showForm, setShowForm] = useState(false)
   const [refreshing, setRefreshing] = useState(false)
   const [filter, setFilter] = useState<FilterType>("ALL")
+  const [updatingStatus, setUpdatingStatus] = useState<string | null>(null)
 
   const fetchAdmins = useCallback(async () => {
     try {
@@ -86,6 +88,38 @@ export function AdminManagement() {
   const handleFormSuccess = () => {
     setShowForm(false)
     fetchAdmins() // Real-time refresh after creating
+  }
+
+  const handleToggleStatus = async (adminId: string, currentStatus: string, accessLevel: string) => {
+    setUpdatingStatus(adminId)
+    try {
+      const token = localStorage.getItem("token")
+      if (!token) return
+
+      const newStatus = currentStatus === "ACTIVE" ? "INACTIVE" : "ACTIVE"
+      const endpoint = accessLevel === "DEPT_STATE_ADMIN" 
+        ? `${API_URL}/api/super-admin/state-admins/${adminId}/status`
+        : `${API_URL}/api/super-admin/municipal-admins/${adminId}/status`
+      
+      const response = await fetch(endpoint, {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ status: newStatus }),
+      })
+
+      if (response.ok) {
+        setAdmins(admins.map(admin => 
+          admin.id === adminId ? { ...admin, status: newStatus } : admin
+        ))
+      }
+    } catch (err) {
+      console.error("Error updating admin status:", err)
+    } finally {
+      setUpdatingStatus(null)
+    }
   }
 
   const formatDepartment = (dept?: string) => {
@@ -300,6 +334,7 @@ export function AdminManagement() {
                       )}
                       <TableHead className="font-semibold text-gray-700">Department</TableHead>
                       <TableHead className="font-semibold text-gray-700">Status</TableHead>
+                      <TableHead className="font-semibold text-gray-700">Actions</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
@@ -339,6 +374,23 @@ export function AdminManagement() {
                           >
                             {admin.status || "UNKNOWN"}
                           </Badge>
+                        </TableCell>
+                        <TableCell>
+                          <div className="flex items-center gap-3">
+                            <div className="w-5 h-5 flex items-center justify-center">
+                              {updatingStatus === admin.id && (
+                                <Loader2 className="h-4 w-4 animate-spin text-red-600" />
+                              )}
+                            </div>
+                            <Switch
+                              checked={admin.status === "ACTIVE"}
+                              onCheckedChange={() => handleToggleStatus(admin.id, admin.status || "INACTIVE", admin.accessLevel || "")}
+                              disabled={updatingStatus === admin.id}
+                            />
+                            <span className="text-sm text-gray-500 w-16">
+                              {admin.status === "ACTIVE" ? "Active" : "Inactive"}
+                            </span>
+                          </div>
                         </TableCell>
                       </TableRow>
                     ))}
