@@ -369,9 +369,10 @@ export type RegionalWorkflowScalarFieldEnum = (typeof RegionalWorkflowScalarFiel
 export const ChatScalarFieldEnum = {
   id: 'id',
   message: 'message',
+  complaintId: 'complaintId',
   userId: 'userId',
-  adminId: 'adminId',
-  adminRole: 'adminRole',
+  agentId: 'agentId',
+  senderType: 'senderType',
   imageUrl: 'imageUrl',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'

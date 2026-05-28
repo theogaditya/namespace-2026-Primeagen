@@ -69,6 +69,7 @@ model Agent {
   district             String?
   managedByMunicipal   DepartmentMunicipalAdmin? @relation("MunicipalAdminToAgents", fields: [managedByMunicipalId], references: [id])
   assignedComplaints   Complaint[]               @relation("AssignedAgentComplaints")
+  chats                Chat[]
   coAssignedComplaints Complaint[]               @relation("CoAssignedAgentComplaints")
 }
 
@@ -250,6 +251,7 @@ model Complaint {
   managedBySuperAdmin            SuperAdmin?               @relation(fields: [managedBySuperAdminId], references: [id])
   moderatedByMunicipalAdmin      DepartmentMunicipalAdmin? @relation("MunicipalAdminModeratedComplaints", fields: [moderatedByMunicipalAdminId], references: [id])
   auditLogs                      AuditLog[]
+  chats                          Chat[]
   location                       ComplaintLocation?
   upvotes                        Upvote[]
   coAssignedAgents               Agent[]                   @relation("CoAssignedAgentComplaints")
@@ -318,18 +320,22 @@ model RegionalWorkflow {
 }
 
 model Chat {
-  id        String     @id @default(uuid())
-  message   String
-  userId    String
-  adminId   String?
-  adminRole AdminRole?
-  imageUrl  String?
-  createdAt DateTime   @default(now())
-  updatedAt DateTime   @updatedAt
-  user      User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  id          String     @id @default(uuid())
+  message     String
+  userId      String?
+  imageUrl    String?
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+  agentId     String?
+  complaintId String
+  senderType  SenderType
+  agent       Agent?     @relation(fields: [agentId], references: [id])
+  complaint   Complaint  @relation(fields: [complaintId], references: [id], onDelete: Cascade)
+  user        User?      @relation(fields: [userId], references: [id])
 
+  @@index([complaintId])
   @@index([userId])
-  @@index([adminId])
+  @@index([agentId])
   @@map("chats")
 }
 
@@ -346,6 +352,11 @@ model operating_districts {
   name             String
   state            String
   operating_states operating_states @relation(fields: [stateId], references: [id], onDelete: Cascade)
+}
+
+enum SenderType {
+  USER
+  AGENT
 }
 
 enum userStatus {

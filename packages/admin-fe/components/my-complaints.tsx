@@ -11,9 +11,10 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-import { Search, MoreHorizontal, Eye, Calendar, User, CheckCircle, Circle, LayoutList, RefreshCw } from "lucide-react"
+import { Search, MoreHorizontal, Eye, Calendar, User, CheckCircle, Circle, LayoutList, RefreshCw, MessageCircle } from "lucide-react"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Modal } from "@/components/ui/modal"
+import { ChatModal } from "@/components/chat-modal"
 
 interface Complaint {
   id: string
@@ -67,6 +68,7 @@ export function MyComplaints() {
   const [adminType, setAdminType] = useState<string>('')
   const [currentAdminId, setCurrentAdminId] = useState<string>('')
   const [statusUpdating, setStatusUpdating] = useState(false)
+  const [chatComplaint, setChatComplaint] = useState<Complaint | null>(null)
   const [pagination, setPagination] = useState({
     currentPage: 1,
     totalPages: 1,
@@ -447,10 +449,12 @@ export function MyComplaints() {
                           </Button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end">
-                          <DropdownMenuItem onClick={() => setSelectedComplaint(complaint)}>
-                            <Eye className="mr-2 h-4 w-4" />
-                            View Details
-                          </DropdownMenuItem>
+                          {adminType === 'AGENT' && (
+                            <DropdownMenuItem onClick={() => setChatComplaint(complaint)}>
+                              <MessageCircle className="mr-2 h-4 w-4" />
+                              Chat with Citizen
+                            </DropdownMenuItem>
+                          )}
                         </DropdownMenuContent>
                       </DropdownMenu>
                     </div>
@@ -614,6 +618,14 @@ export function MyComplaints() {
           </div>
         )}
       </Modal>
+
+      {/* Chat Modal */}
+      <ChatModal
+        isOpen={!!chatComplaint}
+        onClose={() => setChatComplaint(null)}
+        complaintId={chatComplaint?.id || ''}
+        complaintTitle={chatComplaint?.title || chatComplaint?.subCategory || `Complaint #${chatComplaint?.seq}`}
+      />
     </div>
   )
 }

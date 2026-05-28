@@ -366,6 +366,7 @@ export type AgentWhereInput = {
   district?: Prisma.StringNullableFilter<"Agent"> | string | null
   managedByMunicipal?: Prisma.XOR<Prisma.DepartmentMunicipalAdminNullableScalarRelationFilter, Prisma.DepartmentMunicipalAdminWhereInput> | null
   assignedComplaints?: Prisma.ComplaintListRelationFilter
+  chats?: Prisma.ChatListRelationFilter
   coAssignedComplaints?: Prisma.ComplaintListRelationFilter
 }
 
@@ -394,6 +395,7 @@ export type AgentOrderByWithRelationInput = {
   district?: Prisma.SortOrderInput | Prisma.SortOrder
   managedByMunicipal?: Prisma.DepartmentMunicipalAdminOrderByWithRelationInput
   assignedComplaints?: Prisma.ComplaintOrderByRelationAggregateInput
+  chats?: Prisma.ChatOrderByRelationAggregateInput
   coAssignedComplaints?: Prisma.ComplaintOrderByRelationAggregateInput
 }
 
@@ -425,6 +427,7 @@ export type AgentWhereUniqueInput = Prisma.AtLeast<{
   district?: Prisma.StringNullableFilter<"Agent"> | string | null
   managedByMunicipal?: Prisma.XOR<Prisma.DepartmentMunicipalAdminNullableScalarRelationFilter, Prisma.DepartmentMunicipalAdminWhereInput> | null
   assignedComplaints?: Prisma.ComplaintListRelationFilter
+  chats?: Prisma.ChatListRelationFilter
   coAssignedComplaints?: Prisma.ComplaintListRelationFilter
 }, "id" | "email" | "employeeId" | "officialEmail">
 
@@ -510,6 +513,7 @@ export type AgentCreateInput = {
   district?: string | null
   managedByMunicipal?: Prisma.DepartmentMunicipalAdminCreateNestedOneWithoutManagedAgentsInput
   assignedComplaints?: Prisma.ComplaintCreateNestedManyWithoutAssignedAgentInput
+  chats?: Prisma.ChatCreateNestedManyWithoutAgentInput
   coAssignedComplaints?: Prisma.ComplaintCreateNestedManyWithoutCoAssignedAgentsInput
 }
 
@@ -537,6 +541,7 @@ export type AgentUncheckedCreateInput = {
   managedByMunicipalId?: string | null
   district?: string | null
   assignedComplaints?: Prisma.ComplaintUncheckedCreateNestedManyWithoutAssignedAgentInput
+  chats?: Prisma.ChatUncheckedCreateNestedManyWithoutAgentInput
   coAssignedComplaints?: Prisma.ComplaintUncheckedCreateNestedManyWithoutCoAssignedAgentsInput
 }
 
@@ -564,6 +569,7 @@ export type AgentUpdateInput = {
   district?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   managedByMunicipal?: Prisma.DepartmentMunicipalAdminUpdateOneWithoutManagedAgentsNestedInput
   assignedComplaints?: Prisma.ComplaintUpdateManyWithoutAssignedAgentNestedInput
+  chats?: Prisma.ChatUpdateManyWithoutAgentNestedInput
   coAssignedComplaints?: Prisma.ComplaintUpdateManyWithoutCoAssignedAgentsNestedInput
 }
 
@@ -591,6 +597,7 @@ export type AgentUncheckedUpdateInput = {
   managedByMunicipalId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   district?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   assignedComplaints?: Prisma.ComplaintUncheckedUpdateManyWithoutAssignedAgentNestedInput
+  chats?: Prisma.ChatUncheckedUpdateManyWithoutAgentNestedInput
   coAssignedComplaints?: Prisma.ComplaintUncheckedUpdateManyWithoutCoAssignedAgentsNestedInput
 }
 
@@ -900,6 +907,22 @@ export type AgentUncheckedUpdateManyWithoutCoAssignedComplaintsNestedInput = {
   deleteMany?: Prisma.AgentScalarWhereInput | Prisma.AgentScalarWhereInput[]
 }
 
+export type AgentCreateNestedOneWithoutChatsInput = {
+  create?: Prisma.XOR<Prisma.AgentCreateWithoutChatsInput, Prisma.AgentUncheckedCreateWithoutChatsInput>
+  connectOrCreate?: Prisma.AgentCreateOrConnectWithoutChatsInput
+  connect?: Prisma.AgentWhereUniqueInput
+}
+
+export type AgentUpdateOneWithoutChatsNestedInput = {
+  create?: Prisma.XOR<Prisma.AgentCreateWithoutChatsInput, Prisma.AgentUncheckedCreateWithoutChatsInput>
+  connectOrCreate?: Prisma.AgentCreateOrConnectWithoutChatsInput
+  upsert?: Prisma.AgentUpsertWithoutChatsInput
+  disconnect?: Prisma.AgentWhereInput | boolean
+  delete?: Prisma.AgentWhereInput | boolean
+  connect?: Prisma.AgentWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.AgentUpdateToOneWithWhereWithoutChatsInput, Prisma.AgentUpdateWithoutChatsInput>, Prisma.AgentUncheckedUpdateWithoutChatsInput>
+}
+
 export type AgentCreateWithoutManagedByMunicipalInput = {
   id?: string
   email: string
@@ -923,6 +946,7 @@ export type AgentCreateWithoutManagedByMunicipalInput = {
   collaborationMetric?: number
   district?: string | null
   assignedComplaints?: Prisma.ComplaintCreateNestedManyWithoutAssignedAgentInput
+  chats?: Prisma.ChatCreateNestedManyWithoutAgentInput
   coAssignedComplaints?: Prisma.ComplaintCreateNestedManyWithoutCoAssignedAgentsInput
 }
 
@@ -949,6 +973,7 @@ export type AgentUncheckedCreateWithoutManagedByMunicipalInput = {
   collaborationMetric?: number
   district?: string | null
   assignedComplaints?: Prisma.ComplaintUncheckedCreateNestedManyWithoutAssignedAgentInput
+  chats?: Prisma.ChatUncheckedCreateNestedManyWithoutAgentInput
   coAssignedComplaints?: Prisma.ComplaintUncheckedCreateNestedManyWithoutCoAssignedAgentsInput
 }
 
@@ -1029,6 +1054,7 @@ export type AgentCreateWithoutAssignedComplaintsInput = {
   collaborationMetric?: number
   district?: string | null
   managedByMunicipal?: Prisma.DepartmentMunicipalAdminCreateNestedOneWithoutManagedAgentsInput
+  chats?: Prisma.ChatCreateNestedManyWithoutAgentInput
   coAssignedComplaints?: Prisma.ComplaintCreateNestedManyWithoutCoAssignedAgentsInput
 }
 
@@ -1055,6 +1081,7 @@ export type AgentUncheckedCreateWithoutAssignedComplaintsInput = {
   collaborationMetric?: number
   managedByMunicipalId?: string | null
   district?: string | null
+  chats?: Prisma.ChatUncheckedCreateNestedManyWithoutAgentInput
   coAssignedComplaints?: Prisma.ComplaintUncheckedCreateNestedManyWithoutCoAssignedAgentsInput
 }
 
@@ -1087,6 +1114,7 @@ export type AgentCreateWithoutCoAssignedComplaintsInput = {
   district?: string | null
   managedByMunicipal?: Prisma.DepartmentMunicipalAdminCreateNestedOneWithoutManagedAgentsInput
   assignedComplaints?: Prisma.ComplaintCreateNestedManyWithoutAssignedAgentInput
+  chats?: Prisma.ChatCreateNestedManyWithoutAgentInput
 }
 
 export type AgentUncheckedCreateWithoutCoAssignedComplaintsInput = {
@@ -1113,6 +1141,7 @@ export type AgentUncheckedCreateWithoutCoAssignedComplaintsInput = {
   managedByMunicipalId?: string | null
   district?: string | null
   assignedComplaints?: Prisma.ComplaintUncheckedCreateNestedManyWithoutAssignedAgentInput
+  chats?: Prisma.ChatUncheckedCreateNestedManyWithoutAgentInput
 }
 
 export type AgentCreateOrConnectWithoutCoAssignedComplaintsInput = {
@@ -1154,6 +1183,7 @@ export type AgentUpdateWithoutAssignedComplaintsInput = {
   collaborationMetric?: Prisma.IntFieldUpdateOperationsInput | number
   district?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   managedByMunicipal?: Prisma.DepartmentMunicipalAdminUpdateOneWithoutManagedAgentsNestedInput
+  chats?: Prisma.ChatUpdateManyWithoutAgentNestedInput
   coAssignedComplaints?: Prisma.ComplaintUpdateManyWithoutCoAssignedAgentsNestedInput
 }
 
@@ -1180,6 +1210,7 @@ export type AgentUncheckedUpdateWithoutAssignedComplaintsInput = {
   collaborationMetric?: Prisma.IntFieldUpdateOperationsInput | number
   managedByMunicipalId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   district?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  chats?: Prisma.ChatUncheckedUpdateManyWithoutAgentNestedInput
   coAssignedComplaints?: Prisma.ComplaintUncheckedUpdateManyWithoutCoAssignedAgentsNestedInput
 }
 
@@ -1197,6 +1228,130 @@ export type AgentUpdateWithWhereUniqueWithoutCoAssignedComplaintsInput = {
 export type AgentUpdateManyWithWhereWithoutCoAssignedComplaintsInput = {
   where: Prisma.AgentScalarWhereInput
   data: Prisma.XOR<Prisma.AgentUpdateManyMutationInput, Prisma.AgentUncheckedUpdateManyWithoutCoAssignedComplaintsInput>
+}
+
+export type AgentCreateWithoutChatsInput = {
+  id?: string
+  email: string
+  fullName: string
+  employeeId?: string
+  password: string
+  phoneNumber: string
+  officialEmail: string
+  department: $Enums.Department
+  municipality?: string | null
+  accessLevel?: $Enums.AccessLevel
+  workloadLimit?: number
+  currentWorkload?: number
+  availabilityStatus?: string
+  dateOfCreation?: Date | string
+  lastUpdated?: Date | string
+  status?: $Enums.Status
+  lastLogin?: Date | string | null
+  resolutionRate?: number
+  avgResolutionTime?: string | null
+  collaborationMetric?: number
+  district?: string | null
+  managedByMunicipal?: Prisma.DepartmentMunicipalAdminCreateNestedOneWithoutManagedAgentsInput
+  assignedComplaints?: Prisma.ComplaintCreateNestedManyWithoutAssignedAgentInput
+  coAssignedComplaints?: Prisma.ComplaintCreateNestedManyWithoutCoAssignedAgentsInput
+}
+
+export type AgentUncheckedCreateWithoutChatsInput = {
+  id?: string
+  email: string
+  fullName: string
+  employeeId?: string
+  password: string
+  phoneNumber: string
+  officialEmail: string
+  department: $Enums.Department
+  municipality?: string | null
+  accessLevel?: $Enums.AccessLevel
+  workloadLimit?: number
+  currentWorkload?: number
+  availabilityStatus?: string
+  dateOfCreation?: Date | string
+  lastUpdated?: Date | string
+  status?: $Enums.Status
+  lastLogin?: Date | string | null
+  resolutionRate?: number
+  avgResolutionTime?: string | null
+  collaborationMetric?: number
+  managedByMunicipalId?: string | null
+  district?: string | null
+  assignedComplaints?: Prisma.ComplaintUncheckedCreateNestedManyWithoutAssignedAgentInput
+  coAssignedComplaints?: Prisma.ComplaintUncheckedCreateNestedManyWithoutCoAssignedAgentsInput
+}
+
+export type AgentCreateOrConnectWithoutChatsInput = {
+  where: Prisma.AgentWhereUniqueInput
+  create: Prisma.XOR<Prisma.AgentCreateWithoutChatsInput, Prisma.AgentUncheckedCreateWithoutChatsInput>
+}
+
+export type AgentUpsertWithoutChatsInput = {
+  update: Prisma.XOR<Prisma.AgentUpdateWithoutChatsInput, Prisma.AgentUncheckedUpdateWithoutChatsInput>
+  create: Prisma.XOR<Prisma.AgentCreateWithoutChatsInput, Prisma.AgentUncheckedCreateWithoutChatsInput>
+  where?: Prisma.AgentWhereInput
+}
+
+export type AgentUpdateToOneWithWhereWithoutChatsInput = {
+  where?: Prisma.AgentWhereInput
+  data: Prisma.XOR<Prisma.AgentUpdateWithoutChatsInput, Prisma.AgentUncheckedUpdateWithoutChatsInput>
+}
+
+export type AgentUpdateWithoutChatsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  fullName?: Prisma.StringFieldUpdateOperationsInput | string
+  employeeId?: Prisma.StringFieldUpdateOperationsInput | string
+  password?: Prisma.StringFieldUpdateOperationsInput | string
+  phoneNumber?: Prisma.StringFieldUpdateOperationsInput | string
+  officialEmail?: Prisma.StringFieldUpdateOperationsInput | string
+  department?: Prisma.EnumDepartmentFieldUpdateOperationsInput | $Enums.Department
+  municipality?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  accessLevel?: Prisma.EnumAccessLevelFieldUpdateOperationsInput | $Enums.AccessLevel
+  workloadLimit?: Prisma.IntFieldUpdateOperationsInput | number
+  currentWorkload?: Prisma.IntFieldUpdateOperationsInput | number
+  availabilityStatus?: Prisma.StringFieldUpdateOperationsInput | string
+  dateOfCreation?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  lastUpdated?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  status?: Prisma.EnumStatusFieldUpdateOperationsInput | $Enums.Status
+  lastLogin?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  resolutionRate?: Prisma.FloatFieldUpdateOperationsInput | number
+  avgResolutionTime?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  collaborationMetric?: Prisma.IntFieldUpdateOperationsInput | number
+  district?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  managedByMunicipal?: Prisma.DepartmentMunicipalAdminUpdateOneWithoutManagedAgentsNestedInput
+  assignedComplaints?: Prisma.ComplaintUpdateManyWithoutAssignedAgentNestedInput
+  coAssignedComplaints?: Prisma.ComplaintUpdateManyWithoutCoAssignedAgentsNestedInput
+}
+
+export type AgentUncheckedUpdateWithoutChatsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  fullName?: Prisma.StringFieldUpdateOperationsInput | string
+  employeeId?: Prisma.StringFieldUpdateOperationsInput | string
+  password?: Prisma.StringFieldUpdateOperationsInput | string
+  phoneNumber?: Prisma.StringFieldUpdateOperationsInput | string
+  officialEmail?: Prisma.StringFieldUpdateOperationsInput | string
+  department?: Prisma.EnumDepartmentFieldUpdateOperationsInput | $Enums.Department
+  municipality?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  accessLevel?: Prisma.EnumAccessLevelFieldUpdateOperationsInput | $Enums.AccessLevel
+  workloadLimit?: Prisma.IntFieldUpdateOperationsInput | number
+  currentWorkload?: Prisma.IntFieldUpdateOperationsInput | number
+  availabilityStatus?: Prisma.StringFieldUpdateOperationsInput | string
+  dateOfCreation?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  lastUpdated?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  status?: Prisma.EnumStatusFieldUpdateOperationsInput | $Enums.Status
+  lastLogin?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  resolutionRate?: Prisma.FloatFieldUpdateOperationsInput | number
+  avgResolutionTime?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  collaborationMetric?: Prisma.IntFieldUpdateOperationsInput | number
+  managedByMunicipalId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  district?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  assignedComplaints?: Prisma.ComplaintUncheckedUpdateManyWithoutAssignedAgentNestedInput
+  coAssignedComplaints?: Prisma.ComplaintUncheckedUpdateManyWithoutCoAssignedAgentsNestedInput
 }
 
 export type AgentCreateManyManagedByMunicipalInput = {
@@ -1246,6 +1401,7 @@ export type AgentUpdateWithoutManagedByMunicipalInput = {
   collaborationMetric?: Prisma.IntFieldUpdateOperationsInput | number
   district?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   assignedComplaints?: Prisma.ComplaintUpdateManyWithoutAssignedAgentNestedInput
+  chats?: Prisma.ChatUpdateManyWithoutAgentNestedInput
   coAssignedComplaints?: Prisma.ComplaintUpdateManyWithoutCoAssignedAgentsNestedInput
 }
 
@@ -1272,6 +1428,7 @@ export type AgentUncheckedUpdateWithoutManagedByMunicipalInput = {
   collaborationMetric?: Prisma.IntFieldUpdateOperationsInput | number
   district?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   assignedComplaints?: Prisma.ComplaintUncheckedUpdateManyWithoutAssignedAgentNestedInput
+  chats?: Prisma.ChatUncheckedUpdateManyWithoutAgentNestedInput
   coAssignedComplaints?: Prisma.ComplaintUncheckedUpdateManyWithoutCoAssignedAgentsNestedInput
 }
 
@@ -1323,6 +1480,7 @@ export type AgentUpdateWithoutCoAssignedComplaintsInput = {
   district?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   managedByMunicipal?: Prisma.DepartmentMunicipalAdminUpdateOneWithoutManagedAgentsNestedInput
   assignedComplaints?: Prisma.ComplaintUpdateManyWithoutAssignedAgentNestedInput
+  chats?: Prisma.ChatUpdateManyWithoutAgentNestedInput
 }
 
 export type AgentUncheckedUpdateWithoutCoAssignedComplaintsInput = {
@@ -1349,6 +1507,7 @@ export type AgentUncheckedUpdateWithoutCoAssignedComplaintsInput = {
   managedByMunicipalId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   district?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   assignedComplaints?: Prisma.ComplaintUncheckedUpdateManyWithoutAssignedAgentNestedInput
+  chats?: Prisma.ChatUncheckedUpdateManyWithoutAgentNestedInput
 }
 
 export type AgentUncheckedUpdateManyWithoutCoAssignedComplaintsInput = {
@@ -1383,11 +1542,13 @@ export type AgentUncheckedUpdateManyWithoutCoAssignedComplaintsInput = {
 
 export type AgentCountOutputType = {
   assignedComplaints: number
+  chats: number
   coAssignedComplaints: number
 }
 
 export type AgentCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   assignedComplaints?: boolean | AgentCountOutputTypeCountAssignedComplaintsArgs
+  chats?: boolean | AgentCountOutputTypeCountChatsArgs
   coAssignedComplaints?: boolean | AgentCountOutputTypeCountCoAssignedComplaintsArgs
 }
 
@@ -1406,6 +1567,13 @@ export type AgentCountOutputTypeDefaultArgs<ExtArgs extends runtime.Types.Extens
  */
 export type AgentCountOutputTypeCountAssignedComplaintsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   where?: Prisma.ComplaintWhereInput
+}
+
+/**
+ * AgentCountOutputType without action
+ */
+export type AgentCountOutputTypeCountChatsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.ChatWhereInput
 }
 
 /**
@@ -1441,6 +1609,7 @@ export type AgentSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = 
   district?: boolean
   managedByMunicipal?: boolean | Prisma.Agent$managedByMunicipalArgs<ExtArgs>
   assignedComplaints?: boolean | Prisma.Agent$assignedComplaintsArgs<ExtArgs>
+  chats?: boolean | Prisma.Agent$chatsArgs<ExtArgs>
   coAssignedComplaints?: boolean | Prisma.Agent$coAssignedComplaintsArgs<ExtArgs>
   _count?: boolean | Prisma.AgentCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["agent"]>
@@ -1526,6 +1695,7 @@ export type AgentOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = ru
 export type AgentInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   managedByMunicipal?: boolean | Prisma.Agent$managedByMunicipalArgs<ExtArgs>
   assignedComplaints?: boolean | Prisma.Agent$assignedComplaintsArgs<ExtArgs>
+  chats?: boolean | Prisma.Agent$chatsArgs<ExtArgs>
   coAssignedComplaints?: boolean | Prisma.Agent$coAssignedComplaintsArgs<ExtArgs>
   _count?: boolean | Prisma.AgentCountOutputTypeDefaultArgs<ExtArgs>
 }
@@ -1541,6 +1711,7 @@ export type $AgentPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs 
   objects: {
     managedByMunicipal: Prisma.$DepartmentMunicipalAdminPayload<ExtArgs> | null
     assignedComplaints: Prisma.$ComplaintPayload<ExtArgs>[]
+    chats: Prisma.$ChatPayload<ExtArgs>[]
     coAssignedComplaints: Prisma.$ComplaintPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
@@ -1962,6 +2133,7 @@ export interface Prisma__AgentClient<T, Null = never, ExtArgs extends runtime.Ty
   readonly [Symbol.toStringTag]: "PrismaPromise"
   managedByMunicipal<T extends Prisma.Agent$managedByMunicipalArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Agent$managedByMunicipalArgs<ExtArgs>>): Prisma.Prisma__DepartmentMunicipalAdminClient<runtime.Types.Result.GetResult<Prisma.$DepartmentMunicipalAdminPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   assignedComplaints<T extends Prisma.Agent$assignedComplaintsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Agent$assignedComplaintsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ComplaintPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  chats<T extends Prisma.Agent$chatsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Agent$chatsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ChatPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   coAssignedComplaints<T extends Prisma.Agent$coAssignedComplaintsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Agent$coAssignedComplaintsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ComplaintPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
@@ -2450,6 +2622,30 @@ export type Agent$assignedComplaintsArgs<ExtArgs extends runtime.Types.Extension
   take?: number
   skip?: number
   distinct?: Prisma.ComplaintScalarFieldEnum | Prisma.ComplaintScalarFieldEnum[]
+}
+
+/**
+ * Agent.chats
+ */
+export type Agent$chatsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the Chat
+   */
+  select?: Prisma.ChatSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the Chat
+   */
+  omit?: Prisma.ChatOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ChatInclude<ExtArgs> | null
+  where?: Prisma.ChatWhereInput
+  orderBy?: Prisma.ChatOrderByWithRelationInput | Prisma.ChatOrderByWithRelationInput[]
+  cursor?: Prisma.ChatWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.ChatScalarFieldEnum | Prisma.ChatScalarFieldEnum[]
 }
 
 /**

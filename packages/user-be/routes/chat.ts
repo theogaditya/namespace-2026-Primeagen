@@ -49,10 +49,11 @@ export function chatRouter(db: PrismaClient) {
   const prismaClient = db || getPrisma();
 
   // Create a new chat message (authenticated user) - supports optional image upload
+  // Expects: { message?, complaintId, adminId? }
   router.post("/create", uploadMiddleware.single("image"), async (req: Request, res: Response) => {
     try {
       const userId = req.userId as string | undefined;
-      const { message, adminId: adminIdFromBody, adminRole: adminRoleFromBody } = req.body;
+      const { message, complaintId: complaintIdFromBody, adminId: adminIdFromBody, adminRole: adminRoleFromBody } = req.body;
       let imageUrl: string | null = req.body.imageUrl || null;
 
       if (!userId) {
@@ -77,74 +78,71 @@ export function chatRouter(db: PrismaClient) {
         }
       }
 
-      // Determine assigned admin: prefer body adminId if provided
-      let assignedAdminId: string | null = adminIdFromBody || null
-      let assignedAdminRole: string | null = adminRoleFromBody || null
+      // Determine assigned admin: prefer provided adminId, else prefer complaint.assignedAgentId, else reuse previous admin, else fallback to admin selection
+      let assignedAdminId: string | null = adminIdFromBody || null;
+      let assignedAdminRole: string | null = adminRoleFromBody || null;
+      const complaintId = complaintIdFromBody || null;
+
+      if (complaintId) {
+        const complaint = await (prismaClient as any).complaint.findUnique({ where: { id: complaintId }, select: { assignedAgentId: true } });
+        if (complaint && complaint.assignedAgentId) {
+          assignedAdminId = complaint.assignedAgentId;
+          assignedAdminRole = 'AGENT';
+        }
+      }
 
       if (!assignedAdminId) {
         // Check if user already has existing chats with an admin — reuse that admin
-        const existing = await (prismaClient as any).chats.findFirst({
-          where: { userId, adminId: { not: null } },
-          orderBy: { createdAt: "desc" },
-          select: { adminId: true, adminRole: true },
-        })
+        const existing = await (prismaClient as any).chat.findFirst({
+          where: { userId, agentId: { not: null } },
+          orderBy: { createdAt: 'desc' },
+          select: { agentId: true },
+        });
 
-        if (existing && existing.adminId) {
-          assignedAdminId = existing.adminId
-          assignedAdminRole = existing.adminRole || null
+        if (existing && existing.agentId) {
+          assignedAdminId = existing.agentId;
+          assignedAdminRole = 'AGENT';
+        }
+      }
+
+      // Final fallback: select a municipal admin or agent as before
+      if (!assignedAdminId) {
+        const municipal = await (prismaClient as any).departmentMunicipalAdmin.findFirst({
+          where: { status: 'ACTIVE' },
+          orderBy: { currentWorkload: 'asc' },
+          select: { id: true },
+        });
+
+        if (municipal && municipal.id) {
+          assignedAdminId = municipal.id;
+          assignedAdminRole = 'DEPT_MUNICIPAL_ADMIN';
+          try {
+            await (prismaClient as any).departmentMunicipalAdmin.update({ where: { id: municipal.id }, data: { currentWorkload: { increment: 1 } } });
+          } catch (e) {
+            console.warn('Failed to increment municipal admin workload:', e);
+          }
         } else {
-          // No existing admin -> assign a municipal admin (lowest workload)
-          const municipal = await (prismaClient as any).departmentMunicipalAdmin.findFirst({
-            where: { status: "ACTIVE" },
-            orderBy: { currentWorkload: "asc" },
-            select: { id: true },
-          })
-
-          if (municipal && municipal.id) {
-            assignedAdminId = municipal.id
-            assignedAdminRole = "DEPT_MUNICIPAL_ADMIN"
-
-            // increment municipal admin workload (best-effort)
-            try {
-              await (prismaClient as any).departmentMunicipalAdmin.update({
-                where: { id: municipal.id },
-                data: { currentWorkload: { increment: 1 } },
-              })
-            } catch (e) {
-              console.warn("Failed to increment municipal admin workload:", e)
-            }
+          const superMun = await (prismaClient as any).superMunicipalAdmin.findFirst({ where: { status: 'ACTIVE' }, orderBy: { lastUpdated: 'asc' }, select: { id: true } });
+          if (superMun && superMun.id) {
+            assignedAdminId = superMun.id;
+            assignedAdminRole = 'SUPER_MUNICIPAL_ADMIN';
           } else {
-            // fallback: try SuperMunicipalAdmin
-            const superMun = await (prismaClient as any).superMunicipalAdmin.findFirst({
-              where: { status: "ACTIVE" },
-              orderBy: { lastUpdated: "asc" },
-              select: { id: true },
-            })
-            if (superMun && superMun.id) {
-              assignedAdminId = superMun.id
-              assignedAdminRole = "SUPER_MUNICIPAL_ADMIN"
-            } else {
-              // final fallback: pick an Agent
-              const agent = await (prismaClient as any).agent.findFirst({
-                where: { status: "ACTIVE" },
-                orderBy: { currentWorkload: "asc" },
-                select: { id: true },
-              })
-              if (agent && agent.id) {
-                assignedAdminId = agent.id
-                assignedAdminRole = "AGENT"
-              }
+            const agent = await (prismaClient as any).agent.findFirst({ where: { status: 'ACTIVE' }, orderBy: { currentWorkload: 'asc' }, select: { id: true } });
+            if (agent && agent.id) {
+              assignedAdminId = agent.id;
+              assignedAdminRole = 'AGENT';
             }
           }
         }
       }
 
-      const chat = await (prismaClient as any).chats.create({
+      const chat = await (prismaClient as any).chat.create({
         data: {
-          message: message || "",
+          message: message || '',
+          complaintId: complaintId || undefined,
           userId,
-          adminId: assignedAdminId,
-          adminRole: assignedAdminRole || null,
+          agentId: assignedAdminId || undefined,
+          senderType: 'USER' as any,
           imageUrl: imageUrl || null,
         },
       });
@@ -156,24 +154,17 @@ export function chatRouter(db: PrismaClient) {
     }
   });
 
-  // Get chats between authenticated user and a specific admin
+  // Get chats for a specific complaint (authenticated user)
+  // query: ?complaintId=...
   router.get("/list", async (req: Request, res: Response) => {
     try {
       const userId = req.userId as string | undefined;
-      const adminId = (req.query.adminId as string) || undefined;
+      const complaintId = (req.query.complaintId as string) || undefined;
 
-      if (!userId) {
-        return res.status(401).json({ success: false, message: "Not authenticated" });
-      }
+      if (!userId) return res.status(401).json({ success: false, message: 'Not authenticated' });
+      if (!complaintId) return res.status(400).json({ success: false, message: 'complaintId query parameter required' });
 
-      if (!adminId) {
-        return res.status(400).json({ success: false, message: "adminId query parameter required" });
-      }
-
-      const chats = await (prismaClient as any).chats.findMany({
-        where: { userId, adminId },
-        orderBy: { createdAt: "asc" },
-      });
+      const chats = await (prismaClient as any).chat.findMany({ where: { complaintId }, orderBy: { createdAt: 'asc' } });
 
       return res.json({ success: true, data: chats });
     } catch (err) {
@@ -191,19 +182,20 @@ export function chatRouter(db: PrismaClient) {
         return res.status(401).json({ success: false, message: "Not authenticated" });
       }
 
-      const chats = await (prismaClient as any).chats.findMany({
-        where: { userId, adminId: { not: null } },
-        orderBy: { createdAt: "desc" },
-        select: { adminId: true, adminRole: true, message: true, createdAt: true, id: true },
+      const chats = await (prismaClient as any).chat.findMany({
+        where: { userId, agentId: { not: null } },
+        orderBy: { createdAt: 'desc' },
+        select: { agentId: true, message: true, createdAt: true, id: true },
       });
 
       const seen = new Set<string>();
-      const result: Array<{ adminId: string; adminRole?: string | null; lastMessage: string; lastAt: Date; chatId: string }> = [];
+      const result: Array<{ adminId: string; lastMessage: string; lastAt: Date; chatId: string }> = [];
       for (const c of chats) {
-        if (!c.adminId) continue;
-        if (seen.has(c.adminId)) continue;
-        seen.add(c.adminId);
-        result.push({ adminId: c.adminId, adminRole: c.adminRole || null, lastMessage: c.message, lastAt: c.createdAt, chatId: c.id });
+        if (!c.agentId) continue;
+        if (seen.has(c.agentId)) continue;
+        seen.add(c.agentId);
+        // Return shape similar to previous API: adminId holds the agent id
+        result.push({ adminId: c.agentId, lastMessage: c.message, lastAt: c.createdAt, chatId: c.id });
       }
 
       return res.json({ success: true, data: result });

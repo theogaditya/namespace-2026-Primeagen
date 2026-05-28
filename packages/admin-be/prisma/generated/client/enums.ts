@@ -9,6 +9,14 @@
 * 🟢 You can import this file directly.
 */
 
+export const SenderType = {
+  USER: 'USER',
+  AGENT: 'AGENT'
+} as const
+
+export type SenderType = (typeof SenderType)[keyof typeof SenderType]
+
+
 export const userStatus = {
   ACTIVE: 'ACTIVE',
   DELETED: 'DELETED',

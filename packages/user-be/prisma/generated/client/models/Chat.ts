@@ -28,33 +28,36 @@ export type ChatMinAggregateOutputType = {
   id: string | null
   message: string | null
   userId: string | null
-  adminId: string | null
-  adminRole: $Enums.AdminRole | null
   imageUrl: string | null
   createdAt: Date | null
   updatedAt: Date | null
+  agentId: string | null
+  complaintId: string | null
+  senderType: $Enums.SenderType | null
 }
 
 export type ChatMaxAggregateOutputType = {
   id: string | null
   message: string | null
   userId: string | null
-  adminId: string | null
-  adminRole: $Enums.AdminRole | null
   imageUrl: string | null
   createdAt: Date | null
   updatedAt: Date | null
+  agentId: string | null
+  complaintId: string | null
+  senderType: $Enums.SenderType | null
 }
 
 export type ChatCountAggregateOutputType = {
   id: number
   message: number
   userId: number
-  adminId: number
-  adminRole: number
   imageUrl: number
   createdAt: number
   updatedAt: number
+  agentId: number
+  complaintId: number
+  senderType: number
   _all: number
 }
 
@@ -63,33 +66,36 @@ export type ChatMinAggregateInputType = {
   id?: true
   message?: true
   userId?: true
-  adminId?: true
-  adminRole?: true
   imageUrl?: true
   createdAt?: true
   updatedAt?: true
+  agentId?: true
+  complaintId?: true
+  senderType?: true
 }
 
 export type ChatMaxAggregateInputType = {
   id?: true
   message?: true
   userId?: true
-  adminId?: true
-  adminRole?: true
   imageUrl?: true
   createdAt?: true
   updatedAt?: true
+  agentId?: true
+  complaintId?: true
+  senderType?: true
 }
 
 export type ChatCountAggregateInputType = {
   id?: true
   message?: true
   userId?: true
-  adminId?: true
-  adminRole?: true
   imageUrl?: true
   createdAt?: true
   updatedAt?: true
+  agentId?: true
+  complaintId?: true
+  senderType?: true
   _all?: true
 }
 
@@ -168,12 +174,13 @@ export type ChatGroupByArgs<ExtArgs extends runtime.Types.Extensions.InternalArg
 export type ChatGroupByOutputType = {
   id: string
   message: string
-  userId: string
-  adminId: string | null
-  adminRole: $Enums.AdminRole | null
+  userId: string | null
   imageUrl: string | null
   createdAt: Date
   updatedAt: Date
+  agentId: string | null
+  complaintId: string
+  senderType: $Enums.SenderType
   _count: ChatCountAggregateOutputType | null
   _min: ChatMinAggregateOutputType | null
   _max: ChatMaxAggregateOutputType | null
@@ -200,24 +207,30 @@ export type ChatWhereInput = {
   NOT?: Prisma.ChatWhereInput | Prisma.ChatWhereInput[]
   id?: Prisma.StringFilter<"Chat"> | string
   message?: Prisma.StringFilter<"Chat"> | string
-  userId?: Prisma.StringFilter<"Chat"> | string
-  adminId?: Prisma.StringNullableFilter<"Chat"> | string | null
-  adminRole?: Prisma.EnumAdminRoleNullableFilter<"Chat"> | $Enums.AdminRole | null
+  userId?: Prisma.StringNullableFilter<"Chat"> | string | null
   imageUrl?: Prisma.StringNullableFilter<"Chat"> | string | null
   createdAt?: Prisma.DateTimeFilter<"Chat"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Chat"> | Date | string
-  user?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
+  agentId?: Prisma.StringNullableFilter<"Chat"> | string | null
+  complaintId?: Prisma.StringFilter<"Chat"> | string
+  senderType?: Prisma.EnumSenderTypeFilter<"Chat"> | $Enums.SenderType
+  agent?: Prisma.XOR<Prisma.AgentNullableScalarRelationFilter, Prisma.AgentWhereInput> | null
+  complaint?: Prisma.XOR<Prisma.ComplaintScalarRelationFilter, Prisma.ComplaintWhereInput>
+  user?: Prisma.XOR<Prisma.UserNullableScalarRelationFilter, Prisma.UserWhereInput> | null
 }
 
 export type ChatOrderByWithRelationInput = {
   id?: Prisma.SortOrder
   message?: Prisma.SortOrder
-  userId?: Prisma.SortOrder
-  adminId?: Prisma.SortOrderInput | Prisma.SortOrder
-  adminRole?: Prisma.SortOrderInput | Prisma.SortOrder
+  userId?: Prisma.SortOrderInput | Prisma.SortOrder
   imageUrl?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
+  agentId?: Prisma.SortOrderInput | Prisma.SortOrder
+  complaintId?: Prisma.SortOrder
+  senderType?: Prisma.SortOrder
+  agent?: Prisma.AgentOrderByWithRelationInput
+  complaint?: Prisma.ComplaintOrderByWithRelationInput
   user?: Prisma.UserOrderByWithRelationInput
 }
 
@@ -227,24 +240,28 @@ export type ChatWhereUniqueInput = Prisma.AtLeast<{
   OR?: Prisma.ChatWhereInput[]
   NOT?: Prisma.ChatWhereInput | Prisma.ChatWhereInput[]
   message?: Prisma.StringFilter<"Chat"> | string
-  userId?: Prisma.StringFilter<"Chat"> | string
-  adminId?: Prisma.StringNullableFilter<"Chat"> | string | null
-  adminRole?: Prisma.EnumAdminRoleNullableFilter<"Chat"> | $Enums.AdminRole | null
+  userId?: Prisma.StringNullableFilter<"Chat"> | string | null
   imageUrl?: Prisma.StringNullableFilter<"Chat"> | string | null
   createdAt?: Prisma.DateTimeFilter<"Chat"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Chat"> | Date | string
-  user?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
+  agentId?: Prisma.StringNullableFilter<"Chat"> | string | null
+  complaintId?: Prisma.StringFilter<"Chat"> | string
+  senderType?: Prisma.EnumSenderTypeFilter<"Chat"> | $Enums.SenderType
+  agent?: Prisma.XOR<Prisma.AgentNullableScalarRelationFilter, Prisma.AgentWhereInput> | null
+  complaint?: Prisma.XOR<Prisma.ComplaintScalarRelationFilter, Prisma.ComplaintWhereInput>
+  user?: Prisma.XOR<Prisma.UserNullableScalarRelationFilter, Prisma.UserWhereInput> | null
 }, "id">
 
 export type ChatOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
   message?: Prisma.SortOrder
-  userId?: Prisma.SortOrder
-  adminId?: Prisma.SortOrderInput | Prisma.SortOrder
-  adminRole?: Prisma.SortOrderInput | Prisma.SortOrder
+  userId?: Prisma.SortOrderInput | Prisma.SortOrder
   imageUrl?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
+  agentId?: Prisma.SortOrderInput | Prisma.SortOrder
+  complaintId?: Prisma.SortOrder
+  senderType?: Prisma.SortOrder
   _count?: Prisma.ChatCountOrderByAggregateInput
   _max?: Prisma.ChatMaxOrderByAggregateInput
   _min?: Prisma.ChatMinOrderByAggregateInput
@@ -256,88 +273,94 @@ export type ChatScalarWhereWithAggregatesInput = {
   NOT?: Prisma.ChatScalarWhereWithAggregatesInput | Prisma.ChatScalarWhereWithAggregatesInput[]
   id?: Prisma.StringWithAggregatesFilter<"Chat"> | string
   message?: Prisma.StringWithAggregatesFilter<"Chat"> | string
-  userId?: Prisma.StringWithAggregatesFilter<"Chat"> | string
-  adminId?: Prisma.StringNullableWithAggregatesFilter<"Chat"> | string | null
-  adminRole?: Prisma.EnumAdminRoleNullableWithAggregatesFilter<"Chat"> | $Enums.AdminRole | null
+  userId?: Prisma.StringNullableWithAggregatesFilter<"Chat"> | string | null
   imageUrl?: Prisma.StringNullableWithAggregatesFilter<"Chat"> | string | null
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"Chat"> | Date | string
   updatedAt?: Prisma.DateTimeWithAggregatesFilter<"Chat"> | Date | string
+  agentId?: Prisma.StringNullableWithAggregatesFilter<"Chat"> | string | null
+  complaintId?: Prisma.StringWithAggregatesFilter<"Chat"> | string
+  senderType?: Prisma.EnumSenderTypeWithAggregatesFilter<"Chat"> | $Enums.SenderType
 }
 
 export type ChatCreateInput = {
   id?: string
   message: string
-  adminId?: string | null
-  adminRole?: $Enums.AdminRole | null
   imageUrl?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
-  user: Prisma.UserCreateNestedOneWithoutChatsInput
+  senderType: $Enums.SenderType
+  agent?: Prisma.AgentCreateNestedOneWithoutChatsInput
+  complaint: Prisma.ComplaintCreateNestedOneWithoutChatsInput
+  user?: Prisma.UserCreateNestedOneWithoutChatsInput
 }
 
 export type ChatUncheckedCreateInput = {
   id?: string
   message: string
-  userId: string
-  adminId?: string | null
-  adminRole?: $Enums.AdminRole | null
+  userId?: string | null
   imageUrl?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  agentId?: string | null
+  complaintId: string
+  senderType: $Enums.SenderType
 }
 
 export type ChatUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   message?: Prisma.StringFieldUpdateOperationsInput | string
-  adminId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  adminRole?: Prisma.NullableEnumAdminRoleFieldUpdateOperationsInput | $Enums.AdminRole | null
   imageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  user?: Prisma.UserUpdateOneRequiredWithoutChatsNestedInput
+  senderType?: Prisma.EnumSenderTypeFieldUpdateOperationsInput | $Enums.SenderType
+  agent?: Prisma.AgentUpdateOneWithoutChatsNestedInput
+  complaint?: Prisma.ComplaintUpdateOneRequiredWithoutChatsNestedInput
+  user?: Prisma.UserUpdateOneWithoutChatsNestedInput
 }
 
 export type ChatUncheckedUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   message?: Prisma.StringFieldUpdateOperationsInput | string
-  userId?: Prisma.StringFieldUpdateOperationsInput | string
-  adminId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  adminRole?: Prisma.NullableEnumAdminRoleFieldUpdateOperationsInput | $Enums.AdminRole | null
+  userId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   imageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  agentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  complaintId?: Prisma.StringFieldUpdateOperationsInput | string
+  senderType?: Prisma.EnumSenderTypeFieldUpdateOperationsInput | $Enums.SenderType
 }
 
 export type ChatCreateManyInput = {
   id?: string
   message: string
-  userId: string
-  adminId?: string | null
-  adminRole?: $Enums.AdminRole | null
+  userId?: string | null
   imageUrl?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  agentId?: string | null
+  complaintId: string
+  senderType: $Enums.SenderType
 }
 
 export type ChatUpdateManyMutationInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   message?: Prisma.StringFieldUpdateOperationsInput | string
-  adminId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  adminRole?: Prisma.NullableEnumAdminRoleFieldUpdateOperationsInput | $Enums.AdminRole | null
   imageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  senderType?: Prisma.EnumSenderTypeFieldUpdateOperationsInput | $Enums.SenderType
 }
 
 export type ChatUncheckedUpdateManyInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   message?: Prisma.StringFieldUpdateOperationsInput | string
-  userId?: Prisma.StringFieldUpdateOperationsInput | string
-  adminId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  adminRole?: Prisma.NullableEnumAdminRoleFieldUpdateOperationsInput | $Enums.AdminRole | null
+  userId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   imageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  agentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  complaintId?: Prisma.StringFieldUpdateOperationsInput | string
+  senderType?: Prisma.EnumSenderTypeFieldUpdateOperationsInput | $Enums.SenderType
 }
 
 export type ChatListRelationFilter = {
@@ -354,33 +377,36 @@ export type ChatCountOrderByAggregateInput = {
   id?: Prisma.SortOrder
   message?: Prisma.SortOrder
   userId?: Prisma.SortOrder
-  adminId?: Prisma.SortOrder
-  adminRole?: Prisma.SortOrder
   imageUrl?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
+  agentId?: Prisma.SortOrder
+  complaintId?: Prisma.SortOrder
+  senderType?: Prisma.SortOrder
 }
 
 export type ChatMaxOrderByAggregateInput = {
   id?: Prisma.SortOrder
   message?: Prisma.SortOrder
   userId?: Prisma.SortOrder
-  adminId?: Prisma.SortOrder
-  adminRole?: Prisma.SortOrder
   imageUrl?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
+  agentId?: Prisma.SortOrder
+  complaintId?: Prisma.SortOrder
+  senderType?: Prisma.SortOrder
 }
 
 export type ChatMinOrderByAggregateInput = {
   id?: Prisma.SortOrder
   message?: Prisma.SortOrder
   userId?: Prisma.SortOrder
-  adminId?: Prisma.SortOrder
-  adminRole?: Prisma.SortOrder
   imageUrl?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
+  agentId?: Prisma.SortOrder
+  complaintId?: Prisma.SortOrder
+  senderType?: Prisma.SortOrder
 }
 
 export type ChatCreateNestedManyWithoutUserInput = {
@@ -425,28 +451,114 @@ export type ChatUncheckedUpdateManyWithoutUserNestedInput = {
   deleteMany?: Prisma.ChatScalarWhereInput | Prisma.ChatScalarWhereInput[]
 }
 
-export type NullableEnumAdminRoleFieldUpdateOperationsInput = {
-  set?: $Enums.AdminRole | null
+export type ChatCreateNestedManyWithoutAgentInput = {
+  create?: Prisma.XOR<Prisma.ChatCreateWithoutAgentInput, Prisma.ChatUncheckedCreateWithoutAgentInput> | Prisma.ChatCreateWithoutAgentInput[] | Prisma.ChatUncheckedCreateWithoutAgentInput[]
+  connectOrCreate?: Prisma.ChatCreateOrConnectWithoutAgentInput | Prisma.ChatCreateOrConnectWithoutAgentInput[]
+  createMany?: Prisma.ChatCreateManyAgentInputEnvelope
+  connect?: Prisma.ChatWhereUniqueInput | Prisma.ChatWhereUniqueInput[]
+}
+
+export type ChatUncheckedCreateNestedManyWithoutAgentInput = {
+  create?: Prisma.XOR<Prisma.ChatCreateWithoutAgentInput, Prisma.ChatUncheckedCreateWithoutAgentInput> | Prisma.ChatCreateWithoutAgentInput[] | Prisma.ChatUncheckedCreateWithoutAgentInput[]
+  connectOrCreate?: Prisma.ChatCreateOrConnectWithoutAgentInput | Prisma.ChatCreateOrConnectWithoutAgentInput[]
+  createMany?: Prisma.ChatCreateManyAgentInputEnvelope
+  connect?: Prisma.ChatWhereUniqueInput | Prisma.ChatWhereUniqueInput[]
+}
+
+export type ChatUpdateManyWithoutAgentNestedInput = {
+  create?: Prisma.XOR<Prisma.ChatCreateWithoutAgentInput, Prisma.ChatUncheckedCreateWithoutAgentInput> | Prisma.ChatCreateWithoutAgentInput[] | Prisma.ChatUncheckedCreateWithoutAgentInput[]
+  connectOrCreate?: Prisma.ChatCreateOrConnectWithoutAgentInput | Prisma.ChatCreateOrConnectWithoutAgentInput[]
+  upsert?: Prisma.ChatUpsertWithWhereUniqueWithoutAgentInput | Prisma.ChatUpsertWithWhereUniqueWithoutAgentInput[]
+  createMany?: Prisma.ChatCreateManyAgentInputEnvelope
+  set?: Prisma.ChatWhereUniqueInput | Prisma.ChatWhereUniqueInput[]
+  disconnect?: Prisma.ChatWhereUniqueInput | Prisma.ChatWhereUniqueInput[]
+  delete?: Prisma.ChatWhereUniqueInput | Prisma.ChatWhereUniqueInput[]
+  connect?: Prisma.ChatWhereUniqueInput | Prisma.ChatWhereUniqueInput[]
+  update?: Prisma.ChatUpdateWithWhereUniqueWithoutAgentInput | Prisma.ChatUpdateWithWhereUniqueWithoutAgentInput[]
+  updateMany?: Prisma.ChatUpdateManyWithWhereWithoutAgentInput | Prisma.ChatUpdateManyWithWhereWithoutAgentInput[]
+  deleteMany?: Prisma.ChatScalarWhereInput | Prisma.ChatScalarWhereInput[]
+}
+
+export type ChatUncheckedUpdateManyWithoutAgentNestedInput = {
+  create?: Prisma.XOR<Prisma.ChatCreateWithoutAgentInput, Prisma.ChatUncheckedCreateWithoutAgentInput> | Prisma.ChatCreateWithoutAgentInput[] | Prisma.ChatUncheckedCreateWithoutAgentInput[]
+  connectOrCreate?: Prisma.ChatCreateOrConnectWithoutAgentInput | Prisma.ChatCreateOrConnectWithoutAgentInput[]
+  upsert?: Prisma.ChatUpsertWithWhereUniqueWithoutAgentInput | Prisma.ChatUpsertWithWhereUniqueWithoutAgentInput[]
+  createMany?: Prisma.ChatCreateManyAgentInputEnvelope
+  set?: Prisma.ChatWhereUniqueInput | Prisma.ChatWhereUniqueInput[]
+  disconnect?: Prisma.ChatWhereUniqueInput | Prisma.ChatWhereUniqueInput[]
+  delete?: Prisma.ChatWhereUniqueInput | Prisma.ChatWhereUniqueInput[]
+  connect?: Prisma.ChatWhereUniqueInput | Prisma.ChatWhereUniqueInput[]
+  update?: Prisma.ChatUpdateWithWhereUniqueWithoutAgentInput | Prisma.ChatUpdateWithWhereUniqueWithoutAgentInput[]
+  updateMany?: Prisma.ChatUpdateManyWithWhereWithoutAgentInput | Prisma.ChatUpdateManyWithWhereWithoutAgentInput[]
+  deleteMany?: Prisma.ChatScalarWhereInput | Prisma.ChatScalarWhereInput[]
+}
+
+export type ChatCreateNestedManyWithoutComplaintInput = {
+  create?: Prisma.XOR<Prisma.ChatCreateWithoutComplaintInput, Prisma.ChatUncheckedCreateWithoutComplaintInput> | Prisma.ChatCreateWithoutComplaintInput[] | Prisma.ChatUncheckedCreateWithoutComplaintInput[]
+  connectOrCreate?: Prisma.ChatCreateOrConnectWithoutComplaintInput | Prisma.ChatCreateOrConnectWithoutComplaintInput[]
+  createMany?: Prisma.ChatCreateManyComplaintInputEnvelope
+  connect?: Prisma.ChatWhereUniqueInput | Prisma.ChatWhereUniqueInput[]
+}
+
+export type ChatUncheckedCreateNestedManyWithoutComplaintInput = {
+  create?: Prisma.XOR<Prisma.ChatCreateWithoutComplaintInput, Prisma.ChatUncheckedCreateWithoutComplaintInput> | Prisma.ChatCreateWithoutComplaintInput[] | Prisma.ChatUncheckedCreateWithoutComplaintInput[]
+  connectOrCreate?: Prisma.ChatCreateOrConnectWithoutComplaintInput | Prisma.ChatCreateOrConnectWithoutComplaintInput[]
+  createMany?: Prisma.ChatCreateManyComplaintInputEnvelope
+  connect?: Prisma.ChatWhereUniqueInput | Prisma.ChatWhereUniqueInput[]
+}
+
+export type ChatUpdateManyWithoutComplaintNestedInput = {
+  create?: Prisma.XOR<Prisma.ChatCreateWithoutComplaintInput, Prisma.ChatUncheckedCreateWithoutComplaintInput> | Prisma.ChatCreateWithoutComplaintInput[] | Prisma.ChatUncheckedCreateWithoutComplaintInput[]
+  connectOrCreate?: Prisma.ChatCreateOrConnectWithoutComplaintInput | Prisma.ChatCreateOrConnectWithoutComplaintInput[]
+  upsert?: Prisma.ChatUpsertWithWhereUniqueWithoutComplaintInput | Prisma.ChatUpsertWithWhereUniqueWithoutComplaintInput[]
+  createMany?: Prisma.ChatCreateManyComplaintInputEnvelope
+  set?: Prisma.ChatWhereUniqueInput | Prisma.ChatWhereUniqueInput[]
+  disconnect?: Prisma.ChatWhereUniqueInput | Prisma.ChatWhereUniqueInput[]
+  delete?: Prisma.ChatWhereUniqueInput | Prisma.ChatWhereUniqueInput[]
+  connect?: Prisma.ChatWhereUniqueInput | Prisma.ChatWhereUniqueInput[]
+  update?: Prisma.ChatUpdateWithWhereUniqueWithoutComplaintInput | Prisma.ChatUpdateWithWhereUniqueWithoutComplaintInput[]
+  updateMany?: Prisma.ChatUpdateManyWithWhereWithoutComplaintInput | Prisma.ChatUpdateManyWithWhereWithoutComplaintInput[]
+  deleteMany?: Prisma.ChatScalarWhereInput | Prisma.ChatScalarWhereInput[]
+}
+
+export type ChatUncheckedUpdateManyWithoutComplaintNestedInput = {
+  create?: Prisma.XOR<Prisma.ChatCreateWithoutComplaintInput, Prisma.ChatUncheckedCreateWithoutComplaintInput> | Prisma.ChatCreateWithoutComplaintInput[] | Prisma.ChatUncheckedCreateWithoutComplaintInput[]
+  connectOrCreate?: Prisma.ChatCreateOrConnectWithoutComplaintInput | Prisma.ChatCreateOrConnectWithoutComplaintInput[]
+  upsert?: Prisma.ChatUpsertWithWhereUniqueWithoutComplaintInput | Prisma.ChatUpsertWithWhereUniqueWithoutComplaintInput[]
+  createMany?: Prisma.ChatCreateManyComplaintInputEnvelope
+  set?: Prisma.ChatWhereUniqueInput | Prisma.ChatWhereUniqueInput[]
+  disconnect?: Prisma.ChatWhereUniqueInput | Prisma.ChatWhereUniqueInput[]
+  delete?: Prisma.ChatWhereUniqueInput | Prisma.ChatWhereUniqueInput[]
+  connect?: Prisma.ChatWhereUniqueInput | Prisma.ChatWhereUniqueInput[]
+  update?: Prisma.ChatUpdateWithWhereUniqueWithoutComplaintInput | Prisma.ChatUpdateWithWhereUniqueWithoutComplaintInput[]
+  updateMany?: Prisma.ChatUpdateManyWithWhereWithoutComplaintInput | Prisma.ChatUpdateManyWithWhereWithoutComplaintInput[]
+  deleteMany?: Prisma.ChatScalarWhereInput | Prisma.ChatScalarWhereInput[]
+}
+
+export type EnumSenderTypeFieldUpdateOperationsInput = {
+  set?: $Enums.SenderType
 }
 
 export type ChatCreateWithoutUserInput = {
   id?: string
   message: string
-  adminId?: string | null
-  adminRole?: $Enums.AdminRole | null
   imageUrl?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  senderType: $Enums.SenderType
+  agent?: Prisma.AgentCreateNestedOneWithoutChatsInput
+  complaint: Prisma.ComplaintCreateNestedOneWithoutChatsInput
 }
 
 export type ChatUncheckedCreateWithoutUserInput = {
   id?: string
   message: string
-  adminId?: string | null
-  adminRole?: $Enums.AdminRole | null
   imageUrl?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  agentId?: string | null
+  complaintId: string
+  senderType: $Enums.SenderType
 }
 
 export type ChatCreateOrConnectWithoutUserInput = {
@@ -481,52 +593,241 @@ export type ChatScalarWhereInput = {
   NOT?: Prisma.ChatScalarWhereInput | Prisma.ChatScalarWhereInput[]
   id?: Prisma.StringFilter<"Chat"> | string
   message?: Prisma.StringFilter<"Chat"> | string
-  userId?: Prisma.StringFilter<"Chat"> | string
-  adminId?: Prisma.StringNullableFilter<"Chat"> | string | null
-  adminRole?: Prisma.EnumAdminRoleNullableFilter<"Chat"> | $Enums.AdminRole | null
+  userId?: Prisma.StringNullableFilter<"Chat"> | string | null
   imageUrl?: Prisma.StringNullableFilter<"Chat"> | string | null
   createdAt?: Prisma.DateTimeFilter<"Chat"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Chat"> | Date | string
+  agentId?: Prisma.StringNullableFilter<"Chat"> | string | null
+  complaintId?: Prisma.StringFilter<"Chat"> | string
+  senderType?: Prisma.EnumSenderTypeFilter<"Chat"> | $Enums.SenderType
+}
+
+export type ChatCreateWithoutAgentInput = {
+  id?: string
+  message: string
+  imageUrl?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  senderType: $Enums.SenderType
+  complaint: Prisma.ComplaintCreateNestedOneWithoutChatsInput
+  user?: Prisma.UserCreateNestedOneWithoutChatsInput
+}
+
+export type ChatUncheckedCreateWithoutAgentInput = {
+  id?: string
+  message: string
+  userId?: string | null
+  imageUrl?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  complaintId: string
+  senderType: $Enums.SenderType
+}
+
+export type ChatCreateOrConnectWithoutAgentInput = {
+  where: Prisma.ChatWhereUniqueInput
+  create: Prisma.XOR<Prisma.ChatCreateWithoutAgentInput, Prisma.ChatUncheckedCreateWithoutAgentInput>
+}
+
+export type ChatCreateManyAgentInputEnvelope = {
+  data: Prisma.ChatCreateManyAgentInput | Prisma.ChatCreateManyAgentInput[]
+  skipDuplicates?: boolean
+}
+
+export type ChatUpsertWithWhereUniqueWithoutAgentInput = {
+  where: Prisma.ChatWhereUniqueInput
+  update: Prisma.XOR<Prisma.ChatUpdateWithoutAgentInput, Prisma.ChatUncheckedUpdateWithoutAgentInput>
+  create: Prisma.XOR<Prisma.ChatCreateWithoutAgentInput, Prisma.ChatUncheckedCreateWithoutAgentInput>
+}
+
+export type ChatUpdateWithWhereUniqueWithoutAgentInput = {
+  where: Prisma.ChatWhereUniqueInput
+  data: Prisma.XOR<Prisma.ChatUpdateWithoutAgentInput, Prisma.ChatUncheckedUpdateWithoutAgentInput>
+}
+
+export type ChatUpdateManyWithWhereWithoutAgentInput = {
+  where: Prisma.ChatScalarWhereInput
+  data: Prisma.XOR<Prisma.ChatUpdateManyMutationInput, Prisma.ChatUncheckedUpdateManyWithoutAgentInput>
+}
+
+export type ChatCreateWithoutComplaintInput = {
+  id?: string
+  message: string
+  imageUrl?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  senderType: $Enums.SenderType
+  agent?: Prisma.AgentCreateNestedOneWithoutChatsInput
+  user?: Prisma.UserCreateNestedOneWithoutChatsInput
+}
+
+export type ChatUncheckedCreateWithoutComplaintInput = {
+  id?: string
+  message: string
+  userId?: string | null
+  imageUrl?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  agentId?: string | null
+  senderType: $Enums.SenderType
+}
+
+export type ChatCreateOrConnectWithoutComplaintInput = {
+  where: Prisma.ChatWhereUniqueInput
+  create: Prisma.XOR<Prisma.ChatCreateWithoutComplaintInput, Prisma.ChatUncheckedCreateWithoutComplaintInput>
+}
+
+export type ChatCreateManyComplaintInputEnvelope = {
+  data: Prisma.ChatCreateManyComplaintInput | Prisma.ChatCreateManyComplaintInput[]
+  skipDuplicates?: boolean
+}
+
+export type ChatUpsertWithWhereUniqueWithoutComplaintInput = {
+  where: Prisma.ChatWhereUniqueInput
+  update: Prisma.XOR<Prisma.ChatUpdateWithoutComplaintInput, Prisma.ChatUncheckedUpdateWithoutComplaintInput>
+  create: Prisma.XOR<Prisma.ChatCreateWithoutComplaintInput, Prisma.ChatUncheckedCreateWithoutComplaintInput>
+}
+
+export type ChatUpdateWithWhereUniqueWithoutComplaintInput = {
+  where: Prisma.ChatWhereUniqueInput
+  data: Prisma.XOR<Prisma.ChatUpdateWithoutComplaintInput, Prisma.ChatUncheckedUpdateWithoutComplaintInput>
+}
+
+export type ChatUpdateManyWithWhereWithoutComplaintInput = {
+  where: Prisma.ChatScalarWhereInput
+  data: Prisma.XOR<Prisma.ChatUpdateManyMutationInput, Prisma.ChatUncheckedUpdateManyWithoutComplaintInput>
 }
 
 export type ChatCreateManyUserInput = {
   id?: string
   message: string
-  adminId?: string | null
-  adminRole?: $Enums.AdminRole | null
   imageUrl?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  agentId?: string | null
+  complaintId: string
+  senderType: $Enums.SenderType
 }
 
 export type ChatUpdateWithoutUserInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   message?: Prisma.StringFieldUpdateOperationsInput | string
-  adminId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  adminRole?: Prisma.NullableEnumAdminRoleFieldUpdateOperationsInput | $Enums.AdminRole | null
   imageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  senderType?: Prisma.EnumSenderTypeFieldUpdateOperationsInput | $Enums.SenderType
+  agent?: Prisma.AgentUpdateOneWithoutChatsNestedInput
+  complaint?: Prisma.ComplaintUpdateOneRequiredWithoutChatsNestedInput
 }
 
 export type ChatUncheckedUpdateWithoutUserInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   message?: Prisma.StringFieldUpdateOperationsInput | string
-  adminId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  adminRole?: Prisma.NullableEnumAdminRoleFieldUpdateOperationsInput | $Enums.AdminRole | null
   imageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  agentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  complaintId?: Prisma.StringFieldUpdateOperationsInput | string
+  senderType?: Prisma.EnumSenderTypeFieldUpdateOperationsInput | $Enums.SenderType
 }
 
 export type ChatUncheckedUpdateManyWithoutUserInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   message?: Prisma.StringFieldUpdateOperationsInput | string
-  adminId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  adminRole?: Prisma.NullableEnumAdminRoleFieldUpdateOperationsInput | $Enums.AdminRole | null
   imageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  agentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  complaintId?: Prisma.StringFieldUpdateOperationsInput | string
+  senderType?: Prisma.EnumSenderTypeFieldUpdateOperationsInput | $Enums.SenderType
+}
+
+export type ChatCreateManyAgentInput = {
+  id?: string
+  message: string
+  userId?: string | null
+  imageUrl?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  complaintId: string
+  senderType: $Enums.SenderType
+}
+
+export type ChatUpdateWithoutAgentInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  message?: Prisma.StringFieldUpdateOperationsInput | string
+  imageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  senderType?: Prisma.EnumSenderTypeFieldUpdateOperationsInput | $Enums.SenderType
+  complaint?: Prisma.ComplaintUpdateOneRequiredWithoutChatsNestedInput
+  user?: Prisma.UserUpdateOneWithoutChatsNestedInput
+}
+
+export type ChatUncheckedUpdateWithoutAgentInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  message?: Prisma.StringFieldUpdateOperationsInput | string
+  userId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  imageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  complaintId?: Prisma.StringFieldUpdateOperationsInput | string
+  senderType?: Prisma.EnumSenderTypeFieldUpdateOperationsInput | $Enums.SenderType
+}
+
+export type ChatUncheckedUpdateManyWithoutAgentInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  message?: Prisma.StringFieldUpdateOperationsInput | string
+  userId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  imageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  complaintId?: Prisma.StringFieldUpdateOperationsInput | string
+  senderType?: Prisma.EnumSenderTypeFieldUpdateOperationsInput | $Enums.SenderType
+}
+
+export type ChatCreateManyComplaintInput = {
+  id?: string
+  message: string
+  userId?: string | null
+  imageUrl?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  agentId?: string | null
+  senderType: $Enums.SenderType
+}
+
+export type ChatUpdateWithoutComplaintInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  message?: Prisma.StringFieldUpdateOperationsInput | string
+  imageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  senderType?: Prisma.EnumSenderTypeFieldUpdateOperationsInput | $Enums.SenderType
+  agent?: Prisma.AgentUpdateOneWithoutChatsNestedInput
+  user?: Prisma.UserUpdateOneWithoutChatsNestedInput
+}
+
+export type ChatUncheckedUpdateWithoutComplaintInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  message?: Prisma.StringFieldUpdateOperationsInput | string
+  userId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  imageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  agentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  senderType?: Prisma.EnumSenderTypeFieldUpdateOperationsInput | $Enums.SenderType
+}
+
+export type ChatUncheckedUpdateManyWithoutComplaintInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  message?: Prisma.StringFieldUpdateOperationsInput | string
+  userId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  imageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  agentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  senderType?: Prisma.EnumSenderTypeFieldUpdateOperationsInput | $Enums.SenderType
 }
 
 
@@ -535,74 +836,93 @@ export type ChatSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
   id?: boolean
   message?: boolean
   userId?: boolean
-  adminId?: boolean
-  adminRole?: boolean
   imageUrl?: boolean
   createdAt?: boolean
   updatedAt?: boolean
-  user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
+  agentId?: boolean
+  complaintId?: boolean
+  senderType?: boolean
+  agent?: boolean | Prisma.Chat$agentArgs<ExtArgs>
+  complaint?: boolean | Prisma.ComplaintDefaultArgs<ExtArgs>
+  user?: boolean | Prisma.Chat$userArgs<ExtArgs>
 }, ExtArgs["result"]["chat"]>
 
 export type ChatSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
   message?: boolean
   userId?: boolean
-  adminId?: boolean
-  adminRole?: boolean
   imageUrl?: boolean
   createdAt?: boolean
   updatedAt?: boolean
-  user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
+  agentId?: boolean
+  complaintId?: boolean
+  senderType?: boolean
+  agent?: boolean | Prisma.Chat$agentArgs<ExtArgs>
+  complaint?: boolean | Prisma.ComplaintDefaultArgs<ExtArgs>
+  user?: boolean | Prisma.Chat$userArgs<ExtArgs>
 }, ExtArgs["result"]["chat"]>
 
 export type ChatSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
   message?: boolean
   userId?: boolean
-  adminId?: boolean
-  adminRole?: boolean
   imageUrl?: boolean
   createdAt?: boolean
   updatedAt?: boolean
-  user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
+  agentId?: boolean
+  complaintId?: boolean
+  senderType?: boolean
+  agent?: boolean | Prisma.Chat$agentArgs<ExtArgs>
+  complaint?: boolean | Prisma.ComplaintDefaultArgs<ExtArgs>
+  user?: boolean | Prisma.Chat$userArgs<ExtArgs>
 }, ExtArgs["result"]["chat"]>
 
 export type ChatSelectScalar = {
   id?: boolean
   message?: boolean
   userId?: boolean
-  adminId?: boolean
-  adminRole?: boolean
   imageUrl?: boolean
   createdAt?: boolean
   updatedAt?: boolean
+  agentId?: boolean
+  complaintId?: boolean
+  senderType?: boolean
 }
 
-export type ChatOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "message" | "userId" | "adminId" | "adminRole" | "imageUrl" | "createdAt" | "updatedAt", ExtArgs["result"]["chat"]>
+export type ChatOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "message" | "userId" | "imageUrl" | "createdAt" | "updatedAt" | "agentId" | "complaintId" | "senderType", ExtArgs["result"]["chat"]>
 export type ChatInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
+  agent?: boolean | Prisma.Chat$agentArgs<ExtArgs>
+  complaint?: boolean | Prisma.ComplaintDefaultArgs<ExtArgs>
+  user?: boolean | Prisma.Chat$userArgs<ExtArgs>
 }
 export type ChatIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
+  agent?: boolean | Prisma.Chat$agentArgs<ExtArgs>
+  complaint?: boolean | Prisma.ComplaintDefaultArgs<ExtArgs>
+  user?: boolean | Prisma.Chat$userArgs<ExtArgs>
 }
 export type ChatIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
+  agent?: boolean | Prisma.Chat$agentArgs<ExtArgs>
+  complaint?: boolean | Prisma.ComplaintDefaultArgs<ExtArgs>
+  user?: boolean | Prisma.Chat$userArgs<ExtArgs>
 }
 
 export type $ChatPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   name: "Chat"
   objects: {
-    user: Prisma.$UserPayload<ExtArgs>
+    agent: Prisma.$AgentPayload<ExtArgs> | null
+    complaint: Prisma.$ComplaintPayload<ExtArgs>
+    user: Prisma.$UserPayload<ExtArgs> | null
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
     message: string
-    userId: string
-    adminId: string | null
-    adminRole: $Enums.AdminRole | null
+    userId: string | null
     imageUrl: string | null
     createdAt: Date
     updatedAt: Date
+    agentId: string | null
+    complaintId: string
+    senderType: $Enums.SenderType
   }, ExtArgs["result"]["chat"]>
   composites: {}
 }
@@ -997,7 +1317,9 @@ readonly fields: ChatFieldRefs;
  */
 export interface Prisma__ChatClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
-  user<T extends Prisma.UserDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.UserDefaultArgs<ExtArgs>>): Prisma.Prisma__UserClient<runtime.Types.Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+  agent<T extends Prisma.Chat$agentArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Chat$agentArgs<ExtArgs>>): Prisma.Prisma__AgentClient<runtime.Types.Result.GetResult<Prisma.$AgentPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+  complaint<T extends Prisma.ComplaintDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.ComplaintDefaultArgs<ExtArgs>>): Prisma.Prisma__ComplaintClient<runtime.Types.Result.GetResult<Prisma.$ComplaintPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+  user<T extends Prisma.Chat$userArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Chat$userArgs<ExtArgs>>): Prisma.Prisma__UserClient<runtime.Types.Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -1030,11 +1352,12 @@ export interface ChatFieldRefs {
   readonly id: Prisma.FieldRef<"Chat", 'String'>
   readonly message: Prisma.FieldRef<"Chat", 'String'>
   readonly userId: Prisma.FieldRef<"Chat", 'String'>
-  readonly adminId: Prisma.FieldRef<"Chat", 'String'>
-  readonly adminRole: Prisma.FieldRef<"Chat", 'AdminRole'>
   readonly imageUrl: Prisma.FieldRef<"Chat", 'String'>
   readonly createdAt: Prisma.FieldRef<"Chat", 'DateTime'>
   readonly updatedAt: Prisma.FieldRef<"Chat", 'DateTime'>
+  readonly agentId: Prisma.FieldRef<"Chat", 'String'>
+  readonly complaintId: Prisma.FieldRef<"Chat", 'String'>
+  readonly senderType: Prisma.FieldRef<"Chat", 'SenderType'>
 }
     
 
@@ -1428,6 +1751,44 @@ export type ChatDeleteManyArgs<ExtArgs extends runtime.Types.Extensions.Internal
    * Limit how many Chats to delete.
    */
   limit?: number
+}
+
+/**
+ * Chat.agent
+ */
+export type Chat$agentArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the Agent
+   */
+  select?: Prisma.AgentSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the Agent
+   */
+  omit?: Prisma.AgentOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.AgentInclude<ExtArgs> | null
+  where?: Prisma.AgentWhereInput
+}
+
+/**
+ * Chat.user
+ */
+export type Chat$userArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the User
+   */
+  select?: Prisma.UserSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the User
+   */
+  omit?: Prisma.UserOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.UserInclude<ExtArgs> | null
+  where?: Prisma.UserWhereInput
 }
 
 /**

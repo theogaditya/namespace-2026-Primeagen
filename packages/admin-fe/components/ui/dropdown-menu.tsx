@@ -35,10 +35,11 @@ const DropdownMenuTrigger = React.forwardRef<
   }
 
   if (asChild && React.isValidElement(children)) {
+    // Ensure our internal click handler is used (do not allow props.onClick to override it)
     return React.cloneElement(children as React.ReactElement<any>, {
       ref,
-      onClick: handleClick,
       ...props,
+      onClick: handleClick,
     })
   }
 
@@ -46,8 +47,9 @@ const DropdownMenuTrigger = React.forwardRef<
     <button
       ref={ref}
       className={cn("inline-flex items-center justify-center", className)}
-      onClick={handleClick}
       {...props}
+      // Spread props first so our handler is the final onClick and cannot be overridden
+      onClick={handleClick}
     >
       {children}
     </button>
@@ -104,8 +106,18 @@ DropdownMenuContent.displayName = "DropdownMenuContent"
 const DropdownMenuItem = React.forwardRef<
   HTMLDivElement,
   React.HTMLAttributes<HTMLDivElement> & { inset?: boolean }
->(({ className, inset, ...props }, ref) => {
+>(({ className, inset, onClick, ...props }, ref) => {
   const { setOpen } = React.useContext(DropdownMenuContext)
+
+  const handleClick = (e: React.MouseEvent<HTMLDivElement>) => {
+    // Prevent the click from bubbling up to parent elements (like the complaint row)
+    e.stopPropagation()
+    try {
+      onClick?.(e as any)
+    } finally {
+      setOpen(false)
+    }
+  }
 
   return (
     <div
@@ -115,7 +127,7 @@ const DropdownMenuItem = React.forwardRef<
         inset && "pl-8",
         className
       )}
-      onClick={() => setOpen(false)}
+      onClick={handleClick}
       {...props}
     />
   )
