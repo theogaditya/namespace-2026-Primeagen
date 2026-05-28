@@ -93,12 +93,17 @@ export type AuditLog = Prisma.AuditLogModel
  */
 export type RegionalWorkflow = Prisma.RegionalWorkflowModel
 /**
- * Model OpratingStates
+ * Model Chat
  * 
  */
-export type OpratingStates = Prisma.OpratingStatesModel
+export type Chat = Prisma.ChatModel
 /**
- * Model OpratingDistricts
+ * Model operating_states
  * 
  */
-export type OpratingDistricts = Prisma.OpratingDistrictsModel
+export type operating_states = Prisma.operating_statesModel
+/**
+ * Model operating_districts
+ * 
+ */
+export type operating_districts = Prisma.operating_districtsModel

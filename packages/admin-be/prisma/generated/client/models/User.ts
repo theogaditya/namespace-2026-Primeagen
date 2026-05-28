@@ -249,6 +249,7 @@ export type UserWhereInput = {
   complaints?: Prisma.ComplaintListRelationFilter
   auditLogsCreated?: Prisma.AuditLogListRelationFilter
   upvotes?: Prisma.UpvoteListRelationFilter
+  chats?: Prisma.ChatListRelationFilter
   location?: Prisma.XOR<Prisma.UserLocationNullableScalarRelationFilter, Prisma.UserLocationWhereInput> | null
 }
 
@@ -269,6 +270,7 @@ export type UserOrderByWithRelationInput = {
   complaints?: Prisma.ComplaintOrderByRelationAggregateInput
   auditLogsCreated?: Prisma.AuditLogOrderByRelationAggregateInput
   upvotes?: Prisma.UpvoteOrderByRelationAggregateInput
+  chats?: Prisma.ChatOrderByRelationAggregateInput
   location?: Prisma.UserLocationOrderByWithRelationInput
 }
 
@@ -292,6 +294,7 @@ export type UserWhereUniqueInput = Prisma.AtLeast<{
   complaints?: Prisma.ComplaintListRelationFilter
   auditLogsCreated?: Prisma.AuditLogListRelationFilter
   upvotes?: Prisma.UpvoteListRelationFilter
+  chats?: Prisma.ChatListRelationFilter
   location?: Prisma.XOR<Prisma.UserLocationNullableScalarRelationFilter, Prisma.UserLocationWhereInput> | null
 }, "id" | "email" | "phoneNumber">
 
@@ -350,6 +353,7 @@ export type UserCreateInput = {
   complaints?: Prisma.ComplaintCreateNestedManyWithoutUserInput
   auditLogsCreated?: Prisma.AuditLogCreateNestedManyWithoutUserInput
   upvotes?: Prisma.UpvoteCreateNestedManyWithoutUserInput
+  chats?: Prisma.ChatCreateNestedManyWithoutUserInput
   location?: Prisma.UserLocationCreateNestedOneWithoutUserInput
 }
 
@@ -370,6 +374,7 @@ export type UserUncheckedCreateInput = {
   complaints?: Prisma.ComplaintUncheckedCreateNestedManyWithoutUserInput
   auditLogsCreated?: Prisma.AuditLogUncheckedCreateNestedManyWithoutUserInput
   upvotes?: Prisma.UpvoteUncheckedCreateNestedManyWithoutUserInput
+  chats?: Prisma.ChatUncheckedCreateNestedManyWithoutUserInput
   location?: Prisma.UserLocationUncheckedCreateNestedOneWithoutUserInput
 }
 
@@ -390,6 +395,7 @@ export type UserUpdateInput = {
   complaints?: Prisma.ComplaintUpdateManyWithoutUserNestedInput
   auditLogsCreated?: Prisma.AuditLogUpdateManyWithoutUserNestedInput
   upvotes?: Prisma.UpvoteUpdateManyWithoutUserNestedInput
+  chats?: Prisma.ChatUpdateManyWithoutUserNestedInput
   location?: Prisma.UserLocationUpdateOneWithoutUserNestedInput
 }
 
@@ -410,6 +416,7 @@ export type UserUncheckedUpdateInput = {
   complaints?: Prisma.ComplaintUncheckedUpdateManyWithoutUserNestedInput
   auditLogsCreated?: Prisma.AuditLogUncheckedUpdateManyWithoutUserNestedInput
   upvotes?: Prisma.UpvoteUncheckedUpdateManyWithoutUserNestedInput
+  chats?: Prisma.ChatUncheckedUpdateManyWithoutUserNestedInput
   location?: Prisma.UserLocationUncheckedUpdateOneWithoutUserNestedInput
 }
 
@@ -597,6 +604,20 @@ export type UserUpdateOneRequiredWithoutAuditLogsCreatedNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutAuditLogsCreatedInput, Prisma.UserUpdateWithoutAuditLogsCreatedInput>, Prisma.UserUncheckedUpdateWithoutAuditLogsCreatedInput>
 }
 
+export type UserCreateNestedOneWithoutChatsInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutChatsInput, Prisma.UserUncheckedCreateWithoutChatsInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutChatsInput
+  connect?: Prisma.UserWhereUniqueInput
+}
+
+export type UserUpdateOneRequiredWithoutChatsNestedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutChatsInput, Prisma.UserUncheckedCreateWithoutChatsInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutChatsInput
+  upsert?: Prisma.UserUpsertWithoutChatsInput
+  connect?: Prisma.UserWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutChatsInput, Prisma.UserUpdateWithoutChatsInput>, Prisma.UserUncheckedUpdateWithoutChatsInput>
+}
+
 export type UserCreateWithoutLocationInput = {
   id?: string
   email: string
@@ -614,6 +635,7 @@ export type UserCreateWithoutLocationInput = {
   complaints?: Prisma.ComplaintCreateNestedManyWithoutUserInput
   auditLogsCreated?: Prisma.AuditLogCreateNestedManyWithoutUserInput
   upvotes?: Prisma.UpvoteCreateNestedManyWithoutUserInput
+  chats?: Prisma.ChatCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutLocationInput = {
@@ -633,6 +655,7 @@ export type UserUncheckedCreateWithoutLocationInput = {
   complaints?: Prisma.ComplaintUncheckedCreateNestedManyWithoutUserInput
   auditLogsCreated?: Prisma.AuditLogUncheckedCreateNestedManyWithoutUserInput
   upvotes?: Prisma.UpvoteUncheckedCreateNestedManyWithoutUserInput
+  chats?: Prisma.ChatUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutLocationInput = {
@@ -668,6 +691,7 @@ export type UserUpdateWithoutLocationInput = {
   complaints?: Prisma.ComplaintUpdateManyWithoutUserNestedInput
   auditLogsCreated?: Prisma.AuditLogUpdateManyWithoutUserNestedInput
   upvotes?: Prisma.UpvoteUpdateManyWithoutUserNestedInput
+  chats?: Prisma.ChatUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutLocationInput = {
@@ -687,6 +711,7 @@ export type UserUncheckedUpdateWithoutLocationInput = {
   complaints?: Prisma.ComplaintUncheckedUpdateManyWithoutUserNestedInput
   auditLogsCreated?: Prisma.AuditLogUncheckedUpdateManyWithoutUserNestedInput
   upvotes?: Prisma.UpvoteUncheckedUpdateManyWithoutUserNestedInput
+  chats?: Prisma.ChatUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutComplaintsInput = {
@@ -705,6 +730,7 @@ export type UserCreateWithoutComplaintsInput = {
   status?: $Enums.userStatus
   auditLogsCreated?: Prisma.AuditLogCreateNestedManyWithoutUserInput
   upvotes?: Prisma.UpvoteCreateNestedManyWithoutUserInput
+  chats?: Prisma.ChatCreateNestedManyWithoutUserInput
   location?: Prisma.UserLocationCreateNestedOneWithoutUserInput
 }
 
@@ -724,6 +750,7 @@ export type UserUncheckedCreateWithoutComplaintsInput = {
   status?: $Enums.userStatus
   auditLogsCreated?: Prisma.AuditLogUncheckedCreateNestedManyWithoutUserInput
   upvotes?: Prisma.UpvoteUncheckedCreateNestedManyWithoutUserInput
+  chats?: Prisma.ChatUncheckedCreateNestedManyWithoutUserInput
   location?: Prisma.UserLocationUncheckedCreateNestedOneWithoutUserInput
 }
 
@@ -759,6 +786,7 @@ export type UserUpdateWithoutComplaintsInput = {
   status?: Prisma.EnumuserStatusFieldUpdateOperationsInput | $Enums.userStatus
   auditLogsCreated?: Prisma.AuditLogUpdateManyWithoutUserNestedInput
   upvotes?: Prisma.UpvoteUpdateManyWithoutUserNestedInput
+  chats?: Prisma.ChatUpdateManyWithoutUserNestedInput
   location?: Prisma.UserLocationUpdateOneWithoutUserNestedInput
 }
 
@@ -778,6 +806,7 @@ export type UserUncheckedUpdateWithoutComplaintsInput = {
   status?: Prisma.EnumuserStatusFieldUpdateOperationsInput | $Enums.userStatus
   auditLogsCreated?: Prisma.AuditLogUncheckedUpdateManyWithoutUserNestedInput
   upvotes?: Prisma.UpvoteUncheckedUpdateManyWithoutUserNestedInput
+  chats?: Prisma.ChatUncheckedUpdateManyWithoutUserNestedInput
   location?: Prisma.UserLocationUncheckedUpdateOneWithoutUserNestedInput
 }
 
@@ -797,6 +826,7 @@ export type UserCreateWithoutUpvotesInput = {
   status?: $Enums.userStatus
   complaints?: Prisma.ComplaintCreateNestedManyWithoutUserInput
   auditLogsCreated?: Prisma.AuditLogCreateNestedManyWithoutUserInput
+  chats?: Prisma.ChatCreateNestedManyWithoutUserInput
   location?: Prisma.UserLocationCreateNestedOneWithoutUserInput
 }
 
@@ -816,6 +846,7 @@ export type UserUncheckedCreateWithoutUpvotesInput = {
   status?: $Enums.userStatus
   complaints?: Prisma.ComplaintUncheckedCreateNestedManyWithoutUserInput
   auditLogsCreated?: Prisma.AuditLogUncheckedCreateNestedManyWithoutUserInput
+  chats?: Prisma.ChatUncheckedCreateNestedManyWithoutUserInput
   location?: Prisma.UserLocationUncheckedCreateNestedOneWithoutUserInput
 }
 
@@ -851,6 +882,7 @@ export type UserUpdateWithoutUpvotesInput = {
   status?: Prisma.EnumuserStatusFieldUpdateOperationsInput | $Enums.userStatus
   complaints?: Prisma.ComplaintUpdateManyWithoutUserNestedInput
   auditLogsCreated?: Prisma.AuditLogUpdateManyWithoutUserNestedInput
+  chats?: Prisma.ChatUpdateManyWithoutUserNestedInput
   location?: Prisma.UserLocationUpdateOneWithoutUserNestedInput
 }
 
@@ -870,6 +902,7 @@ export type UserUncheckedUpdateWithoutUpvotesInput = {
   status?: Prisma.EnumuserStatusFieldUpdateOperationsInput | $Enums.userStatus
   complaints?: Prisma.ComplaintUncheckedUpdateManyWithoutUserNestedInput
   auditLogsCreated?: Prisma.AuditLogUncheckedUpdateManyWithoutUserNestedInput
+  chats?: Prisma.ChatUncheckedUpdateManyWithoutUserNestedInput
   location?: Prisma.UserLocationUncheckedUpdateOneWithoutUserNestedInput
 }
 
@@ -889,6 +922,7 @@ export type UserCreateWithoutAuditLogsCreatedInput = {
   status?: $Enums.userStatus
   complaints?: Prisma.ComplaintCreateNestedManyWithoutUserInput
   upvotes?: Prisma.UpvoteCreateNestedManyWithoutUserInput
+  chats?: Prisma.ChatCreateNestedManyWithoutUserInput
   location?: Prisma.UserLocationCreateNestedOneWithoutUserInput
 }
 
@@ -908,6 +942,7 @@ export type UserUncheckedCreateWithoutAuditLogsCreatedInput = {
   status?: $Enums.userStatus
   complaints?: Prisma.ComplaintUncheckedCreateNestedManyWithoutUserInput
   upvotes?: Prisma.UpvoteUncheckedCreateNestedManyWithoutUserInput
+  chats?: Prisma.ChatUncheckedCreateNestedManyWithoutUserInput
   location?: Prisma.UserLocationUncheckedCreateNestedOneWithoutUserInput
 }
 
@@ -943,6 +978,7 @@ export type UserUpdateWithoutAuditLogsCreatedInput = {
   status?: Prisma.EnumuserStatusFieldUpdateOperationsInput | $Enums.userStatus
   complaints?: Prisma.ComplaintUpdateManyWithoutUserNestedInput
   upvotes?: Prisma.UpvoteUpdateManyWithoutUserNestedInput
+  chats?: Prisma.ChatUpdateManyWithoutUserNestedInput
   location?: Prisma.UserLocationUpdateOneWithoutUserNestedInput
 }
 
@@ -962,6 +998,103 @@ export type UserUncheckedUpdateWithoutAuditLogsCreatedInput = {
   status?: Prisma.EnumuserStatusFieldUpdateOperationsInput | $Enums.userStatus
   complaints?: Prisma.ComplaintUncheckedUpdateManyWithoutUserNestedInput
   upvotes?: Prisma.UpvoteUncheckedUpdateManyWithoutUserNestedInput
+  chats?: Prisma.ChatUncheckedUpdateManyWithoutUserNestedInput
+  location?: Prisma.UserLocationUncheckedUpdateOneWithoutUserNestedInput
+}
+
+export type UserCreateWithoutChatsInput = {
+  id?: string
+  email: string
+  name: string
+  aadhaarId: string
+  consentDataCollection?: boolean
+  dateOfBirth: Date | string
+  dateOfCreation?: Date | string
+  disability?: string | null
+  lastUpdated?: Date | string
+  password: string
+  phoneNumber: string
+  preferredLanguage?: string
+  status?: $Enums.userStatus
+  complaints?: Prisma.ComplaintCreateNestedManyWithoutUserInput
+  auditLogsCreated?: Prisma.AuditLogCreateNestedManyWithoutUserInput
+  upvotes?: Prisma.UpvoteCreateNestedManyWithoutUserInput
+  location?: Prisma.UserLocationCreateNestedOneWithoutUserInput
+}
+
+export type UserUncheckedCreateWithoutChatsInput = {
+  id?: string
+  email: string
+  name: string
+  aadhaarId: string
+  consentDataCollection?: boolean
+  dateOfBirth: Date | string
+  dateOfCreation?: Date | string
+  disability?: string | null
+  lastUpdated?: Date | string
+  password: string
+  phoneNumber: string
+  preferredLanguage?: string
+  status?: $Enums.userStatus
+  complaints?: Prisma.ComplaintUncheckedCreateNestedManyWithoutUserInput
+  auditLogsCreated?: Prisma.AuditLogUncheckedCreateNestedManyWithoutUserInput
+  upvotes?: Prisma.UpvoteUncheckedCreateNestedManyWithoutUserInput
+  location?: Prisma.UserLocationUncheckedCreateNestedOneWithoutUserInput
+}
+
+export type UserCreateOrConnectWithoutChatsInput = {
+  where: Prisma.UserWhereUniqueInput
+  create: Prisma.XOR<Prisma.UserCreateWithoutChatsInput, Prisma.UserUncheckedCreateWithoutChatsInput>
+}
+
+export type UserUpsertWithoutChatsInput = {
+  update: Prisma.XOR<Prisma.UserUpdateWithoutChatsInput, Prisma.UserUncheckedUpdateWithoutChatsInput>
+  create: Prisma.XOR<Prisma.UserCreateWithoutChatsInput, Prisma.UserUncheckedCreateWithoutChatsInput>
+  where?: Prisma.UserWhereInput
+}
+
+export type UserUpdateToOneWithWhereWithoutChatsInput = {
+  where?: Prisma.UserWhereInput
+  data: Prisma.XOR<Prisma.UserUpdateWithoutChatsInput, Prisma.UserUncheckedUpdateWithoutChatsInput>
+}
+
+export type UserUpdateWithoutChatsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  aadhaarId?: Prisma.StringFieldUpdateOperationsInput | string
+  consentDataCollection?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  dateOfBirth?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  dateOfCreation?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  disability?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lastUpdated?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  password?: Prisma.StringFieldUpdateOperationsInput | string
+  phoneNumber?: Prisma.StringFieldUpdateOperationsInput | string
+  preferredLanguage?: Prisma.StringFieldUpdateOperationsInput | string
+  status?: Prisma.EnumuserStatusFieldUpdateOperationsInput | $Enums.userStatus
+  complaints?: Prisma.ComplaintUpdateManyWithoutUserNestedInput
+  auditLogsCreated?: Prisma.AuditLogUpdateManyWithoutUserNestedInput
+  upvotes?: Prisma.UpvoteUpdateManyWithoutUserNestedInput
+  location?: Prisma.UserLocationUpdateOneWithoutUserNestedInput
+}
+
+export type UserUncheckedUpdateWithoutChatsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  aadhaarId?: Prisma.StringFieldUpdateOperationsInput | string
+  consentDataCollection?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  dateOfBirth?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  dateOfCreation?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  disability?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lastUpdated?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  password?: Prisma.StringFieldUpdateOperationsInput | string
+  phoneNumber?: Prisma.StringFieldUpdateOperationsInput | string
+  preferredLanguage?: Prisma.StringFieldUpdateOperationsInput | string
+  status?: Prisma.EnumuserStatusFieldUpdateOperationsInput | $Enums.userStatus
+  complaints?: Prisma.ComplaintUncheckedUpdateManyWithoutUserNestedInput
+  auditLogsCreated?: Prisma.AuditLogUncheckedUpdateManyWithoutUserNestedInput
+  upvotes?: Prisma.UpvoteUncheckedUpdateManyWithoutUserNestedInput
   location?: Prisma.UserLocationUncheckedUpdateOneWithoutUserNestedInput
 }
 
@@ -974,12 +1107,14 @@ export type UserCountOutputType = {
   complaints: number
   auditLogsCreated: number
   upvotes: number
+  chats: number
 }
 
 export type UserCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   complaints?: boolean | UserCountOutputTypeCountComplaintsArgs
   auditLogsCreated?: boolean | UserCountOutputTypeCountAuditLogsCreatedArgs
   upvotes?: boolean | UserCountOutputTypeCountUpvotesArgs
+  chats?: boolean | UserCountOutputTypeCountChatsArgs
 }
 
 /**
@@ -1013,6 +1148,13 @@ export type UserCountOutputTypeCountUpvotesArgs<ExtArgs extends runtime.Types.Ex
   where?: Prisma.UpvoteWhereInput
 }
 
+/**
+ * UserCountOutputType without action
+ */
+export type UserCountOutputTypeCountChatsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.ChatWhereInput
+}
+
 
 export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
@@ -1031,6 +1173,7 @@ export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
   complaints?: boolean | Prisma.User$complaintsArgs<ExtArgs>
   auditLogsCreated?: boolean | Prisma.User$auditLogsCreatedArgs<ExtArgs>
   upvotes?: boolean | Prisma.User$upvotesArgs<ExtArgs>
+  chats?: boolean | Prisma.User$chatsArgs<ExtArgs>
   location?: boolean | Prisma.User$locationArgs<ExtArgs>
   _count?: boolean | Prisma.UserCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["user"]>
@@ -1088,6 +1231,7 @@ export type UserInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = 
   complaints?: boolean | Prisma.User$complaintsArgs<ExtArgs>
   auditLogsCreated?: boolean | Prisma.User$auditLogsCreatedArgs<ExtArgs>
   upvotes?: boolean | Prisma.User$upvotesArgs<ExtArgs>
+  chats?: boolean | Prisma.User$chatsArgs<ExtArgs>
   location?: boolean | Prisma.User$locationArgs<ExtArgs>
   _count?: boolean | Prisma.UserCountOutputTypeDefaultArgs<ExtArgs>
 }
@@ -1100,6 +1244,7 @@ export type $UserPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
     complaints: Prisma.$ComplaintPayload<ExtArgs>[]
     auditLogsCreated: Prisma.$AuditLogPayload<ExtArgs>[]
     upvotes: Prisma.$UpvotePayload<ExtArgs>[]
+    chats: Prisma.$ChatPayload<ExtArgs>[]
     location: Prisma.$UserLocationPayload<ExtArgs> | null
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
@@ -1513,6 +1658,7 @@ export interface Prisma__UserClient<T, Null = never, ExtArgs extends runtime.Typ
   complaints<T extends Prisma.User$complaintsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$complaintsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ComplaintPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   auditLogsCreated<T extends Prisma.User$auditLogsCreatedArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$auditLogsCreatedArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$AuditLogPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   upvotes<T extends Prisma.User$upvotesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$upvotesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$UpvotePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  chats<T extends Prisma.User$chatsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$chatsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ChatPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   location<T extends Prisma.User$locationArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$locationArgs<ExtArgs>>): Prisma.Prisma__UserLocationClient<runtime.Types.Result.GetResult<Prisma.$UserLocationPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
@@ -2013,6 +2159,30 @@ export type User$upvotesArgs<ExtArgs extends runtime.Types.Extensions.InternalAr
   take?: number
   skip?: number
   distinct?: Prisma.UpvoteScalarFieldEnum | Prisma.UpvoteScalarFieldEnum[]
+}
+
+/**
+ * User.chats
+ */
+export type User$chatsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the Chat
+   */
+  select?: Prisma.ChatSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the Chat
+   */
+  omit?: Prisma.ChatOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ChatInclude<ExtArgs> | null
+  where?: Prisma.ChatWhereInput
+  orderBy?: Prisma.ChatOrderByWithRelationInput | Prisma.ChatOrderByWithRelationInput[]
+  cursor?: Prisma.ChatWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.ChatScalarFieldEnum | Prisma.ChatScalarFieldEnum[]
 }
 
 /**

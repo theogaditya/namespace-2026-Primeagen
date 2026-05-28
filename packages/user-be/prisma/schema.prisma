@@ -21,8 +21,9 @@ model User {
   phoneNumber           String        @unique
   preferredLanguage     String        @default("English")
   status                userStatus    @default(ACTIVE)
-  Complaint             Complaint[]
+  complaints            Complaint[]
   auditLogsCreated      AuditLog[]    @relation("LogCreator")
+  chats                 Chat[]
   upvotes               Upvote[]
   location              UserLocation?
 }
@@ -316,29 +317,50 @@ model RegionalWorkflow {
   @@map("regional_workflows")
 }
 
-model OpratingStates {
-  id        String              @id @default(uuid())
-  name      String
-  country   String              @default("India")
-  districts OpratingDistricts[]
+model Chat {
+  id        String     @id @default(uuid())
+  message   String
+  userId    String
+  adminId   String?
+  adminRole AdminRole?
+  imageUrl  String?
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+  user      User       @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  @@map("operating_states")
+  @@index([userId])
+  @@index([adminId])
+  @@map("chats")
 }
 
-model OpratingDistricts {
-  id       String         @id @default(uuid())
-  stateId  String
-  name     String
-  state    String
-  stateRel OpratingStates @relation(fields: [stateId], references: [id], onDelete: Cascade)
+model operating_states {
+  id                  String                @id
+  name                String
+  country             String                @default("India")
+  operating_districts operating_districts[]
+}
 
-  @@map("operating_districts")
+model operating_districts {
+  id               String           @id
+  stateId          String
+  name             String
+  state            String
+  operating_states operating_states @relation(fields: [stateId], references: [id], onDelete: Cascade)
 }
 
 enum userStatus {
   ACTIVE
   DELETED
   SUSPENDED
+}
+
+enum AdminRole {
+  SUPER_ADMIN
+  SUPER_STATE_ADMIN
+  DEPT_STATE_ADMIN
+  SUPER_MUNICIPAL_ADMIN
+  DEPT_MUNICIPAL_ADMIN
+  AGENT
 }
 
 enum Status {

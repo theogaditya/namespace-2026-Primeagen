@@ -15,6 +15,7 @@ import { getComplaintRouter } from "./routes/getComplaint";
 import { districtsRouter } from "./routes/districts";
 import { categoriesRouter } from "./routes/categories";
 import { createAuthMiddleware } from "./middleware/authRoute";
+import { chatRouter } from "./routes/chat";
 
 dotenv.config();
 
@@ -84,6 +85,8 @@ export class Server {
       this.app.use('/api/users', logoutUserRouter(this.db));
       this.app.use('/api/complaints', authMiddleware, createComplaintRouter(this.db));
       this.app.use('/api/complaints/get', authMiddleware, getComplaintRouter(this.db));
+      // User chat routes (authenticated)
+      this.app.use('/api/chat', authMiddleware, chatRouter(this.db));
     }
 
   public getApp(): Express {

@@ -399,8 +399,9 @@ export const ModelName = {
   NewsUpdate: 'NewsUpdate',
   AuditLog: 'AuditLog',
   RegionalWorkflow: 'RegionalWorkflow',
-  OpratingStates: 'OpratingStates',
-  OpratingDistricts: 'OpratingDistricts'
+  Chat: 'Chat',
+  operating_states: 'operating_states',
+  operating_districts: 'operating_districts'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -416,7 +417,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "user" | "userLocation" | "agent" | "departmentMunicipalAdmin" | "superMunicipalAdmin" | "departmentStateAdmin" | "superStateAdmin" | "superAdmin" | "category" | "complaint" | "complaintLocation" | "upvote" | "newsUpdate" | "auditLog" | "regionalWorkflow" | "opratingStates" | "opratingDistricts"
+    modelProps: "user" | "userLocation" | "agent" | "departmentMunicipalAdmin" | "superMunicipalAdmin" | "departmentStateAdmin" | "superStateAdmin" | "superAdmin" | "category" | "complaint" | "complaintLocation" | "upvote" | "newsUpdate" | "auditLog" | "regionalWorkflow" | "chat" | "operating_states" | "operating_districts"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -1530,151 +1531,225 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
-    OpratingStates: {
-      payload: Prisma.$OpratingStatesPayload<ExtArgs>
-      fields: Prisma.OpratingStatesFieldRefs
+    Chat: {
+      payload: Prisma.$ChatPayload<ExtArgs>
+      fields: Prisma.ChatFieldRefs
       operations: {
         findUnique: {
-          args: Prisma.OpratingStatesFindUniqueArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$OpratingStatesPayload> | null
+          args: Prisma.ChatFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ChatPayload> | null
         }
         findUniqueOrThrow: {
-          args: Prisma.OpratingStatesFindUniqueOrThrowArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$OpratingStatesPayload>
+          args: Prisma.ChatFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ChatPayload>
         }
         findFirst: {
-          args: Prisma.OpratingStatesFindFirstArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$OpratingStatesPayload> | null
+          args: Prisma.ChatFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ChatPayload> | null
         }
         findFirstOrThrow: {
-          args: Prisma.OpratingStatesFindFirstOrThrowArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$OpratingStatesPayload>
+          args: Prisma.ChatFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ChatPayload>
         }
         findMany: {
-          args: Prisma.OpratingStatesFindManyArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$OpratingStatesPayload>[]
+          args: Prisma.ChatFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ChatPayload>[]
         }
         create: {
-          args: Prisma.OpratingStatesCreateArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$OpratingStatesPayload>
+          args: Prisma.ChatCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ChatPayload>
         }
         createMany: {
-          args: Prisma.OpratingStatesCreateManyArgs<ExtArgs>
+          args: Prisma.ChatCreateManyArgs<ExtArgs>
           result: BatchPayload
         }
         createManyAndReturn: {
-          args: Prisma.OpratingStatesCreateManyAndReturnArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$OpratingStatesPayload>[]
+          args: Prisma.ChatCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ChatPayload>[]
         }
         delete: {
-          args: Prisma.OpratingStatesDeleteArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$OpratingStatesPayload>
+          args: Prisma.ChatDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ChatPayload>
         }
         update: {
-          args: Prisma.OpratingStatesUpdateArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$OpratingStatesPayload>
+          args: Prisma.ChatUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ChatPayload>
         }
         deleteMany: {
-          args: Prisma.OpratingStatesDeleteManyArgs<ExtArgs>
+          args: Prisma.ChatDeleteManyArgs<ExtArgs>
           result: BatchPayload
         }
         updateMany: {
-          args: Prisma.OpratingStatesUpdateManyArgs<ExtArgs>
+          args: Prisma.ChatUpdateManyArgs<ExtArgs>
           result: BatchPayload
         }
         updateManyAndReturn: {
-          args: Prisma.OpratingStatesUpdateManyAndReturnArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$OpratingStatesPayload>[]
+          args: Prisma.ChatUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ChatPayload>[]
         }
         upsert: {
-          args: Prisma.OpratingStatesUpsertArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$OpratingStatesPayload>
+          args: Prisma.ChatUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ChatPayload>
         }
         aggregate: {
-          args: Prisma.OpratingStatesAggregateArgs<ExtArgs>
-          result: runtime.Types.Utils.Optional<Prisma.AggregateOpratingStates>
+          args: Prisma.ChatAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateChat>
         }
         groupBy: {
-          args: Prisma.OpratingStatesGroupByArgs<ExtArgs>
-          result: runtime.Types.Utils.Optional<Prisma.OpratingStatesGroupByOutputType>[]
+          args: Prisma.ChatGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.ChatGroupByOutputType>[]
         }
         count: {
-          args: Prisma.OpratingStatesCountArgs<ExtArgs>
-          result: runtime.Types.Utils.Optional<Prisma.OpratingStatesCountAggregateOutputType> | number
+          args: Prisma.ChatCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.ChatCountAggregateOutputType> | number
         }
       }
     }
-    OpratingDistricts: {
-      payload: Prisma.$OpratingDistrictsPayload<ExtArgs>
-      fields: Prisma.OpratingDistrictsFieldRefs
+    operating_states: {
+      payload: Prisma.$operating_statesPayload<ExtArgs>
+      fields: Prisma.operating_statesFieldRefs
       operations: {
         findUnique: {
-          args: Prisma.OpratingDistrictsFindUniqueArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$OpratingDistrictsPayload> | null
+          args: Prisma.operating_statesFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$operating_statesPayload> | null
         }
         findUniqueOrThrow: {
-          args: Prisma.OpratingDistrictsFindUniqueOrThrowArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$OpratingDistrictsPayload>
+          args: Prisma.operating_statesFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$operating_statesPayload>
         }
         findFirst: {
-          args: Prisma.OpratingDistrictsFindFirstArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$OpratingDistrictsPayload> | null
+          args: Prisma.operating_statesFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$operating_statesPayload> | null
         }
         findFirstOrThrow: {
-          args: Prisma.OpratingDistrictsFindFirstOrThrowArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$OpratingDistrictsPayload>
+          args: Prisma.operating_statesFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$operating_statesPayload>
         }
         findMany: {
-          args: Prisma.OpratingDistrictsFindManyArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$OpratingDistrictsPayload>[]
+          args: Prisma.operating_statesFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$operating_statesPayload>[]
         }
         create: {
-          args: Prisma.OpratingDistrictsCreateArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$OpratingDistrictsPayload>
+          args: Prisma.operating_statesCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$operating_statesPayload>
         }
         createMany: {
-          args: Prisma.OpratingDistrictsCreateManyArgs<ExtArgs>
+          args: Prisma.operating_statesCreateManyArgs<ExtArgs>
           result: BatchPayload
         }
         createManyAndReturn: {
-          args: Prisma.OpratingDistrictsCreateManyAndReturnArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$OpratingDistrictsPayload>[]
+          args: Prisma.operating_statesCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$operating_statesPayload>[]
         }
         delete: {
-          args: Prisma.OpratingDistrictsDeleteArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$OpratingDistrictsPayload>
+          args: Prisma.operating_statesDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$operating_statesPayload>
         }
         update: {
-          args: Prisma.OpratingDistrictsUpdateArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$OpratingDistrictsPayload>
+          args: Prisma.operating_statesUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$operating_statesPayload>
         }
         deleteMany: {
-          args: Prisma.OpratingDistrictsDeleteManyArgs<ExtArgs>
+          args: Prisma.operating_statesDeleteManyArgs<ExtArgs>
           result: BatchPayload
         }
         updateMany: {
-          args: Prisma.OpratingDistrictsUpdateManyArgs<ExtArgs>
+          args: Prisma.operating_statesUpdateManyArgs<ExtArgs>
           result: BatchPayload
         }
         updateManyAndReturn: {
-          args: Prisma.OpratingDistrictsUpdateManyAndReturnArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$OpratingDistrictsPayload>[]
+          args: Prisma.operating_statesUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$operating_statesPayload>[]
         }
         upsert: {
-          args: Prisma.OpratingDistrictsUpsertArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$OpratingDistrictsPayload>
+          args: Prisma.operating_statesUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$operating_statesPayload>
         }
         aggregate: {
-          args: Prisma.OpratingDistrictsAggregateArgs<ExtArgs>
-          result: runtime.Types.Utils.Optional<Prisma.AggregateOpratingDistricts>
+          args: Prisma.Operating_statesAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateOperating_states>
         }
         groupBy: {
-          args: Prisma.OpratingDistrictsGroupByArgs<ExtArgs>
-          result: runtime.Types.Utils.Optional<Prisma.OpratingDistrictsGroupByOutputType>[]
+          args: Prisma.operating_statesGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.Operating_statesGroupByOutputType>[]
         }
         count: {
-          args: Prisma.OpratingDistrictsCountArgs<ExtArgs>
-          result: runtime.Types.Utils.Optional<Prisma.OpratingDistrictsCountAggregateOutputType> | number
+          args: Prisma.operating_statesCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.Operating_statesCountAggregateOutputType> | number
+        }
+      }
+    }
+    operating_districts: {
+      payload: Prisma.$operating_districtsPayload<ExtArgs>
+      fields: Prisma.operating_districtsFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.operating_districtsFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$operating_districtsPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.operating_districtsFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$operating_districtsPayload>
+        }
+        findFirst: {
+          args: Prisma.operating_districtsFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$operating_districtsPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.operating_districtsFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$operating_districtsPayload>
+        }
+        findMany: {
+          args: Prisma.operating_districtsFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$operating_districtsPayload>[]
+        }
+        create: {
+          args: Prisma.operating_districtsCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$operating_districtsPayload>
+        }
+        createMany: {
+          args: Prisma.operating_districtsCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.operating_districtsCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$operating_districtsPayload>[]
+        }
+        delete: {
+          args: Prisma.operating_districtsDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$operating_districtsPayload>
+        }
+        update: {
+          args: Prisma.operating_districtsUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$operating_districtsPayload>
+        }
+        deleteMany: {
+          args: Prisma.operating_districtsDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.operating_districtsUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.operating_districtsUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$operating_districtsPayload>[]
+        }
+        upsert: {
+          args: Prisma.operating_districtsUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$operating_districtsPayload>
+        }
+        aggregate: {
+          args: Prisma.Operating_districtsAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateOperating_districts>
+        }
+        groupBy: {
+          args: Prisma.operating_districtsGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.Operating_districtsGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.operating_districtsCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.Operating_districtsCountAggregateOutputType> | number
         }
       }
     }
@@ -1996,23 +2071,37 @@ export const RegionalWorkflowScalarFieldEnum = {
 export type RegionalWorkflowScalarFieldEnum = (typeof RegionalWorkflowScalarFieldEnum)[keyof typeof RegionalWorkflowScalarFieldEnum]
 
 
-export const OpratingStatesScalarFieldEnum = {
+export const ChatScalarFieldEnum = {
+  id: 'id',
+  message: 'message',
+  userId: 'userId',
+  adminId: 'adminId',
+  adminRole: 'adminRole',
+  imageUrl: 'imageUrl',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type ChatScalarFieldEnum = (typeof ChatScalarFieldEnum)[keyof typeof ChatScalarFieldEnum]
+
+
+export const Operating_statesScalarFieldEnum = {
   id: 'id',
   name: 'name',
   country: 'country'
 } as const
 
-export type OpratingStatesScalarFieldEnum = (typeof OpratingStatesScalarFieldEnum)[keyof typeof OpratingStatesScalarFieldEnum]
+export type Operating_statesScalarFieldEnum = (typeof Operating_statesScalarFieldEnum)[keyof typeof Operating_statesScalarFieldEnum]
 
 
-export const OpratingDistrictsScalarFieldEnum = {
+export const Operating_districtsScalarFieldEnum = {
   id: 'id',
   stateId: 'stateId',
   name: 'name',
   state: 'state'
 } as const
 
-export type OpratingDistrictsScalarFieldEnum = (typeof OpratingDistrictsScalarFieldEnum)[keyof typeof OpratingDistrictsScalarFieldEnum]
+export type Operating_districtsScalarFieldEnum = (typeof Operating_districtsScalarFieldEnum)[keyof typeof Operating_districtsScalarFieldEnum]
 
 
 export const SortOrder = {
@@ -2191,6 +2280,20 @@ export type EnumComplaintStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$
 export type ListEnumComplaintStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'ComplaintStatus[]'>
     
 
+
+/**
+ * Reference to a field of type 'AdminRole'
+ */
+export type EnumAdminRoleFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'AdminRole'>
+    
+
+
+/**
+ * Reference to a field of type 'AdminRole[]'
+ */
+export type ListEnumAdminRoleFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'AdminRole[]'>
+    
+
 /**
  * Batch Payload for updateMany & deleteMany & createMany
  */
@@ -2285,8 +2388,9 @@ export type GlobalOmitConfig = {
   newsUpdate?: Prisma.NewsUpdateOmit
   auditLog?: Prisma.AuditLogOmit
   regionalWorkflow?: Prisma.RegionalWorkflowOmit
-  opratingStates?: Prisma.OpratingStatesOmit
-  opratingDistricts?: Prisma.OpratingDistrictsOmit
+  chat?: Prisma.ChatOmit
+  operating_states?: Prisma.operating_statesOmit
+  operating_districts?: Prisma.operating_districtsOmit
 }
 
 /* Types for Logging */

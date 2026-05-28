@@ -18,6 +18,18 @@ export const userStatus = {
 export type userStatus = (typeof userStatus)[keyof typeof userStatus]
 
 
+export const AdminRole = {
+  SUPER_ADMIN: 'SUPER_ADMIN',
+  SUPER_STATE_ADMIN: 'SUPER_STATE_ADMIN',
+  DEPT_STATE_ADMIN: 'DEPT_STATE_ADMIN',
+  SUPER_MUNICIPAL_ADMIN: 'SUPER_MUNICIPAL_ADMIN',
+  DEPT_MUNICIPAL_ADMIN: 'DEPT_MUNICIPAL_ADMIN',
+  AGENT: 'AGENT'
+} as const
+
+export type AdminRole = (typeof AdminRole)[keyof typeof AdminRole]
+
+
 export const Status = {
   ACTIVE: 'ACTIVE',
   INACTIVE: 'INACTIVE',

@@ -115,6 +115,11 @@ export type AuditLog = Prisma.AuditLogModel
  */
 export type RegionalWorkflow = Prisma.RegionalWorkflowModel
 /**
+ * Model Chat
+ * 
+ */
+export type Chat = Prisma.ChatModel
+/**
  * Model operating_states
  * 
  */

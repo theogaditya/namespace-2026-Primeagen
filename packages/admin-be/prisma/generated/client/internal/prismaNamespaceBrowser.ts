@@ -66,6 +66,7 @@ export const ModelName = {
   NewsUpdate: 'NewsUpdate',
   AuditLog: 'AuditLog',
   RegionalWorkflow: 'RegionalWorkflow',
+  Chat: 'Chat',
   operating_states: 'operating_states',
   operating_districts: 'operating_districts'
 } as const
@@ -363,6 +364,20 @@ export const RegionalWorkflowScalarFieldEnum = {
 } as const
 
 export type RegionalWorkflowScalarFieldEnum = (typeof RegionalWorkflowScalarFieldEnum)[keyof typeof RegionalWorkflowScalarFieldEnum]
+
+
+export const ChatScalarFieldEnum = {
+  id: 'id',
+  message: 'message',
+  userId: 'userId',
+  adminId: 'adminId',
+  adminRole: 'adminRole',
+  imageUrl: 'imageUrl',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type ChatScalarFieldEnum = (typeof ChatScalarFieldEnum)[keyof typeof ChatScalarFieldEnum]
 
 
 export const Operating_statesScalarFieldEnum = {
