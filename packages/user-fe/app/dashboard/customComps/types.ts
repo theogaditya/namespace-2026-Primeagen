@@ -89,6 +89,7 @@ export interface Complaint {
   attachmentUrl: string | null;
   status: ComplaintStatus;
   upvoteCount: number;
+  hasLiked?: boolean; // Whether the current user has liked this complaint
   isPublic: boolean;
   assignedAgentId: string | null;
   assignedDepartment: string;

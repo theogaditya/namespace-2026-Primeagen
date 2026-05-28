@@ -26,8 +26,13 @@ import {
   Building,
   X,
   Check,
+  Wifi,
+  WifiOff,
+  RefreshCw,
 } from "lucide-react";
 import { ComplaintHeatmap } from "./ComplaintHeatmap";
+import { useLikes, useComplaintLike } from "@/contexts/LikeContext";
+import { PullToRefresh } from "@/components/ui/pull-to-refresh";
 
 // Sub-tab types for community feed
 export type CommunitySubTab = "for-you" | "trending" | "recent" | "heatmap" | "search";
@@ -60,16 +65,11 @@ const containerVariants = {
 function CommunityComplaintCard({
   complaint,
   onClick,
-  onLike,
-  isLiking,
 }: {
   complaint: Complaint;
   onClick: () => void;
-  onLike: (action: "like" | "unlike") => void;
-  isLiking: boolean;
 }) {
-  const [isLiked, setIsLiked] = useState(false);
-  const [localUpvotes, setLocalUpvotes] = useState(complaint.upvoteCount);
+  const { liked, count, isLiking, toggle } = useComplaintLike(complaint.id);
   const [showCopied, setShowCopied] = useState(false);
 
   const statusConfig = STATUS_CONFIG[complaint.status];
@@ -78,11 +78,7 @@ function CommunityComplaintCard({
   const handleLikeClick = (e: React.MouseEvent) => {
     e.stopPropagation();
     if (isLiking) return;
-
-    const newLiked = !isLiked;
-    setIsLiked(newLiked);
-    setLocalUpvotes((prev) => (newLiked ? prev + 1 : Math.max(0, prev - 1)));
-    onLike(newLiked ? "like" : "unlike");
+    toggle();
   };
 
   const handleShareClick = async (e: React.MouseEvent) => {
@@ -211,7 +207,7 @@ function CommunityComplaintCard({
               <button
                 className={cn(
                   "flex items-center gap-2 transition-colors group",
-                  isLiked ? "text-rose-500" : "text-gray-500 hover:text-rose-500"
+                  liked ? "text-rose-500" : "text-gray-500 hover:text-rose-500"
                 )}
                 onClick={handleLikeClick}
                 disabled={isLiking}
@@ -219,14 +215,14 @@ function CommunityComplaintCard({
                 <div
                   className={cn(
                     "p-2 rounded-full transition-colors",
-                    isLiked ? "bg-rose-50" : "group-hover:bg-rose-50"
+                    liked ? "bg-rose-50" : "group-hover:bg-rose-50"
                   )}
                 >
                   <Heart
-                    className={cn("w-4 h-4", isLiked && "fill-current")}
+                    className={cn("w-4 h-4", liked && "fill-current")}
                   />
                 </div>
-                <span className="text-sm">{localUpvotes}</span>
+                <span className="text-sm">{count}</span>
               </button>
 
               {/* Share */}
@@ -418,7 +414,9 @@ export function CommunityFeed({ authToken, onComplaintClick }: CommunityFeedProp
   const [searchQuery, setSearchQuery] = useState("");
   const [searchResults, setSearchResults] = useState<Complaint[]>([]);
   const [isSearching, setIsSearching] = useState(false);
-  const [likingIds, setLikingIds] = useState<Set<string>>(new Set());
+  
+  // Get like context for initialization and connection status
+  const { initializeLikes, isConnected, isAuthenticated } = useLikes();
 
   // Fetch complaints based on active tab
   const fetchComplaints = useCallback(async () => {
@@ -440,14 +438,18 @@ export function CommunityFeed({ authToken, onComplaintClick }: CommunityFeedProp
       }
 
       const data = await response.json();
-      setComplaints(data.data || []);
+      const fetchedComplaints = data.data || [];
+      setComplaints(fetchedComplaints);
+      
+      // Initialize like states from fetched complaints
+      initializeLikes(fetchedComplaints);
     } catch (err) {
       console.error("Error fetching community feed:", err);
       setError("Failed to load complaints. Please try again.");
     } finally {
       setIsLoading(false);
     }
-  }, [activeSubTab, authToken]);
+  }, [activeSubTab, authToken, initializeLikes]);
 
   // Search complaints
   const handleSearch = useCallback(async () => {
@@ -471,43 +473,18 @@ export function CommunityFeed({ authToken, onComplaintClick }: CommunityFeedProp
       }
 
       const data = await response.json();
-      setSearchResults(data.data || []);
+      const fetchedComplaints = data.data || [];
+      setSearchResults(fetchedComplaints);
+      
+      // Initialize like states from search results
+      initializeLikes(fetchedComplaints);
     } catch (err) {
       console.error("Search error:", err);
       setError("Search failed. Please try again.");
     } finally {
       setIsSearching(false);
     }
-  }, [searchQuery, authToken]);
-
-  // Handle like/unlike
-  const handleLike = useCallback(
-    async (complaintId: string, action: "like" | "unlike") => {
-      if (!authToken) return;
-
-      setLikingIds((prev) => new Set(prev).add(complaintId));
-
-      try {
-        await fetch(`/api/complaint/${complaintId}/like`, {
-          method: "POST",
-          headers: {
-            Authorization: `Bearer ${authToken}`,
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ action }),
-        });
-      } catch (err) {
-        console.error("Like error:", err);
-      } finally {
-        setLikingIds((prev) => {
-          const next = new Set(prev);
-          next.delete(complaintId);
-          return next;
-        });
-      }
-    },
-    [authToken]
-  );
+  }, [searchQuery, authToken, initializeLikes]);
 
   // Fetch on tab change
   useEffect(() => {
@@ -526,41 +503,87 @@ export function CommunityFeed({ authToken, onComplaintClick }: CommunityFeedProp
   const displayComplaints =
     activeSubTab === "search" ? searchResults : complaints;
 
+  // Handle refresh based on current tab
+  const handleRefresh = useCallback(() => {
+    if (activeSubTab === "search" && searchQuery.trim()) {
+      handleSearch();
+    } else {
+      fetchComplaints();
+    }
+  }, [activeSubTab, searchQuery, handleSearch, fetchComplaints]);
+
   return (
     <div className="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden mt-4">
       {/* Sub-tab navigation */}
       <SubTabNavigation activeTab={activeSubTab} onTabChange={setActiveSubTab} />
+      
+      {/* Header bar with refresh and connection status */}
+      <div className="px-4 py-2 bg-gray-50 border-b border-gray-100 flex items-center justify-between">
+        {/* Refresh button */}
+        <button
+          onClick={handleRefresh}
+          disabled={isLoading || isSearching || activeSubTab === "heatmap"}
+          className="flex items-center gap-2 px-3 py-1.5 text-sm font-medium text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+        >
+          <RefreshCw className={cn("w-4 h-4", (isLoading || isSearching) && "animate-spin")} />
+          <span className="hidden sm:inline">Refresh</span>
+        </button>
 
-      {/* Search input (only for search tab) */}
-      {activeSubTab === "search" && (
-        <SearchInput
-          value={searchQuery}
-          onChange={setSearchQuery}
-          onSearch={handleSearch}
-          isSearching={isSearching}
-        />
-      )}
+        {/* WebSocket connection status */}
+        <div className={cn(
+          "flex items-center gap-1.5 text-xs",
+          isConnected && isAuthenticated ? "text-green-600" : "text-gray-400"
+        )}>
+          {isConnected && isAuthenticated ? (
+            <>
+              <Wifi className="w-3 h-3" />
+              <span>Real-time</span>
+            </>
+          ) : (
+            <>
+              <WifiOff className="w-3 h-3" />
+              <span>Connecting...</span>
+            </>
+          )}
+        </div>
+      </div>
 
-      {/* Heatmap */}
-      {activeSubTab === "heatmap" && (
-        <ComplaintHeatmap
-          authToken={authToken}
-          onComplaintClick={onComplaintClick}
-        />
-      )}
+      {/* Pull to refresh wrapper for content */}
+      <PullToRefresh
+        onRefresh={handleRefresh}
+        disabled={isLoading || isSearching || activeSubTab === "heatmap"}
+        className="flex-1"
+      >
+        {/* Search input (only for search tab) */}
+        {activeSubTab === "search" && (
+          <SearchInput
+            value={searchQuery}
+            onChange={setSearchQuery}
+            onSearch={handleSearch}
+            isSearching={isSearching}
+          />
+        )}
 
-      {/* Error state */}
-      <AnimatePresence>
-        {error && activeSubTab !== "heatmap" && (
-          <motion.div
-            initial={{ opacity: 0, y: -10 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -10 }}
-            className="m-4 flex items-center gap-3 p-4 bg-red-50 border border-red-200 text-red-700 rounded-xl"
-          >
-            <AlertCircle className="w-5 h-5 shrink-0" />
-            <p className="text-sm">{error}</p>
-            <button
+        {/* Heatmap */}
+        {activeSubTab === "heatmap" && (
+          <ComplaintHeatmap
+            authToken={authToken}
+            onComplaintClick={onComplaintClick}
+          />
+        )}
+
+        {/* Error state */}
+        <AnimatePresence>
+          {error && activeSubTab !== "heatmap" && (
+            <motion.div
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -10 }}
+              className="m-4 flex items-center gap-3 p-4 bg-red-50 border border-red-200 text-red-700 rounded-xl"
+            >
+              <AlertCircle className="w-5 h-5 shrink-0" />
+              <p className="text-sm">{error}</p>
+              <button
               onClick={fetchComplaints}
               className="ml-auto px-3 py-1 text-sm font-medium bg-red-100 hover:bg-red-200 rounded-lg transition-colors"
             >
@@ -610,8 +633,6 @@ export function CommunityFeed({ authToken, onComplaintClick }: CommunityFeedProp
                 key={complaint.id}
                 complaint={complaint}
                 onClick={() => onComplaintClick(complaint)}
-                onLike={(action) => handleLike(complaint.id, action)}
-                isLiking={likingIds.has(complaint.id)}
               />
             ))}
           </motion.div>
@@ -627,6 +648,7 @@ export function CommunityFeed({ authToken, onComplaintClick }: CommunityFeedProp
           </p>
         </div>
       )}
+      </PullToRefresh>
     </div>
   );
 }

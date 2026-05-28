@@ -9,6 +9,7 @@ const BLACKLIST_PREFIX = 'token_blacklist:';
 class TokenBlacklistService {
   private client: RedisClientType;
   private isConnected: boolean = false;
+  private connectPromise: Promise<void> | null = null;
 
   constructor() {
     this.client = createClient({
@@ -18,10 +19,29 @@ class TokenBlacklistService {
   }
 
   public async connect(): Promise<void> {
-    if (!this.isConnected) {
-      await this.client.connect();
-      this.isConnected = true;
+    // If already connected, return immediately
+    if (this.isConnected) {
+      return;
     }
+    
+    // If connection is in progress, wait for it
+    if (this.connectPromise) {
+      return this.connectPromise;
+    }
+    
+    // Start new connection
+    this.connectPromise = (async () => {
+      try {
+        await this.client.connect();
+        this.isConnected = true;
+        console.log('✅ Token Blacklist Redis connected');
+      } catch (error) {
+        this.connectPromise = null;
+        throw error;
+      }
+    })();
+    
+    return this.connectPromise;
   }
 
   /**

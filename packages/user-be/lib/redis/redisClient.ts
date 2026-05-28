@@ -5,6 +5,8 @@ import { createClient, RedisClientType } from '@redis/client';
 
 export class RedisPublishClient {
     private Publishclient: RedisClientType;
+    private connectPromise: Promise<unknown> | null = null;
+    
     constructor() {
         const REDIS_URL = process.env.REDIS_URL;
         this.Publishclient = createClient({
@@ -13,9 +15,14 @@ export class RedisPublishClient {
         this.Publishclient.on('error', (err) => console.log('Redis Client Error', err));
     }
     public async connect() {
-        if (!this.Publishclient.isOpen) {
-            await this.Publishclient.connect();
-        }
+        if (this.Publishclient.isOpen) return;
+        if (this.connectPromise) return this.connectPromise;
+        
+        this.connectPromise = this.Publishclient.connect().catch((err) => {
+            this.connectPromise = null;
+            throw err;
+        });
+        return this.connectPromise;
     }
 
     public getClient(): RedisClientType {
@@ -25,6 +32,8 @@ export class RedisPublishClient {
 
 export class RedisSubscribeClient {
     private Subscribeclient: RedisClientType;
+    private connectPromise: Promise<unknown> | null = null;
+    
     constructor() {
         const REDIS_URL = process.env.REDIS_URL;
         this.Subscribeclient = createClient({
@@ -33,9 +42,14 @@ export class RedisSubscribeClient {
         this.Subscribeclient.on('error', (err) => console.log('Redis Client Error', err));
     }
     public async connect() {
-        if (!this.Subscribeclient.isOpen) {
-            await this.Subscribeclient.connect();
-        }
+        if (this.Subscribeclient.isOpen) return;
+        if (this.connectPromise) return this.connectPromise;
+        
+        this.connectPromise = this.Subscribeclient.connect().catch((err) => {
+            this.connectPromise = null;
+            throw err;
+        });
+        return this.connectPromise;
     }
 
     public getClient(): RedisClientType {
@@ -45,6 +59,8 @@ export class RedisSubscribeClient {
 
 export class generaleClientforCaching{
     private generalClient: RedisClientType;
+    private connectPromise: Promise<unknown> | null = null;
+    
     constructor() {
         const REDIS_URL = process.env.REDIS_URL;
         this.generalClient = createClient({
@@ -53,9 +69,14 @@ export class generaleClientforCaching{
         this.generalClient.on('error', (err) => console.log('Redis Client Error', err));
     }
     public async connect() {
-        if (!this.generalClient.isOpen) {
-            await this.generalClient.connect();
-        }
+        if (this.generalClient.isOpen) return;
+        if (this.connectPromise) return this.connectPromise;
+        
+        this.connectPromise = this.generalClient.connect().catch((err) => {
+            this.connectPromise = null;
+            throw err;
+        });
+        return this.connectPromise;
     }
 
     public getClient(): RedisClientType {
@@ -65,6 +86,7 @@ export class generaleClientforCaching{
 
 export class RedisClientForComplaintCache {
     private complaintCacheClient: RedisClientType;
+    private connectPromise: Promise<unknown> | null = null;
     private readonly CACHE_PREFIX = 'complaint_cache:';
     private readonly DEFAULT_TTL = 300; // 5 minutes default TTL
 
@@ -77,9 +99,14 @@ export class RedisClientForComplaintCache {
     }
 
     public async connect() {
-        if (!this.complaintCacheClient.isOpen) {
-            await this.complaintCacheClient.connect();
-        }
+        if (this.complaintCacheClient.isOpen) return;
+        if (this.connectPromise) return this.connectPromise;
+        
+        this.connectPromise = this.complaintCacheClient.connect().catch((err) => {
+            this.connectPromise = null;
+            throw err;
+        });
+        return this.connectPromise;
     }
 
     public getClient(): RedisClientType {
@@ -128,6 +155,8 @@ export class RedisClientForComplaintCache {
 
 export class RedisClientforUserQueue {
     private UserqueueClient: RedisClientType;
+    private connectPromise: Promise<unknown> | null = null;
+    
     constructor() {
         const REDIS_URL = process.env.REDIS_URL;
         this.UserqueueClient = createClient({
@@ -136,9 +165,14 @@ export class RedisClientforUserQueue {
         this.UserqueueClient.on('error', (err) => console.log('Redis Client Error', err));
     }
     public async connect() {
-        if (!this.UserqueueClient.isOpen) {
-            await this.UserqueueClient.connect();
-        }
+        if (this.UserqueueClient.isOpen) return;
+        if (this.connectPromise) return this.connectPromise;
+        
+        this.connectPromise = this.UserqueueClient.connect().catch((err) => {
+            this.connectPromise = null;
+            throw err;
+        });
+        return this.connectPromise;
     }
 
     public getClient(): RedisClientType {
@@ -149,6 +183,8 @@ export class RedisClientforUserQueue {
 
 export class RedisClientforComplaintQueue{
     private complaintClient: RedisClientType;
+    private connectPromise: Promise<unknown> | null = null;
+    
     constructor() {
         const REDIS_URL = process.env.REDIS_URL;
         this.complaintClient = createClient({
@@ -157,9 +193,14 @@ export class RedisClientforComplaintQueue{
         this.complaintClient.on('error', (err) => console.log('Redis Client Error', err));
     }  
     public async connect() {
-        if (!this.complaintClient.isOpen) {
-            await this.complaintClient.connect();
-        }
+        if (this.complaintClient.isOpen) return;
+        if (this.connectPromise) return this.connectPromise;
+        
+        this.connectPromise = this.complaintClient.connect().catch((err) => {
+            this.connectPromise = null;
+            throw err;
+        });
+        return this.connectPromise;
     }
 
     public getClient(): RedisClientType {

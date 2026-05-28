@@ -6,6 +6,7 @@ import {
   SingleComplaintResponse,
 } from "../lib/types/types";
 import { RedisClientForComplaintCache } from "../lib/redis/redisClient";
+import { likeStore } from "../lib/likes/inMemoryLikeStore";
 
 // Initialize Redis cache client
 const cacheClient = new RedisClientForComplaintCache();
@@ -144,6 +145,29 @@ export function getComplaintRouter(db: PrismaClient) {
   const router = Router();
 
   /**
+   * Helper function to add hasLiked field to complaints
+   * Uses in-memory store for O(1) lookup
+   */
+  function addHasLikedField(complaints: any[], userId?: string): any[] {
+    if (!userId) return complaints.map(c => ({ ...c, hasLiked: false }));
+    
+    return complaints.map(complaint => ({
+      ...complaint,
+      hasLiked: likeStore.hasLiked(userId, complaint.id),
+    }));
+  }
+
+  /**
+   * Helper function to add hasLiked field to a single complaint
+   */
+  function addHasLikedToSingle(complaint: any, userId?: string): any {
+    return {
+      ...complaint,
+      hasLiked: userId ? likeStore.hasLiked(userId, complaint.id) : false,
+    };
+  }
+
+  /**
    * GET /api/complaints
    * Get all complaints with pagination (only public complaints or user's own)
    * Query params:
@@ -209,10 +233,13 @@ export function getComplaintRouter(db: PrismaClient) {
         take: limit,
       });
 
+      // Add hasLiked field to each complaint
+      const complaintsWithLikes = addHasLikedField(complaints, userId);
+
       const response: ComplaintListResponse = {
         success: true,
         message: `Found ${complaints.length} complaints`,
-        data: complaints as unknown as ComplaintResponse[],
+        data: complaintsWithLikes as unknown as ComplaintResponse[],
         pagination: {
           total,
           page,
@@ -295,10 +322,13 @@ export function getComplaintRouter(db: PrismaClient) {
         take: limit,
       });
 
+      // Add hasLiked field to each complaint
+      const complaintsWithLikes = addHasLikedField(complaints, userId);
+
       const response: ComplaintListResponse = {
         success: true,
         message: `Found ${complaints.length} complaints for this user`,
-        data: complaints as unknown as ComplaintResponse[],
+        data: complaintsWithLikes as unknown as ComplaintResponse[],
         pagination: {
           total,
           page,
@@ -385,10 +415,13 @@ export function getComplaintRouter(db: PrismaClient) {
         });
       }
 
+      // Add hasLiked field
+      const complaintWithLike = addHasLikedToSingle(complaint, userId);
+
       const response: SingleComplaintResponse = {
         success: true,
         message: "Complaint retrieved successfully",
-        data: complaint as unknown as ComplaintResponse,
+        data: complaintWithLike as unknown as ComplaintResponse,
       };
 
       // Cache the response
@@ -481,10 +514,13 @@ export function getComplaintRouter(db: PrismaClient) {
         take: limit,
       });
 
+      // Add hasLiked field to each complaint
+      const complaintsWithLikes = addHasLikedField(complaints, requestingUserId);
+
       const response: ComplaintListResponse = {
         success: true,
         message: `Found ${complaints.length} complaints for user ${targetUserId}`,
-        data: complaints as unknown as ComplaintResponse[],
+        data: complaintsWithLikes as unknown as ComplaintResponse[],
         pagination: {
           total,
           page,
@@ -568,10 +604,13 @@ export function getComplaintRouter(db: PrismaClient) {
         });
       }
 
+      // Add hasLiked field
+      const complaintWithLike = addHasLikedToSingle(complaint, userId);
+
       const response: SingleComplaintResponse = {
         success: true,
         message: "Complaint retrieved successfully",
-        data: complaint as unknown as ComplaintResponse,
+        data: complaintWithLike as unknown as ComplaintResponse,
       };
 
       // Cache the response
@@ -630,24 +669,32 @@ export function getComplaintRouter(db: PrismaClient) {
 
         const total = await db.complaint.count({ where: { isPublic: true } });
 
+        // Add hasLiked field to each complaint
+        const complaintsWithLikes = addHasLikedField(complaints, userId);
+
         return res.status(200).json({
           success: true,
           message: `No district set. Showing trending complaints instead.`,
-          data: complaints,
+          data: complaintsWithLikes,
           pagination: { total, page, limit, totalPages: Math.ceil(total / limit) },
         });
       }
 
       const userDistrict = user.location.district;
 
-      // Generate cache key
+      // Generate cache key (without userId - we'll add hasLiked after cache lookup)
       const cacheKey = cacheClient.generateKey('feed_foryou', `${userDistrict}:${page}:${limit}`);
 
       // Check cache first
       if (cacheConnected) {
         const cached = await cacheClient.getCachedResponse<ComplaintListResponse>(cacheKey);
-        if (cached) {
-          return res.status(200).json(cached);
+        if (cached && cached.data) {
+          // Add hasLiked field for THIS user (not cached)
+          const complaintsWithLikes = addHasLikedField(cached.data as any[], userId);
+          return res.status(200).json({
+            ...cached,
+            data: complaintsWithLikes,
+          });
         }
       }
 
@@ -672,7 +719,8 @@ export function getComplaintRouter(db: PrismaClient) {
         take: limit,
       });
 
-      const response: ComplaintListResponse = {
+      // Cache the raw response (WITHOUT hasLiked)
+      const responseForCache: ComplaintListResponse = {
         success: true,
         message: `Found ${complaints.length} complaints from ${userDistrict}`,
         data: complaints as unknown as ComplaintResponse[],
@@ -684,12 +732,17 @@ export function getComplaintRouter(db: PrismaClient) {
         },
       };
 
-      // Cache the response
       if (cacheConnected) {
-        await cacheClient.cacheResponse(cacheKey, response, 120); // 2 minutes TTL
+        await cacheClient.cacheResponse(cacheKey, responseForCache, 120); // 2 minutes TTL
       }
 
-      return res.status(200).json(response);
+      // Add hasLiked field for THIS user before returning
+      const complaintsWithLikes = addHasLikedField(complaints, userId);
+
+      return res.status(200).json({
+        ...responseForCache,
+        data: complaintsWithLikes,
+      });
     } catch (error) {
       console.error("Get for-you feed error:", error);
       return res.status(500).json({
@@ -713,14 +766,21 @@ export function getComplaintRouter(db: PrismaClient) {
       const limit = Math.min(100, Math.max(1, parseInt(req.query.limit as string) || 10));
       const skip = (page - 1) * limit;
 
-      // Generate cache key
+      // Generate cache key (without userId - we'll add hasLiked after cache lookup)
       const cacheKey = cacheClient.generateKey('feed_trending', `${page}:${limit}`);
 
+      const userId = req.userId;
+      
       // Check cache first
       if (cacheConnected) {
         const cached = await cacheClient.getCachedResponse<ComplaintListResponse>(cacheKey);
-        if (cached) {
-          return res.status(200).json(cached);
+        if (cached && cached.data) {
+          // Add hasLiked field for THIS user (not cached)
+          const complaintsWithLikes = addHasLikedField(cached.data as any[], userId);
+          return res.status(200).json({
+            ...cached,
+            data: complaintsWithLikes,
+          });
         }
       }
 
@@ -739,7 +799,8 @@ export function getComplaintRouter(db: PrismaClient) {
         take: limit,
       });
 
-      const response: ComplaintListResponse = {
+      // Cache the raw response (WITHOUT hasLiked)
+      const responseForCache: ComplaintListResponse = {
         success: true,
         message: `Found ${complaints.length} trending complaints`,
         data: complaints as unknown as ComplaintResponse[],
@@ -751,12 +812,17 @@ export function getComplaintRouter(db: PrismaClient) {
         },
       };
 
-      // Cache the response
       if (cacheConnected) {
-        await cacheClient.cacheResponse(cacheKey, response, 120); // 2 minutes TTL
+        await cacheClient.cacheResponse(cacheKey, responseForCache, 120); // 2 minutes TTL
       }
 
-      return res.status(200).json(response);
+      // Add hasLiked field for THIS user before returning
+      const complaintsWithLikes = addHasLikedField(complaints, userId);
+
+      return res.status(200).json({
+        ...responseForCache,
+        data: complaintsWithLikes,
+      });
     } catch (error) {
       console.error("Get trending feed error:", error);
       return res.status(500).json({
@@ -780,14 +846,21 @@ export function getComplaintRouter(db: PrismaClient) {
       const limit = Math.min(100, Math.max(1, parseInt(req.query.limit as string) || 10));
       const skip = (page - 1) * limit;
 
-      // Generate cache key
+      // Generate cache key (without userId - we'll add hasLiked after cache lookup)
       const cacheKey = cacheClient.generateKey('feed_recent', `${page}:${limit}`);
+
+      const userId = req.userId;
 
       // Check cache first
       if (cacheConnected) {
         const cached = await cacheClient.getCachedResponse<ComplaintListResponse>(cacheKey);
-        if (cached) {
-          return res.status(200).json(cached);
+        if (cached && cached.data) {
+          // Add hasLiked field for THIS user (not cached)
+          const complaintsWithLikes = addHasLikedField(cached.data as any[], userId);
+          return res.status(200).json({
+            ...cached,
+            data: complaintsWithLikes,
+          });
         }
       }
 
@@ -803,7 +876,8 @@ export function getComplaintRouter(db: PrismaClient) {
         take: limit,
       });
 
-      const response: ComplaintListResponse = {
+      // Cache the raw response (WITHOUT hasLiked)
+      const responseForCache: ComplaintListResponse = {
         success: true,
         message: `Found ${complaints.length} recent complaints`,
         data: complaints as unknown as ComplaintResponse[],
@@ -815,12 +889,17 @@ export function getComplaintRouter(db: PrismaClient) {
         },
       };
 
-      // Cache the response
       if (cacheConnected) {
-        await cacheClient.cacheResponse(cacheKey, response, 60); // 1 minute TTL for recent
+        await cacheClient.cacheResponse(cacheKey, responseForCache, 60); // 1 minute TTL for recent
       }
 
-      return res.status(200).json(response);
+      // Add hasLiked field for THIS user before returning
+      const complaintsWithLikes = addHasLikedField(complaints, userId);
+
+      return res.status(200).json({
+        ...responseForCache,
+        data: complaintsWithLikes,
+      });
     } catch (error) {
       console.error("Get recent feed error:", error);
       return res.status(500).json({
@@ -854,14 +933,21 @@ export function getComplaintRouter(db: PrismaClient) {
       const limit = Math.min(100, Math.max(1, parseInt(req.query.limit as string) || 10));
       const skip = (page - 1) * limit;
 
-      // Generate cache key for search results
+      // Generate cache key for search results (without userId - we'll add hasLiked after)
       const cacheKey = cacheClient.generateKey('feed_search', `${query}:${page}:${limit}`);
+
+      const userId = req.userId;
 
       // Check cache first
       if (cacheConnected) {
         const cached = await cacheClient.getCachedResponse<ComplaintListResponse>(cacheKey);
-        if (cached) {
-          return res.status(200).json(cached);
+        if (cached && cached.data) {
+          // Add hasLiked field for THIS user (not cached)
+          const complaintsWithLikes = addHasLikedField(cached.data as any[], userId);
+          return res.status(200).json({
+            ...cached,
+            data: complaintsWithLikes,
+          });
         }
       }
 
@@ -889,7 +975,8 @@ export function getComplaintRouter(db: PrismaClient) {
         take: limit,
       });
 
-      const response: ComplaintListResponse = {
+      // Cache the raw response (WITHOUT hasLiked)
+      const responseForCache: ComplaintListResponse = {
         success: true,
         message: `Found ${complaints.length} complaints matching "${query}"`,
         data: complaints as unknown as ComplaintResponse[],
@@ -901,12 +988,17 @@ export function getComplaintRouter(db: PrismaClient) {
         },
       };
 
-      // Cache search results
       if (cacheConnected) {
-        await cacheClient.cacheResponse(cacheKey, response, 180); // 3 minutes TTL for search
+        await cacheClient.cacheResponse(cacheKey, responseForCache, 180); // 3 minutes TTL for search
       }
 
-      return res.status(200).json(response);
+      // Add hasLiked field for THIS user before returning
+      const complaintsWithLikes = addHasLikedField(complaints, userId);
+
+      return res.status(200).json({
+        ...responseForCache,
+        data: complaintsWithLikes,
+      });
     } catch (error) {
       console.error("Search feed error:", error);
       return res.status(500).json({

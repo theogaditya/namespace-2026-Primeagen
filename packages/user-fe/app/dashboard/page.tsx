@@ -14,9 +14,11 @@ import {
   UserData,
   TabType,
 } from "./customComps";
-import { Loader2, AlertCircle, FolderOpen, Plus } from "lucide-react";
+import { Loader2, AlertCircle, FolderOpen, Plus, RefreshCw } from "lucide-react";
 import Link from "next/link";
 import { SwarajAIChat } from "@/components/swaraj-ai-chat";
+import { LikeProvider } from "@/contexts/LikeContext";
+import { PullToRefresh } from "@/components/ui/pull-to-refresh";
 
 // Animation variants
 const containerVariants = {
@@ -220,18 +222,19 @@ export default function DashboardPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 py-25">
-      {/* Header */}
-      <motion.header
-        initial={{ opacity: 0, y: -20 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="bg-white border-b border-gray-200 sticky top-0 z-40"
-      >
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              {/* Mobile Profile Avatar (visible on mobile) */}
-              <button
+    <LikeProvider authToken={authToken}>
+      <div className="min-h-screen bg-gray-50 py-25">
+        {/* Header */}
+        <motion.header
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="bg-white border-b border-gray-200 sticky top-0 z-40"
+        >
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                {/* Mobile Profile Avatar (visible on mobile) */}
+                <button
                 onClick={() => setIsMobileProfileOpen(true)}
                 className="lg:hidden w-10 h-10 rounded-full bg-linear-to-r from-blue-600 to-purple-600 flex items-center justify-center text-white font-bold text-sm shadow-md hover:shadow-lg transition-shadow"
               >
@@ -286,7 +289,29 @@ export default function DashboardPage() {
 
             {/* My Dashboard View */}
             {activeTab === "my-dashboard" && (
-              <>
+              <PullToRefresh
+                onRefresh={fetchMyComplaints}
+                disabled={loadingComplaints}
+                className="space-y-6"
+              >
+                {/* Section Header with Refresh */}
+                <motion.div
+                  initial={{ opacity: 0, y: -10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.25 }}
+                  className="flex items-center justify-between"
+                >
+                  <h2 className="text-lg font-semibold text-gray-900">My Complaints</h2>
+                  <button
+                    onClick={fetchMyComplaints}
+                    disabled={loadingComplaints}
+                    className="flex items-center gap-2 px-3 py-1.5 text-sm font-medium text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-colors disabled:opacity-50"
+                  >
+                    <RefreshCw className={`w-4 h-4 ${loadingComplaints ? 'animate-spin' : ''}`} />
+                    <span className="hidden sm:inline">Refresh</span>
+                  </button>
+                </motion.div>
+
                 {/* Search Bar */}
                 <motion.div
                   initial={{ opacity: 0, y: -10 }}
@@ -401,7 +426,7 @@ export default function DashboardPage() {
                     {searchQuery && ` for "${searchQuery}"`}
                   </motion.p>
                 )}
-              </>
+              </PullToRefresh>
             )}
 
             {/* Community Feed View */}
@@ -506,5 +531,6 @@ export default function DashboardPage() {
       {/* Bottom padding for mobile */}
       <div className="h-24 lg:hidden" />
     </div>
+    </LikeProvider>
   );
 }
