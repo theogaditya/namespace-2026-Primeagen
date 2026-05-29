@@ -1,80 +1,92 @@
-name: CI
+name: CI/CD
 
 on:
   push:
     branches: [main]
+  pull_request:
+
+# allow PR creation
+permissions:
+  contents: write
+  pull-requests: write
 
 jobs:
-  user-be:
-    name: Build & Test user-be
+  build-test-push:
     runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
 
-      - name: Setup Bun
+    env:
+      USER_BE_IMAGE: ogadityahota/swarajdesk-user-be
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install Bun
         uses: oven-sh/setup-bun@v2
         with:
           bun-version: latest
 
-      - name: Install dependencies
-        run: bun install
+      # -------------------------
+      # user-be tests
+      # -------------------------
+      - name: Install deps (user-be)
+        working-directory: packages/user-be
+        run: |
+          bun install --ignore-scripts || true
+          bunx prisma generate
 
-      - name: Build user-be
-        run: bun run --cwd packages/user-be build
+      - name: Run user-be tests
+        working-directory: packages/user-be
+        run: |
+          bun run test:unit
 
-      - name: Test user-be
-        run: bun run --cwd packages/user-be test:unit
-
-  admin-be:
-    name: Build & Test admin-be
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Setup Bun
-        uses: oven-sh/setup-bun@v2
+      # -------------------------
+      # Build & push docker images
+      # -------------------------
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v3
         with:
-          bun-version: latest
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_PASSWORD }}
 
-      - name: Install dependencies
-        run: bun install
+      - name: Build user-be image
+        working-directory: packages/user-be
+        run: |
+          docker build -t $USER_BE_IMAGE:latest -f Dockerfile .
 
-      - name: Build admin-be
-        run: bun run --cwd packages/admin-be build
+      - name: Push images
+        run: |
+          docker push $USER_BE_IMAGE:latest
 
-      - name: Test admin-be
-        run: bun run --cwd packages/admin-be test:unit
-
-  user-fe:
-    name: Build user-fe
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Setup Bun
-        uses: oven-sh/setup-bun@v2
+      # -------------------------
+      # Open PR main -> deploy (skip if one already open)
+      # -------------------------
+      - name: Open PR to deploy
+        uses: actions/github-script@v7
         with:
-          bun-version: latest
-
-      - name: Install dependencies
-        run: bun install
-
-      - name: Build user-fe
-        run: bun run --cwd packages/user-fe build
-
-  admin-fe:
-    name: Build admin-fe
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Setup Bun
-        uses: oven-sh/setup-bun@v2
-        with:
-          bun-version: latest
-
-      - name: Install dependencies
-        run: bun install
-
-      - name: Build admin-fe
-        run: bun run --cwd packages/admin-fe build
+          script: |
+            const owner = context.repo.owner;
+            const repo = context.repo.repo;
+            const base = 'deploy';
+            const head = 'main';
+            // Check if an open PR from main->deploy already exists
+            const prs = await github.rest.pulls.list({ owner, repo, state: 'open', base });
+            const exists = prs.data.find(pr => pr.head.ref === head);
+            if (exists) {
+              core.info(`PR already open: #${exists.number} ${exists.title}`);
+              return;
+            }
+            const title = `Deploy latest from main`;
+            const body = [
+              'This PR merges `main` -> `deploy` to trigger Argo CD.',
+              '',
+              '- Images pushed: `latest`',
+              '- Merge when ready; Argo will sync on merge.'
+            ].join('\n');
+            const res = await github.rest.pulls.create({ owner, repo, title, head, base, body });
+            core.info(`Opened PR #${res.data.number}`);

@@ -1,0 +1,75 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: user-be-deployment
+  labels:
+    app: user-be
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: user-be
+  template:
+    metadata:
+      labels:
+        app: user-be
+    spec:
+      containers:
+        - name: user-be
+          image: user-be:latest
+          ports:
+            - containerPort: 3000
+              name: http
+            - containerPort: 3001
+              name: websocket
+          env:
+            - name: NODE_ENV
+              value: "production"
+            - name: PORT
+              value: "3000"
+            - name: WS_PORT
+              value: "3001"
+            - name: SECRETS_AWS_ACCESS_KEY_ID
+              valueFrom:
+                secretKeyRef:
+                  name: user-be-secrets
+                  key: SECRETS_AWS_ACCESS_KEY_ID
+            - name: SECRETS_AWS_SECRET_ACCESS_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: user-be-secrets
+                  key: SECRETS_AWS_SECRET_ACCESS_KEY
+            - name: SECRET_NAME_AWS_USER_BE
+              valueFrom:
+                secretKeyRef:
+                  name: user-be-secrets
+                  key: SECRET_NAME_AWS_USER_BE
+            - name: DATABASE_URL
+              valueFrom:
+                secretKeyRef:
+                  name: user-be-secrets
+                  key: DATABASE_URL
+            - name: REDIS_URL
+              valueFrom:
+                secretKeyRef:
+                  name: user-be-secrets
+                  key: REDIS_URL
+          resources:
+            requests:
+              memory: "256Mi"
+              cpu: "250m"
+            limits:
+              memory: "512Mi"
+              cpu: "500m"
+          livenessProbe:
+            httpGet:
+              path: /api/health
+              port: 3000
+            initialDelaySeconds: 30
+            periodSeconds: 10
+          readinessProbe:
+            httpGet:
+              path: /api/health
+              port: 3000
+            initialDelaySeconds: 5
+            periodSeconds: 5
