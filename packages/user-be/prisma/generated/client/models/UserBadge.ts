@@ -182,8 +182,8 @@ export type UserBadgeWhereInput = {
   badgeId?: Prisma.StringFilter<"UserBadge"> | string
   earnedAt?: Prisma.DateTimeFilter<"UserBadge"> | Date | string
   notified?: Prisma.BoolFilter<"UserBadge"> | boolean
-  user?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
   badge?: Prisma.XOR<Prisma.BadgeScalarRelationFilter, Prisma.BadgeWhereInput>
+  user?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
 }
 
 export type UserBadgeOrderByWithRelationInput = {
@@ -192,8 +192,8 @@ export type UserBadgeOrderByWithRelationInput = {
   badgeId?: Prisma.SortOrder
   earnedAt?: Prisma.SortOrder
   notified?: Prisma.SortOrder
-  user?: Prisma.UserOrderByWithRelationInput
   badge?: Prisma.BadgeOrderByWithRelationInput
+  user?: Prisma.UserOrderByWithRelationInput
 }
 
 export type UserBadgeWhereUniqueInput = Prisma.AtLeast<{
@@ -206,8 +206,8 @@ export type UserBadgeWhereUniqueInput = Prisma.AtLeast<{
   badgeId?: Prisma.StringFilter<"UserBadge"> | string
   earnedAt?: Prisma.DateTimeFilter<"UserBadge"> | Date | string
   notified?: Prisma.BoolFilter<"UserBadge"> | boolean
-  user?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
   badge?: Prisma.XOR<Prisma.BadgeScalarRelationFilter, Prisma.BadgeWhereInput>
+  user?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
 }, "id" | "userId_badgeId">
 
 export type UserBadgeOrderByWithAggregationInput = {
@@ -236,8 +236,8 @@ export type UserBadgeCreateInput = {
   id?: string
   earnedAt?: Date | string
   notified?: boolean
-  user: Prisma.UserCreateNestedOneWithoutBadgesInput
   badge: Prisma.BadgeCreateNestedOneWithoutUserBadgesInput
+  user: Prisma.UserCreateNestedOneWithoutBadgesInput
 }
 
 export type UserBadgeUncheckedCreateInput = {
@@ -252,8 +252,8 @@ export type UserBadgeUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   earnedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   notified?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  user?: Prisma.UserUpdateOneRequiredWithoutBadgesNestedInput
   badge?: Prisma.BadgeUpdateOneRequiredWithoutUserBadgesNestedInput
+  user?: Prisma.UserUpdateOneRequiredWithoutBadgesNestedInput
 }
 
 export type UserBadgeUncheckedUpdateInput = {
@@ -564,8 +564,8 @@ export type UserBadgeSelect<ExtArgs extends runtime.Types.Extensions.InternalArg
   badgeId?: boolean
   earnedAt?: boolean
   notified?: boolean
-  user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   badge?: boolean | Prisma.BadgeDefaultArgs<ExtArgs>
+  user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["userBadge"]>
 
 export type UserBadgeSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -574,8 +574,8 @@ export type UserBadgeSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Ext
   badgeId?: boolean
   earnedAt?: boolean
   notified?: boolean
-  user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   badge?: boolean | Prisma.BadgeDefaultArgs<ExtArgs>
+  user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["userBadge"]>
 
 export type UserBadgeSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -584,8 +584,8 @@ export type UserBadgeSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Ext
   badgeId?: boolean
   earnedAt?: boolean
   notified?: boolean
-  user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   badge?: boolean | Prisma.BadgeDefaultArgs<ExtArgs>
+  user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["userBadge"]>
 
 export type UserBadgeSelectScalar = {
@@ -598,23 +598,23 @@ export type UserBadgeSelectScalar = {
 
 export type UserBadgeOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "userId" | "badgeId" | "earnedAt" | "notified", ExtArgs["result"]["userBadge"]>
 export type UserBadgeInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   badge?: boolean | Prisma.BadgeDefaultArgs<ExtArgs>
+  user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
 }
 export type UserBadgeIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   badge?: boolean | Prisma.BadgeDefaultArgs<ExtArgs>
+  user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
 }
 export type UserBadgeIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   badge?: boolean | Prisma.BadgeDefaultArgs<ExtArgs>
+  user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
 }
 
 export type $UserBadgePayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   name: "UserBadge"
   objects: {
-    user: Prisma.$UserPayload<ExtArgs>
     badge: Prisma.$BadgePayload<ExtArgs>
+    user: Prisma.$UserPayload<ExtArgs>
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -1016,8 +1016,8 @@ readonly fields: UserBadgeFieldRefs;
  */
 export interface Prisma__UserBadgeClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
-  user<T extends Prisma.UserDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.UserDefaultArgs<ExtArgs>>): Prisma.Prisma__UserClient<runtime.Types.Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   badge<T extends Prisma.BadgeDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.BadgeDefaultArgs<ExtArgs>>): Prisma.Prisma__BadgeClient<runtime.Types.Result.GetResult<Prisma.$BadgePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+  user<T extends Prisma.UserDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.UserDefaultArgs<ExtArgs>>): Prisma.Prisma__UserClient<runtime.Types.Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.

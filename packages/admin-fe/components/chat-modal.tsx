@@ -285,7 +285,8 @@ export function ChatModal({ isOpen, onClose, complaintId, complaintTitle }: Chat
                               ? message.agent?.fullName || "Agent"
                               : message.user?.name || "Citizen"}
                           </p>
-                          <p className="text-sm whitespace-pre-wrap break-words">
+                          {/* eslint-disable-next-line */}
+                          <p className="text-sm whitespace-pre-wrap wrap-break-word">
                             {message.message}
                           </p>
                           <p

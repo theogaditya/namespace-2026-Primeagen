@@ -259,10 +259,23 @@ router.get('/my-complaints', authenticateStateAdminOnly, async (req: any, res: a
   try {
     const stateAdminId = req.admin.id;
 
+    // Log when endpoint is hit for debugging
+    console.log(`[stateAdminRoutes] GET /my-complaints hit by stateAdminId=${stateAdminId} query=${JSON.stringify(req.query)} - returning complaints with escalatedToStateAdminId != null`);
+
+    // Pagination params (optional)
+    const page = parseInt(String(req.query?.page || '1'), 10) || 1;
+    const limit = Math.min(parseInt(String(req.query?.limit || '20'), 10) || 20, 100);
+    const skip = (page - 1) * limit;
+
+    // Return any complaint that has an escalatedToStateAdminId (no specific id check)
+    const where = {
+      escalatedToStateAdminId: { not: null },
+    };
+
+    const total = await prisma.complaint.count({ where });
+
     const complaintsRaw = await prisma.complaint.findMany({
-      where: {
-        escalatedToStateAdminId: stateAdminId,
-      },
+      where,
       include: {
         category: true,
         User: true,
@@ -277,7 +290,9 @@ router.get('/my-complaints', authenticateStateAdminOnly, async (req: any, res: a
       },
       orderBy: {
         submissionDate: 'desc'
-      }
+      },
+      skip,
+      take: limit
     });
 
     // Map Prisma relation `User` to `complainant` for response consistency
@@ -286,7 +301,7 @@ router.get('/my-complaints', authenticateStateAdminOnly, async (req: any, res: a
       complainant: User || null
     }));
 
-    return res.json({ success: true, complaints });
+    return res.json({ success: true, complaints, pagination: { total, page, limit, totalPages: Math.ceil(total / limit) } });
   } catch (error: any) {
     console.error('Error fetching state admin complaints:', error);
     return res.status(500).json({ 

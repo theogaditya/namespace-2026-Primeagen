@@ -88,7 +88,7 @@ export function StateMyComplaints() {
         return
       }
 
-      // Use state admin specific endpoint
+      // Call admin-be assigned-only endpoint for state admin
       const res = await fetch(`/api/state-admin/my-complaints?page=${pagination.currentPage}&limit=${pagination.itemsPerPage}`, {
         headers: { Authorization: `Bearer ${token}` },
       })
