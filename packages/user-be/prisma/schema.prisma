@@ -25,8 +25,8 @@ model User {
   auditLogsCreated      AuditLog[]    @relation("LogCreator")
   chats                 Chat[]
   upvotes               Upvote[]
-  location              UserLocation?
   badges                UserBadge[]
+  location              UserLocation?
 }
 
 model UserLocation {
@@ -355,6 +355,38 @@ model operating_districts {
   operating_states operating_states @relation(fields: [stateId], references: [id], onDelete: Cascade)
 }
 
+model Badge {
+  id          String        @id @default(uuid())
+  slug        String        @unique
+  name        String
+  description String
+  icon        String
+  category    BadgeCategory
+  rarity      BadgeRarity
+  threshold   Int
+  createdAt   DateTime      @default(now())
+  userBadges  UserBadge[]
+
+  @@index([category])
+  @@index([rarity])
+  @@map("badges")
+}
+
+model UserBadge {
+  id       String   @id @default(uuid())
+  userId   String
+  badgeId  String
+  earnedAt DateTime @default(now())
+  notified Boolean  @default(false)
+  badge    Badge    @relation(fields: [badgeId], references: [id], onDelete: Cascade)
+  user     User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, badgeId])
+  @@index([userId])
+  @@index([earnedAt])
+  @@map("user_badges")
+}
+
 enum userStatus {
   ACTIVE
   DELETED
@@ -425,51 +457,11 @@ enum SenderType {
   AGENT
 }
 
-// ============================================
-// Gamification - Badge System
-// ============================================
-
-model Badge {
-  id          String        @id @default(uuid())
-  slug        String        @unique // e.g., "first_step", "trending_voice"
-  name        String        // Display name
-  description String        // How to earn it
-  icon        String        // Lucide icon name
-  category    BadgeCategory
-  rarity      BadgeRarity
-  threshold   Int           // Number required to earn (e.g., 5 complaints)
-  createdAt   DateTime      @default(now())
-
-  // Relations
-  userBadges UserBadge[]
-
-  @@index([category])
-  @@index([rarity])
-  @@map("badges")
-}
-
-model UserBadge {
-  id       String   @id @default(uuid())
-  userId   String
-  badgeId  String
-  earnedAt DateTime @default(now())
-  notified Boolean  @default(false) // Has user been notified?
-
-  // Relations
-  user  User  @relation(fields: [userId], references: [id], onDelete: Cascade)
-  badge Badge @relation(fields: [badgeId], references: [id], onDelete: Cascade)
-
-  @@unique([userId, badgeId])
-  @@index([userId])
-  @@index([earnedAt])
-  @@map("user_badges")
-}
-
 enum BadgeCategory {
-  FILING              // Complaint filing milestones
-  ENGAGEMENT          // Likes and community interaction
-  RESOLUTION          // Complaints getting resolved
-  CATEGORY_SPECIALIST // Department/category specialists
+  FILING
+  ENGAGEMENT
+  RESOLUTION
+  CATEGORY_SPECIALIST
 }
 
 enum BadgeRarity {

@@ -210,39 +210,15 @@ export function StateAdminLayout({ children, activeTab = 'dashboard', onTabChang
                     <span>Settings</span>
                   </DropdownMenuItem>
                   <DropdownMenuSeparator />
-                    <DropdownMenuItem onClick={async () => {
-                      // Logout flow: attempt server-side invalidation then clear client state
-                      try {
-                        const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null
-                        const adminType = typeof window !== 'undefined' ? localStorage.getItem('adminType') : null
-
-                        if (adminType === 'SUPER_ADMIN') {
-                          // super-admin logout endpoint clears cookie
-                          await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000'}/api/super-admin/logout`, { method: 'POST', credentials: 'include' })
-                        } else if (token) {
-                          // try to invalidate token on server if endpoint exists
-                          try {
-                            await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000'}/api/users/logout`, {
-                              method: 'POST',
-                              headers: { Authorization: `Bearer ${token}` },
-                            })
-                          } catch (e) {
-                            // ignore server errors; we'll still clear client state
-                          }
-                        }
-                      } catch (err) {
-                        console.warn('Logout error', err)
-                      } finally {
-                        // Clear client-side auth
-                        try { localStorage.removeItem('token'); localStorage.removeItem('admin'); localStorage.removeItem('adminType'); } catch {}
-                        // notify other tabs
-                        try { window.dispatchEvent(new Event('authChange')) } catch {}
-                        router.push('/')
-                      }
-                    }}>
-                      <LogOut className="mr-2 h-4 w-4" />
-                      <span>Log out</span>
-                    </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => {
+                    // Client-only logout: clear localStorage and redirect
+                    try { localStorage.removeItem('token'); localStorage.removeItem('admin'); localStorage.removeItem('adminType'); } catch {}
+                    try { window.dispatchEvent(new Event('authChange')) } catch {}
+                    router.push('/')
+                  }}>
+                    <LogOut className="mr-2 h-4 w-4" />
+                    <span>Log out</span>
+                  </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
             </div>
