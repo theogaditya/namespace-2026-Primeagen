@@ -38,3 +38,4 @@ report.[0-9]_.[0-9]_.[0-9]_.[0-9]_.json
 .terraform.lock.hcl
 terraform.tfstate
 terraform.tfstate.backup
+.terraform/
