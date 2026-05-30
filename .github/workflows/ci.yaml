@@ -36,6 +36,8 @@ jobs:
       # -------------------------
       - name: Install deps (user-be)
         working-directory: packages/user-be
+        env:
+          DATABASE_URL: "postgresql://dummy:dummy@localhost:5432/dummy"
         run: |
           bun install --ignore-scripts || true
           bunx prisma generate
@@ -57,7 +59,7 @@ jobs:
       - name: Build user-be image
         working-directory: packages/user-be
         run: |
-          docker build -t $USER_BE_IMAGE:latest -f Dockerfile .
+          docker build --build-arg DATABASE_URL="postgresql://dummy:dummy@localhost:5432/dummy" -t $USER_BE_IMAGE:latest -f Dockerfile .
 
       - name: Push images
         run: |
