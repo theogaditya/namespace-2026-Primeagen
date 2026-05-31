@@ -3,9 +3,12 @@ kind: Ingress
 metadata:
   name: argocd
   namespace: argocd
+  annotations:
+    kubernetes.io/ingress.class: platform-traefik
 spec:
+  ingressClassName: platform-traefik
   rules:
-    - host: argo-testing-mern.adityahota.online
+    - host: sih-argo-testing-mern.adityahota.online
       http:
         paths:
           - path: /
