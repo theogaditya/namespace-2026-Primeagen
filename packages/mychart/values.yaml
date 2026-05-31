@@ -1,0 +1,10 @@
+argo-cd:
+  fullnameOverride: argocd
+  namespaceOverride: argocd
+  server:
+    insecure: true
+    service:
+      type: LoadBalancer
+
+traefik:
+  namespaceOverride: default

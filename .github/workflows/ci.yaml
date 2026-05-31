@@ -1,24 +1,48 @@
-name: CI
+name: CI/CD
 
 on:
   push:
     branches: [main]
+  pull_request:
+
+# allow PR creation
+permissions:
+  contents: write
+  pull-requests: write
 
 jobs:
-  user-be:
-    name: Build & Test user-be
+  build-test-push:
     runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
 
-      - name: Setup Bun
+    env:
+      USER_BE_IMAGE: ogadityahota/swarajdesk-user-be
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install Bun
         uses: oven-sh/setup-bun@v2
         with:
           bun-version: latest
 
-      - name: Install dependencies
-        run: bun install
+      # -------------------------
+      # user-be tests
+      # -------------------------
+      - name: Install deps (user-be)
+        working-directory: packages/user-be
+        env:
+          DATABASE_URL: "postgresql://dummy:dummy@localhost:5432/dummy"
+        run: |
+          bun install --ignore-scripts || true
+          bunx prisma generate
 
+<<<<<<< HEAD
       - name: Build user-be
         run: bun run --cwd packages/user-be build
 
@@ -53,15 +77,88 @@ jobs:
 
       - name: Setup Bun
         uses: oven-sh/setup-bun@v2
+=======
+      - name: Run user-be tests
+        working-directory: packages/user-be
+        run: |
+          bun run test:unit
+Run actions/github-script@v7
+RequestError [HttpError]: GitHub Actions is not permitted to create or approve pull requests.
+    at /home/runner/work/_actions/actions/github-script/v7/dist/index.js:9537:21
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async eval (eval at callAsyncFunction (/home/runner/work/_actions/actions/github-script/v7/dist/index.js:36187:16), <anonymous>:21:13)
+    at async main (/home/runner/work/_actions/actions/github-script/v7/dist/index.js:36285:20) {
+  status: 403,
+  response: {
+    url: 'https://api.github.com/repos/theogaditya/sih-swarajdesk-2025/pulls',
+    status: 403,
+    headers: {
+      'access-control-allow-origin': '*',
+      'access-control-expose-headers': 'ETag, Link, Location, Retry-After, X-GitHub-OTP, X-RateLimit-Limit, X-RateLimit-Remaining, X-RateLimit-Used, X-RateLimit-Resource, X-RateLimit-Reset, X-OAuth-Scopes, X-Accepted-OAuth-Scopes, X-Poll-Interval, X-GitHub-Media-Type, X-GitHub-SSO, X-GitHub-Request-Id, Deprecation, Sunset',
+      'content-encoding': 'gzip',
+      'content-security-policy': "default-src 'none'",
+      'content-type': 'application/json; charset=utf-8',
+      date: 'Sun, 07 Dec 2025 17:00:41 GMT',
+      'referrer-policy': 'origin-when-cross-origin, strict-origin-when-cross-origin',
+      server: 'github.com',
+      'strict-transport-security': 'max-age=31536000; includeSubdomains; preload',
+      'transfer-encoding': 'chunked',
+      vary: 'Accept-Encoding, Accept, X-Requested-With',
+      'x-accepted-github-permissions': 'pull_requests=write',
+      'x-content-type-options': 'nosniff',
+      'x-frame-options': 'deny',
+      'x-github-api-version-selected': '2022-11-28',
+      'x-github-media-type': 'github.v3; format=json',
+      'x-github-request-id': '7C01:2794E2:7B80FBC:7FB22CC:6935B2B9',
+      'x-ratelimit-limit': '5000',
+      'x-ratelimit-remaining': '4996',
+      'x-ratelimit-reset': '1765130221',
+      'x-ratelimit-resource': 'core',
+      'x-ratelimit-used': '4',
+      'x-xss-protection': '0'
+    },
+    data: {
+      message: 'GitHub Actions is not permitted to create or approve pull requests.',
+      documentation_url: 'https://docs.github.com/rest/pulls/pulls#create-a-pull-request',
+      status: '403'
+    }
+  },
+  request: {
+    method: 'POST',
+    url: 'https://api.github.com/repos/theogaditya/sih-swarajdesk-2025/pulls',
+    headers: {
+      accept: 'application/vnd.github.v3+json',
+      'user-agent': 'actions/github-script octokit-core.js/5.0.1 Node.js/20.19.5 (linux; x64)',
+      authorization: 'token [REDACTED]',
+      'content-type': 'application/json; charset=utf-8'
+    },
+    body: '{"title":"Deploy latest from main","head":"main","base":"deploy","body":"This PR merges `main` -> `deploy` to trigger Argo CD.\\n\\n- Images pushed: `latest`\\n- Merge when ready; Argo will sync on merge."}',
+    request: {
+      agent: [Agent],
+      fetch: [Function: proxyFetch],
+      hook: [Function: bound bound register]
+    }
+  }
+}
+Error: Unhandled error: HttpError: GitHub Actions is not permitted to create or approve pull requests.
+1s
+0s
+      # -------------------------
+      # Build & push docker images
+      # -------------------------
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v3
+>>>>>>> 1b4a6ec7a3e4a4deaa96c075cf8295f67b46449c
         with:
-          bun-version: latest
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_PASSWORD }}
 
-      - name: Install dependencies
-        run: bun install
+      - name: Build user-be image
+        working-directory: packages/user-be
+        run: |
+          docker build --build-arg DATABASE_URL="postgresql://dummy:dummy@localhost:5432/dummy" -t $USER_BE_IMAGE:latest -f Dockerfile .
 
-      - name: Build user-fe
-        run: bun run --cwd packages/user-fe build
-
+<<<<<<< HEAD
   admin-fe:
     name: Build admin-fe
     runs-on: ubuntu-latest
@@ -78,3 +175,36 @@ jobs:
 
       - name: Build admin-fe
         run: bun run --cwd packages/admin-fe build
+=======
+      - name: Push images
+        run: |
+          docker push $USER_BE_IMAGE:latest
+
+      # -------------------------
+      # Open PR main -> deploy (skip if one already open)
+      # -------------------------
+      - name: Open PR to deploy
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const owner = context.repo.owner;
+            const repo = context.repo.repo;
+            const base = 'deploy';
+            const head = 'main';
+            // Check if an open PR from main->deploy already exists
+            const prs = await github.rest.pulls.list({ owner, repo, state: 'open', base });
+            const exists = prs.data.find(pr => pr.head.ref === head);
+            if (exists) {
+              core.info(`PR already open: #${exists.number} ${exists.title}`);
+              return;
+            }
+            const title = `Deploy latest from main`;
+            const body = [
+              'This PR merges `main` -> `deploy` to trigger Argo CD.',
+              '',
+              '- Images pushed: `latest`',
+              '- Merge when ready; Argo will sync on merge.'
+            ].join('\n');
+            const res = await github.rest.pulls.create({ owner, repo, title, head, base, body });
+            core.info(`Opened PR #${res.data.number}`);
+>>>>>>> 1b4a6ec7a3e4a4deaa96c075cf8295f67b46449c

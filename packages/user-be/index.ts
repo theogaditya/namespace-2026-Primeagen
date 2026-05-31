@@ -36,7 +36,7 @@ export class Server {
     this.app.use(helmet());
     this.app.use(compression());
 
-    this.backEndUser = process.env.frontend;
+    this.frontEndUser = process.env.frontend;
     this.backEndUser = process.env.backend;
     this.worker = process.env.worker;
     this.frontEndAdmin = process.env.frontend_admin;
@@ -51,15 +51,14 @@ export class Server {
     this.app.use(helmet());
     this.app.use(compression());
 
-    const devWhitelist = [this.frontEndUser, this.backEndUser, this.worker, this.frontEndAdmin, this.backEndAdmin]
-    //const devWhitelist = ["*"]
+    const whitelist = [this.frontEndUser, this.backEndUser, this.worker, this.frontEndAdmin, this.backEndAdmin].filter(Boolean);
 
     const corsOptions = {
       origin: (origin: any, cb: any) => {
         console.log("[CORS] incoming Origin:", origin);
+        console.log("[CORS] whitelist:", whitelist);
         if (!origin) return cb(null, true);
-        if (process.env.NODE_ENV !== "production") {
-          if (devWhitelist.includes(origin)) return cb(null, true);
+        if (whitelist.includes(origin)) {
           return cb(null, true);
         }
         return cb(new Error("Not allowed by CORS"));

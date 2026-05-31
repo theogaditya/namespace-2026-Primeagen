@@ -1,0 +1,9 @@
+dependencies:
+- name: traefik
+  repository: https://traefik.github.io/charts
+  version: 28.0.0
+- name: argo-cd
+  repository: https://argoproj.github.io/argo-helm
+  version: 7.4.3
+digest: sha256:62ac1f4c84cde70a31296eabaed18680878cf9e61f31bc987d2f29a12d140f5c
+generated: "2025-12-07T21:35:50.432102425+05:30"
