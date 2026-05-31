@@ -6,46 +6,47 @@ on:
   pull_request:
 
 # allow PR creation
-      vary: 'Accept-Encoding, Accept, X-Requested-With',
-      'x-accepted-github-permissions': 'pull_requests=write',
-      'x-content-type-options': 'nosniff',
-      'x-frame-options': 'deny',
-      'x-github-api-version-selected': '2022-11-28',
-      'x-github-media-type': 'github.v3; format=json',
-      'x-github-request-id': '7C01:2794E2:7B80FBC:7FB22CC:6935B2B9',
-      'x-ratelimit-limit': '5000',
-      'x-ratelimit-remaining': '4996',
-      'x-ratelimit-reset': '1765130221',
-      'x-ratelimit-resource': 'core',
-      'x-ratelimit-used': '4',
-      'x-xss-protection': '0'
-    },
-    data: {
-      message: 'GitHub Actions is not permitted to create or approve pull requests.',
-      documentation_url: 'https://docs.github.com/rest/pulls/pulls#create-a-pull-request',
-      status: '403'
-    }
-  },
-  request: {
-    method: 'POST',
-    url: 'https://api.github.com/repos/theogaditya/sih-swarajdesk-2025/pulls',
-    headers: {
-      accept: 'application/vnd.github.v3+json',
-      'user-agent': 'actions/github-script octokit-core.js/5.0.1 Node.js/20.19.5 (linux; x64)',
-      authorization: 'token [REDACTED]',
-      'content-type': 'application/json; charset=utf-8'
-    },
-    body: '{"title":"Deploy latest from main","head":"main","base":"deploy","body":"This PR merges `main` -> `deploy` to trigger Argo CD.\\n\\n- Images pushed: `latest`\\n- Merge when ready; Argo will sync on merge."}',
-    request: {
-      agent: [Agent],
-      fetch: [Function: proxyFetch],
-      hook: [Function: bound bound register]
-    }
-  }
-}
-Error: Unhandled error: HttpError: GitHub Actions is not permitted to create or approve pull requests.
-1s
-0s
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  build-test-push:
+    runs-on: ubuntu-latest
+
+    env:
+      USER_BE_IMAGE: ogadityahota/swarajdesk-user-be
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
+      # -------------------------
+      # user-be tests
+      # -------------------------
+      - name: Install deps (user-be)
+        working-directory: packages/user-be
+        env:
+          DATABASE_URL: "postgresql://dummy:dummy@localhost:5432/dummy"
+        run: |
+          bun install --ignore-scripts || true
+          bunx prisma generate
+
+      - name: Run user-be tests
+        working-directory: packages/user-be
+        run: |
+          bun run test:unit
+
       # -------------------------
       # Build & push docker images
       # -------------------------
@@ -79,15 +80,15 @@ Error: Unhandled error: HttpError: GitHub Actions is not permitted to create or 
             const prs = await github.rest.pulls.list({ owner, repo, state: 'open', base });
             const exists = prs.data.find(pr => pr.head.ref === head);
             if (exists) {
-              core.info(`PR already open: #${exists.number} ${exists.title}`);
+              core.info(\`PR already open: #\${exists.number} \${exists.title}\`);
               return;
             }
-            const title = `Deploy latest from main`;
+            const title = \`Deploy latest from main\`;
             const body = [
-              'This PR merges `main` -> `deploy` to trigger Argo CD.',
+              'This PR merges \`main\` -> \`deploy\` to trigger Argo CD.',
               '',
-              '- Images pushed: `latest`',
+              '- Images pushed: \`latest\`',
               '- Merge when ready; Argo will sync on merge.'
-            ].join('\n');
+            ].join('\\n');
             const res = await github.rest.pulls.create({ owner, repo, title, head, base, body });
-            core.info(`Opened PR #${res.data.number}`);
+            core.info(\`Opened PR #\${res.data.number}\`);
