@@ -6,67 +6,6 @@ on:
   pull_request:
 
 # allow PR creation
-permissions:
-  contents: write
-  pull-requests: write
-
-jobs:
-  build-test-push:
-    runs-on: ubuntu-latest
-
-    env:
-      USER_BE_IMAGE: ogadityahota/swarajdesk-user-be
-
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Set up Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '20'
-
-      - name: Install Bun
-        uses: oven-sh/setup-bun@v2
-        with:
-          bun-version: latest
-
-      # -------------------------
-      # user-be tests
-      # -------------------------
-      - name: Install deps (user-be)
-        working-directory: packages/user-be
-        env:
-          DATABASE_URL: "postgresql://dummy:dummy@localhost:5432/dummy"
-        run: |
-          bun install --ignore-scripts || true
-          bunx prisma generate
-
-      - name: Run user-be tests
-        working-directory: packages/user-be
-        run: |
-          bun run test:unit
-Run actions/github-script@v7
-RequestError [HttpError]: GitHub Actions is not permitted to create or approve pull requests.
-    at /home/runner/work/_actions/actions/github-script/v7/dist/index.js:9537:21
-    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
-    at async eval (eval at callAsyncFunction (/home/runner/work/_actions/actions/github-script/v7/dist/index.js:36187:16), <anonymous>:21:13)
-    at async main (/home/runner/work/_actions/actions/github-script/v7/dist/index.js:36285:20) {
-  status: 403,
-  response: {
-    url: 'https://api.github.com/repos/theogaditya/sih-swarajdesk-2025/pulls',
-    status: 403,
-    headers: {
-      'access-control-allow-origin': '*',
-      'access-control-expose-headers': 'ETag, Link, Location, Retry-After, X-GitHub-OTP, X-RateLimit-Limit, X-RateLimit-Remaining, X-RateLimit-Used, X-RateLimit-Resource, X-RateLimit-Reset, X-OAuth-Scopes, X-Accepted-OAuth-Scopes, X-Poll-Interval, X-GitHub-Media-Type, X-GitHub-SSO, X-GitHub-Request-Id, Deprecation, Sunset',
-      'content-encoding': 'gzip',
-      'content-security-policy': "default-src 'none'",
-      'content-type': 'application/json; charset=utf-8',
-      date: 'Sun, 07 Dec 2025 17:00:41 GMT',
-      'referrer-policy': 'origin-when-cross-origin, strict-origin-when-cross-origin',
-      server: 'github.com',
-      'strict-transport-security': 'max-age=31536000; includeSubdomains; preload',
-      'transfer-encoding': 'chunked',
       vary: 'Accept-Encoding, Accept, X-Requested-With',
       'x-accepted-github-permissions': 'pull_requests=write',
       'x-content-type-options': 'nosniff',
