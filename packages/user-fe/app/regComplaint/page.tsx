@@ -271,6 +271,7 @@ export default function RegisterComplaintPage() {
     setErrors,
     setPhoto,
     goToStep,
+    setImageValidationStatus,
   } = useComplaintForm();
 
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -279,6 +280,9 @@ export default function RegisterComplaintPage() {
   const [showPopup, setShowPopup] = useState(false);
   const [complaintId, setComplaintId] = useState<string | null>(null);
   const [mounted, setMounted] = useState(false);
+
+  // Use imageValidationStatus from formData (persisted)
+  const imageValidationStatus = formData.imageValidationStatus;
 
   useEffect(() => {
     setMounted(true);
@@ -471,6 +475,7 @@ export default function RegisterComplaintPage() {
             setFieldTouched={setFieldTouched}
             setErrors={setErrors}
             setPhoto={setPhoto}
+            setImageValidationStatus={setImageValidationStatus}
           />
         );
       case 3:
@@ -494,6 +499,12 @@ export default function RegisterComplaintPage() {
   // Check if current step has errors
   const hasStepErrors = Object.keys(errors).filter((k) => errors[k]).length > 0;
   const currentStepConfig = STEPS[currentStep - 1];
+  
+  // Check if Next button should be disabled (validation in progress or invalid image on step 2)
+  const isNextDisabled = currentStep === 2 && (
+    imageValidationStatus === "validating" || 
+    imageValidationStatus === "invalid"
+  );
 
   return (
     <div className="min-h-screen relative overflow-hidden bg-linear-to-b from-slate-50 via-white to-slate-100 py-10">
@@ -685,16 +696,23 @@ export default function RegisterComplaintPage() {
                 </div>
 
                 {currentStep < 4 ? (
-                  <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
+                  <motion.div whileHover={{ scale: isNextDisabled ? 1 : 1.02 }} whileTap={{ scale: isNextDisabled ? 1 : 0.98 }}>
                     <Button
                       onClick={handleNext}
+                      disabled={isNextDisabled}
                       className={cn(
                         "flex items-center gap-2 px-8 py-5 rounded-xl text-white shadow-lg transition-all bg-linear-to-r",
                         currentStepConfig.gradient,
-                        "hover:shadow-xl hover:brightness-110"
+                        isNextDisabled 
+                          ? "opacity-50 cursor-not-allowed grayscale" 
+                          : "hover:shadow-xl hover:brightness-110"
                       )}
                     >
-                      Next
+                      {imageValidationStatus === "validating" 
+                        ? "Validating..." 
+                        : imageValidationStatus === "invalid" 
+                          ? "Invalid Image" 
+                          : "Next"}
                       <ArrowRight className="h-4 w-4" />
                     </Button>
                   </motion.div>

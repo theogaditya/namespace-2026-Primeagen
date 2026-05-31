@@ -18,6 +18,7 @@ const initialFormState: ComplaintFormState = {
   isPublic: false,
   photo: null,
   photoPreview: "",
+  imageValidationStatus: "idle",
   // Step 3
   district: "",
   pin: "",
@@ -50,12 +51,12 @@ export function useComplaintForm() {
         const saved = localStorage.getItem(STORAGE_KEY);
         if (saved) {
           const parsed = JSON.parse(saved);
-          // Don't restore file, just the form data
+          // Restore form data including photoPreview and imageValidationStatus
+          // but not the File object itself (can't be serialized)
           setFormData({
             ...initialFormState,
             ...parsed.formData,
-            photo: null,
-            photoPreview: "",
+            photo: null, // File can't be restored from localStorage
           });
           setCurrentStep(parsed.currentStep || 1);
           setTouched(parsed.touched || {});
@@ -71,12 +72,12 @@ export function useComplaintForm() {
   useEffect(() => {
     if (isLoaded && typeof window !== "undefined") {
       try {
-        // Don't save file to localStorage
+        // Save form data including photoPreview and imageValidationStatus
+        // but not the File object
         const dataToSave = {
           formData: {
             ...formData,
-            photo: null,
-            photoPreview: "",
+            photo: null, // File can't be saved to localStorage
           },
           currentStep,
           touched,
@@ -189,6 +190,7 @@ export function useComplaintForm() {
           ...prev,
           photo: file,
           photoPreview: e.target?.result as string,
+          imageValidationStatus: "idle", // Reset validation when new photo is set
         }));
       };
       reader.readAsDataURL(file);
@@ -197,8 +199,17 @@ export function useComplaintForm() {
         ...prev,
         photo: null,
         photoPreview: "",
+        imageValidationStatus: "idle",
       }));
     }
+  }, []);
+
+  // Helper to set image validation status
+  const setImageValidationStatus = useCallback((status: ComplaintFormState["imageValidationStatus"]) => {
+    setFormData((prev) => ({
+      ...prev,
+      imageValidationStatus: status,
+    }));
   }, []);
 
   return {
@@ -218,7 +229,6 @@ export function useComplaintForm() {
     isFieldValid,
     setErrors,
     setPhoto,
+    setImageValidationStatus,
   };
 }
-
-export type { ComplaintFormState, ComplaintFormField };

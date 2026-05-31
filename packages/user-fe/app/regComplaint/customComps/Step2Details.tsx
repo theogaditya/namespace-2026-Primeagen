@@ -1,11 +1,12 @@
 "use client";
 
-import React, { useRef, useState } from "react";
-import { motion, type Variants } from "framer-motion";
+import React, { useRef, useState, useEffect, useCallback } from "react";
+import { motion, AnimatePresence, type Variants } from "framer-motion";
 import { cn } from "@/lib/utils";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Checkbox } from "@/components/ui/checkbox";
+import { validateImage, type ImageValidationResult } from "@/lib/api/imageValidation";
 import { 
   URGENCY_OPTIONS, 
   ComplaintUrgency, 
@@ -28,6 +29,9 @@ import {
   Sparkles,
   Upload,
   Camera,
+  Loader2,
+  ShieldCheck,
+  ShieldAlert,
 } from "lucide-react";
 
 const containerVariants: Variants = {
@@ -67,6 +71,9 @@ const headerVariants: Variants = {
   },
 };
 
+// Image validation status types
+export type ImageValidationStatus = "idle" | "validating" | "valid" | "invalid" | "error";
+
 interface Step2Props {
   formData: {
     subCategory: string;
@@ -76,6 +83,7 @@ interface Step2Props {
     photo: File | null;
     photoPreview: string;
     categoryName: string;
+    imageValidationStatus: ImageValidationStatus;
   };
   touched: { [key: string]: boolean };
   errors: { [key: string]: string | undefined };
@@ -83,6 +91,7 @@ interface Step2Props {
   setFieldTouched: (field: string) => void;
   setErrors: React.Dispatch<React.SetStateAction<{ [key: string]: string | undefined }>>;
   setPhoto: (file: File | null) => void;
+  setImageValidationStatus: (status: ImageValidationStatus) => void;
 }
 
 interface WordCounterProps {
@@ -120,6 +129,123 @@ function WordCounter({ current, max }: WordCounterProps) {
   );
 }
 
+// Pulsing dots animation for loading state
+const pulsingDotsVariants: Variants = {
+  animate: {
+    transition: {
+      staggerChildren: 0.2,
+    },
+  },
+};
+
+const dotVariants: Variants = {
+  initial: { opacity: 0.4 },
+  animate: {
+    opacity: [0.4, 1, 0.4],
+    transition: {
+      duration: 1,
+      repeat: Infinity,
+      ease: "easeInOut",
+    },
+  },
+};
+
+interface ImageValidationBadgeProps {
+  status: ImageValidationStatus;
+  validationResult?: ImageValidationResult | null;
+}
+
+function ImageValidationBadge({ status, validationResult }: ImageValidationBadgeProps) {
+  if (status === "idle") return null;
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 10, scale: 0.9 }}
+      animate={{ opacity: 1, y: 0, scale: 1 }}
+      exit={{ opacity: 0, y: -10, scale: 0.9 }}
+      transition={{ type: "spring", stiffness: 200, damping: 20 }}
+      className="mt-3"
+    >
+      {status === "validating" && (
+        <motion.div
+          className="inline-flex items-center gap-2 px-4 py-2.5 rounded-full bg-linear-to-r from-emerald-50 to-teal-50 border border-emerald-200 shadow-sm"
+          animate={{
+            boxShadow: [
+              "0 0 0 0 rgba(16, 185, 129, 0)",
+              "0 0 0 8px rgba(16, 185, 129, 0.1)",
+              "0 0 0 0 rgba(16, 185, 129, 0)",
+            ],
+          }}
+          transition={{ duration: 2, repeat: Infinity }}
+        >
+          <motion.div
+            animate={{ rotate: 360 }}
+            transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+          >
+            <Loader2 className="h-4 w-4 text-emerald-600" />
+          </motion.div>
+          <span className="text-sm font-medium text-emerald-700">Verifying with SwarajAI</span>
+          <motion.div className="flex gap-0.5" variants={pulsingDotsVariants} animate="animate">
+            {[0, 1, 2].map((i) => (
+              <motion.span
+                key={i}
+                variants={dotVariants}
+                className="w-1 h-1 rounded-full bg-emerald-500"
+              />
+            ))}
+          </motion.div>
+        </motion.div>
+      )}
+
+      {status === "valid" && (
+        <motion.div
+          initial={{ scale: 0.8 }}
+          animate={{ scale: 1 }}
+          className="inline-flex items-center gap-2 px-4 py-2.5 rounded-full bg-linear-to-r from-green-50 to-emerald-50 border border-green-300 shadow-sm"
+        >
+          <motion.div
+            initial={{ scale: 0 }}
+            animate={{ scale: 1 }}
+            transition={{ type: "spring", stiffness: 300, damping: 15, delay: 0.1 }}
+          >
+            <ShieldCheck className="h-4 w-4 text-green-600" />
+          </motion.div>
+          <span className="text-sm font-semibold text-green-700">Image Validated</span>
+          <motion.div
+            initial={{ scale: 0 }}
+            animate={{ scale: 1 }}
+            transition={{ type: "spring", stiffness: 300, delay: 0.2 }}
+          >
+            <CheckCircle className="h-4 w-4 text-green-500" />
+          </motion.div>
+        </motion.div>
+      )}
+
+      {status === "invalid" && (
+        <motion.div
+          initial={{ scale: 0.8 }}
+          animate={{ scale: 1 }}
+          className="inline-flex items-center gap-2 px-4 py-2.5 rounded-full bg-linear-to-r from-amber-50 to-orange-50 border border-amber-300 shadow-sm"
+        >
+          <ShieldAlert className="h-4 w-4 text-amber-600" />
+          <span className="text-sm font-medium text-amber-700">Image may not be relevant</span>
+        </motion.div>
+      )}
+
+      {status === "error" && (
+        <motion.div
+          initial={{ scale: 0.8 }}
+          animate={{ scale: 1 }}
+          className="inline-flex items-center gap-2 px-4 py-2.5 rounded-full bg-linear-to-r from-red-50 to-rose-50 border border-red-200 shadow-sm"
+        >
+          <AlertCircle className="h-4 w-4 text-red-500" />
+          <span className="text-sm font-medium text-red-600">Validation failed - please try again</span>
+        </motion.div>
+      )}
+    </motion.div>
+  );
+}
+
 export function Step2Details({
   formData,
   touched,
@@ -128,10 +254,35 @@ export function Step2Details({
   setFieldTouched,
   setErrors,
   setPhoto,
+  setImageValidationStatus,
 }: Step2Props) {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [photoError, setPhotoError] = useState<string | null>(null);
   const [isDragging, setIsDragging] = useState(false);
+  const [validationResult, setValidationResult] = useState<ImageValidationResult | null>(null);
+
+  // Use validation status from formData (persisted)
+  const validationStatus = formData.imageValidationStatus;
+
+  // Validate image when photo changes
+  const performImageValidation = useCallback(async (file: File) => {
+    setImageValidationStatus("validating");
+    setValidationResult(null);
+
+    try {
+      const result = await validateImage(file);
+      setValidationResult(result);
+      
+      if (result.is_valid) {
+        setImageValidationStatus("valid");
+      } else {
+        setImageValidationStatus("invalid");
+      }
+    } catch (err) {
+      console.error("Image validation error:", err);
+      setImageValidationStatus("error");
+    }
+  }, [setImageValidationStatus]);
 
   const subCategoryWords = countWords(formData.subCategory);
   const descriptionWords = countWords(formData.description);
@@ -139,6 +290,7 @@ export function Step2Details({
   const handlePhotoSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     setPhotoError(null);
+    setValidationResult(null);
 
     if (!file) return;
 
@@ -155,11 +307,14 @@ export function Step2Details({
     }
 
     setPhoto(file);
+    // Trigger AI validation
+    performImageValidation(file);
   };
 
   const handleDrop = (e: React.DragEvent<HTMLDivElement>) => {
     e.preventDefault();
     setIsDragging(false);
+    setValidationResult(null);
     
     const file = e.dataTransfer.files?.[0];
     if (!file) return;
@@ -175,11 +330,14 @@ export function Step2Details({
     }
 
     setPhoto(file);
+    // Trigger AI validation
+    performImageValidation(file);
   };
 
   const handleRemovePhoto = () => {
     setPhoto(null);
     setPhotoError(null);
+    setValidationResult(null);
     if (fileInputRef.current) {
       fileInputRef.current.value = "";
     }
@@ -375,7 +533,7 @@ export function Step2Details({
             <motion.div
               initial={{ opacity: 0, scale: 0.9 }}
               animate={{ opacity: 1, scale: 1 }}
-              className="relative inline-block group"
+              className="relative inline-block"
             >
               <img
                 src={formData.photoPreview}
@@ -387,13 +545,10 @@ export function Step2Details({
                 onClick={handleRemovePhoto}
                 whileHover={{ scale: 1.1 }}
                 whileTap={{ scale: 0.9 }}
-                className="absolute -top-2 -right-2 p-1.5 bg-red-500 text-white rounded-full shadow-lg hover:bg-red-600 transition-colors"
+                className="absolute -top-2 -right-2 p-1.5 bg-red-500 text-white rounded-full shadow-lg hover:bg-red-600 transition-colors z-10"
               >
                 <X className="h-4 w-4" />
               </motion.button>
-              <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity rounded-xl flex items-center justify-center">
-                <span className="text-white text-sm font-medium">Click × to remove</span>
-              </div>
             </motion.div>
           ) : (
             <motion.div
@@ -453,6 +608,16 @@ export function Step2Details({
               {photoError}
             </motion.p>
           )}
+          
+          {/* Image Validation Badge */}
+          <AnimatePresence mode="wait">
+            {formData.photo && (
+              <ImageValidationBadge 
+                status={validationStatus} 
+                validationResult={validationResult} 
+              />
+            )}
+          </AnimatePresence>
         </div>
       </motion.div>
 
