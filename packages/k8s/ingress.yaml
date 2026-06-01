@@ -2,13 +2,15 @@ apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: user-be-ingress
+  namespace: default
   annotations:
     traefik.ingress.kubernetes.io/router.entrypoints: web,websecure
+    cloud.google.com/load-balancer-type: "External"
 spec:
-  ingressClassName: traefik
+  ingressClassName: platform-traefik
   rules:
     # HTTP API routing
-    - host: user-be.adityahota.online
+    - host: sih-user-be.adityahota.online
       http:
         paths:
           - path: /
@@ -20,7 +22,7 @@ spec:
                   number: 3000
 
     # WebSocket routing
-    - host: ws-user-be.adityahota.online
+    - host: sih-ws-user-be.adityahota.online
       http:
         paths:
           - path: /
