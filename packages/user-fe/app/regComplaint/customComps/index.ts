@@ -1,6 +1,6 @@
 // Step Components
 export { Step1Category } from "./Step1Category";
-export { Step2Details } from "./Step2Details";
+export { Step2Details, type ImageValidationStatus } from "./Step2Details";
 export { Step3Location } from "./Step3Location";
 export { Step4Review } from "./Step4Review";
 

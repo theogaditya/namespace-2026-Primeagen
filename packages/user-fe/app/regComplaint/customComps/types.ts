@@ -48,6 +48,7 @@ export interface ComplaintFormState {
   isPublic: boolean;
   photo: File | null;
   photoPreview: string;
+  imageValidationStatus: "idle" | "validating" | "valid" | "invalid" | "error";
   
   // Step 3 - Location
   district: string;

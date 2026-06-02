@@ -43,6 +43,42 @@ jobs:
           bun install --ignore-scripts || true
           bunx prisma generate
 
+<<<<<<< HEAD
+      - name: Build user-be
+        run: bun run --cwd packages/user-be build
+
+      - name: Test user-be
+        run: bun run --cwd packages/user-be test:unit
+
+  admin-be:
+    name: Build & Test admin-be
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
+      - name: Install dependencies
+        run: bun install
+
+      - name: Build admin-be
+        run: bun run --cwd packages/admin-be build
+
+      - name: Test admin-be
+        run: bun run --cwd packages/admin-be test:unit
+
+  user-fe:
+    name: Build user-fe
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+=======
       - name: Run user-be tests
         working-directory: packages/user-be
         run: |
@@ -53,6 +89,7 @@ jobs:
       # -------------------------
       - name: Log in to Docker Hub
         uses: docker/login-action@v3
+>>>>>>> 1b4a6ec7a3e4a4deaa96c075cf8295f67b46449c
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_PASSWORD }}
@@ -62,6 +99,24 @@ jobs:
         run: |
           docker build --build-arg DATABASE_URL="postgresql://dummy:dummy@localhost:5432/dummy" -t $USER_BE_IMAGE:latest -f Dockerfile .
 
+<<<<<<< HEAD
+  admin-fe:
+    name: Build admin-fe
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
+      - name: Install dependencies
+        run: bun install
+
+      - name: Build admin-fe
+        run: bun run --cwd packages/admin-fe build
+=======
       - name: Push images
         run: |
           docker push $USER_BE_IMAGE:latest

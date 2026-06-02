@@ -37,6 +37,7 @@ export class Server {
     this.app.use(compression());
 
     this.frontEndUser = process.env.frontend;
+    this.frontEndUser = process.env.frontend;
     this.backEndUser = process.env.backend;
     this.worker = process.env.worker;
     this.frontEndAdmin = process.env.frontend_admin;

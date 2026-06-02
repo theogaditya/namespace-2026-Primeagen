@@ -4,6 +4,7 @@ import { processedComplaintQueueService } from "../lib/redis/processedComplaintQ
 import { PrismaClient } from "../prisma/generated/client/client";
 import { complaintProcessingSchema } from "../lib/schemas/validation.complaint.processing";
 import { standardizeSubCategory } from "../lib/gcp/gcp";
+import { moderateTextSafe } from "../lib/moderation/moderationClient";
 import { getBadgeService } from "../lib/badges/badgeService";
 import dotenv from "dotenv";
 
@@ -64,9 +65,32 @@ export async function processNextComplaint(db: PrismaClient): Promise<{ processe
 
     // Placeholder for AI standardized sub-category  
     const AIstandardizedSubCategory = "dev";
-    
+
     // AI standardized sub-category (stub for now)
     // const AIstandardizedSubCategory = await standardizeSubCategory(complaintData.subCategory);
+
+    // Call moderation service to sanitize abusive text. If moderation service returns clean_text,
+    // let AIabusedFlag: boolean | null = null;
+    // try {
+    //   console.log("Testing Out The Abusive Route");
+      
+    //   const mod = await moderateTextSafe({ text: complaintData.description, user_id: complaintData.userId });
+    //   if (mod) {
+    //     if (mod.has_abuse) {
+    //       AIabusedFlag = true;
+    //     }
+    //     // Use cleaned text if provided
+    //     if (mod.clean_text && typeof mod.clean_text === 'string' && mod.clean_text.trim().length > 0) {
+    //       complaintData.description = mod.clean_text;
+    //     }
+    //     console.log("[ComplaintProcessing] Moderation Successfull");
+    //   }
+    // } catch (mErr) {
+    //   console.warn('[ComplaintProcessing] moderation call failed, proceeding with original description', mErr);
+    // }
+    
+    // Testing Abuse Route Stub 
+    const AIabusedFlag: boolean = false;
 
     const result = await db.$transaction(async (tx) => {
       const complaint = await tx.complaint.create({
@@ -77,7 +101,7 @@ export async function processNextComplaint(db: PrismaClient): Promise<{ processe
           AIstandardizedSubCategory,
           description: complaintData.description,
           isDuplicate: isDuplicate || false,
-          // AIabusedFlag: false, // Placeholder for future AI abuse detection
+          AIabusedFlag: AIabusedFlag,
           // AIimageVarificationStatus: false, // Placeholder for future AI image verification
           urgency: complaintData.urgency || "LOW",
           attachmentUrl: complaintData.attachmentUrl || null,
