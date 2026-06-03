@@ -81,10 +81,10 @@ jobs:
             const prs = await github.rest.pulls.list({ owner, repo, state: 'open', base });
             const exists = prs.data.find(pr => pr.head.ref === head);
             if (exists) {
-              core.info(PR already open: #${exists.number} ${exists.title});
+              core.info('PR already open: #' + exists.number + ' ' + exists.title);
               return;
             }
-            const title = Deploy latest from main;
+            const title = 'Deploy latest from main';
             const body = [
               'This PR merges main -> deploy to trigger Argo CD.',
               '',
@@ -92,4 +92,4 @@ jobs:
               '- Merge when ready; Argo will sync on merge.'
             ].join('\n');
             const res = await github.rest.pulls.create({ owner, repo, title, head, base, body });
-            core.info(Opened PR #${res.data.number});
+            core.info('Opened PR #' + res.data.number);
