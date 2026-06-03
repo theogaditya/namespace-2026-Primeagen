@@ -16,7 +16,7 @@ const mockStateAdminFindFirst = vi.fn();
 const mockStateAdminFindUnique = vi.fn();
 const mockStateAdminUpdate = vi.fn();
 const mockTransaction = vi.fn();
-
+ 
 const prismaMock: any = {
   complaint: {
     findUnique: mockComplaintFindUnique,
