@@ -7,7 +7,6 @@ terraform {
     }
   }
 }
-
 variable "project" {
   type = string
   default = "orbital-builder-454706-h5"
@@ -35,7 +34,6 @@ resource "google_container_cluster" "autopilot" {
   ip_allocation_policy {
     cluster_ipv4_cidr_block = "/17"
   }
-
   binary_authorization {
     evaluation_mode = "DISABLED"
   }
