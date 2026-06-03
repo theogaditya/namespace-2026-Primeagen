@@ -15,6 +15,7 @@
         "typescript": "^5",
       },
     },
+    
     "packages/admin-be": {
       "name": "admin-be",
       "version": "1.0.0",
