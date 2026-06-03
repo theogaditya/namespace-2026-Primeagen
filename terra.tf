@@ -12,10 +12,6 @@ variable "project" {
   type = string
   default = "orbital-builder-454706-h5"
 }
-
-
-
-
 provider "google" {
   project = var.project
   region  = "us-central1"
