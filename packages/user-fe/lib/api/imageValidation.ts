@@ -5,6 +5,7 @@ export interface ImageValidationResult {
   source: string | null
   confidence_vlm: number | null
   confidence_vit: number | null
+  service_unavailable?: boolean
 }
 
 /**
@@ -19,23 +20,42 @@ export async function validateImage(file: File, endpoint?: string): Promise<Imag
   const form = new FormData()
   form.append('image', file)
 
-  const res = await fetch(url, { method: 'POST', body: form })
+  try {
+    const res = await fetch(url, { method: 'POST', body: form })
 
-  if (!res.ok) {
-    const text = await res.text()
-    throw new Error(`Image validation server error ${res.status}: ${text}`)
-  }
+    let data: any = null
+    try {
+      data = await res.json()
+    } catch {
+      /* ignore */
+    }
 
-  const data = await res.json()
+    if (!res.ok) {
+      const serviceUnavailable = res.status >= 500 || res.status === 503 || res.status === 504 || data?.service_unavailable
+      throw new Error(serviceUnavailable ? 'validation-service-unavailable' : (data?.error || `status-${res.status}`))
+    }
 
-  // Normalize returned fields to expected types
-  return {
-    sector: data.sector ?? null,
-    category: data.category ?? null,
-    is_valid: Boolean(data.is_valid),
-    source: data.source ?? null,
-    confidence_vlm: data.confidence_vlm == null ? null : Number(data.confidence_vlm),
-    confidence_vit: data.confidence_vit == null ? null : Number(data.confidence_vit),
+    return {
+      sector: data?.sector ?? null,
+      category: data?.category ?? null,
+      is_valid: Boolean(data?.is_valid),
+      source: data?.source ?? null,
+      confidence_vlm: data?.confidence_vlm == null ? null : Number(data.confidence_vlm),
+      confidence_vit: data?.confidence_vit == null ? null : Number(data.confidence_vit),
+      service_unavailable: Boolean(data?.service_unavailable),
+    }
+  } catch (err) {
+    console.error('Image validation failed:', err)
+    const isServiceUnavailable = err instanceof Error && err.message === 'validation-service-unavailable'
+    return {
+      sector: null,
+      category: null,
+      is_valid: false,
+      source: null,
+      confidence_vlm: null,
+      confidence_vit: null,
+      service_unavailable: isServiceUnavailable,
+    }
   }
 }
 

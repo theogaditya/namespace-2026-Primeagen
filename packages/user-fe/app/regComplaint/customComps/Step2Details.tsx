@@ -83,7 +83,6 @@ interface Step2Props {
     photo: File | null;
     photoPreview: string;
     categoryName: string;
-    imageValidationStatus: ImageValidationStatus;
   };
   touched: { [key: string]: boolean };
   errors: { [key: string]: string | undefined };
@@ -91,7 +90,7 @@ interface Step2Props {
   setFieldTouched: (field: string) => void;
   setErrors: React.Dispatch<React.SetStateAction<{ [key: string]: string | undefined }>>;
   setPhoto: (file: File | null) => void;
-  setImageValidationStatus: (status: ImageValidationStatus) => void;
+  onValidationStatusChange?: (status: ImageValidationStatus) => void;
 }
 
 interface WordCounterProps {
@@ -254,19 +253,22 @@ export function Step2Details({
   setFieldTouched,
   setErrors,
   setPhoto,
-  setImageValidationStatus,
+  onValidationStatusChange,
 }: Step2Props) {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [photoError, setPhotoError] = useState<string | null>(null);
   const [isDragging, setIsDragging] = useState(false);
+  const [validationStatus, setValidationStatus] = useState<ImageValidationStatus>("idle");
   const [validationResult, setValidationResult] = useState<ImageValidationResult | null>(null);
 
-  // Use validation status from formData (persisted)
-  const validationStatus = formData.imageValidationStatus;
+  // Notify parent of validation status changes
+  useEffect(() => {
+    onValidationStatusChange?.(validationStatus);
+  }, [validationStatus, onValidationStatusChange]);
 
   // Validate image when photo changes
   const performImageValidation = useCallback(async (file: File) => {
-    setImageValidationStatus("validating");
+    setValidationStatus("validating");
     setValidationResult(null);
 
     try {
@@ -274,15 +276,15 @@ export function Step2Details({
       setValidationResult(result);
       
       if (result.is_valid) {
-        setImageValidationStatus("valid");
+        setValidationStatus("valid");
       } else {
-        setImageValidationStatus("invalid");
+        setValidationStatus("invalid");
       }
     } catch (err) {
       console.error("Image validation error:", err);
-      setImageValidationStatus("error");
+      setValidationStatus("error");
     }
-  }, [setImageValidationStatus]);
+  }, []);
 
   const subCategoryWords = countWords(formData.subCategory);
   const descriptionWords = countWords(formData.description);
@@ -290,6 +292,7 @@ export function Step2Details({
   const handlePhotoSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     setPhotoError(null);
+    setValidationStatus("idle");
     setValidationResult(null);
 
     if (!file) return;
@@ -314,6 +317,7 @@ export function Step2Details({
   const handleDrop = (e: React.DragEvent<HTMLDivElement>) => {
     e.preventDefault();
     setIsDragging(false);
+    setValidationStatus("idle");
     setValidationResult(null);
     
     const file = e.dataTransfer.files?.[0];
@@ -337,6 +341,7 @@ export function Step2Details({
   const handleRemovePhoto = () => {
     setPhoto(null);
     setPhotoError(null);
+    setValidationStatus("idle");
     setValidationResult(null);
     if (fileInputRef.current) {
       fileInputRef.current.value = "";
