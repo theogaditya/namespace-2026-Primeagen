@@ -12,7 +12,7 @@ RUN bun install
 COPY prisma ./prisma
 COPY . .
 
-ARG DATABASE_URL
+ARG DATABASE_URL="postgresql://dummy:dummy@localhost:5432/dummy"
 ENV DATABASE_URL=$DATABASE_URL
 RUN bunx prisma generate
 
