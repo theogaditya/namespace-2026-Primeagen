@@ -34,6 +34,7 @@
     "@google-cloud/vertexai": "^1.10.0",
     "@prisma/adapter-pg": "^7.0.1",
     "@prisma/client": "^7.0.1",
+    "@redis/client": "^5.10.0",
     "axios": "^1.13.2",
     "bcrypt": "^6.0.0",
     "cookie-parser": "^1.4.7",
