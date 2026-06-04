@@ -64,10 +64,10 @@ export async function processNextComplaint(db: PrismaClient): Promise<{ processe
     }
 
     // Placeholder for AI standardized sub-category  
-    const AIstandardizedSubCategory = "dev";
+    // const AIstandardizedSubCategory = "dev";
 
     // AI standardized sub-category (stub for now)
-    // const AIstandardizedSubCategory = await standardizeSubCategory(complaintData.subCategory);
+    const AIstandardizedSubCategory = await standardizeSubCategory(complaintData.subCategory);
 
     // Call moderation service to sanitize abusive text. If moderation service returns clean_text,
     // let AIabusedFlag: boolean | null = null;
