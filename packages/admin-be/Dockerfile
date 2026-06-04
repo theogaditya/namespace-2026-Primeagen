@@ -5,7 +5,7 @@ WORKDIR /app
 RUN apk add --no-cache openssl
 
 COPY package.json ./
-COPY bun.lock ./
+COPY bun.lock* ./
 
 RUN bun install
 
