@@ -2,14 +2,16 @@
 
 import React from "react";
 import { motion, AnimatePresence, type Variants } from "framer-motion";
-import { Loader2, CheckCircle2, XCircle, Sparkles, Send, Shield, Clock } from "lucide-react";
+import { Loader2, CheckCircle2, XCircle, Sparkles, Send, Shield, Clock, RefreshCw, WifiOff, CloudOff } from "lucide-react";
 
 interface LoadingPopupProps {
   isOpen: boolean;
-  status?: "loading" | "success" | "error";
+  status?: "loading" | "success" | "error" | "queued-offline" | "synced";
   message?: string;
   subMessage?: string;
   onClose?: () => void;
+  /** For synced state - the complaint ID to view */
+  complaintId?: string | null;
 }
 
 const backdropVariants: Variants = {
@@ -58,6 +60,7 @@ export function LoadingPopup({
   message = "Submitting your complaint",
   subMessage = "Please wait while we process your request...",
   onClose,
+  complaintId,
 }: LoadingPopupProps) {
   const statusConfig = {
     loading: {
@@ -77,6 +80,18 @@ export function LoadingPopup({
       bgGradient: "from-red-500 to-rose-600",
       glowColor: "rgba(239, 68, 68, 0.4)",
       ringColor: "ring-red-200",
+    },
+    "queued-offline": {
+      icon: <RefreshCw className="h-10 w-10 text-white" />,
+      bgGradient: "from-blue-500 to-cyan-600",
+      glowColor: "rgba(59, 130, 246, 0.4)",
+      ringColor: "ring-blue-200",
+    },
+    synced: {
+      icon: <CheckCircle2 className="h-10 w-10 text-white" />,
+      bgGradient: "from-green-500 to-emerald-600",
+      glowColor: "rgba(34, 197, 94, 0.4)",
+      ringColor: "ring-green-200",
     },
   };
 
@@ -146,12 +161,32 @@ export function LoadingPopup({
                       ))}
                     </>
                   )}
+
+                  {/* Floating particles for queued-offline state */}
+                  {status === "queued-offline" && (
+                    <>
+                      {[0, 1, 2, 3, 4, 5].map((i) => (
+                        <motion.div
+                          key={i}
+                          className="absolute"
+                          style={{
+                            left: `${20 + (i % 3) * 25}%`,
+                            top: `${10 + Math.floor(i / 3) * 60}%`,
+                          }}
+                          variants={particleVariants}
+                          animate="animate"
+                        >
+                          <Sparkles className="h-3 w-3 text-blue-400" />
+                        </motion.div>
+                      ))}
+                    </>
+                  )}
                   
                   {/* Glow effect */}
                   <motion.div 
                     className={`absolute inset-0 rounded-full blur-2xl`}
                     style={{ backgroundColor: config.glowColor }}
-                    animate={status === "loading" ? {
+                    animate={(status === "loading" || status === "queued-offline") ? {
                       scale: [1, 1.3, 1],
                       opacity: [0.3, 0.5, 0.3],
                     } : {}}
@@ -161,8 +196,8 @@ export function LoadingPopup({
                   {/* Main icon container */}
                   <motion.div 
                     className={`relative bg-linear-to-br ${config.bgGradient} rounded-2xl p-5 shadow-lg ring-4 ${config.ringColor}`}
-                    animate={status === "loading" ? { rotate: 360 } : {}}
-                    transition={status === "loading" ? { 
+                    animate={(status === "loading" || status === "queued-offline") ? { rotate: 360 } : {}}
+                    transition={(status === "loading" || status === "queued-offline") ? { 
                       repeat: Infinity, 
                       duration: 2, 
                       ease: "linear" 
@@ -238,6 +273,73 @@ export function LoadingPopup({
                   </motion.div>
                 )}
 
+                {/* Queued Offline State - Waiting for sync */}
+                {status === "queued-offline" && (
+                  <>
+                    {/* Sync animation dots */}
+                    <motion.div 
+                      className="flex space-x-3"
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      transition={{ delay: 0.3 }}
+                    >
+                      {[0, 1, 2].map((i) => (
+                        <motion.span
+                          key={i}
+                          className="h-3 w-3 rounded-full bg-linear-to-r from-blue-500 to-cyan-500"
+                          animate={{
+                            y: [0, -8, 0],
+                            scale: [1, 1.2, 1],
+                          }}
+                          transition={{
+                            duration: 0.6,
+                            repeat: Infinity,
+                            delay: i * 0.15,
+                          }}
+                        />
+                      ))}
+                    </motion.div>
+
+                    {/* Warning card for offline state */}
+                    <motion.div
+                      className="w-full p-4 bg-blue-50 border border-blue-200 rounded-2xl"
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: 0.4 }}
+                    >
+                      <div className="flex items-center gap-3">
+                        <motion.div
+                          animate={{ rotate: 360 }}
+                          transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
+                        >
+                          <RefreshCw className="h-5 w-5 text-blue-600" />
+                        </motion.div>
+                        <div className="flex-1 text-left">
+                          <p className="text-sm font-semibold text-blue-800">Waiting for Connection</p>
+                          <p className="text-xs text-blue-600 mt-0.5">Please do not close this page while syncing</p>
+                        </div>
+                      </div>
+                    </motion.div>
+
+                    {/* Offline badges */}
+                    <motion.div
+                      className="flex flex-wrap gap-2 justify-center"
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: 0.5 }}
+                    >
+                      <span className="flex items-center gap-1.5 px-3 py-1.5 bg-amber-50 text-amber-600 text-xs font-medium rounded-full">
+                        <WifiOff className="h-3 w-3" />
+                        Offline Mode
+                      </span>
+                      <span className="flex items-center gap-1.5 px-3 py-1.5 bg-blue-50 text-blue-600 text-xs font-medium rounded-full">
+                        <CloudOff className="h-3 w-3" />
+                        Saved Locally
+                      </span>
+                    </motion.div>
+                  </>
+                )}
+
                 {/* Success state badges */}
                 {status === "success" && (
                   <motion.div
@@ -257,8 +359,44 @@ export function LoadingPopup({
                   </motion.div>
                 )}
 
-                {/* Close button (for success/error) */}
-                {status !== "loading" && onClose && (
+                {/* Synced state badges and button */}
+                {status === "synced" && (
+                  <>
+                    <motion.div
+                      className="flex flex-wrap gap-2 justify-center"
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: 0.3 }}
+                    >
+                      <span className="flex items-center gap-1.5 px-3 py-1.5 bg-green-50 text-green-600 text-xs font-medium rounded-full">
+                        <CheckCircle2 className="h-3 w-3" />
+                        Synced Successfully
+                      </span>
+                      <span className="flex items-center gap-1.5 px-3 py-1.5 bg-blue-50 text-blue-600 text-xs font-medium rounded-full">
+                        <Clock className="h-3 w-3" />
+                        Tracking ID Assigned
+                      </span>
+                    </motion.div>
+
+                    {/* View Complaint button for synced state */}
+                    {onClose && (
+                      <motion.button
+                        onClick={onClose}
+                        className="mt-2 px-8 py-3 rounded-xl text-sm font-semibold text-white bg-linear-to-r from-green-500 to-emerald-600 hover:shadow-lg transition-all shadow-md"
+                        initial={{ opacity: 0, y: 10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        whileHover={{ scale: 1.05 }}
+                        whileTap={{ scale: 0.95 }}
+                        transition={{ delay: 0.4 }}
+                      >
+                        View Complaint
+                      </motion.button>
+                    )}
+                  </>
+                )}
+
+                {/* Close button (for success/error only - not for queued-offline or synced) */}
+                {(status === "success" || status === "error") && onClose && (
                   <motion.button
                     onClick={onClose}
                     className={`mt-2 px-8 py-3 rounded-xl text-sm font-semibold text-white bg-linear-to-r ${config.bgGradient} hover:shadow-lg transition-all shadow-md`}

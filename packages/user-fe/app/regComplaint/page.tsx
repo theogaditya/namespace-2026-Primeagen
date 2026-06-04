@@ -302,32 +302,69 @@ export default function RegisterComplaintPage() {
   } = useOfflineQueue({
     autoSync: true,
     onSyncStart: () => {
-      showNotification("Syncing queued complaints", "Your queued complaints are being submitted...", "default");
+      // If popup is showing queued-offline state, keep it showing
+      if (showPopup && submitStatus === "queued-offline") {
+        // Update message to show syncing in progress
+        setSubmitMessage({
+          title: "Syncing Your Complaint",
+          description: "Your complaint is being submitted to the server...",
+        });
+      } else {
+        showNotification("Syncing queued complaints", "Your queued complaints are being submitted...", "default");
+      }
     },
     onSyncComplete: (result) => {
-      if (result.successCount > 0) {
+      // If popup is showing queued-offline state and sync succeeded, update to synced state
+      if (showPopup && submitStatus === "queued-offline" && result.successCount > 0) {
+        setSubmitStatus("synced");
+        setSubmitMessage({
+          title: "Complaint Submitted!",
+          description: "Your complaint has been successfully synced and submitted.",
+        });
+        setWasQueuedOffline(false); // No longer offline queued
+        setPendingOfflineId(null);
+      } else if (result.successCount > 0) {
         showNotification("Sync Complete", `${result.successCount} complaint(s) submitted successfully!`, "success");
       }
+      
       if (result.failedCount > 0) {
-        showNotification("Some complaints failed", `${result.failedCount} complaint(s) couldn't be submitted. They'll retry automatically.`, "destructive");
+        if (showPopup && submitStatus === "queued-offline") {
+          // Keep showing the queued-offline state if sync failed
+          setSubmitMessage({
+            title: "Complaint Saved Offline",
+            description: "Sync failed. Will retry when connection is stable.",
+          });
+        } else {
+          showNotification("Some complaints failed", `${result.failedCount} complaint(s) couldn't be submitted. They'll retry automatically.`, "destructive");
+        }
       }
     },
     onSyncError: (error) => {
-      showNotification("Sync Error", error.message, "destructive");
+      if (showPopup && submitStatus === "queued-offline") {
+        // Keep showing queued-offline state on error
+        setSubmitMessage({
+          title: "Complaint Saved Offline",
+          description: "Sync error occurred. Will retry automatically.",
+        });
+      } else {
+        showNotification("Sync Error", error.message, "destructive");
+      }
     },
     onQueued: (id) => {
       console.log("[RegisterComplaint] Complaint queued with ID:", id);
+      setPendingOfflineId(id);
     },
   });
 
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [submitStatus, setSubmitStatus] = useState<"loading" | "success" | "error">("loading");
+  const [submitStatus, setSubmitStatus] = useState<"loading" | "success" | "error" | "queued-offline" | "synced">("loading");
   const [submitMessage, setSubmitMessage] = useState({ title: "", description: "" });
   const [showPopup, setShowPopup] = useState(false);
   const [complaintId, setComplaintId] = useState<string | null>(null);
   const [mounted, setMounted] = useState(false);
   const [imageValidationStatus, setImageValidationStatus] = useState<ImageValidationStatus>("idle");
   const [wasQueuedOffline, setWasQueuedOffline] = useState(false);
+  const [pendingOfflineId, setPendingOfflineId] = useState<string | null>(null);
 
   useEffect(() => {
     setMounted(true);
@@ -399,6 +436,7 @@ export default function RegisterComplaintPage() {
     setIsSubmitting(true);
     setShowPopup(true);
     setWasQueuedOffline(false);
+    setPendingOfflineId(null);
 
     // Check if we're offline - queue immediately if so
     if (!online) {
@@ -414,8 +452,9 @@ export default function RegisterComplaintPage() {
         const result = await queueComplaint(formData);
 
         if (result.success) {
-          setSubmitStatus("success");
+          setSubmitStatus("queued-offline");
           setWasQueuedOffline(true);
+          setPendingOfflineId(result.queuedId || null);
           setSubmitMessage({
             title: "Complaint Saved Offline!",
             description: "Your complaint will be automatically submitted when you're back online.",
@@ -521,8 +560,9 @@ export default function RegisterComplaintPage() {
         const queueResult = await queueComplaint(formData);
         
         if (queueResult.success) {
-          setSubmitStatus("success");
+          setSubmitStatus("queued-offline");
           setWasQueuedOffline(true);
+          setPendingOfflineId(queueResult.queuedId || null);
           setSubmitMessage({
             title: "Complaint Saved for Later",
             description: "We couldn't submit right now, but your complaint has been saved and will be submitted automatically.",
@@ -545,13 +585,15 @@ export default function RegisterComplaintPage() {
 
   // Handle popup close
   const handlePopupClose = () => {
+    // Don't allow closing while in queued-offline state (waiting for sync)
+    if (submitStatus === "queued-offline") {
+      return; // Prevent closing - user must wait for sync
+    }
+    
     setShowPopup(false);
-    if (submitStatus === "success") {
+    if (submitStatus === "success" || submitStatus === "synced") {
       // Navigate to dashboard or complaint view
-      if (wasQueuedOffline) {
-        // For offline queued complaints, just go to dashboard
-        router.push("/dashboard");
-      } else if (complaintId) {
+      if (complaintId) {
         router.push(`/dashboard?complaint=${complaintId}`);
       } else {
         router.push("/dashboard");
