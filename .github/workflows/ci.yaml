@@ -17,6 +17,7 @@ jobs:
 
     env:
       USER_BE_IMAGE: ogadityahota/swarajdesk-user-be
+      ADMIN_BE_IMAGE: ogadityahota/sih-swarajdesk-admin-be
 
     steps:
       - name: Checkout code
@@ -49,6 +50,22 @@ jobs:
           bun run test:unit
 
       # -------------------------
+      # admin-be tests
+      # -------------------------
+      - name: Install deps (admin-be)
+        working-directory: packages/admin-be
+        env:
+          DATABASE_URL: "postgresql://dummy:dummy@localhost:5432/dummy"
+        run: |
+          bun install --ignore-scripts || true
+          bunx prisma generate
+
+      - name: Run admin-be tests
+        working-directory: packages/admin-be
+        run: |
+          bun run test:unit
+
+      # -------------------------
       # Build & push docker images
       # -------------------------
       - name: Log in to Docker Hub
@@ -62,9 +79,15 @@ jobs:
         run: |
           docker build --build-arg DATABASE_URL="postgresql://dummy:dummy@localhost:5432/dummy" -t $USER_BE_IMAGE:latest -f Dockerfile .
 
+      - name: Build admin-be image
+        working-directory: packages/admin-be
+        run: |
+          docker build --build-arg DATABASE_URL="postgresql://dummy:dummy@localhost:5432/dummy" -t $ADMIN_BE_IMAGE:latest -f Dockerfile .
+
       - name: Push images
         run: |
           docker push $USER_BE_IMAGE:latest
+          docker push $ADMIN_BE_IMAGE:latest
 
       # -------------------------
       # Open PR main -> deploy (skip if one already open)

@@ -1,0 +1,21 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: admin-be-ingress
+  namespace: default
+  annotations:
+    traefik.ingress.kubernetes.io/router.entrypoints: web,websecure
+    cloud.google.com/load-balancer-type: "External"
+spec:
+  ingressClassName: platform-traefik
+  rules:
+    - host: sih-admin-be.adityahota.online
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: admin-be-service
+                port:
+                  number: 3002
