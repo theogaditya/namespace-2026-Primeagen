@@ -82,7 +82,7 @@ jobs:
       - name: Build admin-be image
         working-directory: packages/admin-be
         run: |
-          docker build --build-arg DATABASE_URL="postgresql://dummy:dummy@localhost:5432/dummy" -t $ADMIN_BE_IMAGE:latest -f Dockerfile .
+          docker build --no-cache --build-arg DATABASE_URL="postgresql://dummy:dummy@localhost:5432/dummy" -t $ADMIN_BE_IMAGE:latest -f Dockerfile .
 
       - name: Push images
         run: |
