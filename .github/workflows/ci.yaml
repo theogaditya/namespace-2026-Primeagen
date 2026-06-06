@@ -77,7 +77,7 @@ jobs:
       - name: Build user-be image
         working-directory: packages/user-be
         run: |
-          docker build --build-arg DATABASE_URL="postgresql://dummy:dummy@localhost:5432/dummy" -t $USER_BE_IMAGE:latest -f Dockerfile .
+          docker build --no-cache --build-arg DATABASE_URL="postgresql://dummy:dummy@localhost:5432/dummy" -t $USER_BE_IMAGE:latest -f Dockerfile .
 
       - name: Build admin-be image
         working-directory: packages/admin-be
