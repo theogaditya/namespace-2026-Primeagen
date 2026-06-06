@@ -1,0 +1,60 @@
+version: '3.8'
+
+services:
+  admin-be:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        DATABASE_URL: ${DATABASE_URL:-postgresql://dummy:dummy@localhost:5432/dummy}
+    container_name: admin-be
+    ports:
+      - "${ADMIN_BE_PORT:-3002}:3002"
+    environment:
+      # App Config
+      NODE_ENV: ${NODE_ENV:-development}
+      ADMIN_BE_PORT: ${ADMIN_BE_PORT:-3002}
+      ADMIN_BE_URL: ${ADMIN_BE_URL:-http://localhost:3002}
+      
+      # Database
+      DATABASE_URL: ${DATABASE_URL}
+      
+      # Auth
+      JWT_SECRET: ${JWT_SECRET}
+      
+      # CORS - comma separated origins
+      ALLOWED_ORIGINS: ${ALLOWED_ORIGINS:-http://localhost:3000,http://localhost:3003,http://localhost:3001,https://admin.swarajdesk.co.in}
+      
+      # Redis
+      REDIS_URL: ${REDIS_URL}
+      
+      # Moderation
+      DEFAULT_MODERATION_URL: ${DEFAULT_MODERATION_URL}
+      
+      # GCP Vertex AI
+      CLIENT_EMAIL: ${CLIENT_EMAIL}
+      PRIVATE_KEY: ${PRIVATE_KEY}
+      GCP_PROJECT_ID: ${GCP_PROJECT_ID}
+      GCP_LOCATION: ${GCP_LOCATION}
+      ENDPOINT_ID: ${ENDPOINT_ID}
+      
+      # AWS Region
+      AWS_REGION: ${AWS_REGION:-ap-south-2}
+      
+      # AWS Secrets Manager
+      SECRETS_AWS_ACCESS_KEY_ID: ${SECRETS_AWS_ACCESS_KEY_ID}
+      SECRETS_AWS_SECRET_ACCESS_KEY: ${SECRETS_AWS_SECRET_ACCESS_KEY}
+      SECRET_NAME_AWS_USER_BE: ${SECRET_NAME_AWS_USER_BE}
+      
+      # AWS S3
+      S3_AWS_ACCESS_KEY_ID: ${S3_AWS_ACCESS_KEY_ID}
+      S3_AWS_SECRET_ACCESS_KEY: ${S3_AWS_SECRET_ACCESS_KEY}
+      AWS_BUCKET: ${AWS_BUCKET:-sih-swaraj}
+    restart: unless-stopped
+    networks:
+      - admin-network
+
+networks:
+  admin-network:
+    driver: bridge
+

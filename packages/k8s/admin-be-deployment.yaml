@@ -1,0 +1,68 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: admin-be-deployment
+  namespace: default
+  labels:
+    app: admin-be
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: admin-be
+  template:
+    metadata:
+      labels:
+        app: admin-be
+    spec:
+      containers:
+        - name: admin-be
+          image: ogadityahota/sih-swarajdesk-admin-be:latest
+          ports:
+            - containerPort: 3002
+              name: http
+          env:
+            - name: NODE_ENV
+              value: "production"
+            - name: ADMIN_BE_PORT
+              value: "3002"
+          envFrom:
+            - secretRef:
+                name: sih-swaraj-admin-be-secret  # from ExternalSecret
+          resources:
+            requests:
+              memory: "256Mi"
+              cpu: "250m"
+            limits:
+              memory: "512Mi"
+              cpu: "500m"
+          livenessProbe:
+            httpGet:
+              path: /api/health
+              port: 3002
+            initialDelaySeconds: 30
+            periodSeconds: 10
+          readinessProbe:
+            httpGet:
+              path: /api/health
+              port: 3002
+            initialDelaySeconds: 5
+            periodSeconds: 5
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: admin-be-service
+  namespace: default
+  labels:
+    app: admin-be
+spec:
+  selector:
+    app: admin-be
+  ports:
+    - name: http
+      port: 3002
+      targetPort: 3002
+      protocol: TCP
+  type: ClusterIP
