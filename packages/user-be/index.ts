@@ -25,6 +25,7 @@ export class Server {
   private app: Express;
   private db: PrismaClient;
   private readonly frontEndUser?: string;
+  private readonly frontEndUserAlt?: string;
   private readonly backEndUser?: string;
   private readonly worker?: string;
   private readonly frontEndAdmin?: string;
@@ -37,7 +38,7 @@ export class Server {
     this.app.use(compression());
 
     this.frontEndUser = process.env.frontend;
-    this.frontEndUser = process.env.frontend;
+    this.frontEndUserAlt = process.env.frontend_alt; // Alternative frontend URL (e.g., Vercel)
     this.backEndUser = process.env.backend;
     this.worker = process.env.worker;
     this.frontEndAdmin = process.env.frontend_admin;
@@ -52,7 +53,7 @@ export class Server {
     this.app.use(helmet());
     this.app.use(compression());
 
-    const whitelist = [this.frontEndUser, this.backEndUser, this.worker, this.frontEndAdmin, this.backEndAdmin].filter(Boolean);
+    const whitelist = [this.frontEndUser, this.frontEndUserAlt, this.backEndUser, this.worker, this.frontEndAdmin, this.backEndAdmin].filter(Boolean);
 
     const corsOptions = {
       origin: (origin: any, cb: any) => {
