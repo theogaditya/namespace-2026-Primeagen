@@ -182,6 +182,8 @@ export function LoadingPopup({
                     </>
                   )}
                   
+
+                  
                   {/* Glow effect */}
                   <motion.div 
                     className={`absolute inset-0 rounded-full blur-2xl`}
