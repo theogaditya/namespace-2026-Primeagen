@@ -53,18 +53,9 @@ export class Server {
     this.app.use(helmet());
     this.app.use(compression());
 
-    const whitelist = [this.frontEndUser, this.frontEndUserAlt, this.backEndUser, this.worker, this.frontEndAdmin, this.backEndAdmin].filter(Boolean);
-
+    // Allow all origins for CORS
     const corsOptions = {
-      origin: (origin: any, cb: any) => {
-        console.log("[CORS] incoming Origin:", origin);
-        console.log("[CORS] whitelist:", whitelist);
-        if (!origin) return cb(null, true);
-        if (whitelist.includes(origin)) {
-          return cb(null, true);
-        }
-        return cb(new Error("Not allowed by CORS"));
-      },
+      origin: true, 
       credentials: true,
       methods: ["GET", "POST", "PUT", "DELETE", "PATCH"],
       allowedHeaders: ["Content-Type", "Authorization"],
