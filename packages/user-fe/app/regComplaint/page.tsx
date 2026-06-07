@@ -4,7 +4,6 @@ import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { motion, AnimatePresence, type Variants } from "framer-motion";
 import { Button } from "@/components/ui/button";
-import { useOfflineQueue } from "@/lib/offlineQueue/useOfflineQueue";
 import {
   ArrowLeft,
   ArrowRight,
@@ -22,9 +21,6 @@ import {
   Users,
   HelpCircle,
   MessageSquare,
-  WifiOff,
-  Cloud,
-  CloudOff,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { SwarajAIChat } from "@/components/swaraj-ai-chat";
@@ -278,93 +274,13 @@ export default function RegisterComplaintPage() {
     goToStep,
   } = useComplaintForm();
 
-  // Toast notification state
-  const [notification, setNotification] = useState<{
-    show: boolean;
-    title: string;
-    description: string;
-    variant: "default" | "destructive" | "success";
-  } | null>(null);
-
-  // Show notification helper
-  const showNotification = (title: string, description: string, variant: "default" | "destructive" | "success" = "default") => {
-    setNotification({ show: true, title, description, variant });
-    // Auto-hide after 5 seconds
-    setTimeout(() => setNotification(null), 5000);
-  };
-
-  // Offline queue hook for handling submissions
-  const {
-    queueCount,
-    online,
-    isSyncing,
-    manualSync,
-  } = useOfflineQueue({
-    autoSync: true,
-    onSyncStart: () => {
-      // If popup is showing queued-offline state, keep it showing
-      if (showPopup && submitStatus === "queued-offline") {
-        // Update message to show syncing in progress
-        setSubmitMessage({
-          title: "Syncing Your Complaint",
-          description: "Your complaint is being submitted to the server...",
-        });
-      } else {
-        showNotification("Syncing queued complaints", "Your queued complaints are being submitted...", "default");
-      }
-    },
-    onSyncComplete: (result) => {
-      // If popup is showing queued-offline state and sync succeeded, update to synced state
-      if (showPopup && submitStatus === "queued-offline" && result.successCount > 0) {
-        setSubmitStatus("synced");
-        setSubmitMessage({
-          title: "Complaint Submitted!",
-          description: "Your complaint has been successfully synced and submitted.",
-        });
-        setWasQueuedOffline(false); // No longer offline queued
-        setPendingOfflineId(null);
-      } else if (result.successCount > 0) {
-        showNotification("Sync Complete", `${result.successCount} complaint(s) submitted successfully!`, "success");
-      }
-      
-      if (result.failedCount > 0) {
-        if (showPopup && submitStatus === "queued-offline") {
-          // Keep showing the queued-offline state if sync failed
-          setSubmitMessage({
-            title: "Complaint Saved Offline",
-            description: "Sync failed. Will retry when connection is stable.",
-          });
-        } else {
-          showNotification("Some complaints failed", `${result.failedCount} complaint(s) couldn't be submitted. They'll retry automatically.`, "destructive");
-        }
-      }
-    },
-    onSyncError: (error) => {
-      if (showPopup && submitStatus === "queued-offline") {
-        // Keep showing queued-offline state on error
-        setSubmitMessage({
-          title: "Complaint Saved Offline",
-          description: "Sync error occurred. Will retry automatically.",
-        });
-      } else {
-        showNotification("Sync Error", error.message, "destructive");
-      }
-    },
-    onQueued: (id) => {
-      console.log("[RegisterComplaint] Complaint queued with ID:", id);
-      setPendingOfflineId(id);
-    },
-  });
-
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [submitStatus, setSubmitStatus] = useState<"loading" | "success" | "error" | "queued-offline" | "synced">("loading");
+  const [submitStatus, setSubmitStatus] = useState<"loading" | "success" | "error">("loading");
   const [submitMessage, setSubmitMessage] = useState({ title: "", description: "" });
   const [showPopup, setShowPopup] = useState(false);
   const [complaintId, setComplaintId] = useState<string | null>(null);
   const [mounted, setMounted] = useState(false);
   const [imageValidationStatus, setImageValidationStatus] = useState<ImageValidationStatus>("idle");
-  const [wasQueuedOffline, setWasQueuedOffline] = useState(false);
-  const [pendingOfflineId, setPendingOfflineId] = useState<string | null>(null);
 
   useEffect(() => {
     setMounted(true);
@@ -426,7 +342,7 @@ export default function RegisterComplaintPage() {
     }
   };
 
-  // Handle form submission with offline queue support
+  // Handle form submission
   const handleSubmit = async () => {
     // Validate step 4 (final check)
     const { schema, data } = getStepValidationData(3); // Re-validate step 3 before submit
@@ -435,48 +351,6 @@ export default function RegisterComplaintPage() {
 
     setIsSubmitting(true);
     setShowPopup(true);
-    setWasQueuedOffline(false);
-    setPendingOfflineId(null);
-
-    // Check if we're offline - queue immediately if so
-    if (!online) {
-      setSubmitStatus("loading");
-      setSubmitMessage({
-        title: "You're offline",
-        description: "Saving your complaint locally...",
-      });
-
-      try {
-        // Import queueComplaint dynamically to avoid SSR issues
-        const { queueComplaint } = await import("@/lib/offlineQueue");
-        const result = await queueComplaint(formData);
-
-        if (result.success) {
-          setSubmitStatus("queued-offline");
-          setWasQueuedOffline(true);
-          setPendingOfflineId(result.queuedId || null);
-          setSubmitMessage({
-            title: "Complaint Saved Offline!",
-            description: "Your complaint will be automatically submitted when you're back online.",
-          });
-          resetForm();
-        } else {
-          throw new Error(result.error || "Failed to save complaint offline");
-        }
-      } catch (error) {
-        console.error("Offline queue error:", error);
-        setSubmitStatus("error");
-        setSubmitMessage({
-          title: "Failed to Save",
-          description: error instanceof Error ? error.message : "Could not save your complaint. Please try again.",
-        });
-      } finally {
-        setIsSubmitting(false);
-      }
-      return;
-    }
-
-    // Online submission
     setSubmitStatus("loading");
     setSubmitMessage({
       title: "Submitting your complaint",
@@ -552,32 +426,11 @@ export default function RegisterComplaintPage() {
       resetForm();
     } catch (error) {
       console.error("Submit error:", error);
-      
-      // If online submission fails, try to queue it offline
-      try {
-        console.log("[RegisterComplaint] Online submission failed, attempting to queue offline...");
-        const { queueComplaint } = await import("@/lib/offlineQueue");
-        const queueResult = await queueComplaint(formData);
-        
-        if (queueResult.success) {
-          setSubmitStatus("queued-offline");
-          setWasQueuedOffline(true);
-          setPendingOfflineId(queueResult.queuedId || null);
-          setSubmitMessage({
-            title: "Complaint Saved for Later",
-            description: "We couldn't submit right now, but your complaint has been saved and will be submitted automatically.",
-          });
-          resetForm();
-        } else {
-          throw error; // Use original error
-        }
-      } catch (queueError) {
-        setSubmitStatus("error");
-        setSubmitMessage({
-          title: "Submission Failed",
-          description: error instanceof Error ? error.message : "An unexpected error occurred. Please try again.",
-        });
-      }
+      setSubmitStatus("error");
+      setSubmitMessage({
+        title: "Submission Failed",
+        description: error instanceof Error ? error.message : "An unexpected error occurred. Please try again.",
+      });
     } finally {
       setIsSubmitting(false);
     }
@@ -585,13 +438,8 @@ export default function RegisterComplaintPage() {
 
   // Handle popup close
   const handlePopupClose = () => {
-    // Don't allow closing while in queued-offline state (waiting for sync)
-    if (submitStatus === "queued-offline") {
-      return; // Prevent closing - user must wait for sync
-    }
-    
     setShowPopup(false);
-    if (submitStatus === "success" || submitStatus === "synced") {
+    if (submitStatus === "success") {
       // Navigate to dashboard or complaint view
       if (complaintId) {
         router.push(`/dashboard?complaint=${complaintId}`);
@@ -707,56 +555,6 @@ export default function RegisterComplaintPage() {
                 <Sparkles className="w-4 h-4" />
                 AI-Powered Complaint System
               </motion.div>
-              
-              {/* Offline/Online Status */}
-              <motion.div
-                className={cn(
-                  "inline-flex items-center gap-2 px-3 py-2 rounded-full text-sm font-medium transition-colors",
-                  online 
-                    ? "bg-green-100 text-green-700" 
-                    : "bg-amber-100 text-amber-700"
-                )}
-                initial={{ opacity: 0, scale: 0.9 }}
-                animate={{ opacity: 1, scale: 1 }}
-              >
-                {online ? (
-                  <>
-                    <Cloud className="w-4 h-4" />
-                    <span className="hidden sm:inline">Online</span>
-                  </>
-                ) : (
-                  <>
-                    <CloudOff className="w-4 h-4" />
-                    <span className="hidden sm:inline">Offline</span>
-                  </>
-                )}
-              </motion.div>
-
-              {/* Queued Complaints Badge */}
-              {queueCount > 0 && (
-                <motion.div
-                  className="inline-flex items-center gap-2 px-3 py-2 rounded-full bg-blue-100 text-blue-700 text-sm font-medium cursor-pointer"
-                  initial={{ opacity: 0, scale: 0.9 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  whileHover={{ scale: 1.05 }}
-                  onClick={() => {
-                    if (online && !isSyncing) {
-                      manualSync();
-                    }
-                  }}
-                  title={online ? "Click to sync now" : "Will sync when online"}
-                >
-                  <WifiOff className="w-4 h-4" />
-                  {queueCount} pending
-                  {isSyncing && (
-                    <motion.div
-                      className="w-3 h-3 border-2 border-blue-700 border-t-transparent rounded-full"
-                      animate={{ rotate: 360 }}
-                      transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
-                    />
-                  )}
-                </motion.div>
-              )}
             </div>
             <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-gray-900 mb-3 tracking-tight">
               Register a Complaint
@@ -984,50 +782,6 @@ export default function RegisterComplaintPage() {
 
       {/* AI Chatbot */}
       <SwarajAIChat />
-
-      {/* Toast Notification */}
-      <AnimatePresence>
-        {notification && notification.show && (
-          <motion.div
-            initial={{ opacity: 0, y: 50, x: "-50%" }}
-            animate={{ opacity: 1, y: 0, x: "-50%" }}
-            exit={{ opacity: 0, y: 50, x: "-50%" }}
-            className={cn(
-              "fixed bottom-6 left-1/2 z-50 px-4 py-3 rounded-xl shadow-lg border backdrop-blur-sm max-w-md",
-              notification.variant === "destructive" && "bg-red-50/90 border-red-200 text-red-800",
-              notification.variant === "success" && "bg-green-50/90 border-green-200 text-green-800",
-              notification.variant === "default" && "bg-white/90 border-gray-200 text-gray-800"
-            )}
-          >
-            <div className="flex items-start gap-3">
-              <div className={cn(
-                "p-1 rounded-lg",
-                notification.variant === "destructive" && "bg-red-100",
-                notification.variant === "success" && "bg-green-100",
-                notification.variant === "default" && "bg-blue-100"
-              )}>
-                {notification.variant === "destructive" ? (
-                  <AlertCircle className="w-4 h-4 text-red-600" />
-                ) : notification.variant === "success" ? (
-                  <CheckCircle className="w-4 h-4 text-green-600" />
-                ) : (
-                  <Cloud className="w-4 h-4 text-blue-600" />
-                )}
-              </div>
-              <div className="flex-1">
-                <p className="font-semibold text-sm">{notification.title}</p>
-                <p className="text-xs opacity-80 mt-0.5">{notification.description}</p>
-              </div>
-              <button
-                onClick={() => setNotification(null)}
-                className="text-gray-400 hover:text-gray-600 transition-colors"
-              >
-                ×
-              </button>
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
     </div>
   );
 }
