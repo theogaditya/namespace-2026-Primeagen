@@ -18,6 +18,7 @@ jobs:
     env:
       USER_BE_IMAGE: ogadityahota/swarajdesk-user-be
       ADMIN_BE_IMAGE: ogadityahota/sih-swarajdesk-admin-be
+      IMAGE_TAG: ${{ github.sha }}
 
     steps:
       - name: Checkout code
@@ -68,26 +69,42 @@ jobs:
       # -------------------------
       # Build & push docker images
       # -------------------------
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
       - name: Log in to Docker Hub
         uses: docker/login-action@v3
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_PASSWORD }}
 
-      - name: Build user-be image
-        working-directory: packages/user-be
-        run: |
-          docker build --no-cache --build-arg DATABASE_URL="postgresql://dummy:dummy@localhost:5432/dummy" -t $USER_BE_IMAGE:latest -f Dockerfile .
+      - name: Build and push user-be image
+        uses: docker/build-push-action@v6
+        with:
+          context: packages/user-be
+          file: packages/user-be/Dockerfile
+          push: true
+          tags: |
+            ${{ env.USER_BE_IMAGE }}:latest
+            ${{ env.USER_BE_IMAGE }}:${{ env.IMAGE_TAG }}
+          build-args: |
+            DATABASE_URL=postgresql://dummy:dummy@localhost:5432/dummy
+          no-cache: true
+          pull: true
 
-      - name: Build admin-be image
-        working-directory: packages/admin-be
-        run: |
-          docker build --no-cache --build-arg DATABASE_URL="postgresql://dummy:dummy@localhost:5432/dummy" -t $ADMIN_BE_IMAGE:latest -f Dockerfile .
-
-      - name: Push images
-        run: |
-          docker push $USER_BE_IMAGE:latest
-          docker push $ADMIN_BE_IMAGE:latest
+      - name: Build and push admin-be image
+        uses: docker/build-push-action@v6
+        with:
+          context: packages/admin-be
+          file: packages/admin-be/Dockerfile
+          push: true
+          tags: |
+            ${{ env.ADMIN_BE_IMAGE }}:latest
+            ${{ env.ADMIN_BE_IMAGE }}:${{ env.IMAGE_TAG }}
+          build-args: |
+            DATABASE_URL=postgresql://dummy:dummy@localhost:5432/dummy
+          no-cache: true
+          pull: true
 
       # -------------------------
       # Open PR main -> deploy (skip if one already open)
@@ -111,7 +128,7 @@ jobs:
             const body = [
               'This PR merges main -> deploy to trigger Argo CD.',
               '',
-              '- Images pushed: latest',
+              '- Images pushed: latest, ' + process.env.IMAGE_TAG,
               '- Merge when ready; Argo will sync on merge.'
             ].join('\n');
             const res = await github.rest.pulls.create({ owner, repo, title, head, base, body });

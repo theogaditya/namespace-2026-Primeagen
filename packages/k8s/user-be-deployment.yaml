@@ -5,6 +5,9 @@ metadata:
   namespace: default
   labels:
     app: user-be
+  annotations:
+    # Force redeployment by updating this timestamp when pushing changes
+    kubernetes.io/change-cause: "Initial deployment"
 spec:
   replicas: 1
   selector:
@@ -14,6 +17,9 @@ spec:
     metadata:
       labels:
         app: user-be
+      annotations:
+        # This annotation can be updated to force pod recreation
+        rollme: "initial"
     spec:
       containers:
         - name: user-be
