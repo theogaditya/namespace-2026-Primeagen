@@ -29,18 +29,9 @@ export class Server {
     this.app.use(express.json());
     this.app.use(cookieParser());
 
-    const allowedOrigins = (process.env.ALLOWED_ORIGINS || '').split(',').map((s) => s.trim()).filter(Boolean);
-
     this.app.use(
       cors({
-        origin: (origin, callback) => {
-          if (!origin) return callback(null, true);
-          if (allowedOrigins.indexOf(origin) !== -1) {
-            return callback(null, true);
-          }
-          console.warn('Blocked CORS request from origin:', origin);
-          return callback(new Error('Not allowed by CORS'));
-        },
+        origin: true,
         credentials: true,
         methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
         allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],

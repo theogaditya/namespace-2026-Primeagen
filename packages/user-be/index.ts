@@ -57,8 +57,8 @@ export class Server {
     };
     this.app.use(cors(corsOptions));
     
-    // Handle preflight requests explicitly
-    this.app.options('*', cors(corsOptions));
+    // Handle preflight requests explicitly (Express 5 requires named wildcard)
+    this.app.options('/{*path}', cors(corsOptions));
 
     this.app.use(express.json());
     this.app.use(helmet());
