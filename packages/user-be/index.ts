@@ -34,8 +34,6 @@ export class Server {
   constructor(db: PrismaClient) {
     this.app = express();
     this.db = db;
-    this.app.use(helmet());
-    this.app.use(compression());
 
     this.frontEndUser = process.env.frontend;
     this.frontEndUserAlt = process.env.frontend_alt; // Alternative frontend URL (e.g., Vercel)
@@ -49,20 +47,22 @@ export class Server {
   }
 
     private initializeMiddlewares(): void {
+    // CORS must come BEFORE other middleware
+    const corsOptions = {
+      origin: true,
+      credentials: true,
+      methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
+      allowedHeaders: ["Content-Type", "Authorization"],
+      optionsSuccessStatus: 200, // Some legacy browsers choke on 204
+    };
+    this.app.use(cors(corsOptions));
+    
+    // Handle preflight requests explicitly
+    this.app.options('*', cors(corsOptions));
+
     this.app.use(express.json());
     this.app.use(helmet());
     this.app.use(compression());
-
-    // Allow all origins for CORS
-    const corsOptions = {
-      origin: true, 
-      credentials: true,
-      methods: ["GET", "POST", "PUT", "DELETE", "PATCH"],
-      allowedHeaders: ["Content-Type", "Authorization"],
-      optionsSuccessStatus: 204,
-    };
-
-    this.app.use(cors(corsOptions));
   }
 
     private initializeRoutes(): void {
