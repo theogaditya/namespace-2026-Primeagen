@@ -25,6 +25,7 @@ export class Server {
   private app: Express;
   private db: PrismaClient;
   private readonly frontEndUser?: string;
+  private readonly frontEndUserAlt?: string;
   private readonly backEndUser?: string;
   private readonly worker?: string;
   private readonly frontEndAdmin?: string;
@@ -33,11 +34,9 @@ export class Server {
   constructor(db: PrismaClient) {
     this.app = express();
     this.db = db;
-    this.app.use(helmet());
-    this.app.use(compression());
 
     this.frontEndUser = process.env.frontend;
-    this.frontEndUser = process.env.frontend;
+    this.frontEndUserAlt = process.env.frontend_alt; // Alternative frontend URL (e.g., Vercel)
     this.backEndUser = process.env.backend;
     this.worker = process.env.worker;
     this.frontEndAdmin = process.env.frontend_admin;
@@ -48,29 +47,22 @@ export class Server {
   }
 
     private initializeMiddlewares(): void {
+    // CORS must come BEFORE other middleware
+    const corsOptions = {
+      origin: true,
+      credentials: true,
+      methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
+      allowedHeaders: ["Content-Type", "Authorization"],
+      optionsSuccessStatus: 200, // Some legacy browsers choke on 204
+    };
+    this.app.use(cors(corsOptions));
+    
+    // Handle preflight requests explicitly
+    this.app.options('*', cors(corsOptions));
+
     this.app.use(express.json());
     this.app.use(helmet());
     this.app.use(compression());
-
-    const whitelist = [this.frontEndUser, this.backEndUser, this.worker, this.frontEndAdmin, this.backEndAdmin].filter(Boolean);
-
-    const corsOptions = {
-      origin: (origin: any, cb: any) => {
-        console.log("[CORS] incoming Origin:", origin);
-        console.log("[CORS] whitelist:", whitelist);
-        if (!origin) return cb(null, true);
-        if (whitelist.includes(origin)) {
-          return cb(null, true);
-        }
-        return cb(new Error("Not allowed by CORS"));
-      },
-      credentials: true,
-      methods: ["GET", "POST", "PUT", "DELETE", "PATCH"],
-      allowedHeaders: ["Content-Type", "Authorization"],
-      optionsSuccessStatus: 204,
-    };
-
-    this.app.use(cors(corsOptions));
   }
 
     private initializeRoutes(): void {

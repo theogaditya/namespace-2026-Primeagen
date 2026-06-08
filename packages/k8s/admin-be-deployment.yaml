@@ -18,6 +18,7 @@ spec:
       containers:
         - name: admin-be
           image: ogadityahota/sih-swarajdesk-admin-be:latest
+          imagePullPolicy: Always
           ports:
             - containerPort: 3002
               name: http
