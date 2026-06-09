@@ -31,23 +31,62 @@ const LanguageSelector = ({ onClose }: { onClose: () => void }) => {
 
   useEffect(() => {
     // Get current language from Google Translate cookie
-    const match = document.cookie.match(/googtrans=\/en\/([^;]+)/);
-    if (match) {
+    // Try multiple patterns as cookie format can vary
+    const cookies = document.cookie;
+    
+    // Try standard format: googtrans=/en/hi
+    let match = cookies.match(/googtrans=\/en\/([a-z-]+)/i);
+    
+    // If not found, try URL encoded format: googtrans=%2Fen%2Fhi
+    if (!match) {
+      match = cookies.match(/googtrans=%2Fen%2F([a-z-]+)/i);
+    }
+    
+    if (match && match[1]) {
       setCurrentLang(match[1]);
     }
   }, []);
 
   const changeLanguage = (langCode: string) => {
-    // Set the Google Translate cookie
-    const domain = window.location.hostname;
-    document.cookie = `googtrans=/en/${langCode}; path=/; domain=${domain}`;
-    document.cookie = `googtrans=/en/${langCode}; path=/`;
+    // Clear existing googtrans cookies first (important for production)
+    const hostname = window.location.hostname;
+    const expiredDate = 'Thu, 01 Jan 1970 00:00:00 UTC';
     
-    setCurrentLang(langCode);
-    onClose();
+    // Clear cookies with various domain configurations
+    document.cookie = `googtrans=; expires=${expiredDate}; path=/`;
+    document.cookie = `googtrans=; expires=${expiredDate}; path=/; domain=${hostname}`;
+    document.cookie = `googtrans=; expires=${expiredDate}; path=/; domain=.${hostname}`;
     
-    // Always reload to apply translation
-    window.location.reload();
+    // Also clear from root domain if on subdomain (e.g., app.example.com -> .example.com)
+    const parts = hostname.split('.');
+    if (parts.length > 2) {
+      const rootDomain = parts.slice(-2).join('.');
+      document.cookie = `googtrans=; expires=${expiredDate}; path=/; domain=.${rootDomain}`;
+    }
+    
+    // Small delay to ensure cookies are cleared
+    setTimeout(() => {
+      // Set new Google Translate cookie
+      const newValue = `/en/${langCode}`;
+      
+      // Set cookie without domain (works most reliably in production)
+      document.cookie = `googtrans=${newValue}; path=/`;
+      
+      // Also set with explicit domain for Google Translate to pick up
+      document.cookie = `googtrans=${newValue}; path=/; domain=${hostname}`;
+      
+      // For subdomains, also set on root domain
+      if (parts.length > 2) {
+        const rootDomain = parts.slice(-2).join('.');
+        document.cookie = `googtrans=${newValue}; path=/; domain=.${rootDomain}`;
+      }
+      
+      setCurrentLang(langCode);
+      onClose();
+      
+      // Reload to apply translation
+      window.location.reload();
+    }, 100);
   };
 
   const currentLanguage = LANGUAGES.find(l => l.code === currentLang) || LANGUAGES[0];
