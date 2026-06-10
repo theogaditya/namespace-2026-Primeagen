@@ -27,20 +27,18 @@ import { cn } from "@/lib/utils";
 import { SwarajAIChat } from "@/components/swaraj-ai-chat";
 import {
   useComplaintForm,
-  Step2Details,
   Step3Location,
   Step4Review,
   LoadingPopup,
   step1Schema,
   step2Schema,
   step3Schema,
-  type ImageValidationStatus,
-} from "./customComps";
+} from "../customComps";
 import {
   Step1CategoryWithAutofill,
   Step2DetailsAI,
   type ImageAnalysisStatus,
-} from "./autofillpath";
+} from ".";
 
 // Animation variants
 const containerVariants: Variants = {
@@ -112,43 +110,7 @@ const floatingIconVariants: Variants = {
   },
 };
 
-// Step configuration with enhanced icons - Standard path
-const STEPS_STANDARD = [
-  {
-    id: 1,
-    label: "Category",
-    description: "Select department",
-    icon: <ClipboardList className="h-5 w-5" />,
-    gradient: "from-orange-500 to-amber-500",
-    bgGlow: "bg-orange-500/20",
-  },
-  {
-    id: 2,
-    label: "Details",
-    description: "Describe issue",
-    icon: <FileText className="h-5 w-5" />,
-    gradient: "from-blue-500 to-cyan-500",
-    bgGlow: "bg-blue-500/20",
-  },
-  {
-    id: 3,
-    label: "Location",
-    description: "Add address",
-    icon: <MapPin className="h-5 w-5" />,
-    gradient: "from-emerald-500 to-teal-500",
-    bgGlow: "bg-emerald-500/20",
-  },
-  {
-    id: 4,
-    label: "Review",
-    description: "Confirm & submit",
-    icon: <Eye className="h-5 w-5" />,
-    gradient: "from-purple-500 to-pink-500",
-    bgGlow: "bg-purple-500/20",
-  },
-];
-
-// Step configuration with enhanced icons - Autofill path
+// Step configuration with enhanced icons - for autofill path (3 steps after category)
 const STEPS_AUTOFILL = [
   {
     id: 1,
@@ -184,6 +146,42 @@ const STEPS_AUTOFILL = [
   },
 ];
 
+// Standard steps (non-autofill)
+const STEPS_STANDARD = [
+  {
+    id: 1,
+    label: "Category",
+    description: "Select department",
+    icon: <ClipboardList className="h-5 w-5" />,
+    gradient: "from-orange-500 to-amber-500",
+    bgGlow: "bg-orange-500/20",
+  },
+  {
+    id: 2,
+    label: "Details",
+    description: "Describe issue",
+    icon: <FileText className="h-5 w-5" />,
+    gradient: "from-blue-500 to-cyan-500",
+    bgGlow: "bg-blue-500/20",
+  },
+  {
+    id: 3,
+    label: "Location",
+    description: "Add address",
+    icon: <MapPin className="h-5 w-5" />,
+    gradient: "from-emerald-500 to-teal-500",
+    bgGlow: "bg-emerald-500/20",
+  },
+  {
+    id: 4,
+    label: "Review",
+    description: "Confirm & submit",
+    icon: <Eye className="h-5 w-5" />,
+    gradient: "from-purple-500 to-pink-500",
+    bgGlow: "bg-purple-500/20",
+  },
+];
+
 // Floating background icons
 const FLOATING_ICONS = [
   { icon: <Landmark className="w-8 h-8" />, x: -350, y: -200, delay: 0, color: "text-orange-300" },
@@ -199,7 +197,7 @@ function EnhancedStepProgress({
   steps,
   currentStep,
 }: {
-  steps: typeof STEPS_STANDARD;
+  steps: typeof STEPS_AUTOFILL;
   currentStep: number;
 }) {
   return (
@@ -297,7 +295,7 @@ function EnhancedStepProgress({
   );
 }
 
-export default function RegisterComplaintPage() {
+export default function RegisterComplaintWithAutofillPage() {
   const router = useRouter();
   const {
     formData,
@@ -321,12 +319,11 @@ export default function RegisterComplaintPage() {
   const [showPopup, setShowPopup] = useState(false);
   const [complaintId, setComplaintId] = useState<string | null>(null);
   const [mounted, setMounted] = useState(false);
-  const [imageValidationStatus, setImageValidationStatus] = useState<ImageValidationStatus>("idle");
+  const [imageAnalysisStatus, setImageAnalysisStatus] = useState<ImageAnalysisStatus>("idle");
   
   // Autofill mode state
   const [useAutofill, setUseAutofill] = useState(false);
-  const [imageAnalysisStatus, setImageAnalysisStatus] = useState<ImageAnalysisStatus>("idle");
-  
+
   // Get the appropriate steps based on autofill mode
   const STEPS = useAutofill ? STEPS_AUTOFILL : STEPS_STANDARD;
 
@@ -514,27 +511,9 @@ export default function RegisterComplaintPage() {
           />
         );
       case 2:
-        // Use AI autofill step if enabled, otherwise standard details
-        if (useAutofill) {
-          return (
-            <Step2DetailsAI
-              formData={formData}
-              touched={touched}
-              errors={errors}
-              updateField={updateField}
-              setFieldTouched={setFieldTouched}
-              setErrors={setErrors}
-              setPhoto={setPhoto}
-              onValidationStatusChange={setImageValidationStatus}
-              onAnalysisStatusChange={setImageAnalysisStatus}
-              onAnalysisComplete={(data) => {
-                console.log("AI Analysis complete:", data);
-              }}
-            />
-          );
-        }
+        // Use AI autofill step if enabled
         return (
-          <Step2Details
+          <Step2DetailsAI
             formData={formData}
             touched={touched}
             errors={errors}
@@ -542,7 +521,10 @@ export default function RegisterComplaintPage() {
             setFieldTouched={setFieldTouched}
             setErrors={setErrors}
             setPhoto={setPhoto}
-            onValidationStatusChange={setImageValidationStatus}
+            onAnalysisStatusChange={setImageAnalysisStatus}
+            onAnalysisComplete={(data: { category: string; subCategory: string; description: string }) => {
+              console.log("AI Analysis complete:", data);
+            }}
           />
         );
       case 3:
@@ -568,17 +550,8 @@ export default function RegisterComplaintPage() {
   const currentStepConfig = STEPS[currentStep - 1];
   
   // Check if Next button should be disabled
-  // For autofill path: disable while AI is analyzing
-  // For standard path: disable while image validation is in progress or invalid
-  const isNextDisabled = currentStep === 2 && (
-    useAutofill 
-      ? imageAnalysisStatus === "analyzing"
-      : (
-          imageValidationStatus === "validating" || 
-          imageValidationStatus === "invalid" ||
-          imageValidationStatus === "error"
-        )
-  );
+  // For autofill path on step 2, disable while analyzing
+  const isNextDisabled = currentStep === 2 && useAutofill && imageAnalysisStatus === "analyzing";
 
   return (
     <div className="min-h-screen relative overflow-hidden bg-linear-to-b from-slate-50 via-white to-slate-100 py-10">
@@ -627,7 +600,7 @@ export default function RegisterComplaintPage() {
                 className={cn(
                   "inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium",
                   useAutofill 
-                    ? "bg-gradient-to-r from-purple-100 to-indigo-100 text-purple-700"
+                    ? "bg-linear-to-r from-purple-100 to-indigo-100 text-purple-700"
                     : "bg-linear-to-r from-orange-100 to-amber-100 text-orange-700"
                 )}
                 whileHover={{ scale: 1.05 }}
@@ -732,9 +705,8 @@ export default function RegisterComplaintPage() {
                             Please fix the following errors:
                           </p>
                           <ul className="mt-2 text-sm text-red-600 space-y-1">
-                            {Object.values(errors).map(
-                              (error, idx) =>
-                                error && (
+                            {(Object.values(errors) as string[]).filter(Boolean).map(
+                              (error, idx) => (
                                   <li key={idx} className="flex items-center gap-2">
                                     <span className="w-1.5 h-1.5 bg-red-400 rounded-full" />
                                     {error}
@@ -790,11 +762,9 @@ export default function RegisterComplaintPage() {
                           : "hover:shadow-xl hover:brightness-110"
                       )}
                     >
-                      {imageValidationStatus === "validating" 
-                        ? "Validating..." 
-                        : imageValidationStatus === "invalid" 
-                          ? "Invalid Image" 
-                          : "Next"}
+                      {imageAnalysisStatus === "analyzing" 
+                        ? "Analyzing..." 
+                        : "Next"}
                       <ArrowRight className="h-4 w-4" />
                     </Button>
                   </motion.div>
