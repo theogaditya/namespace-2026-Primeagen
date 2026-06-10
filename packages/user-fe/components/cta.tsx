@@ -78,34 +78,35 @@ export function CTASection({
   }, [])
 
   const floatingIcons: FloatingIcon[] = [
-    { id: 1, icon: <Landmark className="w-10 h-10" />, x: -480, y: -280, z: 0.6, delay: 0, bgColor: "bg-orange-200" },
+    // Desktop positions (hidden on mobile)
+    { id: 1, icon: <Landmark className="w-6 h-6 sm:w-8 sm:h-8 md:w-10 md:h-10" />, x: -480, y: -280, z: 0.6, delay: 0, bgColor: "bg-orange-200" },
     {
       id: 2,
-      icon: <FileText className="w-10 h-10" />,
+      icon: <FileText className="w-6 h-6 sm:w-8 sm:h-8 md:w-10 md:h-10" />,
       x: -420,
       y: -120,
       z: 0.8,
       delay: 0.2,
       bgColor: "bg-emerald-200",
     },
-    { id: 3, icon: <Users className="w-10 h-10" />, x: -460, y: 80, z: 0.7, delay: 0.4, bgColor: "bg-blue-200" },
-    { id: 4, icon: <Shield className="w-10 h-10" />, x: -380, y: 240, z: 0.5, delay: 0.6, bgColor: "bg-orange-200" },
+    { id: 3, icon: <Users className="w-6 h-6 sm:w-8 sm:h-8 md:w-10 md:h-10" />, x: -460, y: 80, z: 0.7, delay: 0.4, bgColor: "bg-blue-200" },
+    { id: 4, icon: <Shield className="w-6 h-6 sm:w-8 sm:h-8 md:w-10 md:h-10" />, x: -380, y: 240, z: 0.5, delay: 0.6, bgColor: "bg-orange-200" },
     {
       id: 5,
-      icon: <Building2 className="w-10 h-10" />,
+      icon: <Building2 className="w-6 h-6 sm:w-8 sm:h-8 md:w-10 md:h-10" />,
       x: 480,
       y: -280,
       z: 0.6,
       delay: 0.1,
       bgColor: "bg-emerald-200",
     },
-    { id: 6, icon: <Scale className="w-10 h-10" />, x: 420, y: -120, z: 0.8, delay: 0.3, bgColor: "bg-orange-200" },
-    { id: 7, icon: <BadgeCheck className="w-10 h-10" />, x: 460, y: 80, z: 0.7, delay: 0.5, bgColor: "bg-blue-200" },
-    { id: 8, icon: <HandHeart className="w-10 h-10" />, x: 380, y: 240, z: 0.5, delay: 0.7, bgColor: "bg-emerald-200" },
-    { id: 9, icon: <Megaphone className="w-10 h-10" />, x: -280, y: -320, z: 0.4, delay: 0.15, bgColor: "bg-blue-200" },
+    { id: 6, icon: <Scale className="w-6 h-6 sm:w-8 sm:h-8 md:w-10 md:h-10" />, x: 420, y: -120, z: 0.8, delay: 0.3, bgColor: "bg-orange-200" },
+    { id: 7, icon: <BadgeCheck className="w-6 h-6 sm:w-8 sm:h-8 md:w-10 md:h-10" />, x: 460, y: 80, z: 0.7, delay: 0.5, bgColor: "bg-blue-200" },
+    { id: 8, icon: <HandHeart className="w-6 h-6 sm:w-8 sm:h-8 md:w-10 md:h-10" />, x: 380, y: 240, z: 0.5, delay: 0.7, bgColor: "bg-emerald-200" },
+    { id: 9, icon: <Megaphone className="w-6 h-6 sm:w-8 sm:h-8 md:w-10 md:h-10" />, x: -280, y: -320, z: 0.4, delay: 0.15, bgColor: "bg-blue-200" },
     {
       id: 10,
-      icon: <ClipboardList className="w-10 h-10" />,
+      icon: <ClipboardList className="w-6 h-6 sm:w-8 sm:h-8 md:w-10 md:h-10" />,
       x: 280,
       y: -320,
       z: 0.4,
@@ -114,19 +115,19 @@ export function CTASection({
     },
     {
       id: 11,
-      icon: <MessageSquare className="w-10 h-10" />,
+      icon: <MessageSquare className="w-6 h-6 sm:w-8 sm:h-8 md:w-10 md:h-10" />,
       x: -520,
       y: -20,
       z: 0.5,
       delay: 0.35,
       bgColor: "bg-emerald-200",
     },
-    { id: 12, icon: <HelpCircle className="w-10 h-10" />, x: 520, y: -20, z: 0.5, delay: 0.45, bgColor: "bg-blue-200" },
-    { id: 13, icon: <Bell className="w-10 h-10" />, x: -280, y: 280, z: 0.6, delay: 0.55, bgColor: "bg-orange-200" },
-    { id: 14, icon: <Vote className="w-10 h-10" />, x: 280, y: 280, z: 0.6, delay: 0.65, bgColor: "bg-emerald-200" },
+    { id: 12, icon: <HelpCircle className="w-6 h-6 sm:w-8 sm:h-8 md:w-10 md:h-10" />, x: 520, y: -20, z: 0.5, delay: 0.45, bgColor: "bg-blue-200" },
+    { id: 13, icon: <Bell className="w-6 h-6 sm:w-8 sm:h-8 md:w-10 md:h-10" />, x: -280, y: 280, z: 0.6, delay: 0.55, bgColor: "bg-orange-200" },
+    { id: 14, icon: <Vote className="w-6 h-6 sm:w-8 sm:h-8 md:w-10 md:h-10" />, x: 280, y: 280, z: 0.6, delay: 0.65, bgColor: "bg-emerald-200" },
     {
       id: 15,
-      icon: <Briefcase className="w-10 h-10" />,
+      icon: <Briefcase className="w-6 h-6 sm:w-8 sm:h-8 md:w-10 md:h-10" />,
       x: -560,
       y: -180,
       z: 0.3,
@@ -135,7 +136,7 @@ export function CTASection({
     },
     {
       id: 16,
-      icon: <GraduationCap className="w-10 h-10" />,
+      icon: <GraduationCap className="w-6 h-6 sm:w-8 sm:h-8 md:w-10 md:h-10" />,
       x: 560,
       y: -180,
       z: 0.3,
@@ -198,15 +199,44 @@ export function CTASection({
   }
 
   return (
-    <section className="w-full min-h-screen relative overflow-hidden bg-linear-to-b from-slate-50 via-white to-slate-100 flex items-center justify-center">
-      {/* Floating icons container */}
+    <section className="w-full min-h-screen relative overflow-hidden bg-linear-to-b from-slate-50 via-white to-slate-100 flex items-center justify-center py-12 sm:py-16 md:py-0">
+      {/* Floating icons container - hidden on small screens, visible on larger */}
       <div
-        className="absolute inset-0 flex items-center justify-center pointer-events-none"
+        className="absolute inset-0 hidden sm:flex items-center justify-center pointer-events-none"
         style={{ perspective: "1000px" }}
       >
         {floatingIcons.map((item) => (
           <div
             key={item.id}
+            className={cn(
+              "absolute rounded-2xl shadow-xl flex items-center justify-center text-slate-600 transition-all duration-1000",
+              item.bgColor,
+              mounted ? "opacity-100" : "opacity-0",
+            )}
+            style={{
+              width: Math.max((72 * item.z + 24) * 0.6, 40),
+              height: Math.max((72 * item.z + 24) * 0.6, 40),
+              transform: `translate(${item.x * 0.5}px, ${item.y * 0.5}px) scale(${item.z})`,
+              animationDelay: `${item.delay}s`,
+              filter: `blur(${(1 - item.z) * 2}px)`,
+              boxShadow: `0 ${20 * item.z}px ${40 * item.z}px rgba(0,0,0,0.1)`,
+            }}
+          >
+            <div className="animate-float" style={{ animationDelay: `${item.delay}s` }}>
+              {item.icon}
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {/* Larger screen floating icons */}
+      <div
+        className="absolute inset-0 hidden md:flex items-center justify-center pointer-events-none"
+        style={{ perspective: "1000px" }}
+      >
+        {floatingIcons.map((item) => (
+          <div
+            key={`md-${item.id}`}
             className={cn(
               "absolute rounded-2xl shadow-xl flex items-center justify-center text-slate-600 transition-all duration-1000",
               item.bgColor,
@@ -229,8 +259,8 @@ export function CTASection({
       </div>
 
       {/* Center content */}
-      <div className="relative z-10 text-center px-4 max-w-3xl mx-auto">
-        <div className="mx-auto mb-8 w-24 h-24 rounded-2xl shadow-2xl flex items-center justify-center animate-fade-in overflow-hidden">
+      <div className="relative z-10 text-center px-4 sm:px-6 max-w-3xl mx-auto">
+        <div className="mx-auto mb-6 sm:mb-8 w-16 h-16 sm:w-20 sm:h-20 md:w-24 md:h-24 rounded-2xl shadow-2xl flex items-center justify-center animate-fade-in overflow-hidden">
           <img
             src="https://swarajdesk.adityahota.online/logo.png"
             alt="SwarajDesk Logo"
@@ -240,7 +270,7 @@ export function CTASection({
 
         <h2
           className={cn(
-            "text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight text-slate-900 mb-6 text-balance transition-all duration-700",
+            "text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-bold tracking-tight text-slate-900 mb-4 sm:mb-6 text-balance transition-all duration-700",
             mounted ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8",
           )}
         >
@@ -249,7 +279,7 @@ export function CTASection({
 
         <p
           className={cn(
-            "text-slate-600 text-lg md:text-xl max-w-xl mx-auto mb-10 text-pretty transition-all duration-700 delay-100",
+            "text-slate-600 text-sm sm:text-base md:text-lg lg:text-xl max-w-xl mx-auto mb-6 sm:mb-8 md:mb-10 text-pretty transition-all duration-700 delay-100 px-2",
             mounted ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8",
           )}
         >
@@ -258,7 +288,7 @@ export function CTASection({
 
         <div
           className={cn(
-            "flex flex-col sm:flex-row items-center justify-center gap-4 transition-all duration-700 delay-200",
+            "flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-4 transition-all duration-700 delay-200",
             mounted ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8",
           )}
         >
@@ -267,7 +297,7 @@ export function CTASection({
             size="lg"
             onClick={handleSecondaryClick}
             className={cn(
-              "min-w-40 h-14 px-8 rounded-full border-2 border-slate-300 bg-white hover:bg-slate-50 hover:border-slate-400 transition-all duration-300 hover:scale-105 relative overflow-hidden text-slate-800 font-medium",
+              "w-full sm:w-auto min-w-[140px] sm:min-w-40 h-11 sm:h-12 md:h-14 px-6 sm:px-8 rounded-full border-2 border-slate-300 bg-white hover:bg-slate-50 hover:border-slate-400 transition-all duration-300 hover:scale-105 relative overflow-hidden text-slate-800 font-medium text-sm sm:text-base",
               secondaryClicked && "scale-95",
             )}
           >
@@ -294,7 +324,7 @@ export function CTASection({
             size="lg"
             onClick={handleDashboardClick}
             className={cn(
-              "min-w-40 h-14 px-8 rounded-full border-2 border-emerald-300 bg-white hover:bg-emerald-50 hover:border-emerald-400 transition-all duration-300 hover:scale-105 relative overflow-hidden text-emerald-700 font-medium",
+              "w-full sm:w-auto min-w-[140px] sm:min-w-40 h-11 sm:h-12 md:h-14 px-6 sm:px-8 rounded-full border-2 border-emerald-300 bg-white hover:bg-emerald-50 hover:border-emerald-400 transition-all duration-300 hover:scale-105 relative overflow-hidden text-emerald-700 font-medium text-sm sm:text-base",
               dashboardClicked && "scale-95",
             )}
           >
@@ -304,12 +334,12 @@ export function CTASection({
             </span>
           </Button>
 
-          <div className="relative">
+          <div className="relative w-full sm:w-auto">
             <Button
               size="lg"
               onClick={handlePrimaryClick}
               className={cn(
-                "min-w-[220px] h-14 px-8 rounded-full bg-blue-900 text-white hover:bg-blue-800 transition-all duration-300 hover:scale-105 relative overflow-hidden font-medium shadow-lg shadow-blue-900/25",
+                "w-full sm:w-auto min-w-[180px] sm:min-w-[200px] md:min-w-[220px] h-11 sm:h-12 md:h-14 px-6 sm:px-8 rounded-full bg-blue-900 text-white hover:bg-blue-800 transition-all duration-300 hover:scale-105 relative overflow-hidden font-medium shadow-lg shadow-blue-900/25 text-sm sm:text-base",
                 primaryClicked && "scale-110 shadow-xl shadow-blue-900/40",
               )}
             >
