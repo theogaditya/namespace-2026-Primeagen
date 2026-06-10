@@ -199,10 +199,10 @@ export function CTASection({
   }
 
   return (
-    <section className="w-full min-h-screen relative overflow-hidden bg-linear-to-b from-slate-50 via-white to-slate-100 flex items-center justify-center py-12 sm:py-16 md:py-0">
-      {/* Floating icons container - hidden on small screens, visible on larger */}
+    <section className="w-full min-h-screen relative overflow-hidden bg-linear-to-b from-slate-50 via-white to-slate-100 flex items-center justify-center py-16 sm:py-20 md:py-0">
+      {/* Floating icons container - hidden on mobile, visible on larger screens */}
       <div
-        className="absolute inset-0 hidden sm:flex items-center justify-center pointer-events-none"
+        className="absolute inset-0 hidden md:flex items-center justify-center pointer-events-none"
         style={{ perspective: "1000px" }}
       >
         {floatingIcons.map((item) => (
@@ -231,12 +231,12 @@ export function CTASection({
 
       {/* Larger screen floating icons */}
       <div
-        className="absolute inset-0 hidden md:flex items-center justify-center pointer-events-none"
+        className="absolute inset-0 hidden lg:flex items-center justify-center pointer-events-none"
         style={{ perspective: "1000px" }}
       >
         {floatingIcons.map((item) => (
           <div
-            key={`md-${item.id}`}
+            key={`lg-${item.id}`}
             className={cn(
               "absolute rounded-2xl shadow-xl flex items-center justify-center text-slate-600 transition-all duration-1000",
               item.bgColor,
@@ -259,8 +259,8 @@ export function CTASection({
       </div>
 
       {/* Center content */}
-      <div className="relative z-10 text-center px-4 sm:px-6 max-w-3xl mx-auto">
-        <div className="mx-auto mb-6 sm:mb-8 w-16 h-16 sm:w-20 sm:h-20 md:w-24 md:h-24 rounded-2xl shadow-2xl flex items-center justify-center animate-fade-in overflow-hidden">
+      <div className="relative z-10 text-center px-5 sm:px-6 max-w-3xl mx-auto">
+        <div className="mx-auto mb-6 sm:mb-8 w-20 h-20 sm:w-24 sm:h-24 rounded-2xl shadow-2xl flex items-center justify-center animate-fade-in overflow-hidden">
           <img
             src="https://swarajdesk.adityahota.online/logo.png"
             alt="SwarajDesk Logo"
@@ -279,7 +279,7 @@ export function CTASection({
 
         <p
           className={cn(
-            "text-slate-600 text-sm sm:text-base md:text-lg lg:text-xl max-w-xl mx-auto mb-6 sm:mb-8 md:mb-10 text-pretty transition-all duration-700 delay-100 px-2",
+            "text-slate-600 text-sm sm:text-base md:text-lg lg:text-xl max-w-xl mx-auto mb-8 sm:mb-10 text-pretty transition-all duration-700 delay-100",
             mounted ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8",
           )}
         >
@@ -297,7 +297,7 @@ export function CTASection({
             size="lg"
             onClick={handleSecondaryClick}
             className={cn(
-              "w-full sm:w-auto min-w-[140px] sm:min-w-40 h-11 sm:h-12 md:h-14 px-6 sm:px-8 rounded-full border-2 border-slate-300 bg-white hover:bg-slate-50 hover:border-slate-400 transition-all duration-300 hover:scale-105 relative overflow-hidden text-slate-800 font-medium text-sm sm:text-base",
+              "w-full sm:w-auto min-w-[160px] sm:min-w-40 h-12 sm:h-12 md:h-14 px-6 sm:px-8 rounded-full border-2 border-slate-300 bg-white hover:bg-slate-50 hover:border-slate-400 transition-all duration-300 hover:scale-105 relative overflow-hidden text-slate-800 font-medium text-sm sm:text-base",
               secondaryClicked && "scale-95",
             )}
           >
@@ -324,7 +324,7 @@ export function CTASection({
             size="lg"
             onClick={handleDashboardClick}
             className={cn(
-              "w-full sm:w-auto min-w-[140px] sm:min-w-40 h-11 sm:h-12 md:h-14 px-6 sm:px-8 rounded-full border-2 border-emerald-300 bg-white hover:bg-emerald-50 hover:border-emerald-400 transition-all duration-300 hover:scale-105 relative overflow-hidden text-emerald-700 font-medium text-sm sm:text-base",
+              "w-full sm:w-auto min-w-[160px] sm:min-w-40 h-12 sm:h-12 md:h-14 px-6 sm:px-8 rounded-full border-2 border-emerald-300 bg-white hover:bg-emerald-50 hover:border-emerald-400 transition-all duration-300 hover:scale-105 relative overflow-hidden text-emerald-700 font-medium text-sm sm:text-base",
               dashboardClicked && "scale-95",
             )}
           >
@@ -339,7 +339,7 @@ export function CTASection({
               size="lg"
               onClick={handlePrimaryClick}
               className={cn(
-                "w-full sm:w-auto min-w-[180px] sm:min-w-[200px] md:min-w-[220px] h-11 sm:h-12 md:h-14 px-6 sm:px-8 rounded-full bg-blue-900 text-white hover:bg-blue-800 transition-all duration-300 hover:scale-105 relative overflow-hidden font-medium shadow-lg shadow-blue-900/25 text-sm sm:text-base",
+                "w-full sm:w-auto min-w-[180px] sm:min-w-[200px] md:min-w-[220px] h-12 sm:h-12 md:h-14 px-6 sm:px-8 rounded-full bg-blue-900 text-white hover:bg-blue-800 transition-all duration-300 hover:scale-105 relative overflow-hidden font-medium shadow-lg shadow-blue-900/25 text-sm sm:text-base",
                 primaryClicked && "scale-110 shadow-xl shadow-blue-900/40",
               )}
             >

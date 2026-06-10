@@ -137,7 +137,7 @@ export function SwarajAIChat({ className }: SwarajAIChatProps) {
       <button
         onClick={() => setIsOpen(true)}
         className={cn(
-          "fixed bottom-6 right-6 z-50 px-4 py-3 rounded-full bg-primary text-primary-foreground shadow-xl",
+          "fixed bottom-4 right-4 sm:bottom-6 sm:right-6 z-50 px-3 sm:px-4 py-2.5 sm:py-3 rounded-full bg-primary text-primary-foreground shadow-xl",
           "hover:scale-105 transition-all duration-100 hover:shadow-2xl",
           "flex items-center gap-2",
           "animate-pulse hover:animate-none",
@@ -145,26 +145,29 @@ export function SwarajAIChat({ className }: SwarajAIChatProps) {
         )}
         aria-label="Open Swaraj AI Chat"
       >
-        <Bot className="w-8 h-8" />
-        <span className="font-medium text-sm">Chat with Swaraj AI</span>
+        <Bot className="w-6 h-6 sm:w-8 sm:h-8" />
+        <span className="font-medium text-xs sm:text-sm hidden sm:inline">Chat with Swaraj AI</span>
       </button>
 
       {/* Chat Window */}
       <div
         ref={chatContainerRef}
         className={cn(
-          "fixed bottom-6 right-6 z-50 w-[380px] max-w-[calc(100vw-48px)] h-[600px] max-h-[calc(100vh-100px)]",
-          "bg-background border border-border rounded-2xl shadow-2xl",
+          "fixed z-50",
+          "bottom-0 right-0 sm:bottom-6 sm:right-6",
+          "w-full sm:w-[380px] sm:max-w-[calc(100vw-48px)]",
+          "h-[85vh] sm:h-[600px] sm:max-h-[calc(100vh-100px)]",
+          "bg-background border-t sm:border border-border sm:rounded-2xl shadow-2xl",
           "flex flex-col overflow-hidden transition-all duration-300",
           isOpen ? "opacity-100 scale-100" : "opacity-0 scale-95 pointer-events-none",
           className
         )}
       >
         {/* Header */}
-        <div className="flex items-center justify-between px-4 py-3 border-b border-border bg-muted/30 shrink-0">
+        <div className="flex items-center justify-between px-3 sm:px-4 py-3 border-b border-border bg-muted/30 shrink-0">
           <div className="flex items-center gap-2">
             <div className="p-1.5 rounded-lg bg-primary/10">
-              <Bot className="w-7 h-7 text-primary" />
+              <Bot className="w-6 h-6 sm:w-7 sm:h-7 text-primary" />
             </div>
             <div>
               <h3 className="font-semibold text-sm">Swaraj AI</h3>
@@ -182,8 +185,8 @@ export function SwarajAIChat({ className }: SwarajAIChatProps) {
         </div>
 
         {/* Language Selector */}
-        <div className="flex items-center gap-2 px-4 py-2 border-b border-border bg-muted/20 shrink-0">
-          <Languages className="w-4 h-4 text-muted-foreground" />
+        <div className="flex items-center gap-2 px-3 sm:px-4 py-2 border-b border-border bg-muted/20 shrink-0 overflow-x-auto">
+          <Languages className="w-4 h-4 text-muted-foreground shrink-0" />
           <div className="flex gap-1">
             {LANGUAGE_OPTIONS.map((lang) => (
               <button
@@ -191,7 +194,7 @@ export function SwarajAIChat({ className }: SwarajAIChatProps) {
                 type="button"
                 onClick={() => setSelectedLanguage(lang.value)}
                 className={cn(
-                  "px-3 py-1 text-xs font-medium rounded-full transition-all duration-200",
+                  "px-2.5 sm:px-3 py-1 text-xs font-medium rounded-full transition-all duration-200 whitespace-nowrap",
                   selectedLanguage === lang.value
                     ? "bg-primary text-primary-foreground"
                     : "bg-muted hover:bg-muted/80 text-muted-foreground"
@@ -204,14 +207,14 @@ export function SwarajAIChat({ className }: SwarajAIChatProps) {
         </div>
 
         {/* Messages Area */}
-        <div className="flex-1 overflow-y-auto px-4 py-3">
+        <div className="flex-1 overflow-y-auto px-3 sm:px-4 py-3">
           {messages.length === 0 ? (
-            <div className="flex flex-col items-center justify-center h-full text-center py-8">
+            <div className="flex flex-col items-center justify-center h-full text-center py-6 sm:py-8">
               <div className="p-3 rounded-full bg-primary/10 mb-4">
-                <Bot className="w-8 h-8 text-primary" />
+                <Bot className="w-7 h-7 sm:w-8 sm:h-8 text-primary" />
               </div>
-              <h4 className="font-medium mb-1">Welcome to Swaraj AI</h4>
-              <p className="text-sm text-muted-foreground mb-4">
+              <h4 className="font-medium mb-1 text-sm sm:text-base">Welcome to Swaraj AI</h4>
+              <p className="text-xs sm:text-sm text-muted-foreground mb-4">
                 How can I help you today?
               </p>
               
@@ -226,7 +229,7 @@ export function SwarajAIChat({ className }: SwarajAIChatProps) {
                     onClick={() => handleSuggestionClick(question)}
                     disabled={isLoading}
                     className={cn(
-                      "w-full px-3 py-2 text-sm text-left rounded-lg",
+                      "w-full px-3 py-2 text-xs sm:text-sm text-left rounded-lg",
                       "border border-border bg-background",
                       "hover:bg-muted/50 hover:border-primary/30 transition-all duration-200",
                       "disabled:opacity-50 disabled:cursor-not-allowed"
@@ -319,7 +322,7 @@ export function SwarajAIChat({ className }: SwarajAIChatProps) {
         )}
 
         {/* Input Area */}
-        <div className="px-4 py-3 border-t border-border bg-muted/20 shrink-0">
+        <div className="px-3 sm:px-4 py-3 border-t border-border bg-muted/20 shrink-0">
           {/* Word Counter */}
           <div className="flex justify-end mb-1">
             <span

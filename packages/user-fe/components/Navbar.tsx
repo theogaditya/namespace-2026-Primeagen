@@ -187,16 +187,16 @@ const Navbar = () => {
 
   return (
     <nav className='fixed top-0 left-0 right-0 z-99999 bg-white/80 backdrop-blur-md shadow-sm'>
-      <div className='max-w-7xl mx-auto px-3 sm:px-4 md:px-6 lg:px-8'>
-        <div className='flex items-center justify-between h-14 sm:h-16 md:h-18'>
+      <div className='max-w-7xl mx-auto px-4 sm:px-6 lg:px-8'>
+        <div className='flex items-center justify-between h-25'>
           {/* Logo */}
-          <Link href='/' className='flex items-center gap-2'>
+          <Link href='/' className='flex items-center gap-2 shrink-0'>
             <Image
               src='https://swarajdesk.adityahota.online/logo.png'
               alt='SwarajDesk Logo'
               width={160}
               height={160}
-              className='object-contain w-[120px] sm:w-[140px] md:w-40'
+              className='object-contain w-28 sm:w-32 md:w-40'
             />
           </Link>
 
@@ -206,30 +206,30 @@ const Navbar = () => {
               <div className="relative" ref={dropdownRef}>
                 <button
                   onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-                  className='flex items-center gap-1.5 sm:gap-2 px-2 sm:px-3 py-1.5 sm:py-2 rounded-full bg-linear-to-r from-blue-600 to-purple-600 text-white font-medium hover:opacity-90 transition-all shadow-md hover:shadow-lg'
+                  className='flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-3 py-2 rounded-full bg-linear-to-r from-blue-600 to-purple-600 text-white font-medium hover:opacity-90 transition-all shadow-md hover:shadow-lg'
                 >
-                  <div className="w-6 h-6 sm:w-7 sm:h-7 rounded-full bg-white/20 flex items-center justify-center">
-                    <User className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+                  <div className="w-7 h-7 rounded-full bg-white/20 flex items-center justify-center">
+                    <User className="w-4 h-4" />
                   </div>
-                  <span className="hidden sm:inline text-xs sm:text-sm max-w-20 sm:max-w-[100px] truncate">
+                  <span className="hidden sm:inline text-sm max-w-[100px] truncate">
                     {userName || 'Profile'}
                   </span>
-                  <ChevronDown className={`w-3.5 h-3.5 sm:w-4 sm:h-4 transition-transform ${isDropdownOpen ? 'rotate-180' : ''}`} />
+                  <ChevronDown className={`w-4 h-4 transition-transform ${isDropdownOpen ? 'rotate-180' : ''}`} />
                 </button>
                 
                 {/* Dropdown Menu */}
                 {isDropdownOpen && (
-                  <div className="absolute right-0 mt-2 w-48 sm:w-56 bg-white rounded-xl shadow-lg border border-gray-100 py-1 z-50 animate-in fade-in slide-in-from-top-2 duration-200">
-                    <div className="px-3 sm:px-4 py-2 border-b border-gray-100">
-                      <p className="text-xs sm:text-sm font-medium text-gray-900 truncate">{userName || 'User'}</p>
-                      <p className="text-[10px] sm:text-xs text-gray-500">Logged in</p>
+                  <div className="absolute right-0 mt-2 w-52 sm:w-56 bg-white rounded-xl shadow-lg border border-gray-100 py-1 z-50 animate-in fade-in slide-in-from-top-2 duration-200">
+                    <div className="px-4 py-2.5 border-b border-gray-100">
+                      <p className="text-sm font-medium text-gray-900 truncate">{userName || 'User'}</p>
+                      <p className="text-xs text-gray-500">Logged in</p>
                     </div>
                     <LanguageSelector onClose={() => setIsDropdownOpen(false)} />
                     <button
                       onClick={handleLogout}
-                      className='w-full flex items-center gap-2 sm:gap-3 px-3 sm:px-4 py-2 sm:py-2.5 text-xs sm:text-sm text-red-600 hover:bg-red-50 transition-colors'
+                      className='w-full flex items-center gap-3 px-4 py-2.5 text-sm text-red-600 hover:bg-red-50 transition-colors'
                     >
-                      <LogOut className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+                      <LogOut className="w-4 h-4" />
                       Logout
                     </button>
                   </div>
@@ -239,13 +239,13 @@ const Navbar = () => {
               <>
                 <Link
                   href='/loginUser'
-                  className='px-3 sm:px-4 md:px-5 py-1.5 sm:py-2 rounded-lg bg-gray-900 text-white text-xs sm:text-sm font-medium hover:bg-gray-800 transition-colors'
+                  className='px-4 sm:px-5 py-2 rounded-lg bg-gray-900 text-white text-sm font-medium hover:bg-gray-800 transition-colors'
                 >
                   Login
                 </Link>
                 <Link
                   href='/addUser'
-                  className='px-3 sm:px-4 md:px-5 py-1.5 sm:py-2 rounded-lg bg-gray-900 text-white text-xs sm:text-sm font-medium hover:bg-gray-800 transition-colors'
+                  className='px-4 sm:px-5 py-2 rounded-lg bg-gray-900 text-white text-sm font-medium hover:bg-gray-800 transition-colors'
                 >
                   Sign Up
                 </Link>
