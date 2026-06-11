@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 
 interface NetworkState {
   isOnline: boolean;
@@ -8,166 +8,147 @@ interface NetworkState {
 }
 
 /**
- * Check actual internet connectivity by making a small request.
- * This is more reliable than just checking network interface status.
+ * Detect if running inside Capacitor native app.
+ * Checks multiple indicators since remote URLs may not have all Capacitor features.
  */
-async function checkActualConnectivity(): Promise<boolean> {
-  try {
-    // Use a small, fast endpoint to check connectivity
-    // We use HEAD request to minimize data transfer
-    const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 5000); // 5 second timeout
-    
-    const response = await fetch("https://www.google.com/favicon.ico", {
-      method: "HEAD",
-      mode: "no-cors", // Avoid CORS issues
-      cache: "no-store",
-      signal: controller.signal,
-    });
-    
-    clearTimeout(timeoutId);
-    return true; // If we get here, we have internet
-  } catch (error) {
-    console.log("[useNetwork] Connectivity check failed:", error);
-    return false;
+function isRunningInCapacitor(): boolean {
+  if (typeof window === "undefined") return false;
+  
+  // Check for Capacitor bridge
+  const win = window as any;
+  
+  // Method 1: Check Capacitor global
+  if (win.Capacitor) {
+    console.log("[useNetwork] Found window.Capacitor");
+    // Try isNativePlatform if available
+    if (typeof win.Capacitor.isNativePlatform === "function") {
+      const result = win.Capacitor.isNativePlatform();
+      console.log("[useNetwork] Capacitor.isNativePlatform():", result);
+      if (result) return true;
+    }
+    // Check platform
+    if (win.Capacitor.platform && win.Capacitor.platform !== "web") {
+      console.log("[useNetwork] Capacitor.platform:", win.Capacitor.platform);
+      return true;
+    }
   }
+  
+  // Method 2: Check for Android/iOS specific indicators
+  const userAgent = navigator.userAgent.toLowerCase();
+  const isAndroidWebView = userAgent.includes("wv") && userAgent.includes("android");
+  const isIOSWebView = (win.webkit?.messageHandlers) && /iphone|ipad|ipod/.test(userAgent);
+  
+  if (isAndroidWebView || isIOSWebView) {
+    console.log("[useNetwork] Detected WebView via userAgent/webkit");
+    return true;
+  }
+  
+  // Method 3: Check for Capacitor-specific globals
+  if (win.androidBridge || win.webkit?.messageHandlers?.bridge) {
+    console.log("[useNetwork] Found native bridge");
+    return true;
+  }
+  
+  return false;
 }
 
 /**
  * Unified network hook that works both in browser and Capacitor native app.
- * - Uses @capacitor/network for native platforms (Android/iOS) as base
- * - Additionally verifies actual internet connectivity
+ * - Uses @capacitor/network for native platforms (Android/iOS)
  * - Falls back to navigator.onLine for web browser
  */
 export function useNetwork(): NetworkState {
   const [networkState, setNetworkState] = useState<NetworkState>({
-    isOnline: true, // Assume online initially
+    isOnline: typeof navigator !== "undefined" ? navigator.onLine : true,
     connectionType: "unknown",
   });
-  
-  const connectivityCheckRef = useRef<NodeJS.Timeout | null>(null);
 
   useEffect(() => {
     let cleanup: (() => void) | undefined;
     let isMounted = true;
 
-    const updateOnlineStatus = async (connected: boolean, connectionType: string) => {
-      if (!isMounted) return;
-      
-      if (connected) {
-        // Network says we're connected, but let's verify actual internet access
-        const hasInternet = await checkActualConnectivity();
-        console.log("[useNetwork] Network connected, actual internet:", hasInternet);
-        
-        if (isMounted) {
-          setNetworkState({
-            isOnline: hasInternet,
-            connectionType: hasInternet ? connectionType : "none",
-          });
-        }
-      } else {
-        console.log("[useNetwork] Network disconnected");
-        if (isMounted) {
-          setNetworkState({
-            isOnline: false,
-            connectionType: "none",
-          });
-        }
-      }
-    };
-
     const setupNetworkListener = async () => {
-      // Dynamically import Capacitor modules to avoid SSR issues
-      try {
-        const { Capacitor } = await import("@capacitor/core");
+      const isCapacitorNative = isRunningInCapacitor();
+      console.log("[useNetwork] Is Capacitor native (final):", isCapacitorNative);
+
+      if (isCapacitorNative) {
+        console.log("[useNetwork] Setting up Capacitor Network plugin");
         
-        // Check if we're running in a native Capacitor environment
-        if (Capacitor.isNativePlatform()) {
-          console.log("[useNetwork] Detected native platform, using Capacitor Network plugin");
+        try {
+          // Dynamically import to avoid SSR issues
+          const { Network } = await import("@capacitor/network");
           
-          try {
-            const { Network } = await import("@capacitor/network");
-            
-            // Get initial status
-            const status = await Network.getStatus();
-            console.log("[useNetwork] Initial network status:", status);
-            await updateOnlineStatus(status.connected, status.connectionType);
-
-            // Listen for changes
-            const listener = await Network.addListener(
-              "networkStatusChange",
-              async (status) => {
-                console.log("[useNetwork] Network status changed:", status);
-                await updateOnlineStatus(status.connected, status.connectionType);
-              }
-            );
-
-            // Periodically check actual connectivity when connected
-            connectivityCheckRef.current = setInterval(async () => {
-              if (isMounted) {
-                const currentStatus = await Network.getStatus();
-                if (currentStatus.connected) {
-                  const hasInternet = await checkActualConnectivity();
-                  if (isMounted && !hasInternet) {
-                    console.log("[useNetwork] Lost actual internet connectivity");
-                    setNetworkState({
-                      isOnline: false,
-                      connectionType: "none",
-                    });
-                  }
-                }
-              }
-            }, 10000); // Check every 10 seconds
-
-            cleanup = () => {
-              console.log("[useNetwork] Removing Capacitor listener");
-              listener.remove();
-              if (connectivityCheckRef.current) {
-                clearInterval(connectivityCheckRef.current);
-              }
-            };
-            
-            return; // Successfully set up Capacitor listener
-          } catch (pluginError) {
-            console.warn("[useNetwork] Capacitor Network plugin error, falling back to browser API:", pluginError);
+          // Get initial status
+          const status = await Network.getStatus();
+          console.log("[useNetwork] Initial Capacitor status:", JSON.stringify(status));
+          
+          if (isMounted) {
+            setNetworkState({
+              isOnline: status.connected,
+              connectionType: status.connectionType,
+            });
           }
-        } else {
-          console.log("[useNetwork] Not a native platform, using browser API");
+
+          // Listen for changes
+          const listener = await Network.addListener(
+            "networkStatusChange",
+            (status) => {
+              console.log("[useNetwork] Capacitor status changed:", JSON.stringify(status));
+              if (isMounted) {
+                setNetworkState({
+                  isOnline: status.connected,
+                  connectionType: status.connectionType,
+                });
+              }
+            }
+          );
+
+          cleanup = () => {
+            console.log("[useNetwork] Removing Capacitor listener");
+            listener.remove();
+          };
+          
+          return; // Successfully set up Capacitor listener
+        } catch (pluginError) {
+          console.error("[useNetwork] Capacitor Network plugin error:", pluginError);
+          // Fall through to browser fallback
         }
-      } catch (capacitorError) {
-        console.log("[useNetwork] Capacitor not available, using browser API");
       }
 
       // Fallback: Web browser - Use navigator.onLine and window events
-      const handleOnline = async () => {
-        console.log("[useNetwork] Browser online event");
-        await updateOnlineStatus(true, "unknown");
-      };
-
-      const handleOffline = () => {
-        console.log("[useNetwork] Browser offline event");
+      console.log("[useNetwork] Using browser navigator.onLine fallback");
+      
+      const handleOnline = () => {
+        console.log("[useNetwork] Browser: online");
         if (isMounted) {
-          setNetworkState({
-            isOnline: false,
-            connectionType: "none",
-          });
+          setNetworkState({ isOnline: true, connectionType: "unknown" });
         }
       };
 
-      // Set initial state with actual connectivity check
-      await updateOnlineStatus(navigator.onLine, navigator.onLine ? "unknown" : "none");
+      const handleOffline = () => {
+        console.log("[useNetwork] Browser: offline");
+        if (isMounted) {
+          setNetworkState({ isOnline: false, connectionType: "none" });
+        }
+      };
 
-      // Add listeners
+      // Set initial state
+      const initialOnline = navigator.onLine;
+      console.log("[useNetwork] Browser initial online:", initialOnline);
+      
+      if (isMounted) {
+        setNetworkState({
+          isOnline: initialOnline,
+          connectionType: initialOnline ? "unknown" : "none",
+        });
+      }
+
       window.addEventListener("online", handleOnline);
       window.addEventListener("offline", handleOffline);
 
       cleanup = () => {
-        console.log("[useNetwork] Removing browser listeners");
         window.removeEventListener("online", handleOnline);
         window.removeEventListener("offline", handleOffline);
-        if (connectivityCheckRef.current) {
-          clearInterval(connectivityCheckRef.current);
-        }
       };
     };
 
@@ -175,9 +156,7 @@ export function useNetwork(): NetworkState {
 
     return () => {
       isMounted = false;
-      if (cleanup) {
-        cleanup();
-      }
+      if (cleanup) cleanup();
     };
   }, []);
 
