@@ -109,6 +109,8 @@ jobs:
             DATABASE_URL=postgresql://dummy:dummy@localhost:5432/dummy
           no-cache: true
           pull: true
+          cache-from: type=inline
+          cache-to: type=inline
 
       # -------------------------
       # Open PR main -> deploy (skip if one already open)

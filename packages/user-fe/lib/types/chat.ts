@@ -2,12 +2,25 @@
 
 export type Language = "english" | "hindi" | "hinglish";
 
+export type ChatMode = "text" | "voice";
+
 export interface ChatMessage {
   id: string;
   role: "user" | "assistant";
   content: string;
   timestamp: Date;
   language?: Language;
+}
+
+// Voice chat specific message type
+export interface VoiceChatMessage {
+  id: string;
+  role: "user" | "assistant";
+  transcription?: string;  // User's speech transcribed
+  reply?: string;          // Bot's text reply
+  audioUrl?: string;       // Bot's audio response URL
+  timestamp: Date;
+  language: Language;
 }
 
 export interface ChatRequest {
@@ -22,6 +35,19 @@ export interface ChatResponse {
 export interface ChatAPIResponse {
   success: boolean;
   data?: ChatResponse;
+  error?: string;
+}
+
+// Voice chat API types
+export interface VoiceChatResponse {
+  audio_url: string;
+  reply: string;
+  transcription: string;
+}
+
+export interface VoiceChatAPIResponse {
+  success: boolean;
+  data?: VoiceChatResponse;
   error?: string;
 }
 
