@@ -29,6 +29,7 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { SwarajAIChat } from "@/components/swaraj-ai-chat";
+import { useNetwork } from "@/hooks/useNetwork";
 import {
   useComplaintForm,
   Step2Details,
@@ -331,8 +332,10 @@ export default function RegisterComplaintPage() {
   const [useAutofill, setUseAutofill] = useState(false);
   const [imageAnalysisStatus, setImageAnalysisStatus] = useState<ImageAnalysisStatus>("idle");
   
+  // Network state from unified hook (works in both browser and Capacitor)
+  const { isOnline } = useNetwork();
+  
   // Offline sync state
-  const [isOnline, setIsOnline] = useState(true);
   const [showOfflineSync, setShowOfflineSync] = useState(false);
   const [syncStatus, setSyncStatus] = useState<"waiting" | "syncing" | "success" | "error">("waiting");
   const [pendingSubmitData, setPendingSubmitData] = useState<FormData | null>(null);
@@ -352,31 +355,6 @@ export default function RegisterComplaintPage() {
       router.push("/loginUser?redirect=/regComplaint");
     }
   }, [router]);
-
-  // Monitor online/offline status
-  useEffect(() => {
-    const handleOnline = () => {
-      console.log("Internet connection restored");
-      setIsOnline(true);
-    };
-
-    const handleOffline = () => {
-      console.log("Internet connection lost");
-      setIsOnline(false);
-    };
-
-    // Check initial status
-    setIsOnline(navigator.onLine);
-
-    // Listen for connection changes
-    window.addEventListener("online", handleOnline);
-    window.addEventListener("offline", handleOffline);
-
-    return () => {
-      window.removeEventListener("online", handleOnline);
-      window.removeEventListener("offline", handleOffline);
-    };
-  }, []);
 
   // Auto-submit when connection is restored
   useEffect(() => {
@@ -444,6 +422,7 @@ export default function RegisterComplaintPage() {
         throw new Error("Authentication required. Please login again.");
       }
 
+      console.log("[submitComplaintWithData] Attempting to submit...");
       const response = await fetch("/api/complaint/submit", {
         method: "POST",
         headers: {
@@ -452,10 +431,18 @@ export default function RegisterComplaintPage() {
         body: submitFormData,
       });
 
-      const responseData = await response.json();
+      console.log("[submitComplaintWithData] Response status:", response.status);
+      
+      let responseData;
+      try {
+        responseData = await response.json();
+      } catch (parseError) {
+        console.error("[submitComplaintWithData] Failed to parse response:", parseError);
+        throw new Error(`Server returned invalid response (status: ${response.status})`);
+      }
 
       if (!response.ok) {
-        throw new Error(responseData.message || responseData.error || "Failed to submit complaint");
+        throw new Error(responseData.message || responseData.error || `Failed to submit complaint (status: ${response.status})`);
       }
 
       // Success
@@ -479,7 +466,7 @@ export default function RegisterComplaintPage() {
       setSyncStatus("error");
       
       // If still online, retry after a delay
-      if (navigator.onLine) {
+      if (isOnline) {
         setTimeout(() => {
           setSyncStatus("waiting");
           submitComplaintWithData(submitFormData);
@@ -542,8 +529,8 @@ export default function RegisterComplaintPage() {
         submitFormData.append("image", formData.photo);
       }
 
-      // Check if online
-      if (!navigator.onLine) {
+      // Check if online (using unified network hook)
+      if (!isOnline) {
         // Store data and show offline sync modal
         setPendingSubmitData(submitFormData);
         setShowOfflineSync(true);
@@ -560,6 +547,7 @@ export default function RegisterComplaintPage() {
         description: "Please wait while we process your request...",
       });
 
+      console.log("[handleSubmit] Attempting to submit, isOnline:", isOnline);
       const response = await fetch("/api/complaint/submit", {
         method: "POST",
         headers: {
@@ -568,10 +556,18 @@ export default function RegisterComplaintPage() {
         body: submitFormData,
       });
 
-      const responseData = await response.json();
+      console.log("[handleSubmit] Response status:", response.status);
+      
+      let responseData;
+      try {
+        responseData = await response.json();
+      } catch (parseError) {
+        console.error("[handleSubmit] Failed to parse response:", parseError);
+        throw new Error(`Server returned invalid response (status: ${response.status})`);
+      }
 
       if (!response.ok) {
-        throw new Error(responseData.message || responseData.error || "Failed to submit complaint");
+        throw new Error(responseData.message || responseData.error || `Failed to submit complaint (status: ${response.status})`);
       }
 
       // Success
@@ -585,12 +581,18 @@ export default function RegisterComplaintPage() {
       // Clear form after successful submission
       resetForm();
     } catch (error) {
-      console.error("Submit error:", error);
+      console.error("[handleSubmit] Submit error:", error);
+      
+      // Check if it's a network error (fetch failed)
+      const isNetworkError = error instanceof TypeError && error.message.includes('fetch');
+      
       setShowPopup(true);
       setSubmitStatus("error");
       setSubmitMessage({
         title: "Submission Failed",
-        description: error instanceof Error ? error.message : "An unexpected error occurred. Please try again.",
+        description: isNetworkError 
+          ? "Network error. Please check your internet connection and try again."
+          : (error instanceof Error ? error.message : "An unexpected error occurred. Please try again."),
       });
     } finally {
       setIsSubmitting(false);
