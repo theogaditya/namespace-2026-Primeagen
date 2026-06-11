@@ -541,9 +541,14 @@ export function Analytics() {
           {/* <h1 className="text-2xl font-bold text-gray-900">Reports & Analytics</h1> */}
           <p className="text-gray-500 mt-1">Real-time insights into complaint management</p>
         </div>
-        <Button onClick={fetchAnalytics} variant="outline" size="sm">
-          Refresh
-        </Button>
+        <div className="flex items-center gap-2">
+          <Button variant="outline" size="sm" className="bg-orange-500 hover:bg-orange-600 text-white border-orange-500 hover:border-orange-600">
+            Generate Report
+          </Button>
+          <Button onClick={fetchAnalytics} variant="outline" size="sm">
+            Refresh
+          </Button>
+        </div>
       </div>
 
       {/* Stats Cards */}
