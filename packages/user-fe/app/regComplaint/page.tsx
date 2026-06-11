@@ -22,6 +22,10 @@ import {
   HelpCircle,
   MessageSquare,
   Brain,
+  WifiOff,
+  Loader2,
+  Clock,
+  XCircle,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { SwarajAIChat } from "@/components/swaraj-ai-chat";
@@ -327,6 +331,13 @@ export default function RegisterComplaintPage() {
   const [useAutofill, setUseAutofill] = useState(false);
   const [imageAnalysisStatus, setImageAnalysisStatus] = useState<ImageAnalysisStatus>("idle");
   
+  // Offline sync state
+  const [isOnline, setIsOnline] = useState(true);
+  const [showOfflineSync, setShowOfflineSync] = useState(false);
+  const [syncStatus, setSyncStatus] = useState<"waiting" | "syncing" | "success" | "error">("waiting");
+  const [pendingSubmitData, setPendingSubmitData] = useState<FormData | null>(null);
+  const [retryCount, setRetryCount] = useState(0);
+  
   // Get the appropriate steps based on autofill mode
   const STEPS = useAutofill ? STEPS_AUTOFILL : STEPS_STANDARD;
 
@@ -341,6 +352,38 @@ export default function RegisterComplaintPage() {
       router.push("/loginUser?redirect=/regComplaint");
     }
   }, [router]);
+
+  // Monitor online/offline status
+  useEffect(() => {
+    const handleOnline = () => {
+      console.log("Internet connection restored");
+      setIsOnline(true);
+    };
+
+    const handleOffline = () => {
+      console.log("Internet connection lost");
+      setIsOnline(false);
+    };
+
+    // Check initial status
+    setIsOnline(navigator.onLine);
+
+    // Listen for connection changes
+    window.addEventListener("online", handleOnline);
+    window.addEventListener("offline", handleOffline);
+
+    return () => {
+      window.removeEventListener("online", handleOnline);
+      window.removeEventListener("offline", handleOffline);
+    };
+  }, []);
+
+  // Auto-submit when connection is restored
+  useEffect(() => {
+    if (isOnline && pendingSubmitData && syncStatus === "waiting") {
+      submitComplaintWithData(pendingSubmitData);
+    }
+  }, [isOnline, pendingSubmitData, syncStatus]);
 
   // Get current step schema and data
   const getStepValidationData = (step: number) => {
@@ -390,6 +433,63 @@ export default function RegisterComplaintPage() {
     }
   };
 
+  // Submit complaint with prepared FormData
+  const submitComplaintWithData = async (submitFormData: FormData) => {
+    setSyncStatus("syncing");
+    setRetryCount((prev) => prev + 1);
+
+    try {
+      const token = localStorage.getItem("authToken");
+      if (!token) {
+        throw new Error("Authentication required. Please login again.");
+      }
+
+      const response = await fetch("/api/complaint/submit", {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+        body: submitFormData,
+      });
+
+      const responseData = await response.json();
+
+      if (!response.ok) {
+        throw new Error(responseData.message || responseData.error || "Failed to submit complaint");
+      }
+
+      // Success
+      setSyncStatus("success");
+      setComplaintId(responseData.complaint?.id || responseData.id || null);
+      
+      // Close offline sync modal after short delay
+      setTimeout(() => {
+        setShowOfflineSync(false);
+        setPendingSubmitData(null);
+        setShowPopup(true);
+        setSubmitStatus("success");
+        setSubmitMessage({
+          title: "Complaint Submitted Successfully!",
+          description: `Your complaint has been registered${responseData.complaint?.id ? ` with ID: ${responseData.complaint.id.slice(0, 8)}...` : ""}. We'll review it shortly.`,
+        });
+        resetForm();
+      }, 2000);
+    } catch (error) {
+      console.error("Submit error:", error);
+      setSyncStatus("error");
+      
+      // If still online, retry after a delay
+      if (navigator.onLine) {
+        setTimeout(() => {
+          setSyncStatus("waiting");
+          submitComplaintWithData(submitFormData);
+        }, 3000);
+      } else {
+        setSyncStatus("waiting");
+      }
+    }
+  };
+
   // Handle form submission
   const handleSubmit = async () => {
     // Validate step 4 (final check)
@@ -398,12 +498,6 @@ export default function RegisterComplaintPage() {
     if (!isValid) return;
 
     setIsSubmitting(true);
-    setShowPopup(true);
-    setSubmitStatus("loading");
-    setSubmitMessage({
-      title: "Submitting your complaint",
-      description: "Please wait while we process your request...",
-    });
 
     try {
       const token = localStorage.getItem("authToken");
@@ -448,6 +542,24 @@ export default function RegisterComplaintPage() {
         submitFormData.append("image", formData.photo);
       }
 
+      // Check if online
+      if (!navigator.onLine) {
+        // Store data and show offline sync modal
+        setPendingSubmitData(submitFormData);
+        setShowOfflineSync(true);
+        setSyncStatus("waiting");
+        setIsSubmitting(false);
+        return;
+      }
+
+      // If online, show loading popup and submit
+      setShowPopup(true);
+      setSubmitStatus("loading");
+      setSubmitMessage({
+        title: "Submitting your complaint",
+        description: "Please wait while we process your request...",
+      });
+
       const response = await fetch("/api/complaint/submit", {
         method: "POST",
         headers: {
@@ -474,6 +586,7 @@ export default function RegisterComplaintPage() {
       resetForm();
     } catch (error) {
       console.error("Submit error:", error);
+      setShowPopup(true);
       setSubmitStatus("error");
       setSubmitMessage({
         title: "Submission Failed",
@@ -859,6 +972,165 @@ export default function RegisterComplaintPage() {
         subMessage={submitMessage.description}
         onClose={handlePopupClose}
       />
+
+      {/* Offline Sync Modal */}
+      <AnimatePresence>
+        {showOfflineSync && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4"
+          >
+            <motion.div
+              initial={{ opacity: 0, scale: 0.9, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.9, y: -20 }}
+              transition={{ type: "spring", stiffness: 200, damping: 20 }}
+              className="bg-white rounded-2xl shadow-2xl border-2 border-slate-200 overflow-hidden max-w-md w-full"
+            >
+              {/* Header */}
+              <div className="bg-gradient-to-r from-blue-500 to-indigo-500 px-6 py-4">
+                <h3 className="text-white font-bold text-xl">Complaint Submission</h3>
+              </div>
+
+              {/* Content */}
+              <div className="p-6 space-y-6">
+                {/* Status Display */}
+                <div className="flex flex-col items-center justify-center space-y-4">
+                  <AnimatePresence mode="wait">
+                    {syncStatus === "waiting" && (
+                      <motion.div
+                        key="waiting"
+                        initial={{ opacity: 0, scale: 0.8 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        exit={{ opacity: 0, scale: 0.8 }}
+                        className="flex flex-col items-center gap-4"
+                      >
+                        <motion.div
+                          animate={{ rotate: 360 }}
+                          transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
+                          className="p-4 bg-amber-100 rounded-full"
+                        >
+                          <Clock className="h-12 w-12 text-amber-600" />
+                        </motion.div>
+                        <div className="text-center">
+                          <h4 className="text-xl font-semibold text-slate-800">Waiting for Connection</h4>
+                          <p className="text-slate-500 mt-2">Your complaint will be submitted once internet is available</p>
+                          <div className="mt-3 flex items-center justify-center gap-2 text-red-600">
+                            <WifiOff className="h-4 w-4" />
+                            <span className="text-sm font-medium">No Internet Connection</span>
+                          </div>
+                        </div>
+                      </motion.div>
+                    )}
+
+                    {syncStatus === "syncing" && (
+                      <motion.div
+                        key="syncing"
+                        initial={{ opacity: 0, scale: 0.8 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        exit={{ opacity: 0, scale: 0.8 }}
+                        className="flex flex-col items-center gap-4"
+                      >
+                        <motion.div
+                          animate={{ rotate: 360 }}
+                          transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+                          className="p-4 bg-blue-100 rounded-full"
+                        >
+                          <Loader2 className="h-12 w-12 text-blue-600" />
+                        </motion.div>
+                        <div className="text-center">
+                          <h4 className="text-xl font-semibold text-slate-800">Syncing Complaint</h4>
+                          <p className="text-slate-500 mt-2">Please wait while we submit your complaint...</p>
+                          <p className="text-xs text-slate-400 mt-1">Attempt {retryCount}</p>
+                        </div>
+                      </motion.div>
+                    )}
+
+                    {syncStatus === "success" && (
+                      <motion.div
+                        key="success"
+                        initial={{ opacity: 0, scale: 0.8 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        exit={{ opacity: 0, scale: 0.8 }}
+                        className="flex flex-col items-center gap-4"
+                      >
+                        <motion.div
+                          initial={{ scale: 0 }}
+                          animate={{ scale: 1 }}
+                          transition={{ type: "spring", stiffness: 200, damping: 15 }}
+                          className="p-4 bg-green-100 rounded-full"
+                        >
+                          <CheckCircle className="h-12 w-12 text-green-600" />
+                        </motion.div>
+                        <div className="text-center">
+                          <h4 className="text-xl font-semibold text-green-800">Success!</h4>
+                          <p className="text-slate-500 mt-2">Your complaint has been submitted successfully</p>
+                        </div>
+                      </motion.div>
+                    )}
+
+                    {syncStatus === "error" && (
+                      <motion.div
+                        key="error"
+                        initial={{ opacity: 0, scale: 0.8 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        exit={{ opacity: 0, scale: 0.8 }}
+                        className="flex flex-col items-center gap-4"
+                      >
+                        <motion.div
+                          animate={{ rotate: [0, -10, 10, -10, 10, 0] }}
+                          transition={{ duration: 0.5 }}
+                          className="p-4 bg-red-100 rounded-full"
+                        >
+                          <XCircle className="h-12 w-12 text-red-600" />
+                        </motion.div>
+                        <div className="text-center">
+                          <h4 className="text-xl font-semibold text-red-800">Submission Failed</h4>
+                          <p className="text-slate-500 mt-2">Retrying automatically...</p>
+                        </div>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                </div>
+
+                {/* Skeleton Pulse Animation - shown during waiting/syncing */}
+                {(syncStatus === "waiting" || syncStatus === "syncing") && (
+                  <motion.div
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    className="space-y-3"
+                  >
+                    {[1, 2, 3].map((i) => (
+                      <motion.div
+                        key={i}
+                        animate={{
+                          opacity: [0.3, 0.6, 0.3],
+                        }}
+                        transition={{
+                          duration: 1.5,
+                          repeat: Infinity,
+                          delay: i * 0.2,
+                        }}
+                        className="h-4 bg-slate-200 rounded-full"
+                        style={{ width: `${100 - i * 15}%` }}
+                      />
+                    ))}
+                  </motion.div>
+                )}
+
+                {/* Info Message */}
+                <div className="bg-blue-50 border border-blue-200 rounded-xl p-4">
+                  <p className="text-sm text-blue-700">
+                    <strong>Note:</strong> This window will automatically close once your complaint is successfully submitted. Please keep it open.
+                  </p>
+                </div>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* AI Chatbot */}
       <SwarajAIChat />
