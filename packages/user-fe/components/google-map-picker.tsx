@@ -6,6 +6,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "@/lib/utils";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { useGeolocation } from "@/hooks/useGeolocation";
 import {
   MapPin,
   Search,
@@ -206,9 +207,11 @@ export function GoogleMapPicker({
   const [predictions, setPredictions] = useState<PlacePrediction[]>([]);
   const [showPredictions, setShowPredictions] = useState(false);
   const [isSearching, setIsSearching] = useState(false);
-  const [isGettingLocation, setIsGettingLocation] = useState(false);
   const [locationError, setLocationError] = useState<string | null>(null);
   const [zoom, setZoom] = useState(DEFAULT_ZOOM);
+
+  // Use unified geolocation hook (works in both browser and Capacitor)
+  const { isLoading: isGettingLocation, getCurrentPosition } = useGeolocation();
 
   const autocompleteServiceRef = useRef<google.maps.places.AutocompleteService | null>(null);
   const placesServiceRef = useRef<google.maps.places.PlacesService | null>(null);
@@ -333,45 +336,19 @@ export function GoogleMapPicker({
     );
   };
 
-  // Handle "Use my location" button
-  const handleUseMyLocation = () => {
-    if (!navigator.geolocation) {
-      setLocationError("Geolocation is not supported by your browser");
-      return;
-    }
-
-    setIsGettingLocation(true);
+  // Handle "Use my location" button (uses unified geolocation hook)
+  const handleUseMyLocation = async () => {
     setLocationError(null);
 
-    navigator.geolocation.getCurrentPosition(
-      (position) => {
-        const { latitude: lat, longitude: lng } = position.coords;
-        onLocationSelect(lat.toFixed(6), lng.toFixed(6));
-        setZoom(15);
-        setIsGettingLocation(false);
-      },
-      (error) => {
-        setIsGettingLocation(false);
-        switch (error.code) {
-          case error.PERMISSION_DENIED:
-            setLocationError("Location permission denied. Please enable it in your browser settings.");
-            break;
-          case error.POSITION_UNAVAILABLE:
-            setLocationError("Location information is unavailable.");
-            break;
-          case error.TIMEOUT:
-            setLocationError("Location request timed out.");
-            break;
-          default:
-            setLocationError("An error occurred while getting your location.");
-        }
-      },
-      {
-        enableHighAccuracy: true,
-        timeout: 10000,
-        maximumAge: 0,
-      }
-    );
+    const position = await getCurrentPosition();
+    
+    if (position) {
+      onLocationSelect(position.latitude.toFixed(6), position.longitude.toFixed(6));
+      setZoom(15);
+    } else {
+      // Error is already set by the hook, but we can show a generic message
+      setLocationError("Could not get your location. Please check permissions and try again.");
+    }
   };
 
   // Handle zoom in/out
