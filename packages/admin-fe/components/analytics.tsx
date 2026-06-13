@@ -335,6 +335,8 @@ export function Analytics() {
   })
   const [showMostLikedModal, setShowMostLikedModal] = useState(false)
   const [animateIcons, setAnimateIcons] = useState(false)
+  const [cid, setCid] = useState("")
+  const [complaintJson, setComplaintJson] = useState<any>(null)
 
   useEffect(() => {
     fetchAnalytics()
@@ -482,6 +484,131 @@ export function Analytics() {
     }
   }
 
+  const openIpfsJson = () => {
+    if (!cid) {``
+      alert("Please enter a CID first")
+      return
+    }
+    window.open(`https://gateway.pinata.cloud/ipfs/${cid}`, "_blank", "noopener,noreferrer")
+  }
+
+  const loadIpfsJson = async () => {
+    if (!cid) {
+      alert("Please enter a CID first")
+      return
+    }
+    try {
+      const res = await fetch(`https://gateway.pinata.cloud/ipfs/${cid}`)
+      if (!res.ok) {
+        alert("Unable to fetch JSON from IPFS")
+        return
+      }
+      const data = await res.json()
+      setComplaintJson(data)
+      alert("JSON loaded! Now generate PDF.")
+    } catch (error) {
+      console.error("Failed loading IPFS JSON", error)
+      alert("Failed to load JSON. Please verify the CID.")
+    }
+  }
+
+  const generateComplaintPDF = (data: any) => {
+    if (!data) return
+    const popup = window.open("", "_blank")
+    if (!popup) {
+      alert("Please allow popups to generate the PDF")
+      return
+    }
+
+    // Format the data in a simple readable way
+    const formatValue = (val: any): string => {
+      if (val === null || val === undefined) return 'N/A'
+      if (typeof val === 'object') return JSON.stringify(val, null, 2)
+      return String(val)
+    }
+
+    const html = `
+      <!DOCTYPE html>
+      <html>
+        <head>
+          <title>Complaint Report</title>
+          <style>
+            * { margin: 0; padding: 0; box-sizing: border-box; }
+            body { 
+              font-family: Arial, sans-serif; 
+              padding: 40px;
+              line-height: 1.6;
+              color: #333;
+            }
+            .header { 
+              text-align: center; 
+              margin-bottom: 30px;
+              border-bottom: 2px solid #333;
+              padding-bottom: 20px;
+            }
+            h1 { 
+              font-size: 24px; 
+              margin-bottom: 10px;
+            }
+            .section { 
+              margin-bottom: 20px;
+            }
+            .field { 
+              margin-bottom: 12px;
+              display: flex;
+              border-bottom: 1px solid #eee;
+              padding: 8px 0;
+            }
+            .label { 
+              font-weight: bold; 
+              width: 200px;
+              flex-shrink: 0;
+            }
+            .value { 
+              flex: 1;
+              word-break: break-word;
+            }
+            .footer {
+              margin-top: 40px;
+              padding-top: 20px;
+              border-top: 1px solid #ccc;
+              text-align: center;
+              font-size: 12px;
+              color: #666;
+            }
+            @media print {
+              body { padding: 20px; }
+            }
+          </style>
+        </head>
+        <body>
+          <div class="header">
+            <h1>Complaint Report</h1>
+            <p>Generated on ${new Date().toLocaleString()}</p>
+          </div>
+
+          <div class="section">
+            ${Object.entries(data).map(([key, value]) => `
+              <div class="field">
+                <div class="label">${key.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase())}:</div>
+                <div class="value">${formatValue(value)}</div>
+              </div>
+            `).join('')}
+          </div>
+
+          <div class="footer">
+            <p>This is a computer-generated document</p>
+          </div>
+        </body>
+      </html>
+    `
+
+    popup.document.write(html)
+    popup.document.close()
+    popup.focus()
+    setTimeout(() => popup.print(), 250)
+  }
+
   const getStatusBadge = (status: string) => {
     const statusStyles: Record<string, string> = {
       REGISTERED: "bg-blue-100 text-blue-800",
@@ -542,13 +669,46 @@ export function Analytics() {
           <p className="text-gray-500 mt-1">Real-time insights into complaint management</p>
         </div>
         <div className="flex items-center gap-2">
-          <Button variant="outline" size="sm" className="bg-orange-500 hover:bg-orange-600 text-white border-orange-500 hover:border-orange-600">
-            Generate Report
-          </Button>
           <Button onClick={fetchAnalytics} variant="outline" size="sm">
             Refresh
           </Button>
         </div>
+      </div>
+
+      <div className="flex items-center gap-2 mt-4">
+        <input
+          type="text"
+          placeholder="Enter IPFS CID"
+          value={cid}
+          onChange={(e) => setCid(e.target.value)}
+          className="border p-2 rounded w-64 text-sm"
+        />
+
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={openIpfsJson}
+        >
+          Open JSON
+        </Button>
+
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={loadIpfsJson}
+        >
+          Load JSON
+        </Button>
+
+        {complaintJson && (
+          <Button
+            size="sm"
+            className="bg-purple-600 text-white"
+            onClick={() => generateComplaintPDF(complaintJson)}
+          >
+            Generate PDF
+          </Button>
+        )}
       </div>
 
       {/* Stats Cards */}
