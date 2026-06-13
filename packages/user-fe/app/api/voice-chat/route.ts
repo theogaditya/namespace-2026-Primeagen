@@ -84,10 +84,15 @@ export async function POST(request: NextRequest): Promise<NextResponse<VoiceChat
       );
     }
 
-    // Build full audio URL
+    // Build proxied audio URL to avoid mixed content (HTTP audio on HTTPS site)
     let audioUrl = data.audio_url;
-    if (audioUrl && !audioUrl.startsWith("http")) {
-      audioUrl = `${VOICE_CHAT_BASE_URL}/${audioUrl}`;
+    if (audioUrl) {
+      // Remove base URL if present, we'll use our proxy
+      const audioPath = audioUrl.startsWith("http") 
+        ? audioUrl.replace(/^https?:\/\/[^\/]+\//, "") 
+        : audioUrl;
+      // Use our proxy endpoint
+      audioUrl = `/api/voice-chat/audio?path=${encodeURIComponent(audioPath)}`;
     }
 
     return NextResponse.json({

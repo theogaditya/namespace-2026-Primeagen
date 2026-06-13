@@ -248,10 +248,17 @@ export function SwarajAIChat({ className }: SwarajAIChatProps) {
     // Stop any currently playing audio
     if (audioRef.current) {
       audioRef.current.pause();
+      audioRef.current.src = "";
       audioRef.current = null;
     }
 
-    const audio = new Audio(url);
+    // Create audio element with WebView-compatible settings
+    const audio = new Audio();
+    audio.crossOrigin = "anonymous";
+    audio.preload = "auto";
+    
+    // Set source after configuration
+    audio.src = url;
     audioRef.current = audio;
     setPlayingAudioId(messageId);
 
@@ -260,16 +267,36 @@ export function SwarajAIChat({ className }: SwarajAIChatProps) {
       audioRef.current = null;
     };
 
-    audio.onerror = () => {
+    audio.onerror = (e) => {
       setPlayingAudioId(null);
       audioRef.current = null;
-      console.error("Error playing audio");
+      console.error("Error playing audio:", e, "URL:", url);
     };
 
-    audio.play().catch((err) => {
-      console.error("Failed to play audio:", err);
-      setPlayingAudioId(null);
-    });
+    // Wait for audio to be ready before playing
+    audio.oncanplaythrough = () => {
+      audio.play().catch((err) => {
+        console.error("Failed to play audio:", err);
+        setPlayingAudioId(null);
+        // Try alternative playback method for WebView
+        tryAlternativePlayback(url, messageId);
+      });
+    };
+
+    // Trigger load
+    audio.load();
+  };
+
+  // Alternative playback method for Android WebView
+  const tryAlternativePlayback = (url: string, messageId: string) => {
+    // Create a temporary anchor to trigger download/play
+    const existingPlayer = document.getElementById("voice-audio-player") as HTMLAudioElement;
+    if (existingPlayer) {
+      existingPlayer.src = url;
+      existingPlayer.play().catch(console.error);
+      setPlayingAudioId(messageId);
+      existingPlayer.onended = () => setPlayingAudioId(null);
+    }
   };
 
   const toggleAudio = (url: string, messageId: string) => {
@@ -731,6 +758,14 @@ export function SwarajAIChat({ className }: SwarajAIChatProps) {
 
   return (
     <>
+      {/* Hidden audio player for WebView compatibility */}
+      <audio 
+        id="voice-audio-player" 
+        style={{ display: "none" }} 
+        playsInline 
+        preload="auto"
+      />
+      
       {/* Floating Chat Button */}
       <button
         onClick={() => setIsOpen(true)}
