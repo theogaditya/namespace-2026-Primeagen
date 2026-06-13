@@ -16,12 +16,21 @@ let pollingInterval: NodeJS.Timeout | null = null;
 // Redis client for registration queue operations
 const registrationQueueClient = new RedisClientforComplaintQueue();
 const REGISTRATION_QUEUE = 'complaint:registration:queue';
+const PROCESSING_QUEUE = 'complaint:processing:inprogress'; // Queue for complaints being processed
 
 export async function processNextComplaint(db: PrismaClient): Promise<{ processed: boolean; result?: any; error?: string }> {
   try {
     await registrationQueueClient.connect();
     const client = registrationQueueClient.getClient();
-    const complaintJson = await client.lIndex(REGISTRATION_QUEUE, 0);
+    
+    // ATOMICALLY move complaint from registration queue to processing queue
+    // This prevents duplicate processing - once moved, other poll cycles won't see it
+    const complaintJson = await client.lMove(
+      REGISTRATION_QUEUE,
+      PROCESSING_QUEUE,
+      'LEFT',  // Pop from left of registration queue
+      'RIGHT'  // Push to right of processing queue
+    );
 
     if (!complaintJson) {
       return { processed: false };
@@ -31,7 +40,8 @@ export async function processNextComplaint(db: PrismaClient): Promise<{ processe
 
     const validationResult = complaintProcessingSchema.safeParse(rawData);
     if (!validationResult.success) {
-      await client.lPop(REGISTRATION_QUEUE);
+      // Remove from processing queue (invalid data)
+      await client.lRem(PROCESSING_QUEUE, 1, complaintJson);
       return { processed: false, error: "Invalid complaint data removed from queue" };
     }
 
@@ -42,8 +52,8 @@ export async function processNextComplaint(db: PrismaClient): Promise<{ processe
       where: { id: complaintData.categoryId },
     });
     if (!categoryExists) {
-      // Remove invalid complaint from queue to avoid repeated failures
-      await client.lPop(REGISTRATION_QUEUE);
+      // Remove from processing queue (invalid categoryId)
+      await client.lRem(PROCESSING_QUEUE, 1, complaintJson);
       console.warn(`Invalid categoryId=${complaintData.categoryId} - removed from queue`);
       return { processed: false, error: "Invalid categoryId removed from queue" };
     }
@@ -70,27 +80,27 @@ export async function processNextComplaint(db: PrismaClient): Promise<{ processe
     const AIstandardizedSubCategory = await standardizeSubCategory(complaintData.subCategory);
 
     // Call moderation service to sanitize abusive text. If moderation service returns clean_text,
-    // let AIabusedFlag: boolean | null = null;
-    // try {
-    //   console.log("Testing Out The Abusive Route");
+    let AIabusedFlag: boolean | null = null;
+    try {
+      console.log("Testing Out The Abusive Route");
       
-    //   const mod = await moderateTextSafe({ text: complaintData.description, user_id: complaintData.userId });
-    //   if (mod) {
-    //     if (mod.has_abuse) {
-    //       AIabusedFlag = true;
-    //     }
-    //     // Use cleaned text if provided
-    //     if (mod.clean_text && typeof mod.clean_text === 'string' && mod.clean_text.trim().length > 0) {
-    //       complaintData.description = mod.clean_text;
-    //     }
-    //     console.log("[ComplaintProcessing] Moderation Successfull");
-    //   }
-    // } catch (mErr) {
-    //   console.warn('[ComplaintProcessing] moderation call failed, proceeding with original description', mErr);
-    // }
+      const mod = await moderateTextSafe({ text: complaintData.description, user_id: complaintData.userId });
+      if (mod) {
+        if (mod.has_abuse) {
+          AIabusedFlag = true;
+        }
+        // Use cleaned text if provided
+        if (mod.clean_text && typeof mod.clean_text === 'string' && mod.clean_text.trim().length > 0) {
+          complaintData.description = mod.clean_text;
+        }
+        console.log("[ComplaintProcessing] Moderation Successfull");
+      }
+    } catch (mErr) {
+      console.warn('[ComplaintProcessing] moderation call failed, proceeding with original description', mErr);
+    }
     
     // Testing Abuse Route Stub 
-    const AIabusedFlag: boolean = false;
+    // const AIabusedFlag: boolean = false;
 
     const result = await db.$transaction(async (tx) => {
       const complaint = await tx.complaint.create({
@@ -125,8 +135,8 @@ export async function processNextComplaint(db: PrismaClient): Promise<{ processe
       return complaint;
     });
 
-    // Pop from registration queue
-    await client.lPop(REGISTRATION_QUEUE);
+    // Remove from processing queue after successful DB insert
+    await client.lRem(PROCESSING_QUEUE, 1, complaintJson);
 
     // Check and award badges after complaint creation
     try {
@@ -167,20 +177,37 @@ export async function processNextComplaint(db: PrismaClient): Promise<{ processe
   } catch (error: any) {
     console.error("Complaint processing error:", error);
     
-    // Pop invalid complaints that cause DB errors (e.g., foreign key violations)
+    // For DB constraint errors, remove from processing queue (data is invalid)
     if (error?.code === 'P2003' || error?.code === 'P2002' || error?.code === 'P2025') {
       try {
         await registrationQueueClient.connect();
         const client = registrationQueueClient.getClient();
-        await client.lPop(REGISTRATION_QUEUE);
-        console.log("Invalid complaint removed from queue due to DB constraint error");
+        // The complaint is already in PROCESSING_QUEUE, we need to find and remove it
+        // Since we don't have complaintJson in this scope after the error, we'll clear the oldest item
+        await client.lPop(PROCESSING_QUEUE);
+        console.log("Invalid complaint removed from processing queue due to DB constraint error");
       } catch (popError) {
-        console.error("Failed to pop invalid complaint:", popError);
+        console.error("Failed to pop invalid complaint from processing queue:", popError);
       }
       return { processed: false, error: "Invalid complaint removed from queue (DB constraint error)" };
     }
     
-    return { processed: false, error: "Processing failed" };
+    // For other errors (like network issues with AI services), 
+    // move complaint back to registration queue for retry
+    try {
+      await registrationQueueClient.connect();
+      const client = registrationQueueClient.getClient();
+      // Move from processing queue back to registration queue for retry
+      const failedComplaint = await client.lPop(PROCESSING_QUEUE);
+      if (failedComplaint) {
+        await client.rPush(REGISTRATION_QUEUE, failedComplaint);
+        console.log("Complaint moved back to registration queue for retry");
+      }
+    } catch (moveError) {
+      console.error("Failed to move complaint back to registration queue:", moveError);
+    }
+    
+    return { processed: false, error: "Processing failed - will retry" };
   }
 }
 

@@ -15,7 +15,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-import { Search, MoreHorizontal, Eye, UserPlus, User, FileText, Clock, AlertTriangle, CheckCircle, Sparkles, X, Flag, Users, Briefcase } from "lucide-react"
+import { Search, MoreHorizontal, Eye, UserPlus, User, FileText, Clock, AlertTriangle, CheckCircle, Sparkles, X, Flag, Users, Briefcase, GitCompare, Loader2 } from "lucide-react"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Modal } from "@/components/ui/modal"
 
@@ -104,6 +104,48 @@ export function AvailableComplaints() {
   const [overviewStats, setOverviewStats] = useState<OverviewStats>({ total: 0, registered: 0, inProgress: 0, resolved: 0, closed: 0, highPriority: 0, assigned: 0 })
   // Random 3-digit number for "Complaints Solved" – generated once per mount
   const [randomSolved] = useState<number>(() => Math.floor(Math.random() * 900) + 100)
+
+  // Comparison modal state
+  const [isCompareModalOpen, setIsCompareModalOpen] = useState(false)
+  const [compareLoading, setCompareLoading] = useState(false)
+  const [compareResult, setCompareResult] = useState<{ match: boolean; confidence: number; reason: string } | null>(null)
+  const [compareError, setCompareError] = useState<string | null>(null)
+  const [customCompareUrl, setCustomCompareUrl] = useState('')
+  const [activeCompareUrl, setActiveCompareUrl] = useState('')
+  
+  // Reference images for comparison (one for each of the top 3 complaints)
+  const referenceImages = [
+    'https://pub-a7deba7d0b9642f8afcfd3aebbcb446f.r2.dev/uploads/1765265732822_pothole_2.jpg', // 1st complaint
+    'https://pub-a7deba7d0b9642f8afcfd3aebbcb446f.r2.dev/uploads/1765265732822_pothole_2.jpg', // 2nd complaint
+    'https://pub-a7deba7d0b9642f8afcfd3aebbcb446f.r2.dev/uploads/1765271481362_brokenwall_1.png', // 3rd complaint
+  ]
+
+  // Recent complaints with images (top 3 for comparison feature)
+  const recentComplaintsWithImages = useMemo(() => {
+    return complaints
+      .filter((c) => c.attachmentUrl)
+      .sort((a, b) => new Date(b.submissionDate).getTime() - new Date(a.submissionDate).getTime())
+      .slice(0, 3)
+  }, [complaints])
+
+  // Map complaint ID to its reference image URL
+  const complaintReferenceMap = useMemo(() => {
+    const map = new Map<string, string>()
+    recentComplaintsWithImages.forEach((c, index) => {
+      map.set(c.id, referenceImages[index] || referenceImages[0])
+    })
+    return map
+  }, [recentComplaintsWithImages])
+
+  // Set of IDs for complaints eligible for comparison
+  const compareEligibleIds = useMemo(() => {
+    return new Set(recentComplaintsWithImages.map((c) => c.id))
+  }, [recentComplaintsWithImages])
+
+  // Get reference image for a specific complaint
+  const getReferenceImageForComplaint = (complaintId: string) => {
+    return complaintReferenceMap.get(complaintId) || referenceImages[0]
+  }
 
   const fetchAvailableComplaints = async (showLoader = true) => {
     if (showLoader) setLoading(true)
@@ -394,6 +436,40 @@ export function AvailableComplaints() {
     return true
   })
 
+  // Compare images function - takes both complaint image URL and reference image URL
+  const handleCompareImages = async (complaintImageUrl: string, referenceImageUrl: string) => {
+    if (!complaintImageUrl || !referenceImageUrl) return
+    setCompareLoading(true)
+    setCompareResult(null)
+    setCompareError(null)
+    setActiveCompareUrl(referenceImageUrl)
+
+    try {
+      const response = await fetch('https://sih-autoai.adityahota.online/api/match', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          imageUrl1: complaintImageUrl,
+          imageUrl2: referenceImageUrl,
+        }),
+      })
+      const data = await response.json()
+      if (data.success) {
+        setCompareResult({
+          match: data.match,
+          confidence: data.confidence,
+          reason: data.reason,
+        })
+      } else {
+        setCompareError(data.error || 'Comparison failed')
+      }
+    } catch (err: any) {
+      setCompareError(err?.message || 'Network error')
+    } finally {
+      setCompareLoading(false)
+    }
+  }
+
   const getHeaderTitle = () => {
     switch (assignmentFilter) {
       case 'unassigned':
@@ -492,6 +568,81 @@ export function AvailableComplaints() {
           ))
         )}
       </div>
+
+      {/* Recent Complaints with Images - For Comparison */}
+      {recentComplaintsWithImages.length > 0 && (
+        <Card className="border-green-200 bg-green-50/50">
+          <CardHeader className="pb-3">
+            <div className="flex items-center gap-2">
+              <GitCompare className="h-5 w-5 text-green-600" />
+              <CardTitle className="text-lg">Recent Complaints with Images</CardTitle>
+            </div>
+            <CardDescription>
+              Compare these recent complaints against the reference image to detect duplicates
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              {recentComplaintsWithImages.map((complaint) => (
+                <div
+                  key={complaint.id}
+                  className="bg-white rounded-lg border border-green-200 overflow-hidden shadow-sm hover:shadow-md transition-shadow"
+                >
+                  {/* Image Preview */}
+                  <div className="aspect-video relative bg-gray-100">
+                    <img
+                      src={complaint.attachmentUrl!}
+                      alt={complaint.title}
+                      className="w-full h-full object-cover"
+                      onError={(e) => {
+                        (e.target as HTMLImageElement).src = '/placeholder.svg'
+                      }}
+                    />
+                    <Badge className="absolute top-2 right-2 bg-green-600 text-white">
+                      #{complaint.seq}
+                    </Badge>
+                  </div>
+                  {/* Complaint Info */}
+                  <div className="p-3 space-y-2">
+                    <h4 className="font-medium text-sm line-clamp-1">{complaint.title || complaint.subCategory}</h4>
+                    <p className="text-xs text-gray-500 line-clamp-2">{complaint.description}</p>
+                    <div className="flex items-center justify-between pt-2">
+                      <div className="flex items-center gap-2">
+                        {getUrgencyBadge(complaint.urgency)}
+                      </div>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="bg-green-500 hover:bg-green-600 text-white border-green-500 hover:border-green-600 text-xs"
+                        onClick={() => {
+                          const complaintImg = complaint.attachmentUrl!
+                          const refImg = getReferenceImageForComplaint(complaint.id)
+                          setSelectedComplaint(complaint)
+                          setCompareResult(null)
+                          setCompareError(null)
+                          setCustomCompareUrl('')
+                          setActiveCompareUrl(refImg)
+                          setIsCompareModalOpen(true)
+                          handleCompareImages(complaintImg, refImg)
+                        }}
+                      >
+                        <GitCompare className="h-3 w-3 mr-1" />
+                        Compare
+                      </Button>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+            {/* Reference Images Info */}
+            <div className="mt-4 p-3 bg-white rounded-lg border border-green-200">
+              <p className="text-xs text-gray-500 mb-2">
+                <span className="font-medium text-gray-700">Reference Images:</span> Each complaint above is compared against its specific reference image.
+              </p>
+            </div>
+          </CardContent>
+        </Card>
+      )}
 
       {/* Complaints Table */}
       <Card>
@@ -677,47 +828,68 @@ export function AvailableComplaints() {
           {/* Complaint Details Modal */}
           <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)}>
             {/* Sticky header with shadow to create visual separation */}
-            <div className="sticky top-0 z-10 bg-white pb-4 border-b shadow-sm -mx-6 px-6 -mt-6 pt-0">
-              <div className="flex items-start justify-between">
-                <div>
-                  <h3 className="text-lg font-bold">{selectedComplaint?.title || selectedComplaint?.subCategory}</h3>
-                  <p className="text-sm text-gray-500">#{selectedComplaint?.seq} • {selectedComplaint?.category}</p>
-                  {(
-                    selectedComplaint?.AIStandardizedSubcategory ||
-                    selectedComplaint?.AIstandardizedSubCategory
-                  ) && (
-                    <p className="text-sm text-gray-500 mt-1 flex items-center">
-                      <Sparkles className="mr-2 h-4 w-4 text-emerald-500" />
-                      <span>SwarajAI classification: {selectedComplaint?.AIStandardizedSubcategory || selectedComplaint?.AIstandardizedSubCategory}</span>
-                    </p>
-                  )}
-                  {/* Assigned agent / municipal admin (non-sensitive) */}
-                  {selectedComplaint?.assignedAgent ? (
-                    <p className="text-sm text-gray-500 mt-2 flex items-center">
-                      <User className="mr-2 h-4 w-4 text-gray-400" />
-                      <span>Assigned to {selectedComplaint.assignedAgent.name}</span>
-                    </p>
-                  ) : selectedComplaint?.managedByMunicipalAdmin ? (
-                    <p className="text-sm text-gray-500 mt-2 flex items-center">
-                      <User className="mr-2 h-4 w-4 text-gray-400" />
-                      <span>Assigned to Municipal Admin {selectedComplaint.managedByMunicipalAdmin.name}</span>
-                    </p>
-                  ) : null}
-                </div>
-                {/* controls are positioned absolutely within header (close top-right, escalate bottom-right) */}
-              </div>
-
-              {/* Close button (top-right) */}
+            <div className="sticky -top-6 z-10 bg-white pb-4 border-b shadow-sm -mx-6 px-6 pt-6 rounded-t-lg">
+              {/* Close button (top-right corner) */}
               <button
                 onClick={() => setIsModalOpen(false)}
                 aria-label="Close"
-                className="absolute top-3 right-3 rounded-full p-1 hover:bg-gray-100 transition-colors mr-4"
+                className="absolute top-4 right-4 rounded-full p-1.5 hover:bg-gray-100 transition-colors z-20"
               >
-                <X className="h-4 w-4 text-gray-500" />
+                <X className="h-5 w-5 text-gray-500" />
               </button>
 
-              {/* Escalate button (bottom-right) */}
-              <div className="absolute right-3 bottom-3">
+              {/* Main header content */}
+              <div className="pr-12">
+                <h3 className="text-lg font-bold">{selectedComplaint?.title || selectedComplaint?.subCategory}</h3>
+                <p className="text-sm text-gray-500">#{selectedComplaint?.seq} • {selectedComplaint?.category}</p>
+                {(
+                  selectedComplaint?.AIStandardizedSubcategory ||
+                  selectedComplaint?.AIstandardizedSubCategory
+                ) && (
+                  <p className="text-sm text-gray-500 mt-1 flex items-center">
+                    <Sparkles className="mr-2 h-4 w-4 text-emerald-500" />
+                    <span>SwarajAI classification: {selectedComplaint?.AIStandardizedSubcategory || selectedComplaint?.AIstandardizedSubCategory}</span>
+                  </p>
+                )}
+                {/* Assigned agent / municipal admin (non-sensitive) */}
+                {selectedComplaint?.assignedAgent ? (
+                  <p className="text-sm text-gray-500 mt-2 flex items-center">
+                    <User className="mr-2 h-4 w-4 text-gray-400" />
+                    <span>Assigned to {selectedComplaint.assignedAgent.name}</span>
+                  </p>
+                ) : selectedComplaint?.managedByMunicipalAdmin ? (
+                  <p className="text-sm text-gray-500 mt-2 flex items-center">
+                    <User className="mr-2 h-4 w-4 text-gray-400" />
+                    <span>Assigned to Municipal Admin {selectedComplaint.managedByMunicipalAdmin.name}</span>
+                  </p>
+                ) : null}
+              </div>
+
+              {/* Action buttons row - Compare and Escalate side by side */}
+              <div className="flex items-center justify-end gap-3 mt-4">
+                {/* Compare button - only for top 3 recent complaints with images */}
+                {selectedComplaint && compareEligibleIds.has(selectedComplaint.id) && selectedComplaint.attachmentUrl && (
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="bg-green-500 hover:bg-green-600 text-white border-green-500 hover:border-green-600"
+                    onClick={() => {
+                      const complaintImg = selectedComplaint.attachmentUrl!
+                      const refImg = getReferenceImageForComplaint(selectedComplaint.id)
+                      setCompareResult(null)
+                      setCompareError(null)
+                      setCustomCompareUrl('')
+                      setActiveCompareUrl(refImg)
+                      setIsCompareModalOpen(true)
+                      handleCompareImages(complaintImg, refImg)
+                    }}
+                  >
+                    <GitCompare className="h-4 w-4 mr-1" />
+                    Compare
+                  </Button>
+                )}
+
+                {/* Escalate button */}
                 {isAssignedToMunicipal ? (
                   <Button variant="outline" size="sm" disabled className="bg-gray-100 text-gray-600 border-gray-200">
                     Escalated
@@ -784,10 +956,10 @@ export function AvailableComplaints() {
                   </Button>
                 )}
               </div>
-              </div>
+            </div>
 
             {/* Scrollable content */}
-            <div className="space-y-4 pt-9">
+            <div className="space-y-4 pt-4">
               {/* Complaint location map (if coordinates available) */}
               {selectedComplaint?.location && (selectedComplaint.location.latitude != null && selectedComplaint.location.longitude != null) ? (
                 <div>
@@ -947,6 +1119,110 @@ export function AvailableComplaints() {
               ) : (
                 <div className="border-t pt-4">
                   <p className="text-sm text-amber-600 bg-amber-50 p-3 rounded-md">Only Municipal Admins and Higher, or Assigned Agent, can Update Status.</p>
+                </div>
+              )}
+            </div>
+          </Modal>
+
+          {/* Image Comparison Modal */}
+          <Modal isOpen={isCompareModalOpen} onClose={() => setIsCompareModalOpen(false)}>
+            <div className="space-y-4">
+              {/* Header */}
+              <div className="flex items-center justify-between border-b pb-3">
+                <h3 className="text-lg font-bold">Image Comparison</h3>
+                <button
+                  onClick={() => setIsCompareModalOpen(false)}
+                  aria-label="Close"
+                  className="rounded-full p-1 hover:bg-gray-100 transition-colors"
+                >
+                  <X className="h-4 w-4 text-gray-500" />
+                </button>
+              </div>
+
+              {/* Loading badge */}
+              {compareLoading && (
+                <div className="flex justify-center">
+                  <Badge className="bg-green-100 text-green-800 flex items-center gap-2 px-4 py-2">
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                    Comparing With Received Image
+                  </Badge>
+                </div>
+              )}
+
+              {/* Side by side images */}
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <h4 className="text-sm font-semibold text-gray-700 text-center">Complaint Image</h4>
+                  <div className="border rounded-lg overflow-hidden bg-gray-50">
+                    <img
+                      src={selectedComplaint?.attachmentUrl || ''}
+                      alt="Complaint image"
+                      className="w-full h-48 object-cover"
+                    />
+                  </div>
+                  <p className="text-xs text-gray-500 text-center">#{selectedComplaint?.seq}</p>
+                </div>
+                <div className="space-y-2">
+                  <h4 className="text-sm font-semibold text-gray-700 text-center">Reference Image</h4>
+                  <div className="border rounded-lg overflow-hidden bg-gray-50">
+                    <img
+                      src={activeCompareUrl}
+                      alt="Reference"
+                      className="w-full h-48 object-cover"
+                    />
+                  </div>
+                  <p className="text-xs text-gray-500 text-center truncate">{activeCompareUrl.split('/').pop()}</p>
+                </div>
+              </div>
+
+              {/* Results */}
+              {compareResult && (
+                <div className="space-y-3 border-t pt-4">
+                  <div className="flex items-center gap-4">
+                    <Badge className={compareResult.match ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}>
+                      {compareResult.match ? '✓ Match Found' : '✗ No Match'}
+                    </Badge>
+                    <span className="text-sm text-gray-600">
+                      Confidence: <strong>{(compareResult.confidence * 100).toFixed(1)}%</strong>
+                    </span>
+                  </div>
+                  <div className="bg-gray-50 p-3 rounded-lg">
+                    <h5 className="text-sm font-semibold text-gray-700 mb-1">Analysis Result:</h5>
+                    <p className="text-sm text-gray-600">{compareResult.reason}</p>
+                  </div>
+                </div>
+              )}
+
+              {/* Error */}
+              {compareError && (
+                <div className="bg-red-50 border border-red-200 p-3 rounded-lg">
+                  <p className="text-sm text-red-600">Error: {compareError}</p>
+                </div>
+              )}
+
+              {/* Re-comparison input - shown after comparison is done */}
+              {(compareResult || compareError) && selectedComplaint?.attachmentUrl && (
+                <div className="border-t pt-4 space-y-3">
+                  <h4 className="text-sm font-semibold text-gray-700">Compare with another image</h4>
+                  <div className="flex gap-2">
+                    <Input
+                      placeholder="Paste image CDN URL here..."
+                      value={customCompareUrl}
+                      onChange={(e) => setCustomCompareUrl(e.target.value)}
+                      className="flex-1"
+                    />
+                    <Button
+                      disabled={!customCompareUrl.trim() || compareLoading}
+                      onClick={() => {
+                        if (customCompareUrl.trim() && selectedComplaint?.attachmentUrl) {
+                          handleCompareImages(selectedComplaint.attachmentUrl, customCompareUrl.trim())
+                        }
+                      }}
+                      className="bg-green-500 hover:bg-green-600 text-white"
+                    >
+                      {compareLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : 'Compare'}
+                    </Button>
+                  </div>
                 </div>
               )}
             </div>

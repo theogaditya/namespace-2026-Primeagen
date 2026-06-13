@@ -2,6 +2,7 @@ import express, { Express, Request, Response } from "express";
 import cors from "cors";
 import { chatRouter } from "./routes/chat";
 import { imageRouter } from "./routes/image";
+import { matchRouter } from "./routes/match";
 import http from "http";
 
 const app: Express = express();
@@ -39,6 +40,9 @@ app.use("/api", chatRouter);
 
 // Image routes
 app.use("/api", imageRouter);
+
+// Match route (compare two images)
+app.use("/api", matchRouter);
 
 // Start server
 const server = app.listen(PORT, () => {
