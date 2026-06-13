@@ -33,7 +33,7 @@ export * from "./enums.ts"
  * const users = await prisma.user.findMany()
  * ```
  * 
- * Read more in our [docs](https://www.prisma.io/docs/reference/tools-and-interfaces/prisma-client).
+ * Read more in our [docs](https://pris.ly/d/client).
  */
 export const PrismaClient = $Class.getPrismaClientClass()
 export type PrismaClient<LogOpts extends Prisma.LogLevel = never, OmitOpts extends Prisma.PrismaClientOptions["omit"] = Prisma.PrismaClientOptions["omit"], ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = $Class.PrismaClient<LogOpts, OmitOpts, ExtArgs>
@@ -130,12 +130,12 @@ export type operating_states = Prisma.operating_statesModel
  */
 export type operating_districts = Prisma.operating_districtsModel
 /**
- * Model badges
+ * Model Badge
  * 
  */
-export type badges = Prisma.badgesModel
+export type Badge = Prisma.BadgeModel
 /**
- * Model user_badges
+ * Model UserBadge
  * 
  */
-export type user_badges = Prisma.user_badgesModel
+export type UserBadge = Prisma.UserBadgeModel

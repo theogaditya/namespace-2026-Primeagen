@@ -69,8 +69,8 @@ export const ModelName = {
   Chat: 'Chat',
   operating_states: 'operating_states',
   operating_districts: 'operating_districts',
-  badges: 'badges',
-  user_badges: 'user_badges'
+  Badge: 'Badge',
+  UserBadge: 'UserBadge'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -402,7 +402,7 @@ export const Operating_districtsScalarFieldEnum = {
 export type Operating_districtsScalarFieldEnum = (typeof Operating_districtsScalarFieldEnum)[keyof typeof Operating_districtsScalarFieldEnum]
 
 
-export const BadgesScalarFieldEnum = {
+export const BadgeScalarFieldEnum = {
   id: 'id',
   slug: 'slug',
   name: 'name',
@@ -414,10 +414,10 @@ export const BadgesScalarFieldEnum = {
   createdAt: 'createdAt'
 } as const
 
-export type BadgesScalarFieldEnum = (typeof BadgesScalarFieldEnum)[keyof typeof BadgesScalarFieldEnum]
+export type BadgeScalarFieldEnum = (typeof BadgeScalarFieldEnum)[keyof typeof BadgeScalarFieldEnum]
 
 
-export const User_badgesScalarFieldEnum = {
+export const UserBadgeScalarFieldEnum = {
   id: 'id',
   userId: 'userId',
   badgeId: 'badgeId',
@@ -425,7 +425,7 @@ export const User_badgesScalarFieldEnum = {
   notified: 'notified'
 } as const
 
-export type User_badgesScalarFieldEnum = (typeof User_badgesScalarFieldEnum)[keyof typeof User_badgesScalarFieldEnum]
+export type UserBadgeScalarFieldEnum = (typeof UserBadgeScalarFieldEnum)[keyof typeof UserBadgeScalarFieldEnum]
 
 
 export const SortOrder = {

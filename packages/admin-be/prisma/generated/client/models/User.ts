@@ -250,7 +250,7 @@ export type UserWhereInput = {
   auditLogsCreated?: Prisma.AuditLogListRelationFilter
   chats?: Prisma.ChatListRelationFilter
   upvotes?: Prisma.UpvoteListRelationFilter
-  user_badges?: Prisma.User_badgesListRelationFilter
+  badges?: Prisma.UserBadgeListRelationFilter
   location?: Prisma.XOR<Prisma.UserLocationNullableScalarRelationFilter, Prisma.UserLocationWhereInput> | null
 }
 
@@ -272,7 +272,7 @@ export type UserOrderByWithRelationInput = {
   auditLogsCreated?: Prisma.AuditLogOrderByRelationAggregateInput
   chats?: Prisma.ChatOrderByRelationAggregateInput
   upvotes?: Prisma.UpvoteOrderByRelationAggregateInput
-  user_badges?: Prisma.user_badgesOrderByRelationAggregateInput
+  badges?: Prisma.UserBadgeOrderByRelationAggregateInput
   location?: Prisma.UserLocationOrderByWithRelationInput
 }
 
@@ -297,7 +297,7 @@ export type UserWhereUniqueInput = Prisma.AtLeast<{
   auditLogsCreated?: Prisma.AuditLogListRelationFilter
   chats?: Prisma.ChatListRelationFilter
   upvotes?: Prisma.UpvoteListRelationFilter
-  user_badges?: Prisma.User_badgesListRelationFilter
+  badges?: Prisma.UserBadgeListRelationFilter
   location?: Prisma.XOR<Prisma.UserLocationNullableScalarRelationFilter, Prisma.UserLocationWhereInput> | null
 }, "id" | "email" | "phoneNumber">
 
@@ -357,7 +357,7 @@ export type UserCreateInput = {
   auditLogsCreated?: Prisma.AuditLogCreateNestedManyWithoutUserInput
   chats?: Prisma.ChatCreateNestedManyWithoutUserInput
   upvotes?: Prisma.UpvoteCreateNestedManyWithoutUserInput
-  user_badges?: Prisma.user_badgesCreateNestedManyWithoutUserInput
+  badges?: Prisma.UserBadgeCreateNestedManyWithoutUserInput
   location?: Prisma.UserLocationCreateNestedOneWithoutUserInput
 }
 
@@ -379,7 +379,7 @@ export type UserUncheckedCreateInput = {
   auditLogsCreated?: Prisma.AuditLogUncheckedCreateNestedManyWithoutUserInput
   chats?: Prisma.ChatUncheckedCreateNestedManyWithoutUserInput
   upvotes?: Prisma.UpvoteUncheckedCreateNestedManyWithoutUserInput
-  user_badges?: Prisma.user_badgesUncheckedCreateNestedManyWithoutUserInput
+  badges?: Prisma.UserBadgeUncheckedCreateNestedManyWithoutUserInput
   location?: Prisma.UserLocationUncheckedCreateNestedOneWithoutUserInput
 }
 
@@ -401,7 +401,7 @@ export type UserUpdateInput = {
   auditLogsCreated?: Prisma.AuditLogUpdateManyWithoutUserNestedInput
   chats?: Prisma.ChatUpdateManyWithoutUserNestedInput
   upvotes?: Prisma.UpvoteUpdateManyWithoutUserNestedInput
-  user_badges?: Prisma.user_badgesUpdateManyWithoutUserNestedInput
+  badges?: Prisma.UserBadgeUpdateManyWithoutUserNestedInput
   location?: Prisma.UserLocationUpdateOneWithoutUserNestedInput
 }
 
@@ -423,7 +423,7 @@ export type UserUncheckedUpdateInput = {
   auditLogsCreated?: Prisma.AuditLogUncheckedUpdateManyWithoutUserNestedInput
   chats?: Prisma.ChatUncheckedUpdateManyWithoutUserNestedInput
   upvotes?: Prisma.UpvoteUncheckedUpdateManyWithoutUserNestedInput
-  user_badges?: Prisma.user_badgesUncheckedUpdateManyWithoutUserNestedInput
+  badges?: Prisma.UserBadgeUncheckedUpdateManyWithoutUserNestedInput
   location?: Prisma.UserLocationUncheckedUpdateOneWithoutUserNestedInput
 }
 
@@ -627,18 +627,18 @@ export type UserUpdateOneWithoutChatsNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutChatsInput, Prisma.UserUpdateWithoutChatsInput>, Prisma.UserUncheckedUpdateWithoutChatsInput>
 }
 
-export type UserCreateNestedOneWithoutUser_badgesInput = {
-  create?: Prisma.XOR<Prisma.UserCreateWithoutUser_badgesInput, Prisma.UserUncheckedCreateWithoutUser_badgesInput>
-  connectOrCreate?: Prisma.UserCreateOrConnectWithoutUser_badgesInput
+export type UserCreateNestedOneWithoutBadgesInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutBadgesInput, Prisma.UserUncheckedCreateWithoutBadgesInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutBadgesInput
   connect?: Prisma.UserWhereUniqueInput
 }
 
-export type UserUpdateOneRequiredWithoutUser_badgesNestedInput = {
-  create?: Prisma.XOR<Prisma.UserCreateWithoutUser_badgesInput, Prisma.UserUncheckedCreateWithoutUser_badgesInput>
-  connectOrCreate?: Prisma.UserCreateOrConnectWithoutUser_badgesInput
-  upsert?: Prisma.UserUpsertWithoutUser_badgesInput
+export type UserUpdateOneRequiredWithoutBadgesNestedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutBadgesInput, Prisma.UserUncheckedCreateWithoutBadgesInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutBadgesInput
+  upsert?: Prisma.UserUpsertWithoutBadgesInput
   connect?: Prisma.UserWhereUniqueInput
-  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutUser_badgesInput, Prisma.UserUpdateWithoutUser_badgesInput>, Prisma.UserUncheckedUpdateWithoutUser_badgesInput>
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutBadgesInput, Prisma.UserUpdateWithoutBadgesInput>, Prisma.UserUncheckedUpdateWithoutBadgesInput>
 }
 
 export type UserCreateWithoutLocationInput = {
@@ -659,7 +659,7 @@ export type UserCreateWithoutLocationInput = {
   auditLogsCreated?: Prisma.AuditLogCreateNestedManyWithoutUserInput
   chats?: Prisma.ChatCreateNestedManyWithoutUserInput
   upvotes?: Prisma.UpvoteCreateNestedManyWithoutUserInput
-  user_badges?: Prisma.user_badgesCreateNestedManyWithoutUserInput
+  badges?: Prisma.UserBadgeCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutLocationInput = {
@@ -680,7 +680,7 @@ export type UserUncheckedCreateWithoutLocationInput = {
   auditLogsCreated?: Prisma.AuditLogUncheckedCreateNestedManyWithoutUserInput
   chats?: Prisma.ChatUncheckedCreateNestedManyWithoutUserInput
   upvotes?: Prisma.UpvoteUncheckedCreateNestedManyWithoutUserInput
-  user_badges?: Prisma.user_badgesUncheckedCreateNestedManyWithoutUserInput
+  badges?: Prisma.UserBadgeUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutLocationInput = {
@@ -717,7 +717,7 @@ export type UserUpdateWithoutLocationInput = {
   auditLogsCreated?: Prisma.AuditLogUpdateManyWithoutUserNestedInput
   chats?: Prisma.ChatUpdateManyWithoutUserNestedInput
   upvotes?: Prisma.UpvoteUpdateManyWithoutUserNestedInput
-  user_badges?: Prisma.user_badgesUpdateManyWithoutUserNestedInput
+  badges?: Prisma.UserBadgeUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutLocationInput = {
@@ -738,7 +738,7 @@ export type UserUncheckedUpdateWithoutLocationInput = {
   auditLogsCreated?: Prisma.AuditLogUncheckedUpdateManyWithoutUserNestedInput
   chats?: Prisma.ChatUncheckedUpdateManyWithoutUserNestedInput
   upvotes?: Prisma.UpvoteUncheckedUpdateManyWithoutUserNestedInput
-  user_badges?: Prisma.user_badgesUncheckedUpdateManyWithoutUserNestedInput
+  badges?: Prisma.UserBadgeUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutComplaintsInput = {
@@ -758,7 +758,7 @@ export type UserCreateWithoutComplaintsInput = {
   auditLogsCreated?: Prisma.AuditLogCreateNestedManyWithoutUserInput
   chats?: Prisma.ChatCreateNestedManyWithoutUserInput
   upvotes?: Prisma.UpvoteCreateNestedManyWithoutUserInput
-  user_badges?: Prisma.user_badgesCreateNestedManyWithoutUserInput
+  badges?: Prisma.UserBadgeCreateNestedManyWithoutUserInput
   location?: Prisma.UserLocationCreateNestedOneWithoutUserInput
 }
 
@@ -779,7 +779,7 @@ export type UserUncheckedCreateWithoutComplaintsInput = {
   auditLogsCreated?: Prisma.AuditLogUncheckedCreateNestedManyWithoutUserInput
   chats?: Prisma.ChatUncheckedCreateNestedManyWithoutUserInput
   upvotes?: Prisma.UpvoteUncheckedCreateNestedManyWithoutUserInput
-  user_badges?: Prisma.user_badgesUncheckedCreateNestedManyWithoutUserInput
+  badges?: Prisma.UserBadgeUncheckedCreateNestedManyWithoutUserInput
   location?: Prisma.UserLocationUncheckedCreateNestedOneWithoutUserInput
 }
 
@@ -816,7 +816,7 @@ export type UserUpdateWithoutComplaintsInput = {
   auditLogsCreated?: Prisma.AuditLogUpdateManyWithoutUserNestedInput
   chats?: Prisma.ChatUpdateManyWithoutUserNestedInput
   upvotes?: Prisma.UpvoteUpdateManyWithoutUserNestedInput
-  user_badges?: Prisma.user_badgesUpdateManyWithoutUserNestedInput
+  badges?: Prisma.UserBadgeUpdateManyWithoutUserNestedInput
   location?: Prisma.UserLocationUpdateOneWithoutUserNestedInput
 }
 
@@ -837,7 +837,7 @@ export type UserUncheckedUpdateWithoutComplaintsInput = {
   auditLogsCreated?: Prisma.AuditLogUncheckedUpdateManyWithoutUserNestedInput
   chats?: Prisma.ChatUncheckedUpdateManyWithoutUserNestedInput
   upvotes?: Prisma.UpvoteUncheckedUpdateManyWithoutUserNestedInput
-  user_badges?: Prisma.user_badgesUncheckedUpdateManyWithoutUserNestedInput
+  badges?: Prisma.UserBadgeUncheckedUpdateManyWithoutUserNestedInput
   location?: Prisma.UserLocationUncheckedUpdateOneWithoutUserNestedInput
 }
 
@@ -858,7 +858,7 @@ export type UserCreateWithoutUpvotesInput = {
   complaints?: Prisma.ComplaintCreateNestedManyWithoutUserInput
   auditLogsCreated?: Prisma.AuditLogCreateNestedManyWithoutUserInput
   chats?: Prisma.ChatCreateNestedManyWithoutUserInput
-  user_badges?: Prisma.user_badgesCreateNestedManyWithoutUserInput
+  badges?: Prisma.UserBadgeCreateNestedManyWithoutUserInput
   location?: Prisma.UserLocationCreateNestedOneWithoutUserInput
 }
 
@@ -879,7 +879,7 @@ export type UserUncheckedCreateWithoutUpvotesInput = {
   complaints?: Prisma.ComplaintUncheckedCreateNestedManyWithoutUserInput
   auditLogsCreated?: Prisma.AuditLogUncheckedCreateNestedManyWithoutUserInput
   chats?: Prisma.ChatUncheckedCreateNestedManyWithoutUserInput
-  user_badges?: Prisma.user_badgesUncheckedCreateNestedManyWithoutUserInput
+  badges?: Prisma.UserBadgeUncheckedCreateNestedManyWithoutUserInput
   location?: Prisma.UserLocationUncheckedCreateNestedOneWithoutUserInput
 }
 
@@ -916,7 +916,7 @@ export type UserUpdateWithoutUpvotesInput = {
   complaints?: Prisma.ComplaintUpdateManyWithoutUserNestedInput
   auditLogsCreated?: Prisma.AuditLogUpdateManyWithoutUserNestedInput
   chats?: Prisma.ChatUpdateManyWithoutUserNestedInput
-  user_badges?: Prisma.user_badgesUpdateManyWithoutUserNestedInput
+  badges?: Prisma.UserBadgeUpdateManyWithoutUserNestedInput
   location?: Prisma.UserLocationUpdateOneWithoutUserNestedInput
 }
 
@@ -937,7 +937,7 @@ export type UserUncheckedUpdateWithoutUpvotesInput = {
   complaints?: Prisma.ComplaintUncheckedUpdateManyWithoutUserNestedInput
   auditLogsCreated?: Prisma.AuditLogUncheckedUpdateManyWithoutUserNestedInput
   chats?: Prisma.ChatUncheckedUpdateManyWithoutUserNestedInput
-  user_badges?: Prisma.user_badgesUncheckedUpdateManyWithoutUserNestedInput
+  badges?: Prisma.UserBadgeUncheckedUpdateManyWithoutUserNestedInput
   location?: Prisma.UserLocationUncheckedUpdateOneWithoutUserNestedInput
 }
 
@@ -958,7 +958,7 @@ export type UserCreateWithoutAuditLogsCreatedInput = {
   complaints?: Prisma.ComplaintCreateNestedManyWithoutUserInput
   chats?: Prisma.ChatCreateNestedManyWithoutUserInput
   upvotes?: Prisma.UpvoteCreateNestedManyWithoutUserInput
-  user_badges?: Prisma.user_badgesCreateNestedManyWithoutUserInput
+  badges?: Prisma.UserBadgeCreateNestedManyWithoutUserInput
   location?: Prisma.UserLocationCreateNestedOneWithoutUserInput
 }
 
@@ -979,7 +979,7 @@ export type UserUncheckedCreateWithoutAuditLogsCreatedInput = {
   complaints?: Prisma.ComplaintUncheckedCreateNestedManyWithoutUserInput
   chats?: Prisma.ChatUncheckedCreateNestedManyWithoutUserInput
   upvotes?: Prisma.UpvoteUncheckedCreateNestedManyWithoutUserInput
-  user_badges?: Prisma.user_badgesUncheckedCreateNestedManyWithoutUserInput
+  badges?: Prisma.UserBadgeUncheckedCreateNestedManyWithoutUserInput
   location?: Prisma.UserLocationUncheckedCreateNestedOneWithoutUserInput
 }
 
@@ -1016,7 +1016,7 @@ export type UserUpdateWithoutAuditLogsCreatedInput = {
   complaints?: Prisma.ComplaintUpdateManyWithoutUserNestedInput
   chats?: Prisma.ChatUpdateManyWithoutUserNestedInput
   upvotes?: Prisma.UpvoteUpdateManyWithoutUserNestedInput
-  user_badges?: Prisma.user_badgesUpdateManyWithoutUserNestedInput
+  badges?: Prisma.UserBadgeUpdateManyWithoutUserNestedInput
   location?: Prisma.UserLocationUpdateOneWithoutUserNestedInput
 }
 
@@ -1037,7 +1037,7 @@ export type UserUncheckedUpdateWithoutAuditLogsCreatedInput = {
   complaints?: Prisma.ComplaintUncheckedUpdateManyWithoutUserNestedInput
   chats?: Prisma.ChatUncheckedUpdateManyWithoutUserNestedInput
   upvotes?: Prisma.UpvoteUncheckedUpdateManyWithoutUserNestedInput
-  user_badges?: Prisma.user_badgesUncheckedUpdateManyWithoutUserNestedInput
+  badges?: Prisma.UserBadgeUncheckedUpdateManyWithoutUserNestedInput
   location?: Prisma.UserLocationUncheckedUpdateOneWithoutUserNestedInput
 }
 
@@ -1058,7 +1058,7 @@ export type UserCreateWithoutChatsInput = {
   complaints?: Prisma.ComplaintCreateNestedManyWithoutUserInput
   auditLogsCreated?: Prisma.AuditLogCreateNestedManyWithoutUserInput
   upvotes?: Prisma.UpvoteCreateNestedManyWithoutUserInput
-  user_badges?: Prisma.user_badgesCreateNestedManyWithoutUserInput
+  badges?: Prisma.UserBadgeCreateNestedManyWithoutUserInput
   location?: Prisma.UserLocationCreateNestedOneWithoutUserInput
 }
 
@@ -1079,7 +1079,7 @@ export type UserUncheckedCreateWithoutChatsInput = {
   complaints?: Prisma.ComplaintUncheckedCreateNestedManyWithoutUserInput
   auditLogsCreated?: Prisma.AuditLogUncheckedCreateNestedManyWithoutUserInput
   upvotes?: Prisma.UpvoteUncheckedCreateNestedManyWithoutUserInput
-  user_badges?: Prisma.user_badgesUncheckedCreateNestedManyWithoutUserInput
+  badges?: Prisma.UserBadgeUncheckedCreateNestedManyWithoutUserInput
   location?: Prisma.UserLocationUncheckedCreateNestedOneWithoutUserInput
 }
 
@@ -1116,7 +1116,7 @@ export type UserUpdateWithoutChatsInput = {
   complaints?: Prisma.ComplaintUpdateManyWithoutUserNestedInput
   auditLogsCreated?: Prisma.AuditLogUpdateManyWithoutUserNestedInput
   upvotes?: Prisma.UpvoteUpdateManyWithoutUserNestedInput
-  user_badges?: Prisma.user_badgesUpdateManyWithoutUserNestedInput
+  badges?: Prisma.UserBadgeUpdateManyWithoutUserNestedInput
   location?: Prisma.UserLocationUpdateOneWithoutUserNestedInput
 }
 
@@ -1137,11 +1137,11 @@ export type UserUncheckedUpdateWithoutChatsInput = {
   complaints?: Prisma.ComplaintUncheckedUpdateManyWithoutUserNestedInput
   auditLogsCreated?: Prisma.AuditLogUncheckedUpdateManyWithoutUserNestedInput
   upvotes?: Prisma.UpvoteUncheckedUpdateManyWithoutUserNestedInput
-  user_badges?: Prisma.user_badgesUncheckedUpdateManyWithoutUserNestedInput
+  badges?: Prisma.UserBadgeUncheckedUpdateManyWithoutUserNestedInput
   location?: Prisma.UserLocationUncheckedUpdateOneWithoutUserNestedInput
 }
 
-export type UserCreateWithoutUser_badgesInput = {
+export type UserCreateWithoutBadgesInput = {
   id?: string
   email: string
   name: string
@@ -1162,7 +1162,7 @@ export type UserCreateWithoutUser_badgesInput = {
   location?: Prisma.UserLocationCreateNestedOneWithoutUserInput
 }
 
-export type UserUncheckedCreateWithoutUser_badgesInput = {
+export type UserUncheckedCreateWithoutBadgesInput = {
   id?: string
   email: string
   name: string
@@ -1183,23 +1183,23 @@ export type UserUncheckedCreateWithoutUser_badgesInput = {
   location?: Prisma.UserLocationUncheckedCreateNestedOneWithoutUserInput
 }
 
-export type UserCreateOrConnectWithoutUser_badgesInput = {
+export type UserCreateOrConnectWithoutBadgesInput = {
   where: Prisma.UserWhereUniqueInput
-  create: Prisma.XOR<Prisma.UserCreateWithoutUser_badgesInput, Prisma.UserUncheckedCreateWithoutUser_badgesInput>
+  create: Prisma.XOR<Prisma.UserCreateWithoutBadgesInput, Prisma.UserUncheckedCreateWithoutBadgesInput>
 }
 
-export type UserUpsertWithoutUser_badgesInput = {
-  update: Prisma.XOR<Prisma.UserUpdateWithoutUser_badgesInput, Prisma.UserUncheckedUpdateWithoutUser_badgesInput>
-  create: Prisma.XOR<Prisma.UserCreateWithoutUser_badgesInput, Prisma.UserUncheckedCreateWithoutUser_badgesInput>
+export type UserUpsertWithoutBadgesInput = {
+  update: Prisma.XOR<Prisma.UserUpdateWithoutBadgesInput, Prisma.UserUncheckedUpdateWithoutBadgesInput>
+  create: Prisma.XOR<Prisma.UserCreateWithoutBadgesInput, Prisma.UserUncheckedCreateWithoutBadgesInput>
   where?: Prisma.UserWhereInput
 }
 
-export type UserUpdateToOneWithWhereWithoutUser_badgesInput = {
+export type UserUpdateToOneWithWhereWithoutBadgesInput = {
   where?: Prisma.UserWhereInput
-  data: Prisma.XOR<Prisma.UserUpdateWithoutUser_badgesInput, Prisma.UserUncheckedUpdateWithoutUser_badgesInput>
+  data: Prisma.XOR<Prisma.UserUpdateWithoutBadgesInput, Prisma.UserUncheckedUpdateWithoutBadgesInput>
 }
 
-export type UserUpdateWithoutUser_badgesInput = {
+export type UserUpdateWithoutBadgesInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
@@ -1220,7 +1220,7 @@ export type UserUpdateWithoutUser_badgesInput = {
   location?: Prisma.UserLocationUpdateOneWithoutUserNestedInput
 }
 
-export type UserUncheckedUpdateWithoutUser_badgesInput = {
+export type UserUncheckedUpdateWithoutBadgesInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
@@ -1251,7 +1251,7 @@ export type UserCountOutputType = {
   auditLogsCreated: number
   chats: number
   upvotes: number
-  user_badges: number
+  badges: number
 }
 
 export type UserCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -1259,7 +1259,7 @@ export type UserCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.I
   auditLogsCreated?: boolean | UserCountOutputTypeCountAuditLogsCreatedArgs
   chats?: boolean | UserCountOutputTypeCountChatsArgs
   upvotes?: boolean | UserCountOutputTypeCountUpvotesArgs
-  user_badges?: boolean | UserCountOutputTypeCountUser_badgesArgs
+  badges?: boolean | UserCountOutputTypeCountBadgesArgs
 }
 
 /**
@@ -1303,8 +1303,8 @@ export type UserCountOutputTypeCountUpvotesArgs<ExtArgs extends runtime.Types.Ex
 /**
  * UserCountOutputType without action
  */
-export type UserCountOutputTypeCountUser_badgesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  where?: Prisma.user_badgesWhereInput
+export type UserCountOutputTypeCountBadgesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.UserBadgeWhereInput
 }
 
 
@@ -1326,7 +1326,7 @@ export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
   auditLogsCreated?: boolean | Prisma.User$auditLogsCreatedArgs<ExtArgs>
   chats?: boolean | Prisma.User$chatsArgs<ExtArgs>
   upvotes?: boolean | Prisma.User$upvotesArgs<ExtArgs>
-  user_badges?: boolean | Prisma.User$user_badgesArgs<ExtArgs>
+  badges?: boolean | Prisma.User$badgesArgs<ExtArgs>
   location?: boolean | Prisma.User$locationArgs<ExtArgs>
   _count?: boolean | Prisma.UserCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["user"]>
@@ -1385,7 +1385,7 @@ export type UserInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = 
   auditLogsCreated?: boolean | Prisma.User$auditLogsCreatedArgs<ExtArgs>
   chats?: boolean | Prisma.User$chatsArgs<ExtArgs>
   upvotes?: boolean | Prisma.User$upvotesArgs<ExtArgs>
-  user_badges?: boolean | Prisma.User$user_badgesArgs<ExtArgs>
+  badges?: boolean | Prisma.User$badgesArgs<ExtArgs>
   location?: boolean | Prisma.User$locationArgs<ExtArgs>
   _count?: boolean | Prisma.UserCountOutputTypeDefaultArgs<ExtArgs>
 }
@@ -1399,7 +1399,7 @@ export type $UserPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
     auditLogsCreated: Prisma.$AuditLogPayload<ExtArgs>[]
     chats: Prisma.$ChatPayload<ExtArgs>[]
     upvotes: Prisma.$UpvotePayload<ExtArgs>[]
-    user_badges: Prisma.$user_badgesPayload<ExtArgs>[]
+    badges: Prisma.$UserBadgePayload<ExtArgs>[]
     location: Prisma.$UserLocationPayload<ExtArgs> | null
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
@@ -1814,7 +1814,7 @@ export interface Prisma__UserClient<T, Null = never, ExtArgs extends runtime.Typ
   auditLogsCreated<T extends Prisma.User$auditLogsCreatedArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$auditLogsCreatedArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$AuditLogPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   chats<T extends Prisma.User$chatsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$chatsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ChatPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   upvotes<T extends Prisma.User$upvotesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$upvotesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$UpvotePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
-  user_badges<T extends Prisma.User$user_badgesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$user_badgesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$user_badgesPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  badges<T extends Prisma.User$badgesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$badgesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$UserBadgePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   location<T extends Prisma.User$locationArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$locationArgs<ExtArgs>>): Prisma.Prisma__UserLocationClient<runtime.Types.Result.GetResult<Prisma.$UserLocationPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
@@ -2342,27 +2342,27 @@ export type User$upvotesArgs<ExtArgs extends runtime.Types.Extensions.InternalAr
 }
 
 /**
- * User.user_badges
+ * User.badges
  */
-export type User$user_badgesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+export type User$badgesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   /**
-   * Select specific fields to fetch from the user_badges
+   * Select specific fields to fetch from the UserBadge
    */
-  select?: Prisma.user_badgesSelect<ExtArgs> | null
+  select?: Prisma.UserBadgeSelect<ExtArgs> | null
   /**
-   * Omit specific fields from the user_badges
+   * Omit specific fields from the UserBadge
    */
-  omit?: Prisma.user_badgesOmit<ExtArgs> | null
+  omit?: Prisma.UserBadgeOmit<ExtArgs> | null
   /**
    * Choose, which related nodes to fetch as well
    */
-  include?: Prisma.user_badgesInclude<ExtArgs> | null
-  where?: Prisma.user_badgesWhereInput
-  orderBy?: Prisma.user_badgesOrderByWithRelationInput | Prisma.user_badgesOrderByWithRelationInput[]
-  cursor?: Prisma.user_badgesWhereUniqueInput
+  include?: Prisma.UserBadgeInclude<ExtArgs> | null
+  where?: Prisma.UserBadgeWhereInput
+  orderBy?: Prisma.UserBadgeOrderByWithRelationInput | Prisma.UserBadgeOrderByWithRelationInput[]
+  cursor?: Prisma.UserBadgeWhereUniqueInput
   take?: number
   skip?: number
-  distinct?: Prisma.User_badgesScalarFieldEnum | Prisma.User_badgesScalarFieldEnum[]
+  distinct?: Prisma.UserBadgeScalarFieldEnum | Prisma.UserBadgeScalarFieldEnum[]
 }
 
 /**

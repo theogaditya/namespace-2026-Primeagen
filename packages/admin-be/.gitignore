@@ -39,3 +39,6 @@ gcp-credentials.json
 
 /generated/prisma
 .env
+
+# Ignore DB Unit Tests
+unit.db.test.ts

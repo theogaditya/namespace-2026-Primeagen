@@ -2,11 +2,12 @@ version: '3.8'
 
 services:
   admin-be:
-    build:
-      context: .
-      dockerfile: Dockerfile
-      args:
-        DATABASE_URL: ${DATABASE_URL:-postgresql://dummy:dummy@localhost:5432/dummy}
+    # build:
+    #   context: .
+    #   dockerfile: Dockerfile
+    #   args:
+    #     DATABASE_URL: ${DATABASE_URL:-postgresql://dummy:dummy@localhost:5432/dummy}
+    image: mistaholmes/swarajdesk-admin-be:latest
     container_name: admin-be
     ports:
       - "${ADMIN_BE_PORT:-3002}:3002"

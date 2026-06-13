@@ -108,12 +108,12 @@ export type operating_states = Prisma.operating_statesModel
  */
 export type operating_districts = Prisma.operating_districtsModel
 /**
- * Model badges
+ * Model Badge
  * 
  */
-export type badges = Prisma.badgesModel
+export type Badge = Prisma.BadgeModel
 /**
- * Model user_badges
+ * Model UserBadge
  * 
  */
-export type user_badges = Prisma.user_badgesModel
+export type UserBadge = Prisma.UserBadgeModel

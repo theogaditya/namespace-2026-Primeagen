@@ -80,12 +80,12 @@ export type PrismaVersion = {
 }
 
 /**
- * Prisma Client JS version: 7.0.1
- * Query Engine version: f09f2815f091dbba658cdcd2264306d88bb5bda6
+ * Prisma Client JS version: 7.1.0
+ * Query Engine version: ab635e6b9d606fa5c8fb8b1a7f909c3c3c1c98ba
  */
 export const prismaVersion: PrismaVersion = {
-  client: "7.0.1",
-  engine: "f09f2815f091dbba658cdcd2264306d88bb5bda6"
+  client: "7.1.0",
+  engine: "ab635e6b9d606fa5c8fb8b1a7f909c3c3c1c98ba"
 }
 
 /**
@@ -402,8 +402,8 @@ export const ModelName = {
   Chat: 'Chat',
   operating_states: 'operating_states',
   operating_districts: 'operating_districts',
-  badges: 'badges',
-  user_badges: 'user_badges'
+  Badge: 'Badge',
+  UserBadge: 'UserBadge'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -419,7 +419,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "user" | "userLocation" | "agent" | "departmentMunicipalAdmin" | "superMunicipalAdmin" | "departmentStateAdmin" | "superStateAdmin" | "superAdmin" | "category" | "complaint" | "complaintLocation" | "upvote" | "newsUpdate" | "auditLog" | "regionalWorkflow" | "chat" | "operating_states" | "operating_districts" | "badges" | "user_badges"
+    modelProps: "user" | "userLocation" | "agent" | "departmentMunicipalAdmin" | "superMunicipalAdmin" | "departmentStateAdmin" | "superStateAdmin" | "superAdmin" | "category" | "complaint" | "complaintLocation" | "upvote" | "newsUpdate" | "auditLog" | "regionalWorkflow" | "chat" | "operating_states" | "operating_districts" | "badge" | "userBadge"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -1755,151 +1755,151 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
-    badges: {
-      payload: Prisma.$badgesPayload<ExtArgs>
-      fields: Prisma.badgesFieldRefs
+    Badge: {
+      payload: Prisma.$BadgePayload<ExtArgs>
+      fields: Prisma.BadgeFieldRefs
       operations: {
         findUnique: {
-          args: Prisma.badgesFindUniqueArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$badgesPayload> | null
+          args: Prisma.BadgeFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$BadgePayload> | null
         }
         findUniqueOrThrow: {
-          args: Prisma.badgesFindUniqueOrThrowArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$badgesPayload>
+          args: Prisma.BadgeFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$BadgePayload>
         }
         findFirst: {
-          args: Prisma.badgesFindFirstArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$badgesPayload> | null
+          args: Prisma.BadgeFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$BadgePayload> | null
         }
         findFirstOrThrow: {
-          args: Prisma.badgesFindFirstOrThrowArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$badgesPayload>
+          args: Prisma.BadgeFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$BadgePayload>
         }
         findMany: {
-          args: Prisma.badgesFindManyArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$badgesPayload>[]
+          args: Prisma.BadgeFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$BadgePayload>[]
         }
         create: {
-          args: Prisma.badgesCreateArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$badgesPayload>
+          args: Prisma.BadgeCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$BadgePayload>
         }
         createMany: {
-          args: Prisma.badgesCreateManyArgs<ExtArgs>
+          args: Prisma.BadgeCreateManyArgs<ExtArgs>
           result: BatchPayload
         }
         createManyAndReturn: {
-          args: Prisma.badgesCreateManyAndReturnArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$badgesPayload>[]
+          args: Prisma.BadgeCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$BadgePayload>[]
         }
         delete: {
-          args: Prisma.badgesDeleteArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$badgesPayload>
+          args: Prisma.BadgeDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$BadgePayload>
         }
         update: {
-          args: Prisma.badgesUpdateArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$badgesPayload>
+          args: Prisma.BadgeUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$BadgePayload>
         }
         deleteMany: {
-          args: Prisma.badgesDeleteManyArgs<ExtArgs>
+          args: Prisma.BadgeDeleteManyArgs<ExtArgs>
           result: BatchPayload
         }
         updateMany: {
-          args: Prisma.badgesUpdateManyArgs<ExtArgs>
+          args: Prisma.BadgeUpdateManyArgs<ExtArgs>
           result: BatchPayload
         }
         updateManyAndReturn: {
-          args: Prisma.badgesUpdateManyAndReturnArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$badgesPayload>[]
+          args: Prisma.BadgeUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$BadgePayload>[]
         }
         upsert: {
-          args: Prisma.badgesUpsertArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$badgesPayload>
+          args: Prisma.BadgeUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$BadgePayload>
         }
         aggregate: {
-          args: Prisma.BadgesAggregateArgs<ExtArgs>
-          result: runtime.Types.Utils.Optional<Prisma.AggregateBadges>
+          args: Prisma.BadgeAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateBadge>
         }
         groupBy: {
-          args: Prisma.badgesGroupByArgs<ExtArgs>
-          result: runtime.Types.Utils.Optional<Prisma.BadgesGroupByOutputType>[]
+          args: Prisma.BadgeGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.BadgeGroupByOutputType>[]
         }
         count: {
-          args: Prisma.badgesCountArgs<ExtArgs>
-          result: runtime.Types.Utils.Optional<Prisma.BadgesCountAggregateOutputType> | number
+          args: Prisma.BadgeCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.BadgeCountAggregateOutputType> | number
         }
       }
     }
-    user_badges: {
-      payload: Prisma.$user_badgesPayload<ExtArgs>
-      fields: Prisma.user_badgesFieldRefs
+    UserBadge: {
+      payload: Prisma.$UserBadgePayload<ExtArgs>
+      fields: Prisma.UserBadgeFieldRefs
       operations: {
         findUnique: {
-          args: Prisma.user_badgesFindUniqueArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$user_badgesPayload> | null
+          args: Prisma.UserBadgeFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$UserBadgePayload> | null
         }
         findUniqueOrThrow: {
-          args: Prisma.user_badgesFindUniqueOrThrowArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$user_badgesPayload>
+          args: Prisma.UserBadgeFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$UserBadgePayload>
         }
         findFirst: {
-          args: Prisma.user_badgesFindFirstArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$user_badgesPayload> | null
+          args: Prisma.UserBadgeFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$UserBadgePayload> | null
         }
         findFirstOrThrow: {
-          args: Prisma.user_badgesFindFirstOrThrowArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$user_badgesPayload>
+          args: Prisma.UserBadgeFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$UserBadgePayload>
         }
         findMany: {
-          args: Prisma.user_badgesFindManyArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$user_badgesPayload>[]
+          args: Prisma.UserBadgeFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$UserBadgePayload>[]
         }
         create: {
-          args: Prisma.user_badgesCreateArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$user_badgesPayload>
+          args: Prisma.UserBadgeCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$UserBadgePayload>
         }
         createMany: {
-          args: Prisma.user_badgesCreateManyArgs<ExtArgs>
+          args: Prisma.UserBadgeCreateManyArgs<ExtArgs>
           result: BatchPayload
         }
         createManyAndReturn: {
-          args: Prisma.user_badgesCreateManyAndReturnArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$user_badgesPayload>[]
+          args: Prisma.UserBadgeCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$UserBadgePayload>[]
         }
         delete: {
-          args: Prisma.user_badgesDeleteArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$user_badgesPayload>
+          args: Prisma.UserBadgeDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$UserBadgePayload>
         }
         update: {
-          args: Prisma.user_badgesUpdateArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$user_badgesPayload>
+          args: Prisma.UserBadgeUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$UserBadgePayload>
         }
         deleteMany: {
-          args: Prisma.user_badgesDeleteManyArgs<ExtArgs>
+          args: Prisma.UserBadgeDeleteManyArgs<ExtArgs>
           result: BatchPayload
         }
         updateMany: {
-          args: Prisma.user_badgesUpdateManyArgs<ExtArgs>
+          args: Prisma.UserBadgeUpdateManyArgs<ExtArgs>
           result: BatchPayload
         }
         updateManyAndReturn: {
-          args: Prisma.user_badgesUpdateManyAndReturnArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$user_badgesPayload>[]
+          args: Prisma.UserBadgeUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$UserBadgePayload>[]
         }
         upsert: {
-          args: Prisma.user_badgesUpsertArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$user_badgesPayload>
+          args: Prisma.UserBadgeUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$UserBadgePayload>
         }
         aggregate: {
-          args: Prisma.User_badgesAggregateArgs<ExtArgs>
-          result: runtime.Types.Utils.Optional<Prisma.AggregateUser_badges>
+          args: Prisma.UserBadgeAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateUserBadge>
         }
         groupBy: {
-          args: Prisma.user_badgesGroupByArgs<ExtArgs>
-          result: runtime.Types.Utils.Optional<Prisma.User_badgesGroupByOutputType>[]
+          args: Prisma.UserBadgeGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.UserBadgeGroupByOutputType>[]
         }
         count: {
-          args: Prisma.user_badgesCountArgs<ExtArgs>
-          result: runtime.Types.Utils.Optional<Prisma.User_badgesCountAggregateOutputType> | number
+          args: Prisma.UserBadgeCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.UserBadgeCountAggregateOutputType> | number
         }
       }
     }
@@ -2255,7 +2255,7 @@ export const Operating_districtsScalarFieldEnum = {
 export type Operating_districtsScalarFieldEnum = (typeof Operating_districtsScalarFieldEnum)[keyof typeof Operating_districtsScalarFieldEnum]
 
 
-export const BadgesScalarFieldEnum = {
+export const BadgeScalarFieldEnum = {
   id: 'id',
   slug: 'slug',
   name: 'name',
@@ -2267,10 +2267,10 @@ export const BadgesScalarFieldEnum = {
   createdAt: 'createdAt'
 } as const
 
-export type BadgesScalarFieldEnum = (typeof BadgesScalarFieldEnum)[keyof typeof BadgesScalarFieldEnum]
+export type BadgeScalarFieldEnum = (typeof BadgeScalarFieldEnum)[keyof typeof BadgeScalarFieldEnum]
 
 
-export const User_badgesScalarFieldEnum = {
+export const UserBadgeScalarFieldEnum = {
   id: 'id',
   userId: 'userId',
   badgeId: 'badgeId',
@@ -2278,7 +2278,7 @@ export const User_badgesScalarFieldEnum = {
   notified: 'notified'
 } as const
 
-export type User_badgesScalarFieldEnum = (typeof User_badgesScalarFieldEnum)[keyof typeof User_badgesScalarFieldEnum]
+export type UserBadgeScalarFieldEnum = (typeof UserBadgeScalarFieldEnum)[keyof typeof UserBadgeScalarFieldEnum]
 
 
 export const SortOrder = {
@@ -2548,7 +2548,7 @@ export type PrismaClientOptions = ({
    *  { emit: 'stdout', level: 'error' }
    * 
    * ```
-   * Read more in our [docs](https://www.prisma.io/docs/reference/tools-and-interfaces/prisma-client/logging#the-log-option).
+   * Read more in our [docs](https://pris.ly/d/logging).
    */
   log?: (LogLevel | LogDefinition)[]
   /**
@@ -2576,6 +2576,22 @@ export type PrismaClientOptions = ({
    * ```
    */
   omit?: GlobalOmitConfig
+  /**
+   * SQL commenter plugins that add metadata to SQL queries as comments.
+   * Comments follow the sqlcommenter format: https://google.github.io/sqlcommenter/
+   * 
+   * @example
+   * ```
+   * const prisma = new PrismaClient({
+   *   adapter,
+   *   comments: [
+   *     traceContext(),
+   *     queryInsights(),
+   *   ],
+   * })
+   * ```
+   */
+  comments?: runtime.SqlCommenterPlugin[]
 }
 export type GlobalOmitConfig = {
   user?: Prisma.UserOmit
@@ -2596,8 +2612,8 @@ export type GlobalOmitConfig = {
   chat?: Prisma.ChatOmit
   operating_states?: Prisma.operating_statesOmit
   operating_districts?: Prisma.operating_districtsOmit
-  badges?: Prisma.badgesOmit
-  user_badges?: Prisma.user_badgesOmit
+  badge?: Prisma.BadgeOmit
+  userBadge?: Prisma.UserBadgeOmit
 }
 
 /* Types for Logging */

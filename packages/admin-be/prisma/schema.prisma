@@ -25,7 +25,7 @@ model User {
   auditLogsCreated      AuditLog[]    @relation("LogCreator")
   chats                 Chat[]
   upvotes               Upvote[]
-  user_badges           user_badges[]
+  badges                UserBadge[]
   location              UserLocation?
 }
 
@@ -330,13 +330,13 @@ model Chat {
   agentId     String?
   complaintId String
   senderType  SenderType
-  agent       Agent?     @relation(fields: [agentId], references: [id])
-  complaint   Complaint  @relation(fields: [complaintId], references: [id], onDelete: Cascade)
+  Agent       Agent?     @relation(fields: [agentId], references: [id])
+  Complaint   Complaint  @relation(fields: [complaintId], references: [id], onDelete: Cascade)
   user        User?      @relation(fields: [userId], references: [id])
 
-  @@index([complaintId])
   @@index([userId])
   @@index([agentId])
+  @@index([complaintId])
   @@map("chats")
 }
 
@@ -355,8 +355,8 @@ model operating_districts {
   operating_states operating_states @relation(fields: [stateId], references: [id], onDelete: Cascade)
 }
 
-model badges {
-  id          String        @id
+model Badge {
+  id          String        @id @default(uuid())
   slug        String        @unique
   name        String
   description String
@@ -365,29 +365,26 @@ model badges {
   rarity      BadgeRarity
   threshold   Int
   createdAt   DateTime      @default(now())
-  user_badges user_badges[]
+  userBadges  UserBadge[]
 
   @@index([category])
   @@index([rarity])
+  @@map("badges")
 }
 
-model user_badges {
-  id       String   @id
+model UserBadge {
+  id       String   @id @default(uuid())
   userId   String
   badgeId  String
   earnedAt DateTime @default(now())
   notified Boolean  @default(false)
-  badges   badges   @relation(fields: [badgeId], references: [id], onDelete: Cascade)
-  User     User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  badge    Badge    @relation(fields: [badgeId], references: [id], onDelete: Cascade)
+  user     User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([userId, badgeId])
-  @@index([earnedAt])
   @@index([userId])
-}
-
-enum SenderType {
-  USER
-  AGENT
+  @@index([earnedAt])
+  @@map("user_badges")
 }
 
 enum userStatus {
@@ -453,6 +450,11 @@ enum ComplaintUrgency {
   MEDIUM
   HIGH
   CRITICAL
+}
+
+enum SenderType {
+  USER
+  AGENT
 }
 
 enum BadgeCategory {
