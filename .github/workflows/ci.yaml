@@ -95,22 +95,22 @@ jobs:
           cache-from: type=inline
           cache-to: type=inline
 
-      - name: Build and push admin-be image
-        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-        uses: docker/build-push-action@v6
-        with:
-          context: packages/admin-be
-          file: packages/admin-be/Dockerfile
-          push: true
-          tags: |
-            ${{ env.ADMIN_BE_IMAGE }}:latest
-            ${{ env.ADMIN_BE_IMAGE }}:${{ env.IMAGE_TAG }}
-          build-args: |
-            DATABASE_URL=postgresql://dummy:dummy@localhost:5432/dummy
-          no-cache: true
-          pull: true
-          cache-from: type=inline
-          cache-to: type=inline
+      # - name: Build and push admin-be image
+      #   if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+      #   uses: docker/build-push-action@v6
+      #   with:
+      #     context: packages/admin-be
+      #     file: packages/admin-be/Dockerfile
+      #     push: true
+      #     tags: |
+      #       ${{ env.ADMIN_BE_IMAGE }}:latest
+      #       ${{ env.ADMIN_BE_IMAGE }}:${{ env.IMAGE_TAG }}
+      #     build-args: |
+      #       DATABASE_URL=postgresql://dummy:dummy@localhost:5432/dummy
+      #     no-cache: true
+      #     pull: true
+      #     cache-from: type=inline
+      #     cache-to: type=inline
 
       # -------------------------
       # Open PR main -> deploy (skip if one already open)

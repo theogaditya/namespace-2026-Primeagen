@@ -3,7 +3,9 @@ import { vi, describe, it, beforeEach, expect } from 'vitest';
 const mockRedisClient = {
   lIndex: vi.fn(),
   lPop: vi.fn(), 
-  lPush: vi.fn()
+  lPush: vi.fn(),
+  lMove: vi.fn(),
+  lRem: vi.fn()
 };
 
 // Mock RedisClientforComplaintQueue class
@@ -33,6 +35,18 @@ vi.mock('../lib/gcp/gcp', () => ({
   standardizeSubCategory: vi.fn().mockResolvedValue('standardized-subcategory')
 }));
 
+// Mock moderation client to avoid external API calls
+vi.mock('../lib/moderation/moderationClient', () => ({
+  moderateTextSafe: vi.fn().mockResolvedValue({ has_abuse: false, clean_text: null })
+}));
+
+// Mock badge service to avoid DB calls
+vi.mock('../lib/badges/badgeService', () => ({
+  getBadgeService: vi.fn().mockReturnValue({
+    checkBadgesAfterComplaint: vi.fn().mockResolvedValue([])
+  })
+}));
+
 // minimal mock prisma client
 const mockCreateComplaint = vi.fn();
 const mockFindFirst = vi.fn();
@@ -59,14 +73,19 @@ describe('processNextComplaint', () => {
   });
 
   it('returns processed=false when queue is empty', async () => {
-    mockRedisClient.lIndex.mockResolvedValue(null);
+    mockRedisClient.lMove.mockResolvedValue(null);
 
     const { processNextComplaint } = await import('../routes/complaintProcessing');
     const result = await processNextComplaint(prismaMock);
     
     expect(result.processed).toBe(false);
     expect(mockConnect).toHaveBeenCalled();
-    expect(mockRedisClient.lIndex).toHaveBeenCalledWith('complaint:registration:queue', 0);
+    expect(mockRedisClient.lMove).toHaveBeenCalledWith(
+      'complaint:registration:queue',
+      'complaint:processing:inprogress',
+      'LEFT',
+      'RIGHT'
+    );
   });
 
   it('processes valid complaint and pushes to processed queue', async () => {
@@ -87,8 +106,8 @@ describe('processNextComplaint', () => {
     };
 
     const sample = JSON.stringify(validComplaint);
-    mockRedisClient.lIndex.mockResolvedValue(sample);
-    mockRedisClient.lPop.mockResolvedValue(sample);
+    mockRedisClient.lMove.mockResolvedValue(sample);
+    mockRedisClient.lRem.mockResolvedValue(1);
 
     // Mock category exists
     mockFindCategory.mockResolvedValue({ id: validComplaint.categoryId, name: 'Water Supply & Sanitation' });
@@ -116,19 +135,19 @@ describe('processNextComplaint', () => {
       isDuplicate: false
     });
     expect(mockProcessedComplaintQueueService.pushToQueue).toHaveBeenCalled();
-    expect(mockRedisClient.lPop).toHaveBeenCalledWith('complaint:registration:queue');
+    expect(mockRedisClient.lRem).toHaveBeenCalledWith('complaint:processing:inprogress', 1, sample);
   });
 
   it('removes invalid JSON complaint and returns processed=false', async () => {
     const invalidJson = 'not-valid-json';
-    mockRedisClient.lIndex.mockResolvedValue(invalidJson);
+    mockRedisClient.lMove.mockResolvedValue(invalidJson);
 
     const { processNextComplaint } = await import('../routes/complaintProcessing');
     const result = await processNextComplaint(prismaMock);
 
     expect(result.processed).toBe(false);
-    expect(result.error).toBe('Processing failed');
-    // JSON.parse error goes to generic catch, so no lPop call
+    expect(result.error).toBe('Processing failed - will retry');
+    // JSON.parse error goes to generic catch, so it moves back to registration queue for retry
   });
 
   it('removes complaint with validation errors and returns processed=false', async () => {
@@ -139,7 +158,8 @@ describe('processNextComplaint', () => {
     };
 
     const sample = JSON.stringify(invalidComplaint);
-    mockRedisClient.lIndex.mockResolvedValue(sample);
+    mockRedisClient.lMove.mockResolvedValue(sample);
+    mockRedisClient.lRem.mockResolvedValue(1);
 
     // category check should not be called because validation fails earlier
     mockFindCategory.mockResolvedValue(null);
@@ -149,7 +169,7 @@ describe('processNextComplaint', () => {
 
     expect(result.processed).toBe(false);
     expect(result.error).toBe('Invalid complaint data removed from queue');
-    expect(mockRedisClient.lPop).toHaveBeenCalledWith('complaint:registration:queue');
+    expect(mockRedisClient.lRem).toHaveBeenCalledWith('complaint:processing:inprogress', 1, sample);
   });
 
   it('flags duplicate complaint with isDuplicate=true and still creates it', async () => {
@@ -165,8 +185,8 @@ describe('processNextComplaint', () => {
     };
 
     const sample = JSON.stringify(validComplaint);
-    mockRedisClient.lIndex.mockResolvedValue(sample);
-    mockRedisClient.lPop.mockResolvedValue(sample);
+    mockRedisClient.lMove.mockResolvedValue(sample);
+    mockRedisClient.lRem.mockResolvedValue(1);
     
     // Mock existing complaint found (duplicate)
     mockFindFirst.mockResolvedValue({ id: 'existing-id' });
@@ -198,6 +218,6 @@ describe('processNextComplaint', () => {
     expect(mockCreateComplaint).toHaveBeenCalled();
     // Duplicates are NOT pushed to the processed queue
     expect(mockProcessedComplaintQueueService.pushToQueue).not.toHaveBeenCalled();
-    expect(mockRedisClient.lPop).toHaveBeenCalledWith('complaint:registration:queue');
+    expect(mockRedisClient.lRem).toHaveBeenCalledWith('complaint:processing:inprogress', 1, sample);
   });
 });
