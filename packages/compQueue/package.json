@@ -1,0 +1,38 @@
+{
+  "name": "comp-queue",
+  "version": "1.0.0",
+  "description": "Complaint Processing Queue Microservice",
+  "type": "module",
+  "scripts": {
+    "dev": "bun run bin.ts",
+    "start": "bun run bin.ts",
+    "build": "bun build bin.ts --outdir ./dist --target bun",
+    "test:unit": "vitest run"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@types/cors": "^2.8.19",
+    "@types/dotenv": "^6.1.1",
+    "@types/express": "^5.0.5",
+    "@types/node": "^24.10.1",
+    "prisma": "^7.0.1",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.9.3",
+    "vitest": "^2.1.4"
+  },
+  "dependencies": {
+    "@aws-sdk/client-secrets-manager": "^3.946.0",
+    "@google-cloud/vertexai": "^1.10.0",
+    "@prisma/adapter-pg": "^7.0.1",
+    "@prisma/client": "^7.0.1",
+    "@redis/client": "^5.10.0",
+    "axios": "^1.13.2",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.7",
+    "express": "^5.1.0",
+    "pg": "^8.16.3",
+    "zod": "^3.25.67"
+  }
+}

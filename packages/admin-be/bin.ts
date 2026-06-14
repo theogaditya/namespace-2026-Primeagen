@@ -3,6 +3,7 @@ import dotenv from "dotenv";
 import { getPrisma } from "./lib/prisma";
 import { initializeGCP } from "./lib/gcp/gcp";
 import { redisClient, RedisClientforComplaintQueue } from './lib/redis/redisClient';
+import { blockchainQueueService } from './lib/redis/blockchainQueueService';
 import { retrieveAndInjectSecrets } from './middleware/retriveSecrets';
 
 // Load local .env file first (for development)
@@ -22,6 +23,8 @@ async function bootstrap() {
       await redisClient.connect();
       const complaintClient = new RedisClientforComplaintQueue();
       await complaintClient.connect();
+      // await blockchainQueueService.clearQueue();
+
     } catch (redisInitErr) {
       console.warn('Failed to initialize Redis clients:', redisInitErr);
     }

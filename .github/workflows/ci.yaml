@@ -67,6 +67,22 @@ jobs:
           bun run test:unit
 
       # -------------------------
+      # Complaint-Queue tests
+      # -------------------------
+      - name: Install deps (admin-be)
+        working-directory: packages/compQueue
+        env:
+          DATABASE_URL: "postgresql://dummy:dummy@localhost:5432/dummy"
+        run: |
+          bun install --ignore-scripts || true
+          bunx prisma generate
+
+      - name: Run compQueue tests
+        working-directory: packages/compQueue
+        run: |
+          bun run test:unit
+
+      # -------------------------
       # Build & push docker images
       # -------------------------
       - name: Set up Docker Buildx

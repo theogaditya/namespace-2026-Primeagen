@@ -1,0 +1,54 @@
+version: '3.8'
+
+services:
+  comp-queue:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        DATABASE_URL: ${DATABASE_URL:-postgresql://dummy:dummy@localhost:5432/dummy}
+    image: mistaholmes/swarajdesk-queue-be:latest
+    container_name: comp-queue
+    ports:
+      - "${COMP_QUEUE_PORT:-3005}:3005"
+    # Explicit environment entries (no env_file) — matches admin-be pattern
+    environment:
+      # App Config
+      NODE_ENV: ${NODE_ENV:-development}
+      COMP_QUEUE_PORT: ${COMP_QUEUE_PORT:-3005}
+
+      # Database
+      DATABASE_URL: ${DATABASE_URL}
+
+      # Redis
+      REDIS_URL: ${REDIS_URL}
+
+      # Moderation
+      DEFAULT_MODERATION_URL: ${DEFAULT_MODERATION_URL}
+
+      # GCP Vertex AI (optional - for AI standardization)
+      CLIENT_EMAIL: ${CLIENT_EMAIL}
+      PRIVATE_KEY: ${PRIVATE_KEY}
+      GCP_PROJECT_ID: ${GCP_PROJECT_ID}
+      GCP_LOCATION: ${GCP_LOCATION}
+      ENDPOINT_ID: ${ENDPOINT_ID}
+
+      # AWS Region (optional - if using AWS services)
+      AWS_REGION: ${AWS_REGION:-ap-south-2}
+
+      # AWS Secrets Manager credentials (used by retrieveAndInjectSecrets)
+      SECRETS_AWS_ACCESS_KEY_ID: ${SECRETS_AWS_ACCESS_KEY_ID}
+      SECRETS_AWS_SECRET_ACCESS_KEY: ${SECRETS_AWS_SECRET_ACCESS_KEY}
+      SECRET_NAME_AWS_USER_BE: ${SECRET_NAME_AWS_USER_BE}
+
+      # S3 (if applicable)
+      S3_AWS_ACCESS_KEY_ID: ${S3_AWS_ACCESS_KEY_ID}
+      S3_AWS_SECRET_ACCESS_KEY: ${S3_AWS_SECRET_ACCESS_KEY}
+      AWS_BUCKET: ${AWS_BUCKET:-sih-swaraj}
+    restart: unless-stopped
+    networks:
+      - comp-queue-network
+
+networks:
+  comp-queue-network:
+    driver: bridge

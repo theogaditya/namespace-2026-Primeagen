@@ -121,6 +121,22 @@ export class BlockchainQueueService {
         }
     }
 
+    public async clearQueue(): Promise<number> {
+        try {
+            if (!this.isConnected) {
+                await this.connect();
+            }
+
+            const client = this.redisClient.getClient();
+            const deleted = await client.del(this.QUEUE_NAME);
+            console.log(`Blockchain queue cleared, deleted=${deleted}`);
+            return deleted;
+        } catch (error) {
+            console.error('Error clearing blockchain queue:', error);
+            throw error;
+        }
+    }
+
     public async disconnect(): Promise<void> {
         if (this.isConnected) {
             const client = this.redisClient.getClient();
