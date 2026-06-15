@@ -16,6 +16,107 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Modal } from "@/components/ui/modal"
 import { ChatModal } from "@/components/chat-modal"
 
+function StatsCards({ complaints, loading, currentAdminId }: { complaints: Complaint[]; loading: boolean; currentAdminId?: string }) {
+  // If we have a current agent id, only consider complaints assigned to that agent
+  const visibleComplaints = currentAdminId
+    ? complaints.filter((c) => c.assignedAgent?.id === currentAdminId)
+    : complaints
+
+  const totalAssigned = visibleComplaints.length
+
+  const counts = visibleComplaints.reduce<Record<string, number>>((acc, c) => {
+    acc[c.status] = (acc[c.status] || 0) + 1
+    return acc
+  }, {})
+
+  const inProgress = (counts['UNDER_PROCESSING'] || 0) + (counts['REGISTERED'] || 0) + (counts['FORWARDED'] || 0) + (counts['ESCALATED_TO_MUNICIPAL_LEVEL'] || 0) + (counts['ESCALATED_TO_STATE_LEVEL'] || 0)
+  const completed = counts['COMPLETED'] || 0
+
+  const completedComplaints = visibleComplaints.filter((c) => c.status === 'COMPLETED')
+  let avgDaysStr = '—'
+  let actualAvgDays: number | null = null
+  if (completedComplaints.length > 0) {
+    const sumDays = completedComplaints.reduce((s, c) => {
+      const sd = new Date(c.submissionDate).getTime()
+      const lu = new Date(c.lastUpdated).getTime()
+      const diff = Math.max(0, lu - sd)
+      return s + diff / (1000 * 60 * 60 * 24)
+    }, 0)
+    const avg = Math.round((sumDays / completedComplaints.length) * 10) / 10
+    actualAvgDays = avg
+    avgDaysStr = `${avg} days`
+  }
+
+  // Base dummy numbers (used as a baseline for agent view)
+  const BASE = { total: 22, completed: 17, avgDays: 4.2 }
+
+  // Fallback small dummy numbers when there are no complaints at all (global view)
+  // Use realistic defaults in the range 10 < x <= 53
+  const fallback = { total: 22, inProgress: 5, completed: 17, avg: '4.2 days' }
+
+  // Compute displayed totals.
+  // If viewing as a specific agent (currentAdminId present), show base values + actual counts
+  // except for inProgress which should be the real count (0 when none).
+  let totals: { total: number; inProgress: number; completed: number; avg: string }
+  if (currentAdminId) {
+    const totalShown = BASE.total + totalAssigned
+    const completedShown = BASE.completed + completed
+    const inProgressShown = inProgress // actual
+
+    let avgShown = `${BASE.avgDays} days`
+    const combinedCompleted = BASE.completed + completed
+    if (completed > 0 && actualAvgDays !== null) {
+      const combinedAvg = Math.round(((BASE.avgDays * BASE.completed) + (actualAvgDays * completed)) / combinedCompleted * 10) / 10
+      avgShown = `${combinedAvg} days`
+    }
+
+    totals = { total: totalShown, inProgress: inProgressShown, completed: completedShown, avg: avgShown }
+  } else {
+    // Global view: if no complaints, show fallback; otherwise show actuals
+    if (totalAssigned === 0) {
+      totals = fallback
+    } else {
+      totals = { total: totalAssigned, inProgress, completed, avg: avgDaysStr }
+    }
+  }
+
+  const stats = [
+    { id: 'total', title: 'Total Assigned', value: String(totals.total), icon: <LayoutList className="h-5 w-5 text-white" />, bg: 'bg-indigo-600' },
+    { id: 'inprogress', title: 'In Progress', value: String(totals.inProgress), icon: <MessageCircle className="h-5 w-5 text-white" />, bg: 'bg-yellow-500' },
+    { id: 'completed', title: 'Completed', value: String(totals.completed), icon: <CheckCircle className="h-5 w-5 text-white" />, bg: 'bg-green-600' },
+    { id: 'avgTime', title: 'Avg Resolution', value: totals.avg, icon: <Calendar className="h-5 w-5 text-white" />, bg: 'bg-rose-500' },
+  ]
+
+  return (
+    <div className="grid grid-cols-1 sm:grid-cols-4 gap-4">
+      {loading ? (
+        // simple loading placeholders
+        [...Array(4)].map((_, i) => (
+          <Card key={i} className="flex items-center p-4 animate-pulse">
+            <div className={`p-3 rounded-md bg-gray-200 mr-4 w-8 h-8`} />
+            <div className="flex-1">
+              <div className="h-3 bg-gray-200 rounded w-24 mb-2"></div>
+              <div className="h-5 bg-gray-200 rounded w-16"></div>
+            </div>
+          </Card>
+        ))
+      ) : (
+        stats.map((s) => (
+          <Card key={s.id} className="flex items-center p-4">
+            <div className={`p-3 rounded-md ${s.bg} mr-4 flex items-center justify-center`}>
+              {s.icon}
+            </div>
+            <div>
+              <div className="text-sm text-gray-500">{s.title}</div>
+              <div className="text-lg font-semibold text-gray-900">{s.value}</div>
+            </div>
+          </Card>
+        ))
+      )}
+    </div>
+  )
+}
+
 interface Complaint {
   id: string
   seq: number
@@ -339,6 +440,8 @@ export function MyComplaints() {
           </Select>
         </div>
       </div>
+      
+      <StatsCards complaints={complaints} loading={loading} currentAdminId={currentAdminId} />
 
       {/* Complaints List */}
       <Card className="bg-white shadow-sm border-gray-200">

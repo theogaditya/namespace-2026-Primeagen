@@ -1,5 +1,5 @@
 
-import { LoginForm } from "@/components/login-form"
+import LoginPage from "@/components/login-page"
 import { Footer7 } from "@/components/footer"
 
 export default function Home() {
@@ -15,19 +15,17 @@ export default function Home() {
               alt="SwarajDesk Logo"
               className="h-16 w-auto block"
             />
-            <span className="ml-3 text-xl font-semibold text-gray-800">Admin Portal</span>
           </div>
         </div>
       </header>
 
-      {/* Main Content */}
-      <main className="flex-1 flex items-center justify-center mb-20">
-          <div className="relative w-full max-w-sm sm:max-w-md md:max-w-lg lg:max-w-xl px-4 sm:px-6 md:px-8 py-6">
-            <LoginForm />
-          </div>
+      {/* Main Content - uses the new LoginPage component */}
+      <main className="flex-1">
+        <LoginPage />
       </main>
-        {/* Footer */}
-        <Footer7 />
+
+      {/* Footer */}
+      <Footer7 />
     </div>
   )
 }

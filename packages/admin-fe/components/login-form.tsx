@@ -25,14 +25,26 @@ const adminTypeRoutes: Record<AdminType, string> = {
   AGENT: "/Agent",
 }
 
-export function LoginForm() {
+type LoginFormProps = {
+  adminType?: AdminType
+  onAdminTypeChange?: (t: AdminType) => void
+}
+
+export function LoginForm({ adminType: controlledAdminType, onAdminTypeChange }: LoginFormProps) {
   const router = useRouter()
-  const [adminType, setAdminType] = React.useState<AdminType>("AGENT")
+  const [adminType, setAdminType] = React.useState<AdminType>((controlledAdminType as AdminType) ?? "AGENT")
   const [email, setEmail] = React.useState("")
   const [password, setPassword] = React.useState("")
   const [error, setError] = React.useState("")
   const [isLoading, setIsLoading] = React.useState(false)
   const [showPassword, setShowPassword] = React.useState(false)
+
+  React.useEffect(() => {
+    if (controlledAdminType && controlledAdminType !== adminType) {
+      setAdminType(controlledAdminType)
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [controlledAdminType])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -76,7 +88,7 @@ export function LoginForm() {
   return (
     <div className="w-full px-4 sm:px-6">
       <Card className="w-full max-w-sm sm:max-w-md md:max-w-lg lg:max-w-xl mx-auto bg-white border-0 shadow-2xl rounded-3xl overflow-hidden">
-        <div className="bg-gradient-to-b from-blue-900 via-blue-800 to-blue-900 px-5 sm:px-6 pt-8 sm:pt-12 pb-6 sm:pb-8 text-center">
+        <div className="bg-linear-to-b from-blue-900 via-blue-800 to-blue-900 px-5 sm:px-6 pt-8 sm:pt-12 pb-6 sm:pb-8 text-center">
           <div className="flex justify-center mb-3">
             <div className="w-16 h-16 sm:w-20 sm:h-20 bg-white rounded-full p-2 shadow-lg flex items-center justify-center">
               <img
@@ -104,7 +116,7 @@ export function LoginForm() {
           <form onSubmit={handleSubmit} className="space-y-5">
             {error && (
               <div className="bg-red-50 border border-red-200 text-red-600 p-3 rounded-lg text-sm flex items-center gap-2">
-                <svg className="w-4 h-4 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                <svg className="w-4 h-4 shrink-0" fill="currentColor" viewBox="0 0 20 20">
                   <path
                     fillRule="evenodd"
                     d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
@@ -119,7 +131,14 @@ export function LoginForm() {
               <Label htmlFor="adminType" className="text-gray-700 font-medium">
                 Admin Type
               </Label>
-              <Select value={adminType} onValueChange={(value) => setAdminType(value as AdminType)}>
+              <Select
+                value={adminType}
+                onValueChange={(value) => {
+                  const v = value as AdminType
+                  setAdminType(v)
+                  if (onAdminTypeChange) onAdminTypeChange(v)
+                }}
+              >
                 <SelectTrigger className="h-10 sm:h-12 bg-white border-gray-300 focus:border-blue-500 focus:ring-blue-500 rounded-xl text-sm sm:text-base">
                   <SelectValue placeholder="Select admin type" />
                 </SelectTrigger>
@@ -179,7 +198,7 @@ export function LoginForm() {
 
             <Button
               type="submit"
-              className="w-full h-10 sm:h-12 bg-gradient-to-r from-blue-800 to-blue-700 hover:from-blue-900 hover:to-blue-800 text-white font-semibold text-sm sm:text-base rounded-xl shadow-lg transition-all duration-200"
+              className="w-full h-10 sm:h-12 bg-linear-to-r from-blue-800 to-blue-700 hover:from-blue-900 hover:to-blue-800 text-white font-semibold text-sm sm:text-base rounded-xl shadow-lg transition-all duration-200"
               disabled={isLoading}
             >
               {isLoading ? (
