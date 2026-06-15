@@ -16,6 +16,33 @@ vi.mock('../lib/redis/tokenBlacklistService', () => ({
   }
 }));
 
+// Mock RedisClientForComplaintCache to prevent cache from interfering with tests
+vi.mock('../lib/redis/redisClient', () => ({
+  RedisClientForComplaintCache: class MockRedisClient {
+    connect = vi.fn().mockResolvedValue(undefined);
+    disconnect = vi.fn().mockResolvedValue(undefined);
+    getCachedResponse = vi.fn().mockResolvedValue(null); // Always return null (no cache hit)
+    cacheResponse = vi.fn().mockResolvedValue(undefined);
+    invalidateCache = vi.fn().mockResolvedValue(undefined);
+    invalidateAllComplaintCaches = vi.fn().mockResolvedValue(undefined);
+    invalidateCachesByPattern = vi.fn().mockResolvedValue(undefined);
+    generateKey = vi.fn().mockImplementation((type: string, identifier?: string) => 
+      identifier ? `complaint_cache:${type}:${identifier}` : `complaint_cache:${type}`
+    );
+    getClient = vi.fn().mockReturnValue({});
+  }
+}));
+
+// Mock likeStore to prevent any issues
+vi.mock('../lib/likes/inMemoryLikeStore', () => ({
+  likeStore: {
+    getLikeCount: vi.fn().mockReturnValue(0),
+    hasLiked: vi.fn().mockReturnValue(false),
+    getUserLikes: vi.fn().mockReturnValue(new Set()),
+    toggle: vi.fn().mockReturnValue({ liked: false, count: 0, complaintId: '' }),
+  }
+}));
+
 import { getComplaintRouter } from '../routes/getComplaint';
 import { createAuthMiddleware } from '../middleware/authRoute';
 import { tokenBlacklistService } from '../lib/redis/tokenBlacklistService';

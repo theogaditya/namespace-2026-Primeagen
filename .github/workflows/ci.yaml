@@ -18,6 +18,8 @@ jobs:
     env:
       USER_BE_IMAGE: ogadityahota/swarajdesk-user-be
       ADMIN_BE_IMAGE: ogadityahota/sih-swarajdesk-admin-be
+      COMP_QUEUE_IMAGE: ogadityahota/swarajdesk-comp-queue
+      SELF_IMAGE: ogadityahota/swarajdesk-self    
       IMAGE_TAG: ${{ github.sha }}
 
     steps:
@@ -83,6 +85,18 @@ jobs:
           bun run test:unit
 
       # -------------------------
+      # self tests
+      # -------------------------
+      - name: Install deps (self)
+        working-directory: packages/self
+        run: |
+          bun install --ignore-scripts || true
+      - name: Run self tests
+        working-directory: packages/self
+        run: |
+          bun run test:unit
+
+      # -------------------------
       # Build & push docker images
       # -------------------------
       - name: Set up Docker Buildx
@@ -111,47 +125,79 @@ jobs:
           cache-from: type=inline
           cache-to: type=inline
 
-      # - name: Build and push admin-be image
-      #   if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-      #   uses: docker/build-push-action@v6
-      #   with:
-      #     context: packages/admin-be
-      #     file: packages/admin-be/Dockerfile
-      #     push: true
-      #     tags: |
-      #       ${{ env.ADMIN_BE_IMAGE }}:latest
-      #       ${{ env.ADMIN_BE_IMAGE }}:${{ env.IMAGE_TAG }}
-      #     build-args: |
-      #       DATABASE_URL=postgresql://dummy:dummy@localhost:5432/dummy
-      #     no-cache: true
-      #     pull: true
-      #     cache-from: type=inline
-      #     cache-to: type=inline
+      - name: Build and push admin-be image
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        uses: docker/build-push-action@v6
+        with:
+          context: packages/admin-be
+          file: packages/admin-be/Dockerfile
+          push: true
+          tags: |
+            ${{ env.ADMIN_BE_IMAGE }}:latest
+            ${{ env.ADMIN_BE_IMAGE }}:${{ env.IMAGE_TAG }}
+          build-args: |
+            DATABASE_URL=postgresql://dummy:dummy@localhost:5432/dummy
+          no-cache: true
+          pull: true
+          cache-from: type=inline
+          cache-to: type=inline
+
+      - name: Build and push compQueue image
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        uses: docker/build-push-action@v6
+        with:
+          context: packages/compQueue
+          file: packages/compQueue/Dockerfile
+          push: true
+          tags: |
+            ${{ env.COMP_QUEUE_IMAGE }}:latest
+            ${{ env.COMP_QUEUE_IMAGE }}:${{ env.IMAGE_TAG }}
+          build-args: |
+            DATABASE_URL=postgresql://dummy:dummy@localhost:5432/dummy
+          no-cache: true
+          pull: true
+          cache-from: type=inline
+          cache-to: type=inline
+
+      - name: Build and push self image
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        uses: docker/build-push-action@v6
+        with:
+          context: packages/self
+          file: packages/self/Dockerfile
+          push: true
+          tags: |
+            ${{ env.SELF_IMAGE }}:latest
+            ${{ env.SELF_IMAGE }}:${{ env.IMAGE_TAG }}
+          no-cache: true
+          pull: true
+          cache-from: type=inline
+          cache-to: type=inline
 
       # -------------------------
       # Open PR main -> deploy (skip if one already open)
       # -------------------------
-      - name: Open PR to deploy
-        uses: actions/github-script@v7
-        with:
-          script: |
-            const owner = context.repo.owner;
-            const repo = context.repo.repo;
-            const base = 'deploy';
-            const head = 'main';
-            // Check if an open PR from main->deploy already exists
-            const prs = await github.rest.pulls.list({ owner, repo, state: 'open', base });
-            const exists = prs.data.find(pr => pr.head.ref === head);
-            if (exists) {
-              core.info('PR already open: #' + exists.number + ' ' + exists.title);
-              return;
-            }
-            const title = 'Deploy latest from main';
-            const body = [
-              'This PR merges main -> deploy to trigger Argo CD.',
-              '',
-              '- Images pushed: latest, ' + process.env.IMAGE_TAG,
-              '- Merge when ready; Argo will sync on merge.'
-            ].join('\n');
-            const res = await github.rest.pulls.create({ owner, repo, title, head, base, body });
-            core.info('Opened PR #' + res.data.number);
+      # - name: Open PR to deploy
+      #   uses: actions/github-script@v7
+      #   with:
+      #     script: |
+      #       const owner = context.repo.owner;
+      #       const repo = context.repo.repo;
+      #       const base = 'deploy';
+      #       const head = 'main';
+      #       // Check if an open PR from main->deploy already exists
+      #       const prs = await github.rest.pulls.list({ owner, repo, state: 'open', base });
+      #       const exists = prs.data.find(pr => pr.head.ref === head);
+      #       if (exists) {
+      #         core.info('PR already open: #' + exists.number + ' ' + exists.title);
+      #         return;
+      #       }
+      #       const title = 'Deploy latest from main';
+      #       const body = [
+      #         'This PR merges main -> deploy to trigger Argo CD.',
+      #         '',
+      #         '- Images pushed: latest, ' + process.env.IMAGE_TAG,
+      #         '- Merge when ready; Argo will sync on merge.'
+      #       ].join('\n');
+      #       const res = await github.rest.pulls.create({ owner, repo, title, head, base, body });
+      #       core.info('Opened PR #' + res.data.number);

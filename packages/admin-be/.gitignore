@@ -42,3 +42,5 @@ gcp-credentials.json
 
 # Ignore DB Unit Tests
 unit.db.test.ts
+
+.env

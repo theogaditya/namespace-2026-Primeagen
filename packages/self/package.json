@@ -5,13 +5,16 @@
   "private": true,
   "scripts": {
     "dev": "bun --watch index.ts",
-    "start": "bun index.ts"
+    "start": "bun index.ts",
+    "test:unit": "vitest test --run"
   },
   "devDependencies": {
     "@types/bun": "^1.3.3",
     "@types/cors": "^2.8.19",
     "@types/express": "^5.0.5",
-    "@types/multer": "^2.0.0"
+    "@types/multer": "^2.0.0",
+    "@types/supertest": "^6.0.3",
+    "supertest": "^7.1.4"
   },
   "peerDependencies": {
     "typescript": "^5.9.3"
@@ -21,6 +24,7 @@
     "express": "^5.1.0",
     "jimp": "^1.6.0",
     "multer": "^2.0.2",
-    "openai": "^6.10.0"
+    "openai": "^6.10.0",
+    "vitest": "^4.0.16"
   }
 }

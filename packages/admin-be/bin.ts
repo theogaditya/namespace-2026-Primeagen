@@ -38,7 +38,7 @@ async function bootstrap() {
     const server = new Server(prisma);
     const app = server.getApp();
 
-    const PORT = process.env.ADMIN_BE_PORT || 4000;
+    const PORT = process.env.ADMIN_BE_PORT || 3002;
 
     app.listen(PORT, () => {
       console.log(`Server is running on port ${PORT}`);

@@ -1,0 +1,126 @@
+---
+- name: Run Prisma migrations and seed for user-be
+  hosts: all
+  become: false
+  vars:
+    project_root: "/home/aditya/code/sih-swarajdesk-2025"
+    user_be_path: "{{ project_root }}/packages/user-be"
+    prisma_path: "{{ user_be_path }}/prisma"
+
+  tasks:
+    - name: Ensure bun is installed
+      shell: command -v bun
+      register: bun_check
+      failed_when: false
+      changed_when: false
+
+    - name: Display bun version
+      command: bun --version
+      register: bun_version
+      changed_when: false
+
+    - name: Debug bun version
+      debug:
+        msg: "Bun version: {{ bun_version.stdout }}"
+
+    - name: Install dependencies
+      command: bun install
+      args:
+        chdir: "{{ user_be_path }}"
+      register: install_result
+      changed_when: "'Installed' in install_result.stdout"
+
+    - name: Run Prisma migrate deploy
+      command: bunx prisma migrate deploy
+      args:
+        chdir: "{{ user_be_path }}"
+      register: migrate_result
+
+    - name: Display migrate result
+      debug:
+        msg: "{{ migrate_result.stdout }}"
+
+    - name: Run Prisma generate
+      command: bunx prisma generate
+      args:
+        chdir: "{{ user_be_path }}"
+      register: generate_result
+
+    - name: Display generate result
+      debug:
+        msg: "{{ generate_result.stdout }}"
+
+    - name: Run seed.ts
+      command: bun run prisma/seed.ts
+      args:
+        chdir: "{{ user_be_path }}"
+      register: seed_result
+
+    - name: Display seed result
+      debug:
+        msg: "{{ seed_result.stdout }}"
+
+    - name: Run badges.seed.ts
+      command: bun run prisma/badges.seed.ts
+      args:
+        chdir: "{{ user_be_path }}"
+      register: badges_seed_result
+
+    - name: Display badges seed result
+      debug:
+        msg: "{{ badges_seed_result.stdout }}"
+
+    - name: Run dummy.seed.ts
+      command: bun run prisma/dummy.seed.ts
+      args:
+        chdir: "{{ user_be_path }}"
+      register: dummy_seed_result
+
+    - name: Display dummy seed result
+      debug:
+        msg: "{{ dummy_seed_result.stdout }}"
+
+    - name: Run operational.seed.ts
+      command: bun run prisma/operational.seed.ts
+      args:
+        chdir: "{{ user_be_path }}"
+      register: operational_seed_result
+
+    - name: Display operational seed result
+      debug:
+        msg: "{{ operational_seed_result.stdout }}"
+
+    - name: Run seed-badges-raw.ts
+      command: bun run prisma/seed-badges-raw.ts
+      args:
+        chdir: "{{ user_be_path }}"
+      register: badges_raw_seed_result
+
+    - name: Display badges raw seed result
+      debug:
+        msg: "{{ badges_raw_seed_result.stdout }}"
+
+    - name: Summary
+      debug:
+        msg: |
+          ========================================
+          Prisma Migration and Seeding Complete!
+          ========================================
+          - Prisma migrate: SUCCESS
+          - Prisma generate: SUCCESS
+          - seed.ts: SUCCESS
+          - badges.seed.ts: SUCCESS
+          - dummy.seed.ts: SUCCESS
+          - operational.seed.ts: SUCCESS
+          - seed-badges-raw.ts: SUCCESS
+          ========================================
+          
+    - name: Run Prisma generate
+      command: bunx prisma generate
+      args:
+        chdir: "{{ user_be_path }}"
+      register: generate_result
+
+    - name: Display generate result
+      debug:
+        msg: "{{ generate_result.stdout }}"
