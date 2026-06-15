@@ -20,7 +20,6 @@
     gcp_project: "orbital-builder-454706-h5"
     gcp_region: "us-central1"
     cluster_name: "autopilot-cluster-1"
-    external_secrets_version: "v0.9.11"
   
   vars_files:
     - vars/secrets.yml  # Contains aws_access_key_id and aws_secret_access_key
@@ -136,16 +135,17 @@
     # ============================================
     # STEP 5: EXTERNAL SECRETS SETUP
     # ============================================
-    - name: "STEP 5: Install External Secrets CRDs"
-      command: kubectl apply -f https://github.com/external-secrets/external-secrets/releases/download/{{ external_secrets_version }}/external-secrets-crds.yaml
-      register: crds_install
-
-    - name: Install/Upgrade External Secrets Helm chart
+    - name: "STEP 5: Install/Upgrade External Secrets Helm chart (includes CRDs)"
       command: >
         helm upgrade --install external-secrets external-secrets/external-secrets
         --namespace external-secrets --create-namespace
         --set installCRDs=true
+        --wait --timeout=300s
       register: external_secrets_install
+
+    - name: Display External Secrets installation result
+      debug:
+        msg: "External Secrets installed/upgraded: {{ external_secrets_install.stdout_lines[-5:] | default(['Success']) }}"
 
     - name: Check if aws-sm-credentials secret exists
       command: kubectl get secret aws-sm-credentials -n external-secrets
