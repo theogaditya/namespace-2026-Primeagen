@@ -5,7 +5,9 @@ metadata:
   namespace: default
   annotations:
     traefik.ingress.kubernetes.io/router.entrypoints: web,websecure
-    cloud.google.com/load-balancer-type: "External"
+    traefik.ingress.kubernetes.io/router.tls: "false"
+    # CORS configuration for Traefik
+    traefik.ingress.kubernetes.io/router.middlewares: default-cors-headers@kubernetescrd
 spec:
   ingressClassName: platform-traefik
   rules:

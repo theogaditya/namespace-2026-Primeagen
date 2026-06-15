@@ -1,0 +1,227 @@
+---
+# ===========================================
+# Pre-Push CI Playbook
+# ===========================================
+# Run tests and build all packages before pushing
+# Usage: ansible-playbook -i inventory.ini pre-push.yml
+# ===========================================
+
+- name: Pre-Push CI - Test and Build All Packages
+  hosts: local
+  become: false
+  gather_facts: false
+  vars:
+    project_root: "/home/aditya/code/sih-swarajdesk-2025"
+    packages:
+      - name: user-be
+        path: "{{ project_root }}/packages/user-be"
+        has_test: true
+        has_build: true
+        has_prisma: true
+        test_cmd: "bun run test:unit"
+        build_cmd: "bun run build"
+      - name: admin-be
+        path: "{{ project_root }}/packages/admin-be"
+        has_test: true
+        has_build: true
+        has_prisma: true
+        test_cmd: "bun run test:unit"
+        build_cmd: "bun run build"
+      - name: compQueue
+        path: "{{ project_root }}/packages/compQueue"
+        has_test: true
+        has_build: true
+        has_prisma: true
+        test_cmd: "bun run test:unit"
+        build_cmd: "bun run build"
+      - name: self
+        path: "{{ project_root }}/packages/self"
+        has_test: true
+        has_build: false
+        has_prisma: false
+        test_cmd: "bun run test:unit"
+        build_cmd: ""
+      - name: user-fe
+        path: "{{ project_root }}/packages/user-fe"
+        has_test: false
+        has_build: true
+        has_prisma: false
+        test_cmd: ""
+        build_cmd: "bun run build"
+      - name: admin-fe
+        path: "{{ project_root }}/packages/admin-fe"
+        has_test: false
+        has_build: true
+        has_prisma: false
+        test_cmd: ""
+        build_cmd: "bun run build"
+
+  tasks:
+    # ============================================
+    # HEADER
+    # ============================================
+    - name: "🚀 PRE-PUSH CI PIPELINE - SIH SwarajDesk 2025"
+      debug:
+        msg: "Starting pre-push checks..."
+
+    # ============================================
+    # PREREQUISITES
+    # ============================================
+    - name: Check bun is installed
+      command: bun --version
+      register: bun_version
+      changed_when: false
+
+    - name: "📋 STEP 1: Prerequisites"
+      debug:
+        msg: "✅ Bun v{{ bun_version.stdout }} installed"
+
+    # ============================================
+    # INSTALL DEPENDENCIES
+    # ============================================
+    - name: "📦 STEP 2: Installing dependencies"
+      debug:
+        msg: "Installing for all packages..."
+
+    - name: Install dependencies
+      command: bun install
+      args:
+        chdir: "{{ item.path }}"
+      loop: "{{ packages }}"
+      loop_control:
+        label: "📦 {{ item.name }}"
+      register: install_results
+      changed_when: false
+      failed_when: false
+
+    # ============================================
+    # GENERATE PRISMA CLIENTS
+    # ============================================
+    - name: "🔧 STEP 3: Generating Prisma clients"
+      debug:
+        msg: "Generating for user-be, admin-be, compQueue..."
+
+    - name: Generate Prisma clients
+      command: bunx prisma generate
+      args:
+        chdir: "{{ item.path }}"
+      loop: "{{ packages | selectattr('has_prisma', 'defined') | selectattr('has_prisma', 'equalto', true) | list }}"
+      loop_control:
+        label: "🔧 {{ item.name }}"
+      register: prisma_results
+      changed_when: false
+      failed_when: false
+
+    # ============================================
+    # RUN TESTS
+    # ============================================
+    - name: "🧪 STEP 4: Running unit tests"
+      debug:
+        msg: "Testing user-be, admin-be, compQueue, self..."
+
+    - name: Run tests
+      command: "{{ item.test_cmd }}"
+      args:
+        chdir: "{{ item.path }}"
+      loop: "{{ packages | selectattr('has_test', 'equalto', true) | list }}"
+      loop_control:
+        label: "🧪 {{ item.name }}"
+      register: test_results
+      changed_when: false
+      failed_when: false
+
+    - name: "🧪 TEST RESULTS"
+      debug:
+        msg: |
+          
+          user-be ........ {{ '✅ PASSED' if test_results.results[0].rc == 0 else '❌ FAILED' }}
+          admin-be ....... {{ '✅ PASSED' if test_results.results[1].rc == 0 else '❌ FAILED' }}
+          compQueue ...... {{ '✅ PASSED' if test_results.results[2].rc == 0 else '❌ FAILED' }}
+          self ........... {{ '✅ PASSED' if test_results.results[3].rc == 0 else '❌ FAILED' }}
+          
+          Total: {{ test_results.results | selectattr('rc', 'equalto', 0) | list | length }}/{{ test_results.results | length }} passed
+
+    # ============================================
+    # RUN BUILDS
+    # ============================================
+    - name: "🏗️ STEP 5: Building packages"
+      debug:
+        msg: "Building user-be, admin-be, compQueue, user-fe, admin-fe..."
+
+    - name: Build packages
+      command: "{{ item.build_cmd }}"
+      args:
+        chdir: "{{ item.path }}"
+      loop: "{{ packages | selectattr('has_build', 'equalto', true) | list }}"
+      loop_control:
+        label: "🏗️ {{ item.name }}"
+      register: build_results
+      changed_when: false
+      failed_when: false
+
+    - name: "🏗️ BUILD RESULTS"
+      debug:
+        msg: |
+          
+          user-be ........ {{ '✅ SUCCESS' if build_results.results[0].rc == 0 else '❌ FAILED' }}
+          admin-be ....... {{ '✅ SUCCESS' if build_results.results[1].rc == 0 else '❌ FAILED' }}
+          compQueue ...... {{ '✅ SUCCESS' if build_results.results[2].rc == 0 else '❌ FAILED' }}
+          user-fe ........ {{ '✅ SUCCESS' if build_results.results[3].rc == 0 else '❌ FAILED' }}
+          admin-fe ....... {{ '✅ SUCCESS' if build_results.results[4].rc == 0 else '❌ FAILED' }}
+          
+          Total: {{ build_results.results | selectattr('rc', 'equalto', 0) | list | length }}/{{ build_results.results | length }} successful
+
+    # ============================================
+    # FINAL SUMMARY
+    # ============================================
+    - name: Calculate totals
+      set_fact:
+        tests_passed: "{{ test_results.results | selectattr('rc', 'equalto', 0) | list | length }}"
+        tests_total: "{{ test_results.results | length }}"
+        tests_failed: "{{ test_results.results | rejectattr('rc', 'equalto', 0) | list | length }}"
+        builds_passed: "{{ build_results.results | selectattr('rc', 'equalto', 0) | list | length }}"
+        builds_total: "{{ build_results.results | length }}"
+        builds_failed: "{{ build_results.results | rejectattr('rc', 'equalto', 0) | list | length }}"
+
+    - name: Set overall status
+      set_fact:
+        all_passed: "{{ (tests_failed | int == 0) and (builds_failed | int == 0) }}"
+
+    - name: "✅ ALL CHECKS PASSED"
+      debug:
+        msg: |
+          
+          ========================================
+          SUMMARY
+          ========================================
+          🧪 Tests:   {{ tests_passed }}/{{ tests_total }} passed
+          🏗️ Builds:  {{ builds_passed }}/{{ builds_total }} passed
+          ========================================
+          
+          🎉 Ready to push!
+          
+          git add .
+          git commit -m "your message"
+          git push origin main
+      when: all_passed | bool
+
+    - name: "❌ CHECKS FAILED"
+      debug:
+        msg: |
+          
+          ========================================
+          SUMMARY
+          ========================================
+          🧪 Tests:   {{ tests_passed }}/{{ tests_total }} passed {% if tests_failed | int > 0 %}({{ tests_failed }} failed){% endif %}
+          
+          🏗️ Builds:  {{ builds_passed }}/{{ builds_total }} passed {% if builds_failed | int > 0 %}({{ builds_failed }} failed){% endif %}
+          
+          ========================================
+          
+          ⚠️ Fix the failing checks before pushing
+      when: not (all_passed | bool)
+
+    - name: Fail pipeline if checks failed
+      fail:
+        msg: "❌ Pipeline failed! Fix issues above before pushing."
+      when: not (all_passed | bool)

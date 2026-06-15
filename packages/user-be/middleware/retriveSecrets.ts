@@ -75,16 +75,15 @@ export async function retrieveAndInjectSecrets(): Promise<void> {
     const secrets: SecretValues = JSON.parse(response.SecretString);
 
     // Inject secrets into process.env
-    // Only override if the value doesn't already exist (local .env takes precedence in dev)
+    // Only override if the value doesn't already exist (env vars from K8s deployment take precedence)
     Object.entries(secrets).forEach(([key, value]) => {
       if (value !== undefined) {
-        // In production, always use AWS secrets
-        // In development, use AWS secrets only if local env var is not set
-        if (process.env.NODE_ENV === "production" || !process.env[key]) {
+        // Skip if env var is already set (from K8s deployment, configmap, or local .env)
+        if (process.env[key]) {
+          console.log(`[AWS Secrets] Skipped (local override): ${key}`);
+        } else {
           process.env[key] = value;
           console.log(`[AWS Secrets] Injected: ${key}`);
-        } else {
-          console.log(`[AWS Secrets] Skipped (local override): ${key}`);
         }
       }
     });

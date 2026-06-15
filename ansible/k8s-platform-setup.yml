@@ -1,0 +1,253 @@
+---
+- name: Setup Kubernetes Platform with Helm Charts
+  hosts: local
+  become: false
+  vars:
+    project_root: "/home/aditya/code/sih-swarajdesk-2025"
+    mychart_path: "{{ project_root }}/packages/mychart"
+    external_secrets_version: "v0.9.11"
+  
+  vars_files:
+    - vars/secrets.yml  # Contains aws_access_key_id and aws_secret_access_key
+
+  tasks:
+    # ============================================
+    # HELM REPOSITORY SETUP
+    # ============================================
+    - name: Add Traefik Helm repository
+      command: helm repo add traefik https://traefik.github.io/charts
+      register: traefik_repo
+      changed_when: "'has been added' in traefik_repo.stdout"
+      failed_when: false
+
+    - name: Display Traefik repo result
+      debug:
+        msg: "{{ traefik_repo.stdout | default('Traefik repo already exists') }}"
+
+    - name: Add Argo Helm repository
+      command: helm repo add argo https://argoproj.github.io/argo-helm
+      register: argo_repo
+      changed_when: "'has been added' in argo_repo.stdout"
+      failed_when: false
+
+    - name: Display Argo repo result
+      debug:
+        msg: "{{ argo_repo.stdout | default('Argo repo already exists') }}"
+
+    - name: Add External Secrets Helm repository
+      command: helm repo add external-secrets https://charts.external-secrets.io
+      register: external_secrets_repo
+      changed_when: "'has been added' in external_secrets_repo.stdout"
+      failed_when: false
+
+    - name: Display External Secrets repo result
+      debug:
+        msg: "{{ external_secrets_repo.stdout | default('External Secrets repo already exists') }}"
+
+    - name: Update Helm repositories
+      command: helm repo update
+      register: helm_update
+
+    - name: Display Helm repo update result
+      debug:
+        msg: "{{ helm_update.stdout }}"
+
+    # ============================================
+    # HELM DEPENDENCY UPDATE
+    # ============================================
+    - name: Update Helm chart dependencies
+      command: helm dependency update .
+      args:
+        chdir: "{{ mychart_path }}"
+      register: dependency_update
+
+    - name: Display dependency update result
+      debug:
+        msg: "{{ dependency_update.stdout }}"
+
+    # ============================================
+    # NAMESPACE CREATION
+    # ============================================
+    - name: Create argocd namespace
+      command: kubectl create namespace argocd
+      register: argocd_ns
+      failed_when: false
+      changed_when: "'created' in argocd_ns.stdout"
+
+    - name: Display argocd namespace result
+      debug:
+        msg: "{{ argocd_ns.stdout | default('Namespace argocd already exists or created') }}"
+      when: argocd_ns.rc == 0 or 'already exists' in argocd_ns.stderr
+
+    # ============================================
+    # PLATFORM HELM CHART INSTALLATION
+    # ============================================
+    - name: Install platform Helm chart
+      command: helm install platform ./mychart --create-namespace
+      args:
+        chdir: "{{ project_root }}/packages"
+      register: platform_install
+      failed_when: false
+
+    - name: Upgrade platform if already installed
+      command: helm upgrade platform ./mychart
+      args:
+        chdir: "{{ project_root }}/packages"
+      register: platform_upgrade
+      when: platform_install.rc != 0 and 'cannot re-use' in platform_install.stderr
+
+    - name: Display platform installation result
+      debug:
+        msg: "{{ platform_install.stdout | default(platform_upgrade.stdout | default('Platform chart installed/upgraded')) }}"
+
+    # ============================================
+    # EXTERNAL SECRETS SETUP
+    # ============================================
+    - name: Install External Secrets CRDs
+      command: kubectl apply -f https://github.com/external-secrets/external-secrets/releases/download/{{ external_secrets_version }}/external-secrets-crds.yaml
+      register: crds_install
+
+    - name: Display CRDs installation result
+      debug:
+        msg: "{{ crds_install.stdout }}"
+
+    - name: Install/Upgrade External Secrets Helm chart
+      command: >
+        helm upgrade --install external-secrets external-secrets/external-secrets
+        --namespace external-secrets --create-namespace
+        --set installCRDs=true
+      register: external_secrets_install
+
+    - name: Display External Secrets installation result
+      debug:
+        msg: "{{ external_secrets_install.stdout }}"
+
+    # ============================================
+    # AWS SECRETS MANAGER CREDENTIALS
+    # ============================================
+    - name: Check if aws-sm-credentials secret exists
+      command: kubectl get secret aws-sm-credentials -n external-secrets
+      register: secret_check
+      failed_when: false
+      changed_when: false
+
+    - name: Create AWS Secrets Manager credentials secret
+      command: >
+        kubectl create secret generic aws-sm-credentials
+        --namespace=external-secrets
+        --from-literal=accessKeyId={{ aws_access_key_id }}
+        --from-literal=secretAccessKey={{ aws_secret_access_key }}
+      register: aws_secret_create
+      when: secret_check.rc != 0
+
+    - name: Display AWS secret creation result
+      debug:
+        msg: "{{ aws_secret_create.stdout | default('AWS SM credentials secret already exists') }}"
+
+    # ============================================
+    # RESTART EXTERNAL SECRETS DEPLOYMENT
+    # ============================================
+    - name: Rollout restart External Secrets deployment
+      command: kubectl rollout restart deployment -n external-secrets
+      register: rollout_restart
+
+    - name: Display rollout restart result
+      debug:
+        msg: "{{ rollout_restart.stdout | default('External Secrets deployment restarted') }}"
+
+    - name: Wait for External Secrets deployment to be ready
+      command: kubectl rollout status deployment -n external-secrets --timeout=120s
+      register: rollout_status
+      failed_when: false
+
+    - name: Display rollout status
+      debug:
+        msg: "{{ rollout_status.stdout }}"
+
+    # ============================================
+    # ARGOCD ADMIN PASSWORD RETRIEVAL
+    # ============================================
+    - name: Wait for ArgoCD to be ready (30 seconds)
+      pause:
+        seconds: 30
+      when: platform_install.rc == 0
+
+    - name: Get ArgoCD initial admin password
+      shell: |
+        kubectl -n argocd get secret argocd-initial-admin-secret \
+          -o jsonpath="{.data.password}" | base64 -d
+      register: argocd_password
+      failed_when: false
+
+    - name: Display ArgoCD admin credentials
+      debug:
+        msg: |
+          ============================================
+          ARGOCD ADMIN CREDENTIALS
+          ============================================
+          Username: admin
+          Password: {{ argocd_password.stdout }}
+          ============================================
+          
+          To access ArgoCD UI, run:
+          kubectl port-forward svc/argocd-server -n argocd 8080:443
+          Then visit: https://localhost:8080
+          ============================================
+      when: argocd_password.rc == 0 and argocd_password.stdout != ""
+
+    - name: ArgoCD password not available yet
+      debug:
+        msg: |
+          ArgoCD initial admin secret not yet available.
+          Run this command manually to get the password:
+          kubectl -n argocd get secret argocd-initial-admin-secret -o jsonpath="{.data.password}" | base64 -d; echo
+      when: argocd_password.rc != 0 or argocd_password.stdout == ""
+
+    # ============================================
+    # FINAL STATUS CHECK
+    # ============================================
+    - name: Get all pods status
+      command: kubectl get pods -A
+      register: all_pods
+
+    - name: Display all pods
+      debug:
+        msg: |
+          ============================================
+          ALL PODS STATUS
+          ============================================
+          {{ all_pods.stdout }}
+
+    - name: Get Helm releases
+      command: helm list -A
+      register: helm_releases
+
+    - name: Display Helm releases
+      debug:
+        msg: |
+          ============================================
+          HELM RELEASES
+          ============================================
+          {{ helm_releases.stdout }}
+
+    - name: Final summary
+      debug:
+        msg: |
+          ============================================
+          KUBERNETES PLATFORM SETUP COMPLETE
+          ============================================
+          
+          Installed Components:
+          - Traefik Helm repo
+          - Argo Helm repo
+          - External Secrets Helm repo
+          - Platform chart (mychart)
+          - External Secrets operator
+          - AWS Secrets Manager credentials
+          
+          Next Steps:
+          1. Verify all pods are running: kubectl get pods -A
+          2. Access ArgoCD: kubectl port-forward svc/argocd-server -n argocd 8080:443
+          3. Configure your ExternalSecret resources
+          
+          ============================================

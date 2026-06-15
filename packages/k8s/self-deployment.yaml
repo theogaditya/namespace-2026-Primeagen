@@ -1,10 +1,10 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: user-be-deployment
+  name: self-deployment
   namespace: default
   labels:
-    app: user-be
+    app: self
   annotations:
     # Force redeployment by updating this timestamp when pushing changes
     kubernetes.io/change-cause: "Initial deployment"
@@ -12,36 +12,30 @@ spec:
   replicas: 1
   selector:
     matchLabels:
-      app: user-be
+      app: self
   template:
     metadata:
       labels:
-        app: user-be
+        app: self
       annotations:
         # This annotation can be updated to force pod recreation
         rollme: "initial"
     spec:
       containers:
-        - name: user-be
-          image: ogadityahota/swarajdesk-user-be:latest
+        - name: self
+          image: ogadityahota/sih-swarajdesk-self:latest
           imagePullPolicy: Always
           ports:
-            - containerPort: 3000
+            - containerPort: 3030
               name: http
-            - containerPort: 3001
-              name: websocket
           envFrom:
             - secretRef:
-                name: sih-swaraj-user-be-secret  # from ExternalSecret
+                name: sih-swaraj-self-secret  # from ExternalSecret
           env:
             - name: NODE_ENV
               value: "production"
             - name: PORT
-              value: "3000"
-            - name: WS_PORT
-              value: "3001"
-            - name: REDIS_URL
-              value: "redis://default:Fl4n78ioG4CJQmNF3BdhuYEopQe0nofF@redis-18062.c44.us-east-1-2.ec2.cloud.redislabs.com:18062"
+              value: "3030"
           resources:
             requests:
               memory: "256Mi"
@@ -51,14 +45,14 @@ spec:
               cpu: "500m"
           livenessProbe:
             httpGet:
-              path: /api/health
-              port: 3000
+              path: /health
+              port: 3030
             initialDelaySeconds: 30
             periodSeconds: 10
           readinessProbe:
             httpGet:
-              path: /api/health
-              port: 3000
+              path: /health
+              port: 3030
             initialDelaySeconds: 5
             periodSeconds: 5
 
@@ -66,20 +60,16 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: user-be-service
+  name: self-service
   namespace: default
   labels:
-    app: user-be
+    app: self
 spec:
   selector:
-    app: user-be
+    app: self
   ports:
     - name: http
-      port: 3000
-      targetPort: 3000
-      protocol: TCP
-    - name: websocket
-      port: 3001
-      targetPort: 3001
+      port: 3030
+      targetPort: 3030
       protocol: TCP
   type: ClusterIP

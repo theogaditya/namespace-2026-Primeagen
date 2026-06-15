@@ -1,0 +1,305 @@
+---
+# ===========================================
+# Full Infrastructure Deployment Playbook
+# ===========================================
+# This playbook orchestrates:
+# 1. Terraform Apply (GKE Autopilot)
+# 2. Connect to GKE Cluster
+# 3. K8s Platform Setup (Helm charts)
+# 4. Apply K8s Manifests
+# ===========================================
+
+- name: Deploy SIH SwarajDesk Infrastructure
+  hosts: local
+  become: false
+  vars:
+    project_root: "/home/aditya/code/sih-swarajdesk-2025"
+    terraform_dir: "{{ project_root }}/terraform"
+    k8s_dir: "{{ project_root }}/packages/k8s"
+    mychart_path: "{{ project_root }}/packages/mychart"
+    gcp_project: "orbital-builder-454706-h5"
+    gcp_region: "us-central1"
+    cluster_name: "autopilot-cluster-1"
+    external_secrets_version: "v0.9.11"
+  
+  vars_files:
+    - vars/secrets.yml  # Contains aws_access_key_id and aws_secret_access_key
+
+  tasks:
+    # ============================================
+    # STEP 1: TERRAFORM APPLY
+    # ============================================
+    - name: "STEP 1: Terraform - Initialize"
+      command: terraform init
+      args:
+        chdir: "{{ terraform_dir }}"
+      register: terraform_init
+
+    - name: Display Terraform init result
+      debug:
+        msg: "{{ terraform_init.stdout_lines | default(['Terraform initialized']) }}"
+
+    - name: "STEP 1: Terraform - Apply"
+      command: terraform apply -auto-approve
+      args:
+        chdir: "{{ terraform_dir }}"
+      register: terraform_apply
+
+    - name: Display Terraform apply result
+      debug:
+        msg: "{{ terraform_apply.stdout_lines[-20:] | default(['Terraform applied']) }}"
+
+    - name: Wait for GKE cluster to be ready (3 minutes)
+      pause:
+        minutes: 3
+      when: "'Creation complete' in terraform_apply.stdout or 'Apply complete' in terraform_apply.stdout"
+
+    # ============================================
+    # STEP 2: CONNECT TO GKE CLUSTER
+    # ============================================
+    - name: "STEP 2: Get GKE Credentials"
+      command: >
+        gcloud container clusters get-credentials {{ cluster_name }}
+        --region {{ gcp_region }}
+        --project {{ gcp_project }}
+      register: gke_credentials
+
+    - name: Display GKE credentials result
+      debug:
+        msg: "{{ gke_credentials.stderr | default('Connected to GKE cluster') }}"
+
+    - name: Verify kubectl connection
+      command: kubectl cluster-info
+      register: cluster_info
+
+    - name: Display cluster info
+      debug:
+        msg: "{{ cluster_info.stdout_lines }}"
+
+    # ============================================
+    # STEP 3: HELM REPOSITORY SETUP
+    # ============================================
+    - name: "STEP 3: Add Traefik Helm repository"
+      command: helm repo add traefik https://traefik.github.io/charts
+      register: traefik_repo
+      failed_when: false
+
+    - name: Add Argo Helm repository
+      command: helm repo add argo https://argoproj.github.io/argo-helm
+      register: argo_repo
+      failed_when: false
+
+    - name: Add External Secrets Helm repository
+      command: helm repo add external-secrets https://charts.external-secrets.io
+      register: external_secrets_repo
+      failed_when: false
+
+    - name: Update Helm repositories
+      command: helm repo update
+      register: helm_update
+
+    - name: Display Helm repo update result
+      debug:
+        msg: "{{ helm_update.stdout }}"
+
+    # ============================================
+    # STEP 4: HELM DEPENDENCY UPDATE & INSTALL
+    # ============================================
+    - name: "STEP 4: Update Helm chart dependencies"
+      command: helm dependency update .
+      args:
+        chdir: "{{ mychart_path }}"
+      register: dependency_update
+
+    - name: Create argocd namespace
+      command: kubectl create namespace argocd
+      register: argocd_ns
+      failed_when: false
+
+    - name: Install platform Helm chart
+      command: helm install platform ./mychart --create-namespace
+      args:
+        chdir: "{{ project_root }}/packages"
+      register: platform_install
+      failed_when: false
+
+    - name: Upgrade platform if already installed
+      command: helm upgrade platform ./mychart
+      args:
+        chdir: "{{ project_root }}/packages"
+      when: platform_install.rc != 0 and 'cannot re-use' in platform_install.stderr
+
+    - name: Display platform installation result
+      debug:
+        msg: "Platform Helm chart installed/upgraded successfully"
+
+    # ============================================
+    # STEP 5: EXTERNAL SECRETS SETUP
+    # ============================================
+    - name: "STEP 5: Install External Secrets CRDs"
+      command: kubectl apply -f https://github.com/external-secrets/external-secrets/releases/download/{{ external_secrets_version }}/external-secrets-crds.yaml
+      register: crds_install
+
+    - name: Install/Upgrade External Secrets Helm chart
+      command: >
+        helm upgrade --install external-secrets external-secrets/external-secrets
+        --namespace external-secrets --create-namespace
+        --set installCRDs=true
+      register: external_secrets_install
+
+    - name: Check if aws-sm-credentials secret exists
+      command: kubectl get secret aws-sm-credentials -n external-secrets
+      register: secret_check
+      failed_when: false
+      changed_when: false
+
+    - name: Create AWS Secrets Manager credentials secret
+      command: >
+        kubectl create secret generic aws-sm-credentials
+        --namespace=external-secrets
+        --from-literal=accessKeyId={{ aws_access_key_id }}
+        --from-literal=secretAccessKey={{ aws_secret_access_key }}
+      when: secret_check.rc != 0
+
+    - name: Rollout restart External Secrets deployment
+      command: kubectl rollout restart deployment -n external-secrets
+
+    - name: Wait for External Secrets to be ready
+      command: kubectl rollout status deployment -n external-secrets --timeout=120s
+      failed_when: false
+
+    # ============================================
+    # STEP 6: APPLY K8S MANIFESTS
+    # ============================================
+    - name: "STEP 6: Apply ClusterSecretStore and ExternalSecrets"
+      command: kubectl apply -f {{ item }}
+      args:
+        chdir: "{{ k8s_dir }}"
+      loop:
+        - user-be-secret.yaml
+        - admin-be-secret.yaml
+      register: secrets_apply
+
+    - name: Apply optional secrets (comp-queue, self)
+      command: kubectl apply -f {{ item }}
+      args:
+        chdir: "{{ k8s_dir }}"
+      loop:
+        - comp-queue-secret.yaml
+        - self-secret.yaml
+      failed_when: false
+
+    - name: Wait for secrets to sync
+      pause:
+        seconds: 15
+
+    - name: Apply middlewares
+      command: kubectl apply -f {{ item }}
+      args:
+        chdir: "{{ k8s_dir }}"
+      loop:
+        - cors-middleware.yaml
+        - ws-middleware.yaml
+
+    - name: Apply deployments
+      command: kubectl apply -f {{ item }}
+      args:
+        chdir: "{{ k8s_dir }}"
+      loop:
+        - user-be-deployment.yaml
+        - admin-be-deployment.yaml
+
+    - name: Apply optional deployments (comp-queue, self)
+      command: kubectl apply -f {{ item }}
+      args:
+        chdir: "{{ k8s_dir }}"
+      loop:
+        - comp-queue-deployment.yaml
+        - self-deployment.yaml
+      failed_when: false
+
+    - name: Apply ingresses
+      command: kubectl apply -f {{ item }}
+      args:
+        chdir: "{{ k8s_dir }}"
+      loop:
+        - ingress.yaml
+        - admin-be-ingress.yaml
+        - argo-ingress.yaml
+
+    - name: Apply optional ingresses (comp-queue, self)
+      command: kubectl apply -f {{ item }}
+      args:
+        chdir: "{{ k8s_dir }}"
+      loop:
+        - comp-queue-ingress.yaml
+        - self-ingress.yaml
+      failed_when: false
+
+    # ============================================
+    # STEP 7: FINAL STATUS
+    # ============================================
+    - name: "STEP 7: Wait for deployments to be ready"
+      pause:
+        seconds: 30
+
+    - name: Get all pods status
+      command: kubectl get pods -A
+      register: all_pods
+
+    - name: Get all services
+      command: kubectl get svc -A
+      register: all_svc
+
+    - name: Get all ingresses
+      command: kubectl get ingress -A
+      register: all_ingress
+
+    - name: Get Helm releases
+      command: helm list -A
+      register: helm_releases
+
+    - name: Get ArgoCD initial admin password
+      shell: |
+        kubectl -n argocd get secret argocd-initial-admin-secret \
+          -o jsonpath="{.data.password}" | base64 -d
+      register: argocd_password
+      failed_when: false
+
+    - name: Display final status
+      debug:
+        msg: |
+          ============================================
+          DEPLOYMENT COMPLETE!
+          ============================================
+          
+          PODS:
+          {{ all_pods.stdout }}
+          
+          SERVICES:
+          {{ all_svc.stdout }}
+          
+          INGRESSES:
+          {{ all_ingress.stdout }}
+          
+          HELM RELEASES:
+          {{ helm_releases.stdout }}
+          
+          ============================================
+          ARGOCD CREDENTIALS
+          ============================================
+          Username: admin
+          Password: {{ argocd_password.stdout | default('Not yet available') }}
+          
+          ============================================
+          NEXT STEPS
+          ============================================
+          1. Get Traefik External IP: kubectl get svc platform-traefik
+          2. Update DNS records in Cloudflare to point to Traefik IP
+          3. Create AWS Secrets Manager secrets:
+             - sih-swaraj-user-be-prod
+             - sih-swaraj-admin-be-prod
+             - sih-swaraj-comp-queue-prod
+             - sih-swaraj-self-prod
+          4. Access ArgoCD at: https://sih-argo-testing-mern.adityahota.online
+          ============================================

@@ -40,4 +40,8 @@ terraform.tfstate
 terraform.tfstate.backup
 .terraform/
 
+# Ansible secrets (unencrypted)
+ansible/vars/secrets.yml
+ansible/.vault_pass
+
 sec.txt

@@ -3,6 +3,8 @@ argo-cd:
   namespaceOverride: argocd
   server:
     insecure: true
+    extraArgs:
+      - --insecure
     service:
       type: LoadBalancer
 

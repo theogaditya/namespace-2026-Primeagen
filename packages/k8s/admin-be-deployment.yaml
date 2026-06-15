@@ -5,6 +5,9 @@ metadata:
   namespace: default
   labels:
     app: admin-be
+  annotations:
+    # Force redeployment by updating this timestamp when pushing changes
+    kubernetes.io/change-cause: "Initial deployment"
 spec:
   replicas: 1
   selector:
@@ -14,6 +17,9 @@ spec:
     metadata:
       labels:
         app: admin-be
+      annotations:
+        # This annotation can be updated to force pod recreation
+        rollme: "initial"
     spec:
       containers:
         - name: admin-be
@@ -22,14 +28,16 @@ spec:
           ports:
             - containerPort: 3002
               name: http
+          envFrom:
+            - secretRef:
+                name: sih-swaraj-admin-be-secret  # from ExternalSecret
           env:
             - name: NODE_ENV
               value: "production"
             - name: ADMIN_BE_PORT
               value: "3002"
-          envFrom:
-            - secretRef:
-                name: sih-swaraj-admin-be-secret  # from ExternalSecret
+            - name: REDIS_URL
+              value: "redis://default:Fl4n78ioG4CJQmNF3BdhuYEopQe0nofF@redis-18062.c44.us-east-1-2.ec2.cloud.redislabs.com:18062"
           resources:
             requests:
               memory: "256Mi"

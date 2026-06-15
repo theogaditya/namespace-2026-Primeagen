@@ -1,21 +1,23 @@
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: argocd
-  namespace: argocd
+  name: comp-queue-ingress
+  namespace: default
   annotations:
     traefik.ingress.kubernetes.io/router.entrypoints: web,websecure
     traefik.ingress.kubernetes.io/router.tls: "false"
+    # CORS configuration for Traefik
+    traefik.ingress.kubernetes.io/router.middlewares: default-cors-headers@kubernetescrd
 spec:
   ingressClassName: platform-traefik
   rules:
-    - host: sih-argo-testing-mern.adityahota.online
+    - host: sih-comp-queue.adityahota.online
       http:
         paths:
           - path: /
             pathType: Prefix
             backend:
               service:
-                name: argocd-server
+                name: comp-queue-service
                 port:
-                  number: 80
+                  number: 3005
