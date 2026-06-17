@@ -13,12 +13,12 @@
   hosts: local
   become: false
   vars:
-    project_root: "/home/aditya/code/sih-swarajdesk-2025"
+    project_root: "/home/abhas/node/Projects/iit-test"
     terraform_dir: "{{ project_root }}/aws/terraform"
     k8s_dir: "{{ project_root }}/packages/k8s"
     mychart_path: "{{ project_root }}/packages/mychart"
     aws_region: "ap-south-1"
-    cluster_name: "swarajdesk-eks"
+    cluster_name: "iit-test-eks"
 
   vars_files:
     - "{{ project_root }}/ansible/vars/secrets.yml"  # Contains aws_access_key_id and aws_secret_access_key
@@ -272,28 +272,28 @@
           ============================================
           AWS EKS DEPLOYMENT COMPLETE!
           ============================================
-          
+
           CLUSTER: {{ cluster_name }}
           REGION:  {{ aws_region }}
-          
+
           PODS:
           {{ all_pods.stdout }}
-          
+
           SERVICES:
           {{ all_svc.stdout }}
-          
+
           INGRESSES:
           {{ all_ingress.stdout }}
-          
+
           HELM RELEASES:
           {{ helm_releases.stdout }}
-          
+
           ============================================
           ARGOCD CREDENTIALS
           ============================================
           Username: admin
           Password: {{ argocd_password.stdout | default('Not yet available') }}
-          
+
           ============================================
           NEXT STEPS
           ============================================
@@ -304,5 +304,5 @@
              - sih-swaraj-admin-be-prod
              - sih-swaraj-comp-queue-prod
              - sih-swaraj-self-prod
-          4. Access ArgoCD at: https://sih-argo-testing-mern.adityahota.online
+          4. Access ArgoCD at: https://iit-argo.adityahota.online
           ============================================

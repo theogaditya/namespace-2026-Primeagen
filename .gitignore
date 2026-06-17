@@ -48,3 +48,6 @@ sec.txt
 json-env.json
 awscliv2.zip
 CONTRIBUTING.md
+
+terraform.tfvars
+terraform.tfstate

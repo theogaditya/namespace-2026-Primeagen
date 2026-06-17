@@ -1,0 +1,105 @@
+---
+# ===========================================
+# Stop All Packages Playbook (AWS Environment)
+# ===========================================
+# Stops all running microservices
+#
+# Usage: ansible-playbook -i inventory.ini aws-stop-all.yml
+# ===========================================
+
+- name: Stop All Packages - IIT Test
+  hosts: local
+  become: false
+  gather_facts: false
+  vars:
+    project_root: "/home/abhas/node/Projects/iit-test"
+    packages:
+      - name: user-be
+        ports:
+          - 3000  # HTTP API
+          - 3001  # WebSocket
+      - name: admin-be
+        ports:
+          - 3002
+      - name: compQueue
+        ports:
+          - 3005
+      - name: self
+        ports:
+          - 3030
+      - name: user-fe
+        ports:
+          - 3003
+      - name: admin-fe
+        ports:
+          - 3004
+
+  tasks:
+    # ============================================
+    # HEADER
+    # ============================================
+    - name: "🛑 STOPPING ALL SERVICES - IIT Test"
+      debug:
+        msg: |
+
+          ========================================
+          Stopping all running packages...
+          ========================================
+
+    # ============================================
+    # STOP ALL SERVICES
+    # ============================================
+    - name: Stop services by port
+      shell: "lsof -ti:{{ item.1 }} | xargs -r kill -9 || true"
+      loop: "{{ packages | subelements('ports') }}"
+      loop_control:
+        label: "🛑 {{ item.0.name }} (port {{ item.1 }})"
+      changed_when: false
+      failed_when: false
+
+    # ============================================
+    # VERIFY STOPPED
+    # ============================================
+    - name: Verify all ports are free
+      shell: "lsof -i:{{ item.1 }} || echo 'STOPPED'"
+      loop: "{{ packages | subelements('ports') }}"
+      loop_control:
+        label: "✅ {{ item.0.name }} (port {{ item.1 }})"
+      register: port_checks
+      changed_when: false
+      failed_when: false
+
+    # ============================================
+    # CLEANUP LOGS (Optional)
+    # ============================================
+    - name: "🧹 Cleaning up log files"
+      file:
+        path: "/tmp/{{ item.name }}.log"
+        state: absent
+      loop: "{{ packages }}"
+      loop_control:
+        label: "🧹 {{ item.name }}.log"
+      failed_when: false
+
+    # ============================================
+    # FINAL STATUS
+    # ============================================
+    - name: "✅ ALL SERVICES STOPPED"
+      debug:
+        msg: |
+
+          ========================================
+          ✅ All services have been stopped!
+          ========================================
+
+          Freed ports:
+          • 3000 (user-be HTTP)
+          • 3001 (user-be WebSocket)
+          • 3002 (admin-be)
+          • 3003 (user-fe)
+          • 3004 (admin-fe)
+          • 3005 (compQueue)
+          • 3030 (self)
+
+          Log files have been cleaned up.
+          ========================================

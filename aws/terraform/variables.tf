@@ -7,13 +7,13 @@ variable "aws_region" {
 variable "project_name" {
   description = "Project name used for resource tagging"
   type        = string
-  default     = "swarajdesk"
+  default     = "iit-test"
 }
 
 variable "cluster_name" {
   description = "Name of the EKS cluster"
   type        = string
-  default     = "swarajdesk-eks"
+  default     = "iit-test-eks"
 }
 
 variable "cluster_version" {

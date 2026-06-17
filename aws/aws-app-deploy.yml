@@ -1,0 +1,115 @@
+---
+# ===========================================
+# AWS EKS Application Deployment
+# ===========================================
+# Deploys only the application layer (Manifests)
+# Assumes Platform (Helm, ExternalSecrets) is ready
+# ===========================================
+
+- name: Deploy SwarajDesk Applications on AWS EKS
+  hosts: local
+  become: false
+  vars:
+    project_root: "/home/abhas/node/Projects/iit-test"
+    k8s_dir: "{{ project_root }}/packages/k8s"
+    aws_region: "ap-south-1"
+    cluster_name: "iit-test-eks"
+
+  tasks:
+    # ============================================
+    # STEP 0: ENSURE CONNECTION
+    # ============================================
+    - name: Verify kubectl connection
+      command: kubectl cluster-info
+      register: cluster_info
+
+    # ============================================
+    # STEP 1: APPLY K8S MANIFESTS
+    # ============================================
+    - name: "STEP 1: Apply ClusterSecretStore and ExternalSecrets"
+      command: kubectl apply -f {{ item }}
+      args:
+        chdir: "{{ k8s_dir }}"
+      loop:
+        - aws-secrets.yaml
+        - user-be-secret.yaml
+        - admin-be-secret.yaml
+        - comp-queue-secret.yaml
+        - self-secret.yaml
+      register: secrets_apply
+
+    - name: Wait for secrets to sync
+      pause:
+        seconds: 5
+
+    - name: Apply middlewares
+      command: kubectl apply -f {{ item }}
+      args:
+        chdir: "{{ k8s_dir }}"
+      loop:
+        - cors-middleware.yaml
+        - ws-middleware.yaml
+
+    - name: Apply deployments
+      command: kubectl apply -f {{ item }}
+      args:
+        chdir: "{{ k8s_dir }}"
+      loop:
+        - user-be-deployment.yaml
+        - admin-be-deployment.yaml
+        - comp-queue-deployment.yaml
+        - self-deployment.yaml
+
+    - name: Apply ingresses
+      command: kubectl apply -f {{ item }}
+      args:
+        chdir: "{{ k8s_dir }}"
+      loop:
+        - ingress.yaml
+        - admin-be-ingress.yaml
+        - argo-ingress.yaml
+        - comp-queue-ingress.yaml
+        - self-ingress.yaml
+
+    # ============================================
+    # STEP 2: FINAL STATUS
+    # ============================================
+    - name: "STEP 2: Wait for deployments to be ready"
+      pause:
+        seconds: 15
+
+    - name: Get all pods status
+      command: kubectl get pods -A
+      register: all_pods
+
+    - name: Get all services
+      command: kubectl get svc -A
+      register: all_svc
+
+    - name: Get all ingresses
+      command: kubectl get ingress -A
+      register: all_ingress
+
+    - name: Display final status
+      debug:
+        msg: |
+          ============================================
+          AWS EKS APP DEPLOYMENT COMPLETE!
+          ============================================
+
+          PODS:
+          {{ all_pods.stdout }}
+
+          SERVICES:
+          {{ all_svc.stdout }}
+
+          INGRESSES:
+          {{ all_ingress.stdout }}
+
+          ============================================
+          NEXT STEPS
+          ============================================
+          1. Get Traefik External IP: kubectl get svc platform-traefik
+          2. Update DNS records in Cloudflare to point to Traefik ELB
+          3. Access ArgoCD at: https://iit-argo.adityahota.online
+          ============================================
