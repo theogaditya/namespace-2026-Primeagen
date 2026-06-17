@@ -10,3 +10,7 @@ argo-cd:
 
 traefik:
   namespaceOverride: default
+  providers:
+    kubernetesIngress:
+      publishedService:
+        enabled: true
