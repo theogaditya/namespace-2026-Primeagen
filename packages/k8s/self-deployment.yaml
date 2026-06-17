@@ -23,7 +23,7 @@ spec:
     spec:
       containers:
         - name: self
-          image: ogadityahota/sih-swarajdesk-self:latest
+          image: ogadityahota/swarajdesk-self:latest
           imagePullPolicy: Always
           ports:
             - containerPort: 3030

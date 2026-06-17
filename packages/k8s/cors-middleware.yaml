@@ -16,6 +16,7 @@ spec:
       - "Content-Type"
       - "Authorization"
     accessControlAllowOriginList:
-      - "*"
+      - "https://iit-bbsr-swaraj-user-fe.adityahota.online"
+      - "https://iit-bbsr-swaraj-admin-fe.adityahota.online"
     accessControlAllowCredentials: true
     accessControlMaxAge: 86400

@@ -176,6 +176,7 @@
       args:
         chdir: "{{ k8s_dir }}"
       loop:
+        - aws-secrets.yaml
         - user-be-secret.yaml
         - admin-be-secret.yaml
       register: secrets_apply

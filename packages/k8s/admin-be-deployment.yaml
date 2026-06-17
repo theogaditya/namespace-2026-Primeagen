@@ -37,7 +37,7 @@ spec:
             - name: ADMIN_BE_PORT
               value: "3002"
             - name: REDIS_URL
-              value: "redis://default:Fl4n78ioG4CJQmNF3BdhuYEopQe0nofF@redis-18062.c44.us-east-1-2.ec2.cloud.redislabs.com:18062"
+              value: "redis://default:X95Voc7K22sc6e3G0sIBcJczdeuadzxi@redis-11469.c305.ap-south-1-1.ec2.cloud.redislabs.com:11469"
           resources:
             requests:
               memory: "256Mi"
@@ -45,18 +45,24 @@ spec:
             limits:
               memory: "512Mi"
               cpu: "500m"
+          startupProbe:
+            httpGet:
+              path: /api/health
+              port: 3002
+            failureThreshold: 30
+            periodSeconds: 10
           livenessProbe:
             httpGet:
               path: /api/health
               port: 3002
-            initialDelaySeconds: 30
             periodSeconds: 10
+            failureThreshold: 3
           readinessProbe:
             httpGet:
               path: /api/health
               port: 3002
-            initialDelaySeconds: 5
             periodSeconds: 5
+            failureThreshold: 3
 
 ---
 apiVersion: v1

@@ -45,3 +45,6 @@ ansible/vars/secrets.yml
 ansible/.vault_pass
 
 sec.txt
+json-env.json
+awscliv2.zip
+CONTRIBUTING.md

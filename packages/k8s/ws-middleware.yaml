@@ -23,7 +23,7 @@ spec:
     - web
     - websecure
   routes:
-    - match: Host(`sih-ws-user-be.adityahota.online`)
+    - match: Host(`iit-bbsr-swaraj-ws-user-be.adityahota.online`)
       kind: Rule
       services:
         - name: user-be-service
