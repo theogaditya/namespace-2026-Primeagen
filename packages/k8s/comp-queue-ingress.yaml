@@ -11,7 +11,7 @@ metadata:
 spec:
   ingressClassName: platform-traefik
   rules:
-    - host: sih-comp-queue.adityahota.online
+    - host: iit-bbsr-swaraj-comp-queue.adityahota.online
       http:
         paths:
           - path: /

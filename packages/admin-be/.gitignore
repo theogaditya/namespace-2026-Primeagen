@@ -44,3 +44,4 @@ gcp-credentials.json
 unit.db.test.ts
 
 .env
+.env.production

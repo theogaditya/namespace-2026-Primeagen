@@ -9,7 +9,7 @@ metadata:
 spec:
   ingressClassName: platform-traefik
   rules:
-    - host: sih-argo-testing-mern.adityahota.online
+    - host: iit-bbsr-swaraj.adityahota.online
       http:
         paths:
           - path: /

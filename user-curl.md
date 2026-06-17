@@ -70,7 +70,9 @@ curl -X POST https://sih-user-be.adityahota.online/api/users/logout \
 
 ### Create New Complaint
 
-```bash
+```bashcurl -X POST "http://localhost:3000/api/auth/login" \
+  -H "Content-Type: application/json" \
+  -d '{"email":"abhashbehera@gmail.com","password":"123123123"}'
 curl -X POST https://sih-user-be.adityahota.online/api/complaints \
   -H "Content-Type: application/json" \
   -H "Authorization: Bearer <paste-token-here>" \

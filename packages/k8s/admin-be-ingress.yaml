@@ -11,7 +11,7 @@ metadata:
 spec:
   ingressClassName: platform-traefik
   rules:
-    - host: sih-admin-be.adityahota.online
+    - host: iit-bbsr-swaraj-admin-be.adityahota.online
       http:
         paths:
           - path: /

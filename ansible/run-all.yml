@@ -1,0 +1,267 @@
+---
+# ===========================================
+# Run All Packages Playbook
+# ===========================================
+# Starts all microservices in the correct order
+# Order: user-be > admin-be > compQueue > self > user-fe > admin-fe
+#
+# Usage: ansible-playbook -i inventory.ini run-all.yml
+# ===========================================
+
+- name: Run All Packages - SIH SwarajDesk 2025
+  hosts: local
+  become: false
+  gather_facts: false
+  vars:
+    project_root: "/home/aditya/code/sih-swarajdesk-2025"
+    packages:
+      - name: user-be
+        path: "{{ project_root }}/packages/user-be"
+        ports:
+          - 3000  # HTTP API
+          - 3001  # WebSocket
+        has_prisma: true
+      - name: admin-be
+        path: "{{ project_root }}/packages/admin-be"
+        ports:
+          - 3002
+        has_prisma: true
+      - name: compQueue
+        path: "{{ project_root }}/packages/compQueue"
+        ports:
+          - 3005
+        has_prisma: true
+      - name: self
+        path: "{{ project_root }}/packages/self"
+        ports:
+          - 3030
+        has_prisma: false
+      - name: user-fe
+        path: "{{ project_root }}/packages/user-fe"
+        ports:
+          - 3003
+        has_prisma: false
+        dev_cmd: "bun run dev -p 3003"
+      - name: admin-fe
+        path: "{{ project_root }}/packages/admin-fe"
+        ports:
+          - 3004
+        has_prisma: false
+        dev_cmd: "bun run dev -p 3004"
+
+  tasks:
+    # ============================================
+    # HEADER
+    # ============================================
+    - name: "🚀 STARTING ALL SERVICES - SIH SwarajDesk 2025"
+      debug:
+        msg: |
+          
+          ========================================
+          Starting all packages in order:
+          1. user-be    (HTTP: 3000, WS: 3001)
+          2. admin-be   (HTTP: 3002)
+          3. compQueue  (HTTP: 3005)
+          4. self       (HTTP: 3030)
+          5. user-fe    (HTTP: 3003)
+          6. admin-fe   (HTTP: 3004)
+          ========================================
+
+    # ============================================
+    # PREREQUISITES CHECK
+    # ============================================
+    - name: Check bun is installed
+      command: bun --version
+      register: bun_version
+      changed_when: false
+
+    - name: "📋 Prerequisites Check"
+      debug:
+        msg: "✅ Bun v{{ bun_version.stdout }} installed"
+
+    # ============================================
+    # INSTALL DEPENDENCIES
+    # ============================================
+    - name: "📦 Installing dependencies for all packages"
+      debug:
+        msg: "Installing dependencies..."
+
+    - name: Install dependencies for each package
+      command: bun install
+      args:
+        chdir: "{{ item.path }}"
+      loop: "{{ packages }}"
+      loop_control:
+        label: "📦 {{ item.name }}"
+      changed_when: false
+      failed_when: false
+
+    # ============================================
+    # GENERATE PRISMA CLIENTS (for packages that need it)
+    # ============================================
+    - name: "🔧 Generating Prisma clients"
+      debug:
+        msg: "Generating Prisma clients for user-be, admin-be, compQueue..."
+
+    - name: Generate Prisma clients
+      command: bunx prisma generate
+      args:
+        chdir: "{{ item.path }}"
+      loop: "{{ packages | selectattr('has_prisma', 'equalto', true) | list }}"
+      loop_control:
+        label: "🔧 {{ item.name }}"
+      changed_when: false
+      failed_when: false
+
+    # ============================================
+    # STOP ANY EXISTING PROCESSES
+    # ============================================
+    - name: "🛑 Stopping any existing processes"
+      debug:
+        msg: "Cleaning up old processes..."
+
+    - name: Kill existing processes on ports
+      shell: "lsof -ti:{{ item.1 }} | xargs -r kill -9 || true"
+      loop: "{{ packages | subelements('ports') }}"
+      loop_control:
+        label: "🛑 Port {{ item.1 }} ({{ item.0.name }})"
+      changed_when: false
+      failed_when: false
+
+    # ============================================
+    # START ALL SERVICES IN ORDER (BACKGROUND)
+    # ============================================
+    - name: "🟢 Starting all services"
+      debug:
+        msg: "Launching all services in background..."
+
+    # 1. user-be (HTTP: 3000, WS: 3001)
+    - name: "🟢 1/6 Starting user-be (HTTP: 3000, WS: 3001)"
+      shell: "nohup bun run dev > /tmp/user-be.log 2>&1 &"
+      args:
+        chdir: "{{ project_root }}/packages/user-be"
+      async: 10
+      poll: 0
+      register: user_be_job
+
+    - name: Wait for user-be to initialize
+      pause:
+        seconds: 3
+
+    # 2. admin-be (HTTP: 3002)
+    - name: "🟢 2/6 Starting admin-be (HTTP: 3002)"
+      shell: "nohup bun run dev > /tmp/admin-be.log 2>&1 &"
+      args:
+        chdir: "{{ project_root }}/packages/admin-be"
+      async: 10
+      poll: 0
+      register: admin_be_job
+
+    - name: Wait for admin-be to initialize
+      pause:
+        seconds: 2
+
+    # 3. compQueue (HTTP: 3005)
+    - name: "🟢 3/6 Starting compQueue (HTTP: 3005)"
+      shell: "nohup bun run dev > /tmp/compQueue.log 2>&1 &"
+      args:
+        chdir: "{{ project_root }}/packages/compQueue"
+      async: 10
+      poll: 0
+      register: compqueue_job
+
+    - name: Wait for compQueue to initialize
+      pause:
+        seconds: 2
+
+    # 4. self (HTTP: 3030)
+    - name: "🟢 4/6 Starting self (HTTP: 3030)"
+      shell: "nohup bun run dev > /tmp/self.log 2>&1 &"
+      args:
+        chdir: "{{ project_root }}/packages/self"
+      async: 10
+      poll: 0
+      register: self_job
+
+    - name: Wait for self to initialize
+      pause:
+        seconds: 2
+
+    # 5. user-fe (HTTP: 3003)
+    - name: "🟢 5/6 Starting user-fe (HTTP: 3003)"
+      shell: "nohup bun run dev -p 3003 > /tmp/user-fe.log 2>&1 &"
+      args:
+        chdir: "{{ project_root }}/packages/user-fe"
+      async: 10
+      poll: 0
+      register: user_fe_job
+
+    - name: Wait for user-fe to initialize
+      pause:
+        seconds: 4
+
+    # 6. admin-fe (HTTP: 3004)
+    - name: "🟢 6/6 Starting admin-fe (HTTP: 3004)"
+      shell: "nohup bun run dev -p 3004 > /tmp/admin-fe.log 2>&1 &"
+      args:
+        chdir: "{{ project_root }}/packages/admin-fe"
+      async: 10
+      poll: 0
+      register: admin_fe_job
+
+    - name: Wait for admin-fe to initialize
+      pause:
+        seconds: 4
+
+    # ============================================
+    # VERIFY ALL SERVICES STARTED
+    # ============================================
+    - name: "🔍 Verifying services are running"
+      debug:
+        msg: "Checking if all services started successfully..."
+
+    - name: Check running processes
+      shell: "lsof -i:{{ item.1 }} || echo 'NOT_RUNNING'"
+      loop: "{{ packages | subelements('ports') }}"
+      loop_control:
+        label: "🔍 {{ item.0.name }} (port {{ item.1 }})"
+      register: port_checks
+      changed_when: false
+      failed_when: false
+
+    # ============================================
+    # FINAL STATUS
+    # ============================================
+    - name: "📊 SERVICE STATUS"
+      debug:
+        msg: |
+          
+          ========================================
+          🎉 ALL SERVICES LAUNCHED!
+          ========================================
+          
+          📍 Service URLs:
+          ----------------------------------------
+          🔵 user-be    → http://localhost:3000
+          🔵 user-be WS → ws://localhost:3001
+          🔵 admin-be   → http://localhost:3002
+          🔵 compQueue  → http://localhost:3005
+          🔵 self       → http://localhost:3030
+          🟢 user-fe    → http://localhost:3003
+          🟢 admin-fe   → http://localhost:3004
+          
+          📝 Log Files:
+          ----------------------------------------
+          • user-be:    /tmp/user-be.log
+          • admin-be:   /tmp/admin-be.log
+          • compQueue:  /tmp/compQueue.log
+          • self:       /tmp/self.log
+          • user-fe:    /tmp/user-fe.log
+          • admin-fe:   /tmp/admin-fe.log
+          
+          💡 Tips:
+          ----------------------------------------
+          • View logs: tail -f /tmp/<service>.log
+          • Stop all:  ansible-playbook -i inventory.ini stop-all.yml
+          
+          ========================================

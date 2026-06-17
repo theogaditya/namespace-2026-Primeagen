@@ -12,7 +12,7 @@ spec:
   ingressClassName: platform-traefik
   rules:
     # HTTP API routing
-    - host: sih-user-be.adityahota.online
+    - host: iit-bbsr-swaraj-user-be.adityahota.online
       http:
         paths:
           - path: /
@@ -43,7 +43,7 @@ spec:
   ingressClassName: platform-traefik
   rules:
     # WebSocket routing
-    - host: sih-ws-user-be.adityahota.online
+    - host: iit-bbsr-swaraj-ws-user-be.adityahota.online
       http:
         paths:
           - path: /
