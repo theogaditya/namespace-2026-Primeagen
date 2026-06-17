@@ -75,17 +75,17 @@ export function PlacesAutocomplete({
     if (!locationBias?.city && !locationBias?.state && !locationBias?.district) {
       return true; // No bias, accept all
     }
-    
+
     const lowerDesc = description.toLowerCase();
     const city = locationBias.city?.toLowerCase() || "";
     const state = locationBias.state?.toLowerCase() || "";
     const district = locationBias.district?.toLowerCase() || "";
-    
+
     // Check if any of the location components are in the description
     const cityMatch = city ? lowerDesc.includes(city) : false;
     const stateMatch = state ? lowerDesc.includes(state) : false;
     const districtMatch = district ? lowerDesc.includes(district) : false;
-    
+
     return cityMatch || stateMatch || districtMatch;
   }, [locationBias]);
 
@@ -99,7 +99,7 @@ export function PlacesAutocomplete({
 
     setIsLoading(true);
     setLocationMismatch(false);
-    
+
     try {
       // Add city/state to search query to bias results
       let searchQuery = input;
@@ -108,7 +108,7 @@ export function PlacesAutocomplete({
       } else if (locationBias?.state) {
         searchQuery = `${input}, ${locationBias.state}`;
       }
-      
+
       // Since we can't call the API directly from the browser due to CORS,
       // we'll use the Google Maps JavaScript API's AutocompleteService
       if (typeof window !== "undefined" && window.google?.maps?.places) {
@@ -126,7 +126,7 @@ export function PlacesAutocomplete({
               const filteredResults = locationBias?.city || locationBias?.state
                 ? results.filter(r => matchesLocationBias(r.description))
                 : results;
-              
+
               setPredictions(filteredResults);
               setIsOpen(filteredResults.length > 0);
             } else {
@@ -175,7 +175,7 @@ export function PlacesAutocomplete({
     // Check if selected location matches the bias
     const matches = matchesLocationBias(prediction.description);
     setLocationMismatch(!matches);
-    
+
     setInputValue(prediction.description);
     setHasValidSelection(true); // User made a valid selection
     onChange(prediction.description);
@@ -192,7 +192,7 @@ export function PlacesAutocomplete({
     switch (e.key) {
       case "ArrowDown":
         e.preventDefault();
-        setSelectedIndex((prev) => 
+        setSelectedIndex((prev) =>
           prev < predictions.length - 1 ? prev + 1 : prev
         );
         break;
@@ -303,7 +303,7 @@ export function PlacesAutocomplete({
           aria-autocomplete="list"
           role="combobox"
         />
-        
+
         {/* Loading/Validation Icons */}
         <div className="absolute right-3 top-1/2 -translate-y-1/2 flex items-center gap-1">
           {isLoading && <Loader2 className="h-4 w-4 text-gray-400 animate-spin" />}
@@ -322,7 +322,10 @@ export function PlacesAutocomplete({
                   "w-full px-4 py-3 text-left hover:bg-gray-50 transition-colors flex items-start gap-3 border-b border-gray-100 last:border-0",
                   selectedIndex === index && "bg-blue-50"
                 )}
-                onClick={() => handleSelect(prediction)}
+                onMouseDown={(e) => {
+                  e.preventDefault(); // Prevent input blur so onBlur doesn't clear the value
+                  handleSelect(prediction);
+                }}
                 onMouseEnter={() => setSelectedIndex(index)}
               >
                 <MapPin className="h-4 w-4 text-gray-400 mt-0.5 shrink-0" />
@@ -339,16 +342,16 @@ export function PlacesAutocomplete({
               </button>
             ))}
             <div className="px-4 py-2 bg-gray-50 border-t">
-              <img 
-                src="https://developers.google.com/maps/documentation/images/powered_by_google_on_white.png" 
-                alt="Powered by Google" 
+              <img
+                src="https://developers.google.com/maps/documentation/images/powered_by_google_on_white.png"
+                alt="Powered by Google"
                 className="h-4"
               />
             </div>
           </div>
         )}
       </div>
-      
+
       {showError && (
         <p className="text-sm text-red-600 flex items-center gap-1 animate-in fade-in slide-in-from-top-1 duration-200">
           <AlertCircle className="h-4 w-4" />

@@ -266,7 +266,7 @@ export default function AddUser() {
   };
 
   return (
-    <div className="min-h-screen bg-linear-to-br from-blue-50 via-white to-purple-50 py-8 px-4">
+    <div className="min-h-screen bg-linear-to-br from-blue-50 via-white to-purple-50 pt-20 py-8 px-4">
       <LoadingPopup
         isOpen={isSubmitting}
         message="Creating Your Account"

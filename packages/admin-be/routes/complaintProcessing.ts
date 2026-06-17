@@ -22,7 +22,7 @@ export async function processNextComplaint(db: PrismaClient): Promise<{ processe
   try {
     await registrationQueueClient.connect();
     const client = registrationQueueClient.getClient();
-    
+
     // ATOMICALLY move complaint from registration queue to processing queue
     // This prevents duplicate processing - once moved, other poll cycles won't see it
     const complaintJson = await client.lMove(
@@ -46,7 +46,7 @@ export async function processNextComplaint(db: PrismaClient): Promise<{ processe
     }
 
     const complaintData = validationResult.data;
-    
+
     // Verify referenced category exists to avoid FK violations
     const categoryExists = await db.category.findUnique({
       where: { id: complaintData.categoryId },
@@ -73,34 +73,28 @@ export async function processNextComplaint(db: PrismaClient): Promise<{ processe
       console.log(`Duplicate complaint detected. Existing complaint id=${existingComplaint?.id}. New complaint will be flagged as duplicate.`);
     }
 
-    // Placeholder for AI standardized sub-category  
-    const AIstandardizedSubCategory = "dev";
+    // AI standardized sub-category via Vertex AI
+    const AIstandardizedSubCategory = await standardizeSubCategory(complaintData.subCategory);
 
-    // AI standardized sub-category (stub for now)
-    // const AIstandardizedSubCategory = await standardizeSubCategory(complaintData.subCategory);
+    // Call moderation service to sanitize abusive text
+    let AIabusedFlag: boolean | null = null;
+    try {
+      console.log("[ComplaintProcessing] Running moderation check...");
 
-    // Call moderation service to sanitize abusive text. If moderation service returns clean_text,
-    // let AIabusedFlag: boolean | null = null;
-    // try {
-    //   console.log("Testing Out The Abusive Route");
-      
-    //   const mod = await moderateTextSafe({ text: complaintData.description, user_id: complaintData.userId });
-    //   if (mod) {
-    //     if (mod.has_abuse) {
-    //       // AIabusedFlag = true;
-    //     }
-    //     // Use cleaned text if provided
-    //     if (mod.clean_text && typeof mod.clean_text === 'string' && mod.clean_text.trim().length > 0) {
-    //       complaintData.description = mod.clean_text;
-    //     }
-    //     console.log("[ComplaintProcessing] Moderation Successfull");
-    //   }
-    // } catch (mErr) {
-    //   console.warn('[ComplaintProcessing] moderation call failed, proceeding with original description', mErr);
-    // }
-    
-    // Testing Abuse Route Stub 
-    const AIabusedFlag: boolean = false;
+      const mod = await moderateTextSafe({ text: complaintData.description, user_id: complaintData.userId });
+      if (mod) {
+        if (mod.has_abuse) {
+          AIabusedFlag = true;
+        }
+        // Use cleaned text if provided
+        if (mod.clean_text && typeof mod.clean_text === 'string' && mod.clean_text.trim().length > 0) {
+          complaintData.description = mod.clean_text;
+        }
+        console.log("[ComplaintProcessing] Moderation Successful");
+      }
+    } catch (mErr) {
+      console.warn('[ComplaintProcessing] moderation call failed, proceeding with original description', mErr);
+    }
 
     const result = await db.$transaction(async (tx) => {
       const complaint = await tx.complaint.create({
@@ -131,7 +125,7 @@ export async function processNextComplaint(db: PrismaClient): Promise<{ processe
           },
         },
       });
-    
+
       return complaint;
     });
 
@@ -146,7 +140,7 @@ export async function processNextComplaint(db: PrismaClient): Promise<{ processe
         complaintData.assignedDepartment
       );
       if (newBadges.length > 0) {
-        console.log(`[BadgeService] Awarded ${newBadges.length} badge(s) to user ${complaintData.userId}:`, 
+        console.log(`[BadgeService] Awarded ${newBadges.length} badge(s) to user ${complaintData.userId}:`,
           newBadges.map(b => b.badge.name).join(", "));
       }
     } catch (badgeError) {
@@ -172,11 +166,11 @@ export async function processNextComplaint(db: PrismaClient): Promise<{ processe
     } else {
       console.log(`Duplicate complaint id=${result.id} created but not pushed to processed queue.`);
     }
-    
+
     return { processed: true, result: { id: result.id, seq: result.seq, status: result.status, isDuplicate } };
   } catch (error: any) {
     console.error("Complaint processing error:", error);
-    
+
     // For DB constraint errors, remove from processing queue (data is invalid)
     if (error?.code === 'P2003' || error?.code === 'P2002' || error?.code === 'P2025') {
       try {
@@ -191,7 +185,7 @@ export async function processNextComplaint(db: PrismaClient): Promise<{ processe
       }
       return { processed: false, error: "Invalid complaint removed from queue (DB constraint error)" };
     }
-    
+
     // For other errors (like network issues with AI services), 
     // move complaint back to registration queue for retry
     try {
@@ -206,7 +200,7 @@ export async function processNextComplaint(db: PrismaClient): Promise<{ processe
     } catch (moveError) {
       console.error("Failed to move complaint back to registration queue:", moveError);
     }
-    
+
     return { processed: false, error: "Processing failed - will retry" };
   }
 }

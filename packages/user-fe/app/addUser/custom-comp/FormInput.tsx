@@ -59,6 +59,11 @@ export function FormInput({
             className
           )}
           aria-invalid={showError ? "true" : "false"}
+          onClick={(e) => {
+            if (props.type === "date") {
+              (e.target as HTMLInputElement).showPicker?.();
+            }
+          }}
           {...props}
         />
         {touched && (

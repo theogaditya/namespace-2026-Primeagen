@@ -1,203 +1,203 @@
-# name: CI/CD
+name: CI/CD
 
-# on:
-#   push:
-#     branches: [main]
-#   pull_request:
+on:
+  push:
+    branches: [main]
+  pull_request:
 
-# # allow PR creation
-# permissions:
-#   contents: write
-#   pull-requests: write
+# allow PR creation
+permissions:
+  contents: write
+  pull-requests: write
 
 
-# jobs:
-#   build-test-push:
-#     runs-on: ubuntu-latest
+jobs:
+  build-test-push:
+    runs-on: ubuntu-latest
 
-#     env:
-#       USER_BE_IMAGE: ogadityahota/swarajdesk-user-be
-#       ADMIN_BE_IMAGE: ogadityahota/sih-swarajdesk-admin-be
-#       COMP_QUEUE_IMAGE: ogadityahota/swarajdesk-comp-queue
-#       SELF_IMAGE: ogadityahota/swarajdesk-self    
-#       IMAGE_TAG: ${{ github.sha }}
+    env:
+      USER_BE_IMAGE: ogadityahota/swarajdesk-user-be
+      ADMIN_BE_IMAGE: ogadityahota/sih-swarajdesk-admin-be
+      COMP_QUEUE_IMAGE: ogadityahota/swarajdesk-comp-queue
+      SELF_IMAGE: ogadityahota/swarajdesk-self    
+      IMAGE_TAG: ${{ github.sha }}
 
-#     steps:
-#       - name: Checkout code
-#         uses: actions/checkout@v4
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
 
-#       - name: Set up Node.js
-#         uses: actions/setup-node@v4
-#         with:
-#           node-version: '20'
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
 
-#       - name: Install Bun
-#         uses: oven-sh/setup-bun@v2
-#         with:
-#           bun-version: latest
+      - name: Install Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
 
-#       # -------------------------
-#       # user-be tests
-#       # -------------------------
-#       - name: Install deps (user-be)
-#         working-directory: packages/user-be
-#         env:
-#           DATABASE_URL: "postgresql://dummy:dummy@localhost:5432/dummy"
-#         run: |
-#           bun install --ignore-scripts || true
-#           bunx prisma generate
+      # -------------------------
+      # user-be tests
+      # -------------------------
+      - name: Install deps (user-be)
+        working-directory: packages/user-be
+        env:
+          DATABASE_URL: "postgresql://dummy:dummy@localhost:5432/dummy"
+        run: |
+          bun install --ignore-scripts || true
+          bunx prisma generate
 
-#       - name: Run user-be tests
-#         working-directory: packages/user-be
-#         run: |
-#           bun run test:unit
+      - name: Run user-be tests
+        working-directory: packages/user-be
+        run: |
+          bun run test:unit
 
-#       # -------------------------
-#       # admin-be tests
-#       # -------------------------
-#       - name: Install deps (admin-be)
-#         working-directory: packages/admin-be
-#         env:
-#           DATABASE_URL: "postgresql://dummy:dummy@localhost:5432/dummy"
-#         run: |
-#           bun install --ignore-scripts || true
-#           bunx prisma generate
+      # -------------------------
+      # admin-be tests
+      # -------------------------
+      - name: Install deps (admin-be)
+        working-directory: packages/admin-be
+        env:
+          DATABASE_URL: "postgresql://dummy:dummy@localhost:5432/dummy"
+        run: |
+          bun install --ignore-scripts || true
+          bunx prisma generate
 
-#       - name: Run admin-be tests
-#         working-directory: packages/admin-be
-#         run: |
-#           bun run test:unit
+      - name: Run admin-be tests
+        working-directory: packages/admin-be
+        run: |
+          bun run test:unit
 
-#       # -------------------------
-#       # Complaint-Queue tests
-#       # -------------------------
-#       - name: Install deps (admin-be)
-#         working-directory: packages/compQueue
-#         env:
-#           DATABASE_URL: "postgresql://dummy:dummy@localhost:5432/dummy"
-#         run: |
-#           bun install --ignore-scripts || true
-#           bunx prisma generate
+      # -------------------------
+      # Complaint-Queue tests
+      # -------------------------
+      - name: Install deps (admin-be)
+        working-directory: packages/compQueue
+        env:
+          DATABASE_URL: "postgresql://dummy:dummy@localhost:5432/dummy"
+        run: |
+          bun install --ignore-scripts || true
+          bunx prisma generate
 
-#       - name: Run compQueue tests
-#         working-directory: packages/compQueue
-#         run: |
-#           bun run test:unit
+      - name: Run compQueue tests
+        working-directory: packages/compQueue
+        run: |
+          bun run test:unit
 
-#       # -------------------------
-#       # self tests
-#       # -------------------------
-#       - name: Install deps (self)
-#         working-directory: packages/self
-#         run: |
-#           bun install --ignore-scripts || true
-#       - name: Run self tests
-#         working-directory: packages/self
-#         run: |
-#           bun run test:unit
+      # -------------------------
+      # self tests
+      # -------------------------
+      - name: Install deps (self)
+        working-directory: packages/self
+        run: |
+          bun install --ignore-scripts || true
+      - name: Run self tests
+        working-directory: packages/self
+        run: |
+          bun run test:unit
 
-#       # -------------------------
-#       # Build & push docker images
-#       # -------------------------
-#       - name: Set up Docker Buildx
-#         uses: docker/setup-buildx-action@v3
+      # -------------------------
+      # Build & push docker images
+      # -------------------------
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
 
-#       - name: Log in to Docker Hub
-#         uses: docker/login-action@v3
-#         with:
-#           username: ${{ secrets.DOCKERHUB_USERNAME }}
-#           password: ${{ secrets.DOCKERHUB_PASSWORD }}
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_PASSWORD }}
 
-#       - name: Build and push user-be image
-#         if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-#         uses: docker/build-push-action@v6
-#         with:
-#           context: packages/user-be
-#           file: packages/user-be/Dockerfile
-#           push: true
-#           tags: |
-#             ${{ env.USER_BE_IMAGE }}:latest
-#             ${{ env.USER_BE_IMAGE }}:${{ env.IMAGE_TAG }}
-#           build-args: |
-#             DATABASE_URL=postgresql://dummy:dummy@localhost:5432/dummy
-#           no-cache: true
-#           pull: true
-#           cache-from: type=inline
-#           cache-to: type=inline
+      - name: Build and push user-be image
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        uses: docker/build-push-action@v6
+        with:
+          context: packages/user-be
+          file: packages/user-be/Dockerfile
+          push: true
+          tags: |
+            ${{ env.USER_BE_IMAGE }}:latest
+            ${{ env.USER_BE_IMAGE }}:${{ env.IMAGE_TAG }}
+          build-args: |
+            DATABASE_URL=postgresql://dummy:dummy@localhost:5432/dummy
+          no-cache: true
+          pull: true
+          cache-from: type=inline
+          cache-to: type=inline
 
-#       - name: Build and push admin-be image
-#         if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-#         uses: docker/build-push-action@v6
-#         with:
-#           context: packages/admin-be
-#           file: packages/admin-be/Dockerfile
-#           push: true
-#           tags: |
-#             ${{ env.ADMIN_BE_IMAGE }}:latest
-#             ${{ env.ADMIN_BE_IMAGE }}:${{ env.IMAGE_TAG }}
-#           build-args: |
-#             DATABASE_URL=postgresql://dummy:dummy@localhost:5432/dummy
-#           no-cache: true
-#           pull: true
-#           cache-from: type=inline
-#           cache-to: type=inline
+      - name: Build and push admin-be image
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        uses: docker/build-push-action@v6
+        with:
+          context: packages/admin-be
+          file: packages/admin-be/Dockerfile
+          push: true
+          tags: |
+            ${{ env.ADMIN_BE_IMAGE }}:latest
+            ${{ env.ADMIN_BE_IMAGE }}:${{ env.IMAGE_TAG }}
+          build-args: |
+            DATABASE_URL=postgresql://dummy:dummy@localhost:5432/dummy
+          no-cache: true
+          pull: true
+          cache-from: type=inline
+          cache-to: type=inline
 
-#       - name: Build and push compQueue image
-#         if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-#         uses: docker/build-push-action@v6
-#         with:
-#           context: packages/compQueue
-#           file: packages/compQueue/Dockerfile
-#           push: true
-#           tags: |
-#             ${{ env.COMP_QUEUE_IMAGE }}:latest
-#             ${{ env.COMP_QUEUE_IMAGE }}:${{ env.IMAGE_TAG }}
-#           build-args: |
-#             DATABASE_URL=postgresql://dummy:dummy@localhost:5432/dummy
-#           no-cache: true
-#           pull: true
-#           cache-from: type=inline
-#           cache-to: type=inline
+      - name: Build and push compQueue image
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        uses: docker/build-push-action@v6
+        with:
+          context: packages/compQueue
+          file: packages/compQueue/Dockerfile
+          push: true
+          tags: |
+            ${{ env.COMP_QUEUE_IMAGE }}:latest
+            ${{ env.COMP_QUEUE_IMAGE }}:${{ env.IMAGE_TAG }}
+          build-args: |
+            DATABASE_URL=postgresql://dummy:dummy@localhost:5432/dummy
+          no-cache: true
+          pull: true
+          cache-from: type=inline
+          cache-to: type=inline
 
-#       - name: Build and push self image
-#         if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-#         uses: docker/build-push-action@v6
-#         with:
-#           context: packages/self
-#           file: packages/self/Dockerfile
-#           push: true
-#           tags: |
-#             ${{ env.SELF_IMAGE }}:latest
-#             ${{ env.SELF_IMAGE }}:${{ env.IMAGE_TAG }}
-#           no-cache: true
-#           pull: true
-#           cache-from: type=inline
-#           cache-to: type=inline
+      - name: Build and push self image
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        uses: docker/build-push-action@v6
+        with:
+          context: packages/self
+          file: packages/self/Dockerfile
+          push: true
+          tags: |
+            ${{ env.SELF_IMAGE }}:latest
+            ${{ env.SELF_IMAGE }}:${{ env.IMAGE_TAG }}
+          no-cache: true
+          pull: true
+          cache-from: type=inline
+          cache-to: type=inline
 
-#       # -------------------------
-#       # Open PR main -> deploy (skip if one already open)
-#       # -------------------------
-#       # - name: Open PR to deploy
-#       #   uses: actions/github-script@v7
-#       #   with:
-#       #     script: |
-#       #       const owner = context.repo.owner;
-#       #       const repo = context.repo.repo;
-#       #       const base = 'deploy';
-#       #       const head = 'main';
-#       #       // Check if an open PR from main->deploy already exists
-#       #       const prs = await github.rest.pulls.list({ owner, repo, state: 'open', base });
-#       #       const exists = prs.data.find(pr => pr.head.ref === head);
-#       #       if (exists) {
-#       #         core.info('PR already open: #' + exists.number + ' ' + exists.title);
-#       #         return;
-#       #       }
-#       #       const title = 'Deploy latest from main';
-#       #       const body = [
-#       #         'This PR merges main -> deploy to trigger Argo CD.',
-#       #         '',
-#       #         '- Images pushed: latest, ' + process.env.IMAGE_TAG,
-#       #         '- Merge when ready; Argo will sync on merge.'
-#       #       ].join('\n');
-#       #       const res = await github.rest.pulls.create({ owner, repo, title, head, base, body });
-#       #       core.info('Opened PR #' + res.data.number);
+      # -------------------------
+      # Open PR main -> deploy (skip if one already open)
+      # -------------------------
+      # - name: Open PR to deploy
+      #   uses: actions/github-script@v7
+      #   with:
+      #     script: |
+      #       const owner = context.repo.owner;
+      #       const repo = context.repo.repo;
+      #       const base = 'deploy';
+      #       const head = 'main';
+      #       // Check if an open PR from main->deploy already exists
+      #       const prs = await github.rest.pulls.list({ owner, repo, state: 'open', base });
+      #       const exists = prs.data.find(pr => pr.head.ref === head);
+      #       if (exists) {
+      #         core.info('PR already open: #' + exists.number + ' ' + exists.title);
+      #         return;
+      #       }
+      #       const title = 'Deploy latest from main';
+      #       const body = [
+      #         'This PR merges main -> deploy to trigger Argo CD.',
+      #         '',
+      #         '- Images pushed: latest, ' + process.env.IMAGE_TAG,
+      #         '- Merge when ready; Argo will sync on merge.'
+      #       ].join('\n');
+      #       const res = await github.rest.pulls.create({ owner, repo, title, head, base, body });
+      #       core.info('Opened PR #' + res.data.number);
