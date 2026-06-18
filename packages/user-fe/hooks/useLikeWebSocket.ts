@@ -64,7 +64,7 @@ export function useLikeWebSocket({
 }: UseLikeWebSocketOptions): UseLikeWebSocketReturn {
   const [isConnected, setIsConnected] = useState(false);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
-  
+
   // Use refs to store mutable values without causing re-renders
   const wsRef = useRef<WebSocket | null>(null);
   const reconnectTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -72,11 +72,11 @@ export function useLikeWebSocket({
   const reconnectAttemptsRef = useRef(0);
   const isUnmountedRef = useRef(false);
   const isConnectingRef = useRef(false);
-  
+
   // Store callbacks in refs to avoid dependency issues
   const callbacksRef = useRef({ onLikeUpdate, onConnect, onDisconnect, onError });
   callbacksRef.current = { onLikeUpdate, onConnect, onDisconnect, onError };
-  
+
   // Store authToken in ref for stable access
   const authTokenRef = useRef(authToken);
   authTokenRef.current = authToken;
@@ -107,15 +107,15 @@ export function useLikeWebSocket({
     if (isUnmountedRef.current) return;
     if (!authTokenRef.current) return;
     if (isConnectingRef.current) return;
-    
+
     const ws = wsRef.current;
     if (ws && (ws.readyState === WebSocket.OPEN || ws.readyState === WebSocket.CONNECTING)) {
       return;
     }
-    
+
     isConnectingRef.current = true;
     cleanup();
-    
+
     // Close existing connection if any
     if (ws) {
       ws.onopen = null;
@@ -124,26 +124,26 @@ export function useLikeWebSocket({
       ws.onmessage = null;
       wsRef.current = null;
     }
-    
+
     console.log("🔌 Connecting to WebSocket...");
-    
+
     try {
       const newWs = new WebSocket(wsUrl);
       wsRef.current = newWs;
-      
+
       newWs.onopen = () => {
         isConnectingRef.current = false;
-        
+
         if (isUnmountedRef.current) {
           newWs.close(1000, "Component unmounted");
           return;
         }
-        
+
         console.log("🔌 WebSocket connected");
         setIsConnected(true);
         reconnectAttemptsRef.current = 0;
         callbacksRef.current.onConnect?.();
-        
+
         // Send auth
         const token = authTokenRef.current;
         if (token) {
@@ -153,7 +153,7 @@ export function useLikeWebSocket({
             timestamp: Date.now(),
           }));
         }
-        
+
         // Start ping interval
         pingIntervalRef.current = setInterval(() => {
           if (newWs.readyState === WebSocket.OPEN) {
@@ -161,23 +161,23 @@ export function useLikeWebSocket({
           }
         }, PING_INTERVAL);
       };
-      
+
       newWs.onmessage = (event: MessageEvent) => {
         try {
           const message: WsMessage = JSON.parse(event.data);
-          
+
           switch (message.type) {
             case WsMessageType.AUTH_SUCCESS:
               setIsAuthenticated(true);
               reconnectAttemptsRef.current = 0;
               console.log("✅ WebSocket authenticated");
               break;
-              
+
             case WsMessageType.AUTH_ERROR:
               setIsAuthenticated(false);
               console.error("❌ WebSocket auth failed:", message.payload?.error);
               break;
-              
+
             case WsMessageType.LIKE_UPDATE:
               if (message.payload) {
                 callbacksRef.current.onLikeUpdate?.({
@@ -188,11 +188,11 @@ export function useLikeWebSocket({
                 });
               }
               break;
-              
+
             case WsMessageType.PONG:
               // Heartbeat OK
               break;
-              
+
             case WsMessageType.LIKE_ERROR:
             case WsMessageType.ERROR:
               console.error("WebSocket message error:", message.payload?.error);
@@ -202,37 +202,37 @@ export function useLikeWebSocket({
           console.error("Failed to parse WebSocket message:", err);
         }
       };
-      
+
       newWs.onclose = (event) => {
         isConnectingRef.current = false;
         console.log(`🔌 WebSocket disconnected: ${event.code} - ${event.reason || "(no reason)"}`);
-        
+
         cleanup();
         wsRef.current = null;
         setIsConnected(false);
         setIsAuthenticated(false);
         callbacksRef.current.onDisconnect?.();
-        
+
         // Reconnect only if not intentionally closed and component still mounted
-        const shouldReconnect = 
+        const shouldReconnect =
           !isUnmountedRef.current &&
           authTokenRef.current &&
           event.code !== 1000 && // Normal closure
           reconnectAttemptsRef.current < MAX_RECONNECT_ATTEMPTS;
-        
+
         if (shouldReconnect) {
           reconnectAttemptsRef.current++;
           console.log(`🔄 Reconnecting in ${RECONNECT_DELAY}ms (${reconnectAttemptsRef.current}/${MAX_RECONNECT_ATTEMPTS})`);
           reconnectTimeoutRef.current = setTimeout(connect, RECONNECT_DELAY);
         }
       };
-      
+
       newWs.onerror = (error) => {
         isConnectingRef.current = false;
         console.error("WebSocket error:", error);
         callbacksRef.current.onError?.(error);
       };
-      
+
     } catch (error) {
       isConnectingRef.current = false;
       console.error("Failed to create WebSocket:", error);
@@ -242,7 +242,7 @@ export function useLikeWebSocket({
   // Disconnect function
   const disconnect = useCallback(() => {
     cleanup();
-    
+
     const ws = wsRef.current;
     if (ws) {
       // Prevent reconnect by setting onclose to null before closing
@@ -250,7 +250,7 @@ export function useLikeWebSocket({
       ws.close(1000, "Intentional disconnect");
       wsRef.current = null;
     }
-    
+
     setIsConnected(false);
     setIsAuthenticated(false);
   }, [cleanup]);
@@ -276,7 +276,7 @@ export function useLikeWebSocket({
   // IMPORTANT: Only depend on authToken to avoid reconnect loops
   useEffect(() => {
     isUnmountedRef.current = false;
-    
+
     if (authToken) {
       // Small delay to ensure component is mounted
       const timer = setTimeout(connect, 50);
@@ -286,7 +286,7 @@ export function useLikeWebSocket({
         disconnect();
       };
     }
-    
+
     return () => {
       isUnmountedRef.current = true;
     };
