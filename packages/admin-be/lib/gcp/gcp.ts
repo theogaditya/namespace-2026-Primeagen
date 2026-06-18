@@ -17,6 +17,17 @@ export async function initializeGCP(): Promise<{ projectId: string | undefined; 
     const credPath = path.join(__dirname, 'gcp-credentials.json');
     fs.writeFileSync(credPath, GCRED_JSON);
     process.env.GOOGLE_APPLICATION_CREDENTIALS = credPath;
+  } else if (process.env.CLIENT_EMAIL && process.env.PRIVATE_KEY) {
+    // Build credentials JSON from individual env vars
+    const creds = JSON.stringify({
+      type: 'service_account',
+      project_id: process.env.GCP_PROJECT_ID,
+      client_email: process.env.CLIENT_EMAIL,
+      private_key: process.env.PRIVATE_KEY.replace(/\\n/g, '\n'),
+    });
+    const credPath = path.join(__dirname, 'gcp-credentials.json');
+    fs.writeFileSync(credPath, creds);
+    process.env.GOOGLE_APPLICATION_CREDENTIALS = credPath;
   }
 
   // Load configuration from environment variables
