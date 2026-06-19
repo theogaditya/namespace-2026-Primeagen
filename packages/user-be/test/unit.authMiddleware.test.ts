@@ -20,7 +20,7 @@ vi.mock('../lib/redis/tokenBlacklistService', () => ({
 import { createAuthMiddleware } from '../middleware/authRoute';
 import { tokenBlacklistService } from '../lib/redis/tokenBlacklistService';
 
-const JWT_SECRET = "my123";
+const JWT_SECRET = process.env.JWT_SECRET || "my123";
 
 let app: express.Express;
 
@@ -38,13 +38,13 @@ describe('Auth Middleware', () => {
   describe('Token Validation', () => {
     it('returns 401 when no Authorization header is provided', async () => {
       const authMiddleware = createAuthMiddleware(prismaMock);
-      
+
       app.use('/api/protected', authMiddleware, (req, res) => {
         res.json({ success: true, userId: req.userId });
       });
 
       const res = await request(app).get('/api/protected');
-      
+
       expect(res.status).toBe(401);
       expect(res.body.success).toBe(false);
       expect(res.body.message).toBe('Authentication required. Please login first.');
@@ -52,7 +52,7 @@ describe('Auth Middleware', () => {
 
     it('returns 401 when Authorization header does not start with Bearer', async () => {
       const authMiddleware = createAuthMiddleware(prismaMock);
-      
+
       app.use('/api/protected', authMiddleware, (req, res) => {
         res.json({ success: true });
       });
@@ -60,7 +60,7 @@ describe('Auth Middleware', () => {
       const res = await request(app)
         .get('/api/protected')
         .set('Authorization', 'Basic some-token');
-      
+
       expect(res.status).toBe(401);
       expect(res.body.success).toBe(false);
       expect(res.body.message).toBe('Authentication required. Please login first.');
@@ -68,7 +68,7 @@ describe('Auth Middleware', () => {
 
     it('returns 401 when token is invalid', async () => {
       const authMiddleware = createAuthMiddleware(prismaMock);
-      
+
       app.use('/api/protected', authMiddleware, (req, res) => {
         res.json({ success: true });
       });
@@ -76,7 +76,7 @@ describe('Auth Middleware', () => {
       const res = await request(app)
         .get('/api/protected')
         .set('Authorization', 'Bearer invalid-token-here');
-      
+
       expect(res.status).toBe(401);
       expect(res.body.success).toBe(false);
       expect(res.body.message).toBe('Invalid or expired token. Please login again.');
@@ -84,14 +84,14 @@ describe('Auth Middleware', () => {
 
     it('returns 401 when token is expired', async () => {
       const authMiddleware = createAuthMiddleware(prismaMock);
-      
+
       // Create an expired token
       const expiredToken = jwt.sign(
         { userId: 'user-123', email: 'test@example.com', name: 'Test' },
         JWT_SECRET,
         { expiresIn: '-1h' } // Already expired
       );
-      
+
       app.use('/api/protected', authMiddleware, (req, res) => {
         res.json({ success: true });
       });
@@ -99,14 +99,14 @@ describe('Auth Middleware', () => {
       const res = await request(app)
         .get('/api/protected')
         .set('Authorization', `Bearer ${expiredToken}`);
-      
+
       expect(res.status).toBe(401);
       expect(res.body.message).toBe('Invalid or expired token. Please login again.');
     });
 
     it('allows access with valid token', async () => {
       const authMiddleware = createAuthMiddleware(prismaMock);
-      
+
       const validToken = jwt.sign(
         { userId: 'user-123', email: 'test@example.com', name: 'Test User' },
         JWT_SECRET,
@@ -128,7 +128,7 @@ describe('Auth Middleware', () => {
       const res = await request(app)
         .get('/api/protected')
         .set('Authorization', `Bearer ${validToken}`);
-      
+
       expect(res.status).toBe(200);
       expect(res.body.success).toBe(true);
       expect(res.body.userId).toBe('user-123');
@@ -139,7 +139,7 @@ describe('Auth Middleware', () => {
   describe('Token Blacklist Checking', () => {
     it('returns 401 when token is blacklisted', async () => {
       const authMiddleware = createAuthMiddleware(prismaMock);
-      
+
       const validToken = jwt.sign(
         { userId: 'user-123', email: 'test@example.com', name: 'Test' },
         JWT_SECRET,
@@ -156,7 +156,7 @@ describe('Auth Middleware', () => {
       const res = await request(app)
         .get('/api/protected')
         .set('Authorization', `Bearer ${validToken}`);
-      
+
       expect(res.status).toBe(401);
       expect(res.body.success).toBe(false);
       expect(res.body.message).toBe('Token has been invalidated. Please login again.');
@@ -165,7 +165,7 @@ describe('Auth Middleware', () => {
 
     it('allows access when token is not blacklisted', async () => {
       const authMiddleware = createAuthMiddleware(prismaMock);
-      
+
       const validToken = jwt.sign(
         { userId: 'user-123', email: 'test@example.com', name: 'Test' },
         JWT_SECRET,
@@ -189,7 +189,7 @@ describe('Auth Middleware', () => {
       const res = await request(app)
         .get('/api/protected')
         .set('Authorization', `Bearer ${validToken}`);
-      
+
       expect(res.status).toBe(200);
       expect(res.body.success).toBe(true);
     });
@@ -198,7 +198,7 @@ describe('Auth Middleware', () => {
   describe('User Status Verification', () => {
     it('returns 401 when user is not found in database', async () => {
       const authMiddleware = createAuthMiddleware(prismaMock);
-      
+
       const validToken = jwt.sign(
         { userId: 'user-123', email: 'test@example.com', name: 'Test' },
         JWT_SECRET,
@@ -215,7 +215,7 @@ describe('Auth Middleware', () => {
       const res = await request(app)
         .get('/api/protected')
         .set('Authorization', `Bearer ${validToken}`);
-      
+
       expect(res.status).toBe(401);
       expect(res.body.success).toBe(false);
       expect(res.body.message).toBe('Invalid authentication. User not found.');
@@ -223,7 +223,7 @@ describe('Auth Middleware', () => {
 
     it('returns 403 when user status is SUSPENDED', async () => {
       const authMiddleware = createAuthMiddleware(prismaMock);
-      
+
       const validToken = jwt.sign(
         { userId: 'user-123', email: 'test@example.com', name: 'Test' },
         JWT_SECRET,
@@ -245,7 +245,7 @@ describe('Auth Middleware', () => {
       const res = await request(app)
         .get('/api/protected')
         .set('Authorization', `Bearer ${validToken}`);
-      
+
       expect(res.status).toBe(403);
       expect(res.body.success).toBe(false);
       expect(res.body.message).toBe('Account is suspended. Please contact support.');
@@ -253,7 +253,7 @@ describe('Auth Middleware', () => {
 
     it('returns 403 when user status is DELETED', async () => {
       const authMiddleware = createAuthMiddleware(prismaMock);
-      
+
       const validToken = jwt.sign(
         { userId: 'user-123', email: 'test@example.com', name: 'Test' },
         JWT_SECRET,
@@ -275,7 +275,7 @@ describe('Auth Middleware', () => {
       const res = await request(app)
         .get('/api/protected')
         .set('Authorization', `Bearer ${validToken}`);
-      
+
       expect(res.status).toBe(403);
       expect(res.body.success).toBe(false);
       expect(res.body.message).toBe('Account is deleted. Please contact support.');
@@ -283,7 +283,7 @@ describe('Auth Middleware', () => {
 
     it('allows access when user status is ACTIVE', async () => {
       const authMiddleware = createAuthMiddleware(prismaMock);
-      
+
       const validToken = jwt.sign(
         { userId: 'user-123', email: 'test@example.com', name: 'Test' },
         JWT_SECRET,
@@ -305,7 +305,7 @@ describe('Auth Middleware', () => {
       const res = await request(app)
         .get('/api/protected')
         .set('Authorization', `Bearer ${validToken}`);
-      
+
       expect(res.status).toBe(200);
       expect(res.body.success).toBe(true);
       expect(res.body.user.status).toBe('ACTIVE');
@@ -315,7 +315,7 @@ describe('Auth Middleware', () => {
   describe('Error Handling', () => {
     it('returns 500 when database throws error', async () => {
       const authMiddleware = createAuthMiddleware(prismaMock);
-      
+
       const validToken = jwt.sign(
         { userId: 'user-123', email: 'test@example.com', name: 'Test' },
         JWT_SECRET,
@@ -332,7 +332,7 @@ describe('Auth Middleware', () => {
       const res = await request(app)
         .get('/api/protected')
         .set('Authorization', `Bearer ${validToken}`);
-      
+
       expect(res.status).toBe(500);
       expect(res.body.success).toBe(false);
       expect(res.body.message).toBe('Authentication error');
@@ -340,7 +340,7 @@ describe('Auth Middleware', () => {
 
     it('returns 500 when token blacklist service throws error', async () => {
       const authMiddleware = createAuthMiddleware(prismaMock);
-      
+
       const validToken = jwt.sign(
         { userId: 'user-123', email: 'test@example.com', name: 'Test' },
         JWT_SECRET,
@@ -358,7 +358,7 @@ describe('Auth Middleware', () => {
       const res = await request(app)
         .get('/api/protected')
         .set('Authorization', `Bearer ${validToken}`);
-      
+
       expect(res.status).toBe(500);
       expect(res.body.success).toBe(false);
       expect(res.body.message).toBe('Authentication error');
@@ -369,9 +369,9 @@ describe('Auth Middleware', () => {
     it('attaches userId to request object', async () => {
       // Reset the mock to return false (not blacklisted)
       vi.mocked(tokenBlacklistService.isBlacklisted).mockResolvedValue(false);
-      
+
       const authMiddleware = createAuthMiddleware(prismaMock);
-      
+
       const validToken = jwt.sign(
         { userId: 'user-123', email: 'test@example.com', name: 'Test' },
         JWT_SECRET,
@@ -396,16 +396,16 @@ describe('Auth Middleware', () => {
       await request(app)
         .get('/api/protected')
         .set('Authorization', `Bearer ${validToken}`);
-      
+
       expect(capturedUserId).toBe('user-123');
     });
 
     it('attaches user object to request', async () => {
       // Reset the mock to return false (not blacklisted)
       vi.mocked(tokenBlacklistService.isBlacklisted).mockResolvedValue(false);
-      
+
       const authMiddleware = createAuthMiddleware(prismaMock);
-      
+
       const validToken = jwt.sign(
         { userId: 'user-123', email: 'test@example.com', name: 'Test' },
         JWT_SECRET,
@@ -432,7 +432,7 @@ describe('Auth Middleware', () => {
       await request(app)
         .get('/api/protected')
         .set('Authorization', `Bearer ${validToken}`);
-      
+
       expect(capturedUser).toEqual(mockUser);
     });
   });

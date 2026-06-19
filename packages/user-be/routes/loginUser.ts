@@ -4,7 +4,7 @@ import jwt from "jsonwebtoken";
 import { PrismaClient } from "../prisma/generated/client/client";
 import { userLoginSchema } from "../lib/validations/validation.user";
 
-const JWT_SECRET = "my123";
+const JWT_SECRET = process.env.JWT_SECRET || "my123";
 
 export function loginUserRouter(db: PrismaClient) {
   const router = Router();

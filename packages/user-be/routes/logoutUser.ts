@@ -1,10 +1,10 @@
-import { Router,Request,Response } from "express";
+import { Router, Request, Response } from "express";
 import jwt from "jsonwebtoken";
 import { PrismaClient } from "../prisma/generated/client/client";
 import { createAuthMiddleware } from "../middleware/authRoute";
 import { tokenBlacklistService } from "../lib/redis/tokenBlacklistService";
 
-const JWT_SECRET = "my123";
+const JWT_SECRET = process.env.JWT_SECRET || "my123";
 
 export function logoutUserRouter(db: PrismaClient) {
   const router = Router();

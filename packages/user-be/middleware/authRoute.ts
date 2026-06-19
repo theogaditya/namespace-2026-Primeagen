@@ -3,7 +3,7 @@ import jwt from "jsonwebtoken";
 import { PrismaClient } from "../prisma/generated/client/client";
 import { tokenBlacklistService } from "../lib/redis/tokenBlacklistService";
 
-const JWT_SECRET = "my123";
+const JWT_SECRET = process.env.JWT_SECRET || "my123";
 
 // Extend Express Request to include user
 declare global {

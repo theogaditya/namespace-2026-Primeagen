@@ -32,7 +32,7 @@ import { logoutUserRouter } from '../routes/logoutUser';
 import { tokenBlacklistService } from '../lib/redis/tokenBlacklistService';
 import bcrypt from 'bcrypt';
 
-const JWT_SECRET = "my123";
+const JWT_SECRET = process.env.JWT_SECRET || "my123";
 
 let app: express.Express;
 
@@ -163,7 +163,7 @@ describe('Login User routes', () => {
     expect(res.body.data.user).toHaveProperty('id', 'uuid-1');
     expect(res.body.data.user).toHaveProperty('email', 'test@example.com');
     expect(res.body.data.user).not.toHaveProperty('password');
-    
+
     // Verify JWT token is valid
     const decoded = jwt.verify(res.body.data.token, JWT_SECRET) as any;
     expect(decoded).toHaveProperty('userId', 'uuid-1');
@@ -313,7 +313,7 @@ describe('Logout User routes', () => {
     expect(res.body.message).toContain('Logout successful');
     expect(res.body.data).toHaveProperty('userId', 'uuid-1');
     expect(res.body.data).toHaveProperty('logoutTime');
-    
+
     // Verify token was added to blacklist
     expect(tokenBlacklistService.blacklistToken).toHaveBeenCalledTimes(1);
     expect(tokenBlacklistService.blacklistToken).toHaveBeenCalledWith(
@@ -420,7 +420,7 @@ describe('Logout User routes', () => {
 
     // @ts-ignore
     prismaMock.user.findUnique.mockResolvedValue(mockUser);
-    
+
     // Mock Redis failure
     vi.mocked(tokenBlacklistService.blacklistToken).mockRejectedValueOnce(
       new Error('Redis connection failed')
