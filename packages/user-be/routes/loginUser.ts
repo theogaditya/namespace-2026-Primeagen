@@ -69,6 +69,8 @@ export function loginUserRouter(db: PrismaClient) {
       }
 
       // Generate JWT token
+      console.log(`[Login] Signing token with secret length: ${JWT_SECRET.length}`);
+      console.log(`[Login] Secret prefix: ${JWT_SECRET.substring(0, 3)}***`);
       const token = jwt.sign(
         {
           userId: user.id,

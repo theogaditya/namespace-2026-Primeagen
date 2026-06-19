@@ -25,7 +25,7 @@ export enum WsMessageType {
   SUBSCRIBE = "subscribe",
   UNSUBSCRIBE = "unsubscribe",
   PING = "ping",
-  
+
   // Server → Client
   AUTH_SUCCESS = "auth_success",
   AUTH_ERROR = "auth_error",
@@ -88,18 +88,18 @@ interface JwtPayload {
 
 export class WsHandler {
   private db: PrismaClient;
-  
+
   constructor(db: PrismaClient) {
     this.db = db;
   }
-  
+
   /**
    * Parse incoming WebSocket message
    */
   parseMessage(message: string | Buffer): WsMessage | null {
     try {
-      const data = typeof message === 'string' 
-        ? message 
+      const data = typeof message === 'string'
+        ? message
         : message.toString('utf-8');
       return JSON.parse(data) as WsMessage;
     } catch (error) {
@@ -107,7 +107,7 @@ export class WsHandler {
       return null;
     }
   }
-  
+
   /**
    * Create a WebSocket response message
    */
@@ -119,7 +119,7 @@ export class WsHandler {
     };
     return JSON.stringify(message);
   }
-  
+
   /**
    * Authenticate a WebSocket connection
    */
@@ -129,14 +129,14 @@ export class WsHandler {
   ): Promise<boolean> {
     try {
       const { token } = payload;
-      
+
       if (!token) {
         ws.send(this.createMessage(WsMessageType.AUTH_ERROR, {
           error: "Token is required",
         }));
         return false;
       }
-      
+
       // Check if token is blacklisted
       const isBlacklisted = await tokenBlacklistService.isBlacklisted(token);
       if (isBlacklisted) {
@@ -145,47 +145,56 @@ export class WsHandler {
         }));
         return false;
       }
-      
+
       // Verify JWT
       let decoded: JwtPayload;
       try {
+        console.log(`[WS Auth] Verifying token with secret length: ${JWT_SECRET.length}`);
+        console.log(`[WS Auth] Secret prefix: ${JWT_SECRET.substring(0, 3)}***`);
         decoded = jwt.verify(token, JWT_SECRET) as JwtPayload;
-      } catch (err) {
+      } catch (err: any) {
+        console.error(`[WS Auth] Token verification failed: ${err.message}`);
+        if (err.name === 'TokenExpiredError') {
+          const decodedUnverified = jwt.decode(token) as any;
+          console.error(`[WS Auth] Token expired at: ${new Date(decodedUnverified?.exp * 1000).toISOString()}`);
+          console.error(`[WS Auth] Current server time: ${new Date().toISOString()}`);
+        }
         ws.send(this.createMessage(WsMessageType.AUTH_ERROR, {
           error: "Invalid or expired token",
+          details: err.message
         }));
         return false;
       }
-      
+
       // Verify user exists and is active
       const user = await this.db.user.findUnique({
         where: { id: decoded.userId },
         select: { id: true, status: true },
       });
-      
+
       if (!user || user.status !== "ACTIVE") {
         ws.send(this.createMessage(WsMessageType.AUTH_ERROR, {
           error: "User not found or inactive",
         }));
         return false;
       }
-      
+
       // Update WebSocket data
       ws.data.userId = decoded.userId;
       ws.data.isAuthenticated = true;
       ws.data.lastActivity = Date.now();
-      
+
       // Load user's likes into memory
       await this.loadUserLikes(decoded.userId);
-      
+
       // Subscribe to global likes topic
       ws.subscribe("likes:global");
-      
+
       ws.send(this.createMessage(WsMessageType.AUTH_SUCCESS, {
         userId: decoded.userId,
         message: "Authentication successful",
       }));
-      
+
       return true;
     } catch (error) {
       console.error('Authentication error:', error);
@@ -195,14 +204,14 @@ export class WsHandler {
       return false;
     }
   }
-  
+
   /**
    * Load user's likes from Redis/DB into memory
    */
   async loadUserLikes(userId: string): Promise<void> {
     try {
       const redisService = getLikeCounterService();
-      
+
       if (redisService.isReady()) {
         // Try Redis first (faster)
         const likedComplaints = await redisService.getUserLikes(userId);
@@ -219,7 +228,7 @@ export class WsHandler {
       console.error('Error loading user likes:', error);
     }
   }
-  
+
   /**
    * Handle like/unlike action
    */
@@ -234,16 +243,16 @@ export class WsHandler {
       }));
       return;
     }
-    
+
     const { complaintId } = payload;
-    
+
     if (!complaintId) {
       ws.send(this.createMessage(WsMessageType.LIKE_ERROR, {
         error: "complaintId is required",
       }));
       return;
     }
-    
+
     // Validate UUID format
     const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
     if (!uuidRegex.test(complaintId)) {
@@ -252,13 +261,13 @@ export class WsHandler {
       }));
       return;
     }
-    
+
     try {
       const userId = ws.data.userId;
-      
+
       // Toggle in memory store (O(1))
       const result = likeStore.toggle(userId, complaintId);
-      
+
       // Also update Redis (async, non-blocking)
       const redisService = getLikeCounterService();
       if (redisService.isReady()) {
@@ -272,7 +281,7 @@ export class WsHandler {
               await redisService.removeUserLike(userId, complaintId);
               await redisService.decrementLikeCount(complaintId);
             }
-            
+
             // Publish update for multi-instance sync
             await redisService.publishUpdate({
               type: result.liked ? 'like' : 'unlike',
@@ -286,25 +295,25 @@ export class WsHandler {
           }
         })();
       }
-      
+
       // Send confirmation to the user who liked
       ws.send(this.createMessage(WsMessageType.LIKE_UPDATE, {
         complaintId,
         count: result.count,
         liked: result.liked,
       }));
-      
+
       // Broadcast to all subscribers (except sender)
       const broadcastMessage = this.createMessage(WsMessageType.LIKE_UPDATE, {
         complaintId,
         count: result.count,
       });
-      
+
       server.publish("likes:global", broadcastMessage);
-      
+
       // Update last activity
       ws.data.lastActivity = Date.now();
-      
+
     } catch (error) {
       console.error('Like error:', error);
       ws.send(this.createMessage(WsMessageType.LIKE_ERROR, {
@@ -313,7 +322,7 @@ export class WsHandler {
       }));
     }
   }
-  
+
   /**
    * Handle topic subscription
    */
@@ -322,20 +331,20 @@ export class WsHandler {
     payload: SubscribePayload
   ): void {
     const { topic } = payload;
-    
+
     if (!topic) {
       ws.send(this.createMessage(WsMessageType.ERROR, {
         error: "Topic is required",
       }));
       return;
     }
-    
+
     ws.subscribe(topic);
     ws.data.subscribedTopics.add(topic);
-    
+
     ws.send(this.createMessage(WsMessageType.SUBSCRIBED, { topic }));
   }
-  
+
   /**
    * Handle topic unsubscription
    */
@@ -344,20 +353,20 @@ export class WsHandler {
     payload: SubscribePayload
   ): void {
     const { topic } = payload;
-    
+
     if (!topic) {
       ws.send(this.createMessage(WsMessageType.ERROR, {
         error: "Topic is required",
       }));
       return;
     }
-    
+
     ws.unsubscribe(topic);
     ws.data.subscribedTopics.delete(topic);
-    
+
     ws.send(this.createMessage(WsMessageType.UNSUBSCRIBED, { topic }));
   }
-  
+
   /**
    * Handle ping (for keep-alive)
    */
@@ -367,7 +376,7 @@ export class WsHandler {
       serverTime: Date.now(),
     }));
   }
-  
+
   /**
    * Process incoming WebSocket message
    */
@@ -377,42 +386,42 @@ export class WsHandler {
     server: any
   ): Promise<void> {
     const parsed = this.parseMessage(message);
-    
+
     if (!parsed) {
       ws.send(this.createMessage(WsMessageType.ERROR, {
         error: "Invalid message format",
       }));
       return;
     }
-    
+
     switch (parsed.type) {
       case WsMessageType.AUTH:
         await this.authenticate(ws, parsed.payload as AuthPayload);
         break;
-        
+
       case WsMessageType.LIKE:
         await this.handleLike(ws, parsed.payload as LikePayload, server);
         break;
-        
+
       case WsMessageType.SUBSCRIBE:
         this.handleSubscribe(ws, parsed.payload as SubscribePayload);
         break;
-        
+
       case WsMessageType.UNSUBSCRIBE:
         this.handleUnsubscribe(ws, parsed.payload as SubscribePayload);
         break;
-        
+
       case WsMessageType.PING:
         this.handlePing(ws);
         break;
-        
+
       default:
         ws.send(this.createMessage(WsMessageType.ERROR, {
           error: `Unknown message type: ${parsed.type}`,
         }));
     }
   }
-  
+
   /**
    * Handle connection close
    */
@@ -422,11 +431,11 @@ export class WsHandler {
       ws.unsubscribe(topic);
     }
     ws.data.subscribedTopics.clear();
-    
+
     // Note: We don't clear user likes from memory on disconnect
     // as other connections might still need them
   }
-  
+
   /**
    * Create initial user data for new connections
    */
