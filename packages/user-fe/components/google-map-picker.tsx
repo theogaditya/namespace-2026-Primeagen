@@ -18,6 +18,7 @@ import {
   Crosshair,
   ZoomIn,
   ZoomOut,
+  AlertTriangle,
 } from "lucide-react";
 
 const GOOGLE_API_KEY = process.env.NEXT_PUBLIC_GOOGLE_API_KEY || "";
@@ -209,6 +210,21 @@ export function GoogleMapPicker({
   const [isSearching, setIsSearching] = useState(false);
   const [locationError, setLocationError] = useState<string | null>(null);
   const [zoom, setZoom] = useState(DEFAULT_ZOOM);
+  const [isLocationDisabled, setIsLocationDisabled] = useState(false);
+
+  // Check location permission on mount
+  useEffect(() => {
+    if (navigator.permissions && navigator.permissions.query) {
+      navigator.permissions
+        .query({ name: "geolocation" as any })
+        .then((result) => {
+          setIsLocationDisabled(result.state === "denied");
+          result.onchange = () => {
+            setIsLocationDisabled(result.state === "denied");
+          };
+        });
+    }
+  }, []);
 
   // Use unified geolocation hook (works in both browser and Capacitor)
   const { isLoading: isGettingLocation, getCurrentPosition } = useGeolocation();
@@ -341,7 +357,7 @@ export function GoogleMapPicker({
     setLocationError(null);
 
     const position = await getCurrentPosition();
-    
+
     if (position) {
       onLocationSelect(position.latitude.toFixed(6), position.longitude.toFixed(6));
       setZoom(15);
@@ -435,6 +451,21 @@ export function GoogleMapPicker({
           )}
         </AnimatePresence>
       </div>
+
+      {/* Location Warning */}
+      {isLocationDisabled && (
+        <div className="p-4 bg-amber-50 border border-amber-200 rounded-xl flex items-start gap-3">
+          <AlertTriangle className="h-5 w-5 text-amber-600 shrink-0 mt-0.5" />
+          <div className="space-y-1">
+            <p className="font-semibold text-amber-900">Location Services Disabled</p>
+            <p className="text-sm text-amber-800">
+              If your location was off and you turned it on now, please{" "}
+              <span className="font-bold">refresh the page</span> to use the "Use
+              My Location" button.
+            </p>
+          </div>
+        </div>
+      )}
 
       {/* Map Container */}
       <div className="relative">

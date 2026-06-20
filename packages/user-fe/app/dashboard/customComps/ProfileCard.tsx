@@ -95,9 +95,9 @@ export function ProfileCard({ userData, isLoading = false }: ProfileCardProps) {
             <Phone className="w-3.5 h-3.5 text-blue-600" />
           </div>
           <span className="text-gray-700">
-            {userData.phoneNumber.startsWith('+91') 
-              ? `+91 ${userData.phoneNumber.slice(3)}` 
-              : userData.phoneNumber.startsWith('91') 
+            {userData.phoneNumber.startsWith('+91')
+              ? `+91 ${userData.phoneNumber.slice(3)}`
+              : userData.phoneNumber.startsWith('91')
                 ? `+91 ${userData.phoneNumber.slice(2)}`
                 : `+91 ${userData.phoneNumber}`}
           </span>
@@ -171,7 +171,7 @@ export function ProfileCard({ userData, isLoading = false }: ProfileCardProps) {
           {/* Animated gradient background */}
           <div className="absolute inset-0 bg-linear-to-br from-blue-50 via-indigo-50 to-blue-100" />
           <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxwYXRoIGQ9Ik0zNiAxOGMzLjMxNCAwIDYgMi42ODYgNiA2cy0yLjY4NiA2LTYgNi02LTIuNjg2LTYtNiAyLjY4Ni02IDYtNiIgc3Ryb2tlPSJyZ2JhKDI1NSwyNTUsMjU1LDAuMSkiIHN0cm9rZS13aWR0aD0iMiIvPjwvZz48L3N2Zz4=')] opacity-30" />
-          
+
           {/* Content */}
           <div className="relative p-4">
             {/* Header */}
@@ -190,10 +190,10 @@ export function ProfileCard({ userData, isLoading = false }: ProfileCardProps) {
               <div className="relative">
                 <div className="w-10 h-10 rounded-full bg-indigo-100 flex items-center justify-center border border-indigo-200">
                   <svg viewBox="0 0 256 417" className="w-5 h-5" preserveAspectRatio="xMidYMid">
-                    <path fill="#4F46E5" d="M127.961 0l-2.795 9.5v275.668l2.795 2.79 127.962-75.638z" opacity="0.8"/>
-                    <path fill="#4F46E5" d="M127.962 0L0 212.32l127.962 75.639V154.158z" opacity="0.6"/>
-                    <path fill="#4F46E5" d="M127.961 312.187l-1.575 1.92v98.199l1.575 4.6L256 236.587z" opacity="0.8"/>
-                    <path fill="#4F46E5" d="M127.962 416.905v-104.72L0 236.585z" opacity="0.6"/>
+                    <path fill="#4F46E5" d="M127.961 0l-2.795 9.5v275.668l2.795 2.79 127.962-75.638z" opacity="0.8" />
+                    <path fill="#4F46E5" d="M127.962 0L0 212.32l127.962 75.639V154.158z" opacity="0.6" />
+                    <path fill="#4F46E5" d="M127.961 312.187l-1.575 1.92v98.199l1.575 4.6L256 236.587z" opacity="0.8" />
+                    <path fill="#4F46E5" d="M127.962 416.905v-104.72L0 236.585z" opacity="0.6" />
                   </svg>
                 </div>
                 {/* Pulse animation */}
@@ -207,7 +207,7 @@ export function ProfileCard({ userData, isLoading = false }: ProfileCardProps) {
 
             {/* CTA Button */}
             <a
-              href="https://sepolia.etherscan.io/address/0xD1291B832536Aea6b84B95433a2ea939c31635F7"
+              href="https://sepolia.etherscan.io/address/0x3b345b7f156669807A0900c11e6675222A1Dd433"
               target="_blank"
               rel="noopener noreferrer"
               className="group flex items-center justify-center gap-2 w-full py-2.5 bg-indigo-600 hover:bg-indigo-700 rounded-lg border border-indigo-700 transition-all duration-300 hover:scale-[1.02]"
