@@ -1,0 +1,370 @@
+---
+# ═══════════════════════════════════════════════════════════════
+#  autoAnsi/deploy.yml — One-shot EC2 deployment
+#
+#  Combines:  terraform validate/apply  →  extract IP  →
+#             SSH wait  →  system setup  →  container deploy
+#
+#  Usage:
+#    ansible-playbook deploy.yml                    # Full run
+#    ansible-playbook deploy.yml -e skip_terraform=true  # Ansible only
+#    ansible-playbook deploy.yml --check            # Dry run
+# ═══════════════════════════════════════════════════════════════
+
+# ──────────────────────────────────────────────────────────────
+#  PLAY 1 — Terraform (runs on your local machine)
+# ──────────────────────────────────────────────────────────────
+- name: "🏗  PLAY 1 · Terraform — Provision EC2 Instance"
+  hosts: localhost
+  connection: local
+  gather_facts: false
+
+  vars:
+    ec2_dir: "{{ playbook_dir }}/.."
+    key_file: "{{ ec2_dir }}/.key/ec2-iit-pair"
+    skip_terraform: false
+
+  tasks:
+
+    # ── 1. Validate ──────────────────────────────────────────
+    - name: "Step 1/7 · Terraform validate"
+      ansible.builtin.command:
+        cmd: terraform validate
+        chdir: "{{ ec2_dir }}"
+      register: tf_validate
+      changed_when: false
+      when: not skip_terraform | bool
+
+    - name: "  ✓  Validation result"
+      ansible.builtin.debug:
+        msg: "{{ tf_validate.stdout_lines | default(['skipped']) }}"
+      when: not skip_terraform | bool
+
+    # ── 2. Apply ─────────────────────────────────────────────
+    - name: "Step 2/7 · Terraform apply"
+      ansible.builtin.command:
+        cmd: terraform apply -auto-approve
+        chdir: "{{ ec2_dir }}"
+      register: tf_apply
+      when: not skip_terraform | bool
+
+    - name: "  ✓  Apply summary (last 10 lines)"
+      ansible.builtin.debug:
+        msg: "{{ tf_apply.stdout_lines[-10:] | default(['skipped']) }}"
+      when: not skip_terraform | bool
+
+    # ── 3. Extract IP ────────────────────────────────────────
+    - name: "Step 3/7 · Extract instance public IP"
+      ansible.builtin.command:
+        cmd: terraform output -raw instance_public_ip
+        chdir: "{{ ec2_dir }}"
+      register: tf_ip
+      changed_when: false
+
+    - name: "  ✓  Instance IP"
+      ansible.builtin.debug:
+        msg: "Public IP → {{ tf_ip.stdout }}"
+
+    # ── 4. Update inventory.ini ──────────────────────────────
+    - name: "Step 4/7 · Write inventory.ini"
+      ansible.builtin.copy:
+        dest: "{{ ec2_dir }}/ansible/inventory.ini"
+        content: |
+          [webservers]
+          {{ tf_ip.stdout }} ansible_user=ubuntu ansible_ssh_private_key_file={{ key_file }}
+        mode: "0644"
+
+    - name: "  ✓  Inventory written"
+      ansible.builtin.debug:
+        msg: "{{ ec2_dir }}/ansible/inventory.ini updated with {{ tf_ip.stdout }}"
+
+    # ── 5. Wait for SSH ──────────────────────────────────────
+    - name: "Step 5/7 · Wait for SSH readiness (up to 5 min)"
+      ansible.builtin.wait_for:
+        host: "{{ tf_ip.stdout }}"
+        port: 22
+        delay: 10
+        timeout: 300
+        state: started
+
+    - name: "  ✓  SSH is reachable"
+      ansible.builtin.debug:
+        msg: "SSH on {{ tf_ip.stdout }}:22 is ready"
+
+    # ── Register the new host for the next plays ─────────────
+    - name: "Add EC2 instance to in-memory inventory"
+      ansible.builtin.add_host:
+        name: "{{ tf_ip.stdout }}"
+        groups: ec2_target
+        ansible_user: ubuntu
+        ansible_ssh_private_key_file: "{{ key_file }}"
+        ansible_ssh_common_args: "-o StrictHostKeyChecking=no"
+
+    # ── Persist IP for summary ───────────────────────────────
+    - name: "Set IP fact for later plays"
+      ansible.builtin.set_fact:
+        deployed_ip: "{{ tf_ip.stdout }}"
+
+# ──────────────────────────────────────────────────────────────
+#  PLAY 2 — System Setup (runs on the EC2 instance)
+#  Mirrors:  ansible/playbook.yml
+# ──────────────────────────────────────────────────────────────
+- name: "📦  PLAY 2 · Step 6/7 — System Setup (Docker, Nginx, Images)"
+  hosts: ec2_target
+  become: true
+  vars_files:
+    - "{{ playbook_dir }}/../ansible/vars.yml"
+
+  tasks:
+
+    - name: "Install system dependencies"
+      ansible.builtin.apt:
+        name:
+          - docker.io
+          - nginx
+        update_cache: yes
+        state: present
+
+    - name: "Start and enable Docker"
+      ansible.builtin.service:
+        name: docker
+        state: started
+        enabled: yes
+
+    - name: "Pull Docker images"
+      community.docker.docker_image:
+        name: "{{ item }}"
+        source: pull
+      loop:
+        - "{{ images.admin_be }}"
+        - "{{ images.comp_queue }}"
+        - "{{ images.self }}"
+        - "{{ images.user_be }}"
+
+    - name: "Configure Nginx"
+      ansible.builtin.template:
+        src: "{{ playbook_dir }}/../ansible/nginx.conf.j2"
+        dest: /etc/nginx/sites-available/swaraj
+      notify: Reload Nginx
+
+    - name: "Enable Nginx site"
+      ansible.builtin.file:
+        src: /etc/nginx/sites-available/swaraj
+        dest: /etc/nginx/sites-enabled/swaraj
+        state: link
+      notify: Reload Nginx
+
+    - name: "Remove default Nginx site"
+      ansible.builtin.file:
+        path: /etc/nginx/sites-enabled/default
+        state: absent
+      notify: Reload Nginx
+
+  handlers:
+    - name: Reload Nginx
+      ansible.builtin.service:
+        name: nginx
+        state: reloaded
+
+# ──────────────────────────────────────────────────────────────
+#  PLAY 3 — Deploy Containers (runs on the EC2 instance)
+#  Mirrors:  ansible/containers.yml
+# ──────────────────────────────────────────────────────────────
+- name: "🐳  PLAY 3 · Step 7/7 — Deploy Containers"
+  hosts: ec2_target
+  become: true
+  vars_files:
+    - "{{ playbook_dir }}/../ansible/vars.yml"
+
+  tasks:
+
+    # ── AWS CLI + jq ─────────────────────────────────────────
+    - name: "Install awscli and jq"
+      ansible.builtin.apt:
+        name:
+          - awscli
+          - jq
+        update_cache: yes
+        state: present
+
+    # ── AWS Credentials ──────────────────────────────────────
+    - name: "Create AWS credentials directory"
+      ansible.builtin.file:
+        path: /root/.aws
+        state: directory
+        mode: "0700"
+
+    - name: "Write AWS credentials file"
+      ansible.builtin.copy:
+        dest: /root/.aws/credentials
+        mode: "0600"
+        content: |
+          [default]
+          aws_access_key_id={{ aws_access_key }}
+          aws_secret_access_key={{ aws_secret_key }}
+
+    - name: "Write AWS config file"
+      ansible.builtin.copy:
+        dest: /root/.aws/config
+        mode: "0600"
+        content: |
+          [default]
+          region={{ aws_region }}
+          output={{ output_format }}
+
+    # ── Generate ENV files ───────────────────────────────────
+    - name: "Generate admin.env"
+      ansible.builtin.shell: |
+        aws secretsmanager get-secret-value \
+          --secret-id {{ secrets_map.admin_be }} \
+          --region {{ aws_region }} \
+          --query SecretString \
+          --output text | jq -r '
+        {
+          NODE_ENV: "production",
+          SECRETS_AWS_ACCESS_KEY_ID: .SECRETS_AWS_ACCESS_KEY_ID,
+          SECRETS_AWS_SECRET_ACCESS_KEY: .SECRETS_AWS_SECRET_ACCESS_KEY,
+          AWS_REGION: .AWS_REGION,
+          SECRET_NAME_AWS_USER_BE: "{{ secrets_map.admin_be }}"
+        }
+        | to_entries
+        | map("\(.key)=\(.value)")
+        | .[]' > /root/admin.env
+      args:
+        executable: /bin/bash
+
+    - name: "Generate comp.env"
+      ansible.builtin.shell: |
+        aws secretsmanager get-secret-value \
+          --secret-id {{ secrets_map.comp_queue }} \
+          --region {{ aws_region }} \
+          --query SecretString \
+          --output text | jq -r '
+        {
+          NODE_ENV: "production",
+          SECRETS_AWS_ACCESS_KEY_ID: .SECRETS_AWS_ACCESS_KEY_ID,
+          SECRETS_AWS_SECRET_ACCESS_KEY: .SECRETS_AWS_SECRET_ACCESS_KEY,
+          AWS_REGION: .AWS_REGION,
+          SECRET_NAME_AWS_USER_BE: "{{ secrets_map.comp_queue }}"
+        }
+        | to_entries
+        | map("\(.key)=\(.value)")
+        | .[]' > /root/comp.env
+      args:
+        executable: /bin/bash
+
+    - name: "Generate user.env"
+      ansible.builtin.shell: |
+        aws secretsmanager get-secret-value \
+          --secret-id {{ secrets_map.user_be }} \
+          --region {{ aws_region }} \
+          --query SecretString \
+          --output text | jq -r '
+        {
+          NODE_ENV: "production",
+          SECRETS_AWS_ACCESS_KEY_ID: .SECRETS_AWS_ACCESS_KEY_ID,
+          SECRETS_AWS_SECRET_ACCESS_KEY: .SECRETS_AWS_SECRET_ACCESS_KEY,
+          AWS_REGION: .AWS_REGION,
+          SECRET_NAME_AWS_USER_BE: "{{ secrets_map.user_be }}"
+        }
+        | to_entries
+        | map("\(.key)=\(.value)")
+        | .[]' > /root/user.env
+      args:
+        executable: /bin/bash
+
+    - name: "Generate self.env (full secret)"
+      ansible.builtin.shell: |
+        aws secretsmanager get-secret-value \
+          --secret-id {{ secrets_map.self }} \
+          --region {{ aws_region }} \
+          --query SecretString \
+          --output text | jq -r '
+        to_entries
+        | map("\(.key)=\(.value)")
+        | .[]' > /root/self.env
+      args:
+        executable: /bin/bash
+
+    # ── Remove old containers ────────────────────────────────
+    - name: "Remove old containers"
+      community.docker.docker_container:
+        name: "{{ item }}"
+        state: absent
+        force_kill: true
+      loop:
+        - admin-be
+        - comp-queue
+        - user-be
+        - self
+      ignore_errors: true
+
+    # ── Run containers ───────────────────────────────────────
+    - name: "Run Admin BE"
+      community.docker.docker_container:
+        name: admin-be
+        image: "{{ images.admin_be }}"
+        state: started
+        restart_policy: always
+        env_file: /root/admin.env
+        published_ports:
+          - "3002:3002"
+
+    - name: "Run Comp Queue"
+      community.docker.docker_container:
+        name: comp-queue
+        image: "{{ images.comp_queue }}"
+        state: started
+        restart_policy: always
+        env_file: /root/comp.env
+        published_ports:
+          - "3005:3005"
+
+    - name: "Run User BE"
+      community.docker.docker_container:
+        name: user-be
+        image: "{{ images.user_be }}"
+        state: started
+        restart_policy: always
+        env_file: /root/user.env
+        published_ports:
+          - "3000:3000"
+          - "3001:3001"
+
+    - name: "Run Self"
+      community.docker.docker_container:
+        name: self
+        image: "{{ images.self }}"
+        state: started
+        restart_policy: always
+        env_file: /root/self.env
+        published_ports:
+          - "3030:3030"
+
+# ──────────────────────────────────────────────────────────────
+#  PLAY 4 — Final Summary (back on localhost)
+# ──────────────────────────────────────────────────────────────
+- name: "📋  Deployment Summary"
+  hosts: localhost
+  connection: local
+  gather_facts: false
+
+  tasks:
+    - name: "Print deployment summary"
+      ansible.builtin.debug:
+        msg:
+          - "═══════════════════════════════════════════════════"
+          - "  ✅  DEPLOYMENT COMPLETE"
+          - "═══════════════════════════════════════════════════"
+          - ""
+          - "  Instance IP  : {{ deployed_ip }}"
+          - "  SSH command  : ssh -i {{ playbook_dir }}/../.key/ec2-iit-pair ubuntu@{{ deployed_ip }}"
+          - ""
+          - "  Services:"
+          - "    admin-be    → http://{{ deployed_ip }}:3002"
+          - "    comp-queue  → http://{{ deployed_ip }}:3005"
+          - "    user-be     → http://{{ deployed_ip }}:3000"
+          - "    user-be-ws  → http://{{ deployed_ip }}:3001"
+          - "    self        → http://{{ deployed_ip }}:3030"
+          - ""
+          - "═══════════════════════════════════════════════════"

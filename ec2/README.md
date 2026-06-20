@@ -144,3 +144,66 @@ ansible-playbook -i ansible/inventory.ini ansible/playbook.yml
 ``` bash
 ansible-playbook -i ansible/inventory.ini ansible/containers.yml
 ```
+
+---
+
+### One-Shot Deployment — `autoAnsible.sh` (Bash)
+
+> A Bash script that runs the full pipeline with colour-coded terminal output.
+
+```bash
+# Run from the ec2/ directory
+cd ec2
+
+# Full deploy (terraform + ansible)
+./autoAnsible.sh
+
+# Skip terraform (instance already running, re-deploy ansible only)
+./autoAnsible.sh --skip-terraform
+
+# Dry run (preview steps without executing)
+./autoAnsible.sh --dry-run
+```
+
+**What it does (7 steps):**
+1. `terraform validate`
+2. `terraform apply -auto-approve`
+3. Extract IP from `terraform output`
+4. Update `ansible/inventory.ini` with new IP
+5. Poll SSH until instance is reachable (~5 min max)
+6. Run `ansible-playbook … playbook.yml`
+7. Run `ansible-playbook … containers.yml`
+
+---
+
+### One-Shot Deployment — `autoAnsi/deploy.yml` (Ansible)
+
+> A single Ansible playbook that does **everything** — terraform + system setup + container deploy — in one command. No manual steps.
+
+```bash
+# Run from the ec2/autoAnsi/ directory
+cd ec2/autoAnsi
+
+# Full deploy (terraform + ansible)
+ansible-playbook deploy.yml
+
+# Skip terraform (instance already exists)
+ansible-playbook deploy.yml -e skip_terraform=true
+
+# Dry run (Ansible check mode)
+ansible-playbook deploy.yml --check
+```
+
+**Plays inside `deploy.yml`:**
+
+| Play | Runs on | What it does |
+|------|---------|-------------|
+| Play 1 | localhost | Terraform validate → apply → extract IP → update inventory → SSH wait |
+| Play 2 | EC2 instance | Install Docker, Nginx, pull images, configure reverse proxy |
+| Play 3 | EC2 instance | Configure AWS creds, generate env files, deploy all 4 containers |
+| Play 4 | localhost | Print deployment summary with IP, SSH command, and service URLs |
+
+**After deployment, SSH into the instance:**
+```bash
+ssh -i .key/ec2-iit-pair ubuntu@<IP from output>
+```

@@ -7,3 +7,4 @@ inventory.ini
 .key/
 .terraform.tfstate.lock.info
 vars.yml
+.key

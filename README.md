@@ -6,8 +6,8 @@ Here are the public endpoints for the deployed services on the GKE Autopilot clu
 
 | Service | Public URL | Status | Description |
 |---------|------------|--------|-------------|
-| **User Frontend** | `https://iit-bbsr-swaraj-user-fe.adityahota.online` | ❌ **DNS Missing** | Main user interface (Not deployed on K8s) |
-| **Admin Frontend** | `https://iit-bbsr-swaraj-admin-fe.adityahota.online` | ❌ **DNS Missing** | Admin dashboard interface (Not deployed on K8s) |
+| **User Frontend** | `https://iit-bbsr-swaraj-user-fe.adityahota.online` |✅ **Active**Missing** | Main user interface (Not deployed on K8s) |
+| **Admin Frontend** | `https://iit-bbsr-swaraj-admin-fe.adityahota.online` | ✅ **Active**Missing** | Admin dashboard interface (Not deployed on K8s) |
 | **User Backend** | `https://iit-bbsr-swaraj-user-be.adityahota.online` | ✅ **Active** | Main API for user application |
 | **User WebSocket** | `wss://iit-bbsr-swaraj-ws-user-be.adityahota.online` | ✅ **Active** | WebSocket server for real-time updates |
 | **Admin Backend** | `https://iit-bbsr-swaraj-admin-be.adityahota.online` | ✅ **Active** | API for admin dashboard |
