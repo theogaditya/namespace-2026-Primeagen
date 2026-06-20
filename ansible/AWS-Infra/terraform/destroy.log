@@ -1,0 +1,852 @@
+[0m[1mdata.aws_availability_zones.available: Reading...[0m[0m
+[0m[1maws_eip.nat: Refreshing state... [id=eipalloc-0598465467c52c666][0m
+[0m[1maws_iam_role.eks_cluster: Refreshing state... [id=iit-test-eks-cluster-role][0m
+[0m[1maws_vpc.main: Refreshing state... [id=vpc-002ce125909e750ec][0m
+[0m[1maws_iam_role.eks_nodes: Refreshing state... [id=iit-test-eks-node-role][0m
+[0m[1mdata.aws_availability_zones.available: Read complete after 0s [id=ap-south-1][0m
+[0m[1maws_internet_gateway.main: Refreshing state... [id=igw-0c7181b63dfaf4278][0m
+[0m[1maws_subnet.private[1]: Refreshing state... [id=subnet-0c00d59df1e54c954][0m
+[0m[1maws_subnet.private[0]: Refreshing state... [id=subnet-029dd7feef3c598d2][0m
+[0m[1maws_subnet.public[1]: Refreshing state... [id=subnet-08db29161deee96f4][0m
+[0m[1maws_subnet.public[0]: Refreshing state... [id=subnet-0cdb0877fd887bd2e][0m
+[0m[1maws_security_group.eks_cluster: Refreshing state... [id=sg-09498288af0911bd3][0m
+[0m[1maws_route_table.public: Refreshing state... [id=rtb-0131d72561c429efc][0m
+[0m[1maws_route_table_association.public[0]: Refreshing state... [id=rtbassoc-09f03a12ffd78dcf5][0m
+[0m[1maws_nat_gateway.main: Refreshing state... [id=nat-0983d59829b150a24][0m
+[0m[1maws_route_table_association.public[1]: Refreshing state... [id=rtbassoc-0dd8720a17f243f3c][0m
+[0m[1maws_route_table.private: Refreshing state... [id=rtb-0666d3517d8ebd835][0m
+[0m[1maws_route_table_association.private[0]: Refreshing state... [id=rtbassoc-07855a36b58525518][0m
+[0m[1maws_route_table_association.private[1]: Refreshing state... [id=rtbassoc-03a7015f94763578a][0m
+[0m[1maws_iam_role_policy_attachment.eks_vpc_resource_controller: Refreshing state... [id=iit-test-eks-cluster-role-20260215055227224800000004][0m
+[0m[1maws_iam_role_policy_attachment.eks_cluster_policy: Refreshing state... [id=iit-test-eks-cluster-role-20260215055227306400000005][0m
+[0m[1maws_iam_role_policy_attachment.eks_cni_policy: Refreshing state... [id=iit-test-eks-node-role-20260215055227023900000003][0m
+[0m[1maws_iam_role_policy_attachment.eks_worker_node_policy: Refreshing state... [id=iit-test-eks-node-role-20260215055226941300000002][0m
+[0m[1maws_iam_role_policy_attachment.eks_container_registry: Refreshing state... [id=iit-test-eks-node-role-20260215055226728700000001][0m
+[0m[1maws_eks_cluster.main: Refreshing state... [id=iit-test-eks][0m
+[0m[1maws_eks_node_group.main: Refreshing state... [id=iit-test-eks:iit-test-eks-node-group][0m
+
+Terraform used the selected providers to generate the following execution
+plan. Resource actions are indicated with the following symbols:
+  [31m-[0m destroy[0m
+
+Terraform will perform the following actions:
+
+[1m  # aws_eip.nat[0m will be [1m[31mdestroyed[0m
+[0m  [31m-[0m[0m resource "aws_eip" "nat" {
+      [31m-[0m[0m allocation_id            = "eipalloc-0598465467c52c666" [90m-> null[0m[0m
+      [31m-[0m[0m arn                      = "arn:aws:ec2:ap-south-1:637245294687:elastic-ip/eipalloc-0598465467c52c666" [90m-> null[0m[0m
+      [31m-[0m[0m association_id           = "eipassoc-08b5c1c99a15cff5d" [90m-> null[0m[0m
+      [31m-[0m[0m domain                   = "vpc" [90m-> null[0m[0m
+      [31m-[0m[0m id                       = "eipalloc-0598465467c52c666" [90m-> null[0m[0m
+      [31m-[0m[0m network_border_group     = "ap-south-1" [90m-> null[0m[0m
+      [31m-[0m[0m network_interface        = "eni-0611df253000e449f" [90m-> null[0m[0m
+      [31m-[0m[0m private_dns              = "ip-10-0-1-40.ap-south-1.compute.internal" [90m-> null[0m[0m
+      [31m-[0m[0m private_ip               = "10.0.1.40" [90m-> null[0m[0m
+      [31m-[0m[0m public_dns               = "ec2-13-126-39-178.ap-south-1.compute.amazonaws.com" [90m-> null[0m[0m
+      [31m-[0m[0m public_ip                = "13.126.39.178" [90m-> null[0m[0m
+      [31m-[0m[0m public_ipv4_pool         = "amazon" [90m-> null[0m[0m
+      [31m-[0m[0m tags                     = {
+          [31m-[0m[0m "Name" = "iit-test-nat-eip"
+        } [90m-> null[0m[0m
+      [31m-[0m[0m tags_all                 = {
+          [31m-[0m[0m "Environment" = "production"
+          [31m-[0m[0m "ManagedBy"   = "terraform"
+          [31m-[0m[0m "Name"        = "iit-test-nat-eip"
+          [31m-[0m[0m "Project"     = "iit-test"
+        } [90m-> null[0m[0m
+      [31m-[0m[0m vpc                      = true [90m-> null[0m[0m
+        [90m# (5 unchanged attributes hidden)[0m[0m
+    }
+
+[1m  # aws_eks_cluster.main[0m will be [1m[31mdestroyed[0m
+[0m  [31m-[0m[0m resource "aws_eks_cluster" "main" {
+      [31m-[0m[0m arn                           = "arn:aws:eks:ap-south-1:637245294687:cluster/iit-test-eks" [90m-> null[0m[0m
+      [31m-[0m[0m bootstrap_self_managed_addons = true [90m-> null[0m[0m
+      [31m-[0m[0m certificate_authority         = [
+          [31m-[0m[0m {
+              [31m-[0m[0m data = "LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tCk1JSURCVENDQWUyZ0F3SUJBZ0lJU1V5WEZJcFIwL3d3RFFZSktvWklodmNOQVFFTEJRQXdGVEVUTUJFR0ExVUUKQXhNS2EzVmlaWEp1WlhSbGN6QWVGdzB5TmpBeU1UVXdOVFV5TlRKYUZ3MHpOakF5TVRNd05UVTNOVEphTUJVeApFekFSQmdOVkJBTVRDbXQxWW1WeWJtVjBaWE13Z2dFaU1BMEdDU3FHU0liM0RRRUJBUVVBQTRJQkR3QXdnZ0VLCkFvSUJBUURNcWN5VkNTaGVpdEdVbkFxZ3lEVkRqb1lXRVNtd1FGNXRGTGo3QTdPdS9GdkFVMHkrQzNzNjUxLzcKb05rbEhDU01kU0k0ZHRkeEpsKzlGS1ZudnV4bTZrSUUzR0NMTnQ5SC95K0ZSMU1wM3pjNmZ5RHZ6RTltRURuQwphT3hRUkVFcjlyR25oQVRFc1hmVUdCVVoxSTZwZzEvbERxRjVFRzJKNU5OSUl2NzlUTmVQeW96T0ZhTnczcEFFCi81U3VLN3djR3lNMjlNUUZiSWlGU1UzWkhZU0FtRTIyR2lnUndnZ2lCWVdDajZWaWQ2RXNDNUhsWEZKb3l4MmwKNXp3WmxFTHV2Wk1vbk9UQThpRkZqMnlqV0lEQ01XVnBYNm1ad1FvU1kxckh6Um95d0hRWmZTeXA5eTFCREpLMQpXWVhTbVkxWWw2eXVIdmJzUXVWZmRid3kzQkxsQWdNQkFBR2pXVEJYTUE0R0ExVWREd0VCL3dRRUF3SUNwREFQCkJnTlZIUk1CQWY4RUJUQURBUUgvTUIwR0ExVWREZ1FXQkJUY3NPcmpyZEVWMWRWbTAvcGkyaW9KN1RaNThEQVYKQmdOVkhSRUVEakFNZ2dwcmRXSmxjbTVsZEdWek1BMEdDU3FHU0liM0RRRUJDd1VBQTRJQkFRQlIwS21kYjBESgptbCtsVytvSGtsaEIxalRhY3FVK0Q3SWJzbGc4MWtvenV4RlBtTlZBa1FlbGwwRkYyMkxxb2E4Z2lzRlIweUxsCnhoQXp5cVNmQzIrblZqckIvVUxJdGszVTB5R2Q5L0xQcVpDaTcxRE5aZmJOSlUyV05OYVpBVmVBejV6eXNUaVcKSVFNckdqcnVsdkozNWVCWWIvbEthZUZwcnVENVJ4VnJ0UHFFSzZrSzVJVUdaUXdweDFJS25OTVBNZXNMaHFUUgp2VHpSSmtBekNCV3c0Rm02M2c3ZTZ6cWFmTnQ5dTAwOUdqRy8vSUdTSHd2b21DTXUxeFBRcWpiZGY0OWZoRGJDCmEzNGtyR3kxT1p4NDBWTTE4U1h4VWJCUjRMTzhvbFUvc083WEJidWdPVnhCREpKK1czbFB6Ujd3My9oTjN0SVcKTEM0TXlmZGVZSFpMCi0tLS0tRU5EIENFUlRJRklDQVRFLS0tLS0K"
+            },
+        ] [90m-> null[0m[0m
+      [31m-[0m[0m created_at                    = "2026-02-15T05:52:52Z" [90m-> null[0m[0m
+      [31m-[0m[0m enabled_cluster_log_types     = [] [90m-> null[0m[0m
+      [31m-[0m[0m endpoint                      = "https://997CE488C72E24469318911ED779896E.gr7.ap-south-1.eks.amazonaws.com" [90m-> null[0m[0m
+      [31m-[0m[0m id                            = "iit-test-eks" [90m-> null[0m[0m
+      [31m-[0m[0m identity                      = [
+          [31m-[0m[0m {
+              [31m-[0m[0m oidc = [
+                  [31m-[0m[0m {
+                      [31m-[0m[0m issuer = "https://oidc.eks.ap-south-1.amazonaws.com/id/997CE488C72E24469318911ED779896E"
+                    },
+                ]
+            },
+        ] [90m-> null[0m[0m
+      [31m-[0m[0m name                          = "iit-test-eks" [90m-> null[0m[0m
+      [31m-[0m[0m platform_version              = "eks.50" [90m-> null[0m[0m
+      [31m-[0m[0m role_arn                      = "arn:aws:iam::637245294687:role/iit-test-eks-cluster-role" [90m-> null[0m[0m
+      [31m-[0m[0m status                        = "ACTIVE" [90m-> null[0m[0m
+      [31m-[0m[0m tags                          = {
+          [31m-[0m[0m "Name" = "iit-test-eks"
+        } [90m-> null[0m[0m
+      [31m-[0m[0m tags_all                      = {
+          [31m-[0m[0m "Environment" = "production"
+          [31m-[0m[0m "ManagedBy"   = "terraform"
+          [31m-[0m[0m "Name"        = "iit-test-eks"
+          [31m-[0m[0m "Project"     = "iit-test"
+        } [90m-> null[0m[0m
+      [31m-[0m[0m version                       = "1.31" [90m-> null[0m[0m
+
+      [31m-[0m[0m access_config {
+          [31m-[0m[0m authentication_mode                         = "CONFIG_MAP" [90m-> null[0m[0m
+          [31m-[0m[0m bootstrap_cluster_creator_admin_permissions = true [90m-> null[0m[0m
+        }
+
+      [31m-[0m[0m kubernetes_network_config {
+          [31m-[0m[0m ip_family         = "ipv4" [90m-> null[0m[0m
+          [31m-[0m[0m service_ipv4_cidr = "172.20.0.0/16" [90m-> null[0m[0m
+            [90m# (1 unchanged attribute hidden)[0m[0m
+
+          [31m-[0m[0m elastic_load_balancing {
+              [31m-[0m[0m enabled = false [90m-> null[0m[0m
+            }
+        }
+
+      [31m-[0m[0m upgrade_policy {
+          [31m-[0m[0m support_type = "EXTENDED" [90m-> null[0m[0m
+        }
+
+      [31m-[0m[0m vpc_config {
+          [31m-[0m[0m cluster_security_group_id = "sg-08dc9f3a8fa3c05e9" [90m-> null[0m[0m
+          [31m-[0m[0m endpoint_private_access   = true [90m-> null[0m[0m
+          [31m-[0m[0m endpoint_public_access    = true [90m-> null[0m[0m
+          [31m-[0m[0m public_access_cidrs       = [
+              [31m-[0m[0m "0.0.0.0/0",
+            ] [90m-> null[0m[0m
+          [31m-[0m[0m security_group_ids        = [
+              [31m-[0m[0m "sg-09498288af0911bd3",
+            ] [90m-> null[0m[0m
+          [31m-[0m[0m subnet_ids                = [
+              [31m-[0m[0m "subnet-029dd7feef3c598d2",
+              [31m-[0m[0m "subnet-08db29161deee96f4",
+              [31m-[0m[0m "subnet-0c00d59df1e54c954",
+              [31m-[0m[0m "subnet-0cdb0877fd887bd2e",
+            ] [90m-> null[0m[0m
+          [31m-[0m[0m vpc_id                    = "vpc-002ce125909e750ec" [90m-> null[0m[0m
+        }
+    }
+
+[1m  # aws_eks_node_group.main[0m will be [1m[31mdestroyed[0m
+[0m  [31m-[0m[0m resource "aws_eks_node_group" "main" {
+      [31m-[0m[0m ami_type               = "AL2023_x86_64_STANDARD" [90m-> null[0m[0m
+      [31m-[0m[0m arn                    = "arn:aws:eks:ap-south-1:637245294687:nodegroup/iit-test-eks/iit-test-eks-node-group/a6ce2ff1-f5cc-a02e-aaba-165fcc55cf4d" [90m-> null[0m[0m
+      [31m-[0m[0m capacity_type          = "ON_DEMAND" [90m-> null[0m[0m
+      [31m-[0m[0m cluster_name           = "iit-test-eks" [90m-> null[0m[0m
+      [31m-[0m[0m disk_size              = 20 [90m-> null[0m[0m
+      [31m-[0m[0m id                     = "iit-test-eks:iit-test-eks-node-group" [90m-> null[0m[0m
+      [31m-[0m[0m instance_types         = [
+          [31m-[0m[0m "t3.small",
+        ] [90m-> null[0m[0m
+      [31m-[0m[0m labels                 = {} [90m-> null[0m[0m
+      [31m-[0m[0m node_group_name        = "iit-test-eks-node-group" [90m-> null[0m[0m
+      [31m-[0m[0m node_role_arn          = "arn:aws:iam::637245294687:role/iit-test-eks-node-role" [90m-> null[0m[0m
+      [31m-[0m[0m release_version        = "1.31.14-20260209" [90m-> null[0m[0m
+      [31m-[0m[0m resources              = [
+          [31m-[0m[0m {
+              [31m-[0m[0m autoscaling_groups              = [
+                  [31m-[0m[0m {
+                      [31m-[0m[0m name = "eks-iit-test-eks-node-group-a6ce2ff1-f5cc-a02e-aaba-165fcc55cf4d"
+                    },
+                ]
+                [90m# (1 unchanged attribute hidden)[0m[0m
+            },
+        ] [90m-> null[0m[0m
+      [31m-[0m[0m status                 = "ACTIVE" [90m-> null[0m[0m
+      [31m-[0m[0m subnet_ids             = [
+          [31m-[0m[0m "subnet-029dd7feef3c598d2",
+          [31m-[0m[0m "subnet-0c00d59df1e54c954",
+        ] [90m-> null[0m[0m
+      [31m-[0m[0m tags                   = {
+          [31m-[0m[0m "Name" = "iit-test-eks-node-group"
+        } [90m-> null[0m[0m
+      [31m-[0m[0m tags_all               = {
+          [31m-[0m[0m "Environment" = "production"
+          [31m-[0m[0m "ManagedBy"   = "terraform"
+          [31m-[0m[0m "Name"        = "iit-test-eks-node-group"
+          [31m-[0m[0m "Project"     = "iit-test"
+        } [90m-> null[0m[0m
+      [31m-[0m[0m version                = "1.31" [90m-> null[0m[0m
+        [90m# (1 unchanged attribute hidden)[0m[0m
+
+      [31m-[0m[0m scaling_config {
+          [31m-[0m[0m desired_size = 2 [90m-> null[0m[0m
+          [31m-[0m[0m max_size     = 4 [90m-> null[0m[0m
+          [31m-[0m[0m min_size     = 1 [90m-> null[0m[0m
+        }
+
+      [31m-[0m[0m update_config {
+          [31m-[0m[0m max_unavailable            = 1 [90m-> null[0m[0m
+          [31m-[0m[0m max_unavailable_percentage = 0 [90m-> null[0m[0m
+        }
+    }
+
+[1m  # aws_iam_role.eks_cluster[0m will be [1m[31mdestroyed[0m
+[0m  [31m-[0m[0m resource "aws_iam_role" "eks_cluster" {
+      [31m-[0m[0m arn                   = "arn:aws:iam::637245294687:role/iit-test-eks-cluster-role" [90m-> null[0m[0m
+      [31m-[0m[0m assume_role_policy    = jsonencode(
+            {
+              [31m-[0m[0m Statement = [
+                  [31m-[0m[0m {
+                      [31m-[0m[0m Action    = "sts:AssumeRole"
+                      [31m-[0m[0m Effect    = "Allow"
+                      [31m-[0m[0m Principal = {
+                          [31m-[0m[0m Service = "eks.amazonaws.com"
+                        }
+                    },
+                ]
+              [31m-[0m[0m Version   = "2012-10-17"
+            }
+        ) [90m-> null[0m[0m
+      [31m-[0m[0m create_date           = "2026-02-15T05:52:25Z" [90m-> null[0m[0m
+      [31m-[0m[0m force_detach_policies = false [90m-> null[0m[0m
+      [31m-[0m[0m id                    = "iit-test-eks-cluster-role" [90m-> null[0m[0m
+      [31m-[0m[0m managed_policy_arns   = [
+          [31m-[0m[0m "arn:aws:iam::aws:policy/AmazonEKSClusterPolicy",
+          [31m-[0m[0m "arn:aws:iam::aws:policy/AmazonEKSVPCResourceController",
+        ] [90m-> null[0m[0m
+      [31m-[0m[0m max_session_duration  = 3600 [90m-> null[0m[0m
+      [31m-[0m[0m name                  = "iit-test-eks-cluster-role" [90m-> null[0m[0m
+      [31m-[0m[0m path                  = "/" [90m-> null[0m[0m
+      [31m-[0m[0m tags                  = {
+          [31m-[0m[0m "Name" = "iit-test-eks-cluster-role"
+        } [90m-> null[0m[0m
+      [31m-[0m[0m tags_all              = {
+          [31m-[0m[0m "Environment" = "production"
+          [31m-[0m[0m "ManagedBy"   = "terraform"
+          [31m-[0m[0m "Name"        = "iit-test-eks-cluster-role"
+          [31m-[0m[0m "Project"     = "iit-test"
+        } [90m-> null[0m[0m
+      [31m-[0m[0m unique_id             = "AROAZIXWHRBPZ43GFBF6O" [90m-> null[0m[0m
+        [90m# (3 unchanged attributes hidden)[0m[0m
+    }
+
+[1m  # aws_iam_role.eks_nodes[0m will be [1m[31mdestroyed[0m
+[0m  [31m-[0m[0m resource "aws_iam_role" "eks_nodes" {
+      [31m-[0m[0m arn                   = "arn:aws:iam::637245294687:role/iit-test-eks-node-role" [90m-> null[0m[0m
+      [31m-[0m[0m assume_role_policy    = jsonencode(
+            {
+              [31m-[0m[0m Statement = [
+                  [31m-[0m[0m {
+                      [31m-[0m[0m Action    = "sts:AssumeRole"
+                      [31m-[0m[0m Effect    = "Allow"
+                      [31m-[0m[0m Principal = {
+                          [31m-[0m[0m Service = "ec2.amazonaws.com"
+                        }
+                    },
+                ]
+              [31m-[0m[0m Version   = "2012-10-17"
+            }
+        ) [90m-> null[0m[0m
+      [31m-[0m[0m create_date           = "2026-02-15T05:52:25Z" [90m-> null[0m[0m
+      [31m-[0m[0m force_detach_policies = false [90m-> null[0m[0m
+      [31m-[0m[0m id                    = "iit-test-eks-node-role" [90m-> null[0m[0m
+      [31m-[0m[0m managed_policy_arns   = [
+          [31m-[0m[0m "arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryReadOnly",
+          [31m-[0m[0m "arn:aws:iam::aws:policy/AmazonEKSWorkerNodePolicy",
+          [31m-[0m[0m "arn:aws:iam::aws:policy/AmazonEKS_CNI_Policy",
+        ] [90m-> null[0m[0m
+      [31m-[0m[0m max_session_duration  = 3600 [90m-> null[0m[0m
+      [31m-[0m[0m name                  = "iit-test-eks-node-role" [90m-> null[0m[0m
+      [31m-[0m[0m path                  = "/" [90m-> null[0m[0m
+      [31m-[0m[0m tags                  = {
+          [31m-[0m[0m "Name" = "iit-test-eks-node-role"
+        } [90m-> null[0m[0m
+      [31m-[0m[0m tags_all              = {
+          [31m-[0m[0m "Environment" = "production"
+          [31m-[0m[0m "ManagedBy"   = "terraform"
+          [31m-[0m[0m "Name"        = "iit-test-eks-node-role"
+          [31m-[0m[0m "Project"     = "iit-test"
+        } [90m-> null[0m[0m
+      [31m-[0m[0m unique_id             = "AROAZIXWHRBPVK342D3ES" [90m-> null[0m[0m
+        [90m# (3 unchanged attributes hidden)[0m[0m
+    }
+
+[1m  # aws_iam_role_policy_attachment.eks_cluster_policy[0m will be [1m[31mdestroyed[0m
+[0m  [31m-[0m[0m resource "aws_iam_role_policy_attachment" "eks_cluster_policy" {
+      [31m-[0m[0m id         = "iit-test-eks-cluster-role-20260215055227306400000005" [90m-> null[0m[0m
+      [31m-[0m[0m policy_arn = "arn:aws:iam::aws:policy/AmazonEKSClusterPolicy" [90m-> null[0m[0m
+      [31m-[0m[0m role       = "iit-test-eks-cluster-role" [90m-> null[0m[0m
+    }
+
+[1m  # aws_iam_role_policy_attachment.eks_cni_policy[0m will be [1m[31mdestroyed[0m
+[0m  [31m-[0m[0m resource "aws_iam_role_policy_attachment" "eks_cni_policy" {
+      [31m-[0m[0m id         = "iit-test-eks-node-role-20260215055227023900000003" [90m-> null[0m[0m
+      [31m-[0m[0m policy_arn = "arn:aws:iam::aws:policy/AmazonEKS_CNI_Policy" [90m-> null[0m[0m
+      [31m-[0m[0m role       = "iit-test-eks-node-role" [90m-> null[0m[0m
+    }
+
+[1m  # aws_iam_role_policy_attachment.eks_container_registry[0m will be [1m[31mdestroyed[0m
+[0m  [31m-[0m[0m resource "aws_iam_role_policy_attachment" "eks_container_registry" {
+      [31m-[0m[0m id         = "iit-test-eks-node-role-20260215055226728700000001" [90m-> null[0m[0m
+      [31m-[0m[0m policy_arn = "arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryReadOnly" [90m-> null[0m[0m
+      [31m-[0m[0m role       = "iit-test-eks-node-role" [90m-> null[0m[0m
+    }
+
+[1m  # aws_iam_role_policy_attachment.eks_vpc_resource_controller[0m will be [1m[31mdestroyed[0m
+[0m  [31m-[0m[0m resource "aws_iam_role_policy_attachment" "eks_vpc_resource_controller" {
+      [31m-[0m[0m id         = "iit-test-eks-cluster-role-20260215055227224800000004" [90m-> null[0m[0m
+      [31m-[0m[0m policy_arn = "arn:aws:iam::aws:policy/AmazonEKSVPCResourceController" [90m-> null[0m[0m
+      [31m-[0m[0m role       = "iit-test-eks-cluster-role" [90m-> null[0m[0m
+    }
+
+[1m  # aws_iam_role_policy_attachment.eks_worker_node_policy[0m will be [1m[31mdestroyed[0m
+[0m  [31m-[0m[0m resource "aws_iam_role_policy_attachment" "eks_worker_node_policy" {
+      [31m-[0m[0m id         = "iit-test-eks-node-role-20260215055226941300000002" [90m-> null[0m[0m
+      [31m-[0m[0m policy_arn = "arn:aws:iam::aws:policy/AmazonEKSWorkerNodePolicy" [90m-> null[0m[0m
+      [31m-[0m[0m role       = "iit-test-eks-node-role" [90m-> null[0m[0m
+    }
+
+[1m  # aws_internet_gateway.main[0m will be [1m[31mdestroyed[0m
+[0m  [31m-[0m[0m resource "aws_internet_gateway" "main" {
+      [31m-[0m[0m arn      = "arn:aws:ec2:ap-south-1:637245294687:internet-gateway/igw-0c7181b63dfaf4278" [90m-> null[0m[0m
+      [31m-[0m[0m id       = "igw-0c7181b63dfaf4278" [90m-> null[0m[0m
+      [31m-[0m[0m owner_id = "637245294687" [90m-> null[0m[0m
+      [31m-[0m[0m tags     = {
+          [31m-[0m[0m "Name" = "iit-test-igw"
+        } [90m-> null[0m[0m
+      [31m-[0m[0m tags_all = {
+          [31m-[0m[0m "Environment" = "production"
+          [31m-[0m[0m "ManagedBy"   = "terraform"
+          [31m-[0m[0m "Name"        = "iit-test-igw"
+          [31m-[0m[0m "Project"     = "iit-test"
+        } [90m-> null[0m[0m
+      [31m-[0m[0m vpc_id   = "vpc-002ce125909e750ec" [90m-> null[0m[0m
+    }
+
+[1m  # aws_nat_gateway.main[0m will be [1m[31mdestroyed[0m
+[0m  [31m-[0m[0m resource "aws_nat_gateway" "main" {
+      [31m-[0m[0m allocation_id                      = "eipalloc-0598465467c52c666" [90m-> null[0m[0m
+      [31m-[0m[0m association_id                     = "eipassoc-08b5c1c99a15cff5d" [90m-> null[0m[0m
+      [31m-[0m[0m connectivity_type                  = "public" [90m-> null[0m[0m
+      [31m-[0m[0m id                                 = "nat-0983d59829b150a24" [90m-> null[0m[0m
+      [31m-[0m[0m network_interface_id               = "eni-0611df253000e449f" [90m-> null[0m[0m
+      [31m-[0m[0m private_ip                         = "10.0.1.40" [90m-> null[0m[0m
+      [31m-[0m[0m public_ip                          = "13.126.39.178" [90m-> null[0m[0m
+      [31m-[0m[0m secondary_allocation_ids           = [] [90m-> null[0m[0m
+      [31m-[0m[0m secondary_private_ip_address_count = 0 [90m-> null[0m[0m
+      [31m-[0m[0m secondary_private_ip_addresses     = [] [90m-> null[0m[0m
+      [31m-[0m[0m subnet_id                          = "subnet-0cdb0877fd887bd2e" [90m-> null[0m[0m
+      [31m-[0m[0m tags                               = {
+          [31m-[0m[0m "Name" = "iit-test-nat"
+        } [90m-> null[0m[0m
+      [31m-[0m[0m tags_all                           = {
+          [31m-[0m[0m "Environment" = "production"
+          [31m-[0m[0m "ManagedBy"   = "terraform"
+          [31m-[0m[0m "Name"        = "iit-test-nat"
+          [31m-[0m[0m "Project"     = "iit-test"
+        } [90m-> null[0m[0m
+    }
+
+[1m  # aws_route_table.private[0m will be [1m[31mdestroyed[0m
+[0m  [31m-[0m[0m resource "aws_route_table" "private" {
+      [31m-[0m[0m arn              = "arn:aws:ec2:ap-south-1:637245294687:route-table/rtb-0666d3517d8ebd835" [90m-> null[0m[0m
+      [31m-[0m[0m id               = "rtb-0666d3517d8ebd835" [90m-> null[0m[0m
+      [31m-[0m[0m owner_id         = "637245294687" [90m-> null[0m[0m
+      [31m-[0m[0m propagating_vgws = [] [90m-> null[0m[0m
+      [31m-[0m[0m route            = [
+          [31m-[0m[0m {
+              [31m-[0m[0m cidr_block                 = "0.0.0.0/0"
+              [31m-[0m[0m nat_gateway_id             = "nat-0983d59829b150a24"
+                [90m# (11 unchanged attributes hidden)[0m[0m
+            },
+        ] [90m-> null[0m[0m
+      [31m-[0m[0m tags             = {
+          [31m-[0m[0m "Name" = "iit-test-private-rt"
+        } [90m-> null[0m[0m
+      [31m-[0m[0m tags_all         = {
+          [31m-[0m[0m "Environment" = "production"
+          [31m-[0m[0m "ManagedBy"   = "terraform"
+          [31m-[0m[0m "Name"        = "iit-test-private-rt"
+          [31m-[0m[0m "Project"     = "iit-test"
+        } [90m-> null[0m[0m
+      [31m-[0m[0m vpc_id           = "vpc-002ce125909e750ec" [90m-> null[0m[0m
+    }
+
+[1m  # aws_route_table.public[0m will be [1m[31mdestroyed[0m
+[0m  [31m-[0m[0m resource "aws_route_table" "public" {
+      [31m-[0m[0m arn              = "arn:aws:ec2:ap-south-1:637245294687:route-table/rtb-0131d72561c429efc" [90m-> null[0m[0m
+      [31m-[0m[0m id               = "rtb-0131d72561c429efc" [90m-> null[0m[0m
+      [31m-[0m[0m owner_id         = "637245294687" [90m-> null[0m[0m
+      [31m-[0m[0m propagating_vgws = [] [90m-> null[0m[0m
+      [31m-[0m[0m route            = [
+          [31m-[0m[0m {
+              [31m-[0m[0m cidr_block                 = "0.0.0.0/0"
+              [31m-[0m[0m gateway_id                 = "igw-0c7181b63dfaf4278"
+                [90m# (11 unchanged attributes hidden)[0m[0m
+            },
+        ] [90m-> null[0m[0m
+      [31m-[0m[0m tags             = {
+          [31m-[0m[0m "Name" = "iit-test-public-rt"
+        } [90m-> null[0m[0m
+      [31m-[0m[0m tags_all         = {
+          [31m-[0m[0m "Environment" = "production"
+          [31m-[0m[0m "ManagedBy"   = "terraform"
+          [31m-[0m[0m "Name"        = "iit-test-public-rt"
+          [31m-[0m[0m "Project"     = "iit-test"
+        } [90m-> null[0m[0m
+      [31m-[0m[0m vpc_id           = "vpc-002ce125909e750ec" [90m-> null[0m[0m
+    }
+
+[1m  # aws_route_table_association.private[0][0m will be [1m[31mdestroyed[0m
+[0m  [31m-[0m[0m resource "aws_route_table_association" "private" {
+      [31m-[0m[0m id             = "rtbassoc-07855a36b58525518" [90m-> null[0m[0m
+      [31m-[0m[0m route_table_id = "rtb-0666d3517d8ebd835" [90m-> null[0m[0m
+      [31m-[0m[0m subnet_id      = "subnet-029dd7feef3c598d2" [90m-> null[0m[0m
+        [90m# (1 unchanged attribute hidden)[0m[0m
+    }
+
+[1m  # aws_route_table_association.private[1][0m will be [1m[31mdestroyed[0m
+[0m  [31m-[0m[0m resource "aws_route_table_association" "private" {
+      [31m-[0m[0m id             = "rtbassoc-03a7015f94763578a" [90m-> null[0m[0m
+      [31m-[0m[0m route_table_id = "rtb-0666d3517d8ebd835" [90m-> null[0m[0m
+      [31m-[0m[0m subnet_id      = "subnet-0c00d59df1e54c954" [90m-> null[0m[0m
+        [90m# (1 unchanged attribute hidden)[0m[0m
+    }
+
+[1m  # aws_route_table_association.public[0][0m will be [1m[31mdestroyed[0m
+[0m  [31m-[0m[0m resource "aws_route_table_association" "public" {
+      [31m-[0m[0m id             = "rtbassoc-09f03a12ffd78dcf5" [90m-> null[0m[0m
+      [31m-[0m[0m route_table_id = "rtb-0131d72561c429efc" [90m-> null[0m[0m
+      [31m-[0m[0m subnet_id      = "subnet-0cdb0877fd887bd2e" [90m-> null[0m[0m
+        [90m# (1 unchanged attribute hidden)[0m[0m
+    }
+
+[1m  # aws_route_table_association.public[1][0m will be [1m[31mdestroyed[0m
+[0m  [31m-[0m[0m resource "aws_route_table_association" "public" {
+      [31m-[0m[0m id             = "rtbassoc-0dd8720a17f243f3c" [90m-> null[0m[0m
+      [31m-[0m[0m route_table_id = "rtb-0131d72561c429efc" [90m-> null[0m[0m
+      [31m-[0m[0m subnet_id      = "subnet-08db29161deee96f4" [90m-> null[0m[0m
+        [90m# (1 unchanged attribute hidden)[0m[0m
+    }
+
+[1m  # aws_security_group.eks_cluster[0m will be [1m[31mdestroyed[0m
+[0m  [31m-[0m[0m resource "aws_security_group" "eks_cluster" {
+      [31m-[0m[0m arn                    = "arn:aws:ec2:ap-south-1:637245294687:security-group/sg-09498288af0911bd3" [90m-> null[0m[0m
+      [31m-[0m[0m description            = "Security group for EKS cluster control plane" [90m-> null[0m[0m
+      [31m-[0m[0m egress                 = [
+          [31m-[0m[0m {
+              [31m-[0m[0m cidr_blocks      = [
+                  [31m-[0m[0m "0.0.0.0/0",
+                ]
+              [31m-[0m[0m description      = "Allow all outbound"
+              [31m-[0m[0m from_port        = 0
+              [31m-[0m[0m ipv6_cidr_blocks = []
+              [31m-[0m[0m prefix_list_ids  = []
+              [31m-[0m[0m protocol         = "-1"
+              [31m-[0m[0m security_groups  = []
+              [31m-[0m[0m self             = false
+              [31m-[0m[0m to_port          = 0
+            },
+        ] [90m-> null[0m[0m
+      [31m-[0m[0m id                     = "sg-09498288af0911bd3" [90m-> null[0m[0m
+      [31m-[0m[0m ingress                = [
+          [31m-[0m[0m {
+              [31m-[0m[0m cidr_blocks      = [
+                  [31m-[0m[0m "0.0.0.0/0",
+                ]
+              [31m-[0m[0m description      = "Allow HTTPS from anywhere"
+              [31m-[0m[0m from_port        = 443
+              [31m-[0m[0m ipv6_cidr_blocks = []
+              [31m-[0m[0m prefix_list_ids  = []
+              [31m-[0m[0m protocol         = "tcp"
+              [31m-[0m[0m security_groups  = []
+              [31m-[0m[0m self             = false
+              [31m-[0m[0m to_port          = 443
+            },
+        ] [90m-> null[0m[0m
+      [31m-[0m[0m name                   = "iit-test-eks-cluster-sg20260215055236655700000006" [90m-> null[0m[0m
+      [31m-[0m[0m name_prefix            = "iit-test-eks-cluster-sg" [90m-> null[0m[0m
+      [31m-[0m[0m owner_id               = "637245294687" [90m-> null[0m[0m
+      [31m-[0m[0m revoke_rules_on_delete = false [90m-> null[0m[0m
+      [31m-[0m[0m tags                   = {
+          [31m-[0m[0m "Name" = "iit-test-eks-cluster-sg"
+        } [90m-> null[0m[0m
+      [31m-[0m[0m tags_all               = {
+          [31m-[0m[0m "Environment" = "production"
+          [31m-[0m[0m "ManagedBy"   = "terraform"
+          [31m-[0m[0m "Name"        = "iit-test-eks-cluster-sg"
+          [31m-[0m[0m "Project"     = "iit-test"
+        } [90m-> null[0m[0m
+      [31m-[0m[0m vpc_id                 = "vpc-002ce125909e750ec" [90m-> null[0m[0m
+    }
+
+[1m  # aws_subnet.private[0][0m will be [1m[31mdestroyed[0m
+[0m  [31m-[0m[0m resource "aws_subnet" "private" {
+      [31m-[0m[0m arn                                            = "arn:aws:ec2:ap-south-1:637245294687:subnet/subnet-029dd7feef3c598d2" [90m-> null[0m[0m
+      [31m-[0m[0m assign_ipv6_address_on_creation                = false [90m-> null[0m[0m
+      [31m-[0m[0m availability_zone                              = "ap-south-1a" [90m-> null[0m[0m
+      [31m-[0m[0m availability_zone_id                           = "aps1-az1" [90m-> null[0m[0m
+      [31m-[0m[0m cidr_block                                     = "10.0.10.0/24" [90m-> null[0m[0m
+      [31m-[0m[0m enable_dns64                                   = false [90m-> null[0m[0m
+      [31m-[0m[0m enable_lni_at_device_index                     = 0 [90m-> null[0m[0m
+      [31m-[0m[0m enable_resource_name_dns_a_record_on_launch    = false [90m-> null[0m[0m
+      [31m-[0m[0m enable_resource_name_dns_aaaa_record_on_launch = false [90m-> null[0m[0m
+      [31m-[0m[0m id                                             = "subnet-029dd7feef3c598d2" [90m-> null[0m[0m
+      [31m-[0m[0m ipv6_native                                    = false [90m-> null[0m[0m
+      [31m-[0m[0m map_customer_owned_ip_on_launch                = false [90m-> null[0m[0m
+      [31m-[0m[0m map_public_ip_on_launch                        = false [90m-> null[0m[0m
+      [31m-[0m[0m owner_id                                       = "637245294687" [90m-> null[0m[0m
+      [31m-[0m[0m private_dns_hostname_type_on_launch            = "ip-name" [90m-> null[0m[0m
+      [31m-[0m[0m tags                                           = {
+          [31m-[0m[0m "Name"                               = "iit-test-private-1"
+          [31m-[0m[0m "kubernetes.io/cluster/iit-test-eks" = "shared"
+          [31m-[0m[0m "kubernetes.io/role/internal-elb"    = "1"
+        } [90m-> null[0m[0m
+      [31m-[0m[0m tags_all                                       = {
+          [31m-[0m[0m "Environment"                        = "production"
+          [31m-[0m[0m "ManagedBy"                          = "terraform"
+          [31m-[0m[0m "Name"                               = "iit-test-private-1"
+          [31m-[0m[0m "Project"                            = "iit-test"
+          [31m-[0m[0m "kubernetes.io/cluster/iit-test-eks" = "shared"
+          [31m-[0m[0m "kubernetes.io/role/internal-elb"    = "1"
+        } [90m-> null[0m[0m
+      [31m-[0m[0m vpc_id                                         = "vpc-002ce125909e750ec" [90m-> null[0m[0m
+        [90m# (4 unchanged attributes hidden)[0m[0m
+    }
+
+[1m  # aws_subnet.private[1][0m will be [1m[31mdestroyed[0m
+[0m  [31m-[0m[0m resource "aws_subnet" "private" {
+      [31m-[0m[0m arn                                            = "arn:aws:ec2:ap-south-1:637245294687:subnet/subnet-0c00d59df1e54c954" [90m-> null[0m[0m
+      [31m-[0m[0m assign_ipv6_address_on_creation                = false [90m-> null[0m[0m
+      [31m-[0m[0m availability_zone                              = "ap-south-1b" [90m-> null[0m[0m
+      [31m-[0m[0m availability_zone_id                           = "aps1-az3" [90m-> null[0m[0m
+      [31m-[0m[0m cidr_block                                     = "10.0.20.0/24" [90m-> null[0m[0m
+      [31m-[0m[0m enable_dns64                                   = false [90m-> null[0m[0m
+      [31m-[0m[0m enable_lni_at_device_index                     = 0 [90m-> null[0m[0m
+      [31m-[0m[0m enable_resource_name_dns_a_record_on_launch    = false [90m-> null[0m[0m
+      [31m-[0m[0m enable_resource_name_dns_aaaa_record_on_launch = false [90m-> null[0m[0m
+      [31m-[0m[0m id                                             = "subnet-0c00d59df1e54c954" [90m-> null[0m[0m
+      [31m-[0m[0m ipv6_native                                    = false [90m-> null[0m[0m
+      [31m-[0m[0m map_customer_owned_ip_on_launch                = false [90m-> null[0m[0m
+      [31m-[0m[0m map_public_ip_on_launch                        = false [90m-> null[0m[0m
+      [31m-[0m[0m owner_id                                       = "637245294687" [90m-> null[0m[0m
+      [31m-[0m[0m private_dns_hostname_type_on_launch            = "ip-name" [90m-> null[0m[0m
+      [31m-[0m[0m tags                                           = {
+          [31m-[0m[0m "Name"                               = "iit-test-private-2"
+          [31m-[0m[0m "kubernetes.io/cluster/iit-test-eks" = "shared"
+          [31m-[0m[0m "kubernetes.io/role/internal-elb"    = "1"
+        } [90m-> null[0m[0m
+      [31m-[0m[0m tags_all                                       = {
+          [31m-[0m[0m "Environment"                        = "production"
+          [31m-[0m[0m "ManagedBy"                          = "terraform"
+          [31m-[0m[0m "Name"                               = "iit-test-private-2"
+          [31m-[0m[0m "Project"                            = "iit-test"
+          [31m-[0m[0m "kubernetes.io/cluster/iit-test-eks" = "shared"
+          [31m-[0m[0m "kubernetes.io/role/internal-elb"    = "1"
+        } [90m-> null[0m[0m
+      [31m-[0m[0m vpc_id                                         = "vpc-002ce125909e750ec" [90m-> null[0m[0m
+        [90m# (4 unchanged attributes hidden)[0m[0m
+    }
+
+[1m  # aws_subnet.public[0][0m will be [1m[31mdestroyed[0m
+[0m  [31m-[0m[0m resource "aws_subnet" "public" {
+      [31m-[0m[0m arn                                            = "arn:aws:ec2:ap-south-1:637245294687:subnet/subnet-0cdb0877fd887bd2e" [90m-> null[0m[0m
+      [31m-[0m[0m assign_ipv6_address_on_creation                = false [90m-> null[0m[0m
+      [31m-[0m[0m availability_zone                              = "ap-south-1a" [90m-> null[0m[0m
+      [31m-[0m[0m availability_zone_id                           = "aps1-az1" [90m-> null[0m[0m
+      [31m-[0m[0m cidr_block                                     = "10.0.1.0/24" [90m-> null[0m[0m
+      [31m-[0m[0m enable_dns64                                   = false [90m-> null[0m[0m
+      [31m-[0m[0m enable_lni_at_device_index                     = 0 [90m-> null[0m[0m
+      [31m-[0m[0m enable_resource_name_dns_a_record_on_launch    = false [90m-> null[0m[0m
+      [31m-[0m[0m enable_resource_name_dns_aaaa_record_on_launch = false [90m-> null[0m[0m
+      [31m-[0m[0m id                                             = "subnet-0cdb0877fd887bd2e" [90m-> null[0m[0m
+      [31m-[0m[0m ipv6_native                                    = false [90m-> null[0m[0m
+      [31m-[0m[0m map_customer_owned_ip_on_launch                = false [90m-> null[0m[0m
+      [31m-[0m[0m map_public_ip_on_launch                        = true [90m-> null[0m[0m
+      [31m-[0m[0m owner_id                                       = "637245294687" [90m-> null[0m[0m
+      [31m-[0m[0m private_dns_hostname_type_on_launch            = "ip-name" [90m-> null[0m[0m
+      [31m-[0m[0m tags                                           = {
+          [31m-[0m[0m "Name"                               = "iit-test-public-1"
+          [31m-[0m[0m "kubernetes.io/cluster/iit-test-eks" = "shared"
+          [31m-[0m[0m "kubernetes.io/role/elb"             = "1"
+        } [90m-> null[0m[0m
+      [31m-[0m[0m tags_all                                       = {
+          [31m-[0m[0m "Environment"                        = "production"
+          [31m-[0m[0m "ManagedBy"                          = "terraform"
+          [31m-[0m[0m "Name"                               = "iit-test-public-1"
+          [31m-[0m[0m "Project"                            = "iit-test"
+          [31m-[0m[0m "kubernetes.io/cluster/iit-test-eks" = "shared"
+          [31m-[0m[0m "kubernetes.io/role/elb"             = "1"
+        } [90m-> null[0m[0m
+      [31m-[0m[0m vpc_id                                         = "vpc-002ce125909e750ec" [90m-> null[0m[0m
+        [90m# (4 unchanged attributes hidden)[0m[0m
+    }
+
+[1m  # aws_subnet.public[1][0m will be [1m[31mdestroyed[0m
+[0m  [31m-[0m[0m resource "aws_subnet" "public" {
+      [31m-[0m[0m arn                                            = "arn:aws:ec2:ap-south-1:637245294687:subnet/subnet-08db29161deee96f4" [90m-> null[0m[0m
+      [31m-[0m[0m assign_ipv6_address_on_creation                = false [90m-> null[0m[0m
+      [31m-[0m[0m availability_zone                              = "ap-south-1b" [90m-> null[0m[0m
+      [31m-[0m[0m availability_zone_id                           = "aps1-az3" [90m-> null[0m[0m
+      [31m-[0m[0m cidr_block                                     = "10.0.2.0/24" [90m-> null[0m[0m
+      [31m-[0m[0m enable_dns64                                   = false [90m-> null[0m[0m
+      [31m-[0m[0m enable_lni_at_device_index                     = 0 [90m-> null[0m[0m
+      [31m-[0m[0m enable_resource_name_dns_a_record_on_launch    = false [90m-> null[0m[0m
+      [31m-[0m[0m enable_resource_name_dns_aaaa_record_on_launch = false [90m-> null[0m[0m
+      [31m-[0m[0m id                                             = "subnet-08db29161deee96f4" [90m-> null[0m[0m
+      [31m-[0m[0m ipv6_native                                    = false [90m-> null[0m[0m
+      [31m-[0m[0m map_customer_owned_ip_on_launch                = false [90m-> null[0m[0m
+      [31m-[0m[0m map_public_ip_on_launch                        = true [90m-> null[0m[0m
+      [31m-[0m[0m owner_id                                       = "637245294687" [90m-> null[0m[0m
+      [31m-[0m[0m private_dns_hostname_type_on_launch            = "ip-name" [90m-> null[0m[0m
+      [31m-[0m[0m tags                                           = {
+          [31m-[0m[0m "Name"                               = "iit-test-public-2"
+          [31m-[0m[0m "kubernetes.io/cluster/iit-test-eks" = "shared"
+          [31m-[0m[0m "kubernetes.io/role/elb"             = "1"
+        } [90m-> null[0m[0m
+      [31m-[0m[0m tags_all                                       = {
+          [31m-[0m[0m "Environment"                        = "production"
+          [31m-[0m[0m "ManagedBy"                          = "terraform"
+          [31m-[0m[0m "Name"                               = "iit-test-public-2"
+          [31m-[0m[0m "Project"                            = "iit-test"
+          [31m-[0m[0m "kubernetes.io/cluster/iit-test-eks" = "shared"
+          [31m-[0m[0m "kubernetes.io/role/elb"             = "1"
+        } [90m-> null[0m[0m
+      [31m-[0m[0m vpc_id                                         = "vpc-002ce125909e750ec" [90m-> null[0m[0m
+        [90m# (4 unchanged attributes hidden)[0m[0m
+    }
+
+[1m  # aws_vpc.main[0m will be [1m[31mdestroyed[0m
+[0m  [31m-[0m[0m resource "aws_vpc" "main" {
+      [31m-[0m[0m arn                                  = "arn:aws:ec2:ap-south-1:637245294687:vpc/vpc-002ce125909e750ec" [90m-> null[0m[0m
+      [31m-[0m[0m assign_generated_ipv6_cidr_block     = false [90m-> null[0m[0m
+      [31m-[0m[0m cidr_block                           = "10.0.0.0/16" [90m-> null[0m[0m
+      [31m-[0m[0m default_network_acl_id               = "acl-062ef079e19139e34" [90m-> null[0m[0m
+      [31m-[0m[0m default_route_table_id               = "rtb-0602ee1bbc8e3ee01" [90m-> null[0m[0m
+      [31m-[0m[0m default_security_group_id            = "sg-08cb30ec0647d12f3" [90m-> null[0m[0m
+      [31m-[0m[0m dhcp_options_id                      = "dopt-0ac6bac57f2784394" [90m-> null[0m[0m
+      [31m-[0m[0m enable_dns_hostnames                 = true [90m-> null[0m[0m
+      [31m-[0m[0m enable_dns_support                   = true [90m-> null[0m[0m
+      [31m-[0m[0m enable_network_address_usage_metrics = false [90m-> null[0m[0m
+      [31m-[0m[0m id                                   = "vpc-002ce125909e750ec" [90m-> null[0m[0m
+      [31m-[0m[0m instance_tenancy                     = "default" [90m-> null[0m[0m
+      [31m-[0m[0m ipv6_netmask_length                  = 0 [90m-> null[0m[0m
+      [31m-[0m[0m main_route_table_id                  = "rtb-0602ee1bbc8e3ee01" [90m-> null[0m[0m
+      [31m-[0m[0m owner_id                             = "637245294687" [90m-> null[0m[0m
+      [31m-[0m[0m tags                                 = {
+          [31m-[0m[0m "Name" = "iit-test-vpc"
+        } [90m-> null[0m[0m
+      [31m-[0m[0m tags_all                             = {
+          [31m-[0m[0m "Environment" = "production"
+          [31m-[0m[0m "ManagedBy"   = "terraform"
+          [31m-[0m[0m "Name"        = "iit-test-vpc"
+          [31m-[0m[0m "Project"     = "iit-test"
+        } [90m-> null[0m[0m
+        [90m# (4 unchanged attributes hidden)[0m[0m
+    }
+
+[1mPlan:[0m [0m0 to add, 0 to change, 24 to destroy.
+
+Changes to Outputs:
+  [31m-[0m[0m cluster_certificate_authority = (sensitive value) [90m-> null[0m[0m
+  [31m-[0m[0m cluster_endpoint              = "https://997CE488C72E24469318911ED779896E.gr7.ap-south-1.eks.amazonaws.com" [90m-> null[0m[0m
+  [31m-[0m[0m cluster_name                  = "iit-test-eks" [90m-> null[0m[0m
+  [31m-[0m[0m cluster_version               = "1.31" [90m-> null[0m[0m
+  [31m-[0m[0m node_group_name               = "iit-test-eks-node-group" [90m-> null[0m[0m
+  [31m-[0m[0m update_kubeconfig             = "aws eks update-kubeconfig --name iit-test-eks --region ap-south-1" [90m-> null[0m[0m
+  [31m-[0m[0m vpc_id                        = "vpc-002ce125909e750ec" [90m-> null[0m[0m
+[0m[1maws_route_table_association.public[1]: Destroying... [id=rtbassoc-0dd8720a17f243f3c][0m[0m
+[0m[1maws_route_table_association.private[1]: Destroying... [id=rtbassoc-03a7015f94763578a][0m[0m
+[0m[1maws_route_table_association.private[0]: Destroying... [id=rtbassoc-07855a36b58525518][0m[0m
+[0m[1maws_route_table_association.public[0]: Destroying... [id=rtbassoc-09f03a12ffd78dcf5][0m[0m
+[0m[1maws_eks_node_group.main: Destroying... [id=iit-test-eks:iit-test-eks-node-group][0m[0m
+[0m[1maws_route_table_association.public[1]: Destruction complete after 0s[0m
+[0m[1maws_route_table_association.public[0]: Destruction complete after 0s[0m
+[0m[1maws_route_table_association.private[1]: Destruction complete after 0s[0m
+[0m[1maws_route_table.public: Destroying... [id=rtb-0131d72561c429efc][0m[0m
+[0m[1maws_route_table_association.private[0]: Destruction complete after 0s[0m
+[0m[1maws_route_table.private: Destroying... [id=rtb-0666d3517d8ebd835][0m[0m
+[0m[1maws_route_table.public: Destruction complete after 1s[0m
+[0m[1maws_route_table.private: Destruction complete after 1s[0m
+[0m[1maws_nat_gateway.main: Destroying... [id=nat-0983d59829b150a24][0m[0m
+[0m[1maws_eks_node_group.main: Still destroying... [id=iit-test-eks:iit-test-eks-node-group, 00m10s elapsed][0m[0m
+[0m[1maws_nat_gateway.main: Still destroying... [id=nat-0983d59829b150a24, 00m10s elapsed][0m[0m
+[0m[1maws_eks_node_group.main: Still destroying... [id=iit-test-eks:iit-test-eks-node-group, 00m20s elapsed][0m[0m
+[0m[1maws_nat_gateway.main: Still destroying... [id=nat-0983d59829b150a24, 00m20s elapsed][0m[0m
+[0m[1maws_eks_node_group.main: Still destroying... [id=iit-test-eks:iit-test-eks-node-group, 00m30s elapsed][0m[0m
+[0m[1maws_nat_gateway.main: Still destroying... [id=nat-0983d59829b150a24, 00m30s elapsed][0m[0m
+[0m[1maws_eks_node_group.main: Still destroying... [id=iit-test-eks:iit-test-eks-node-group, 00m40s elapsed][0m[0m
+[0m[1maws_nat_gateway.main: Still destroying... [id=nat-0983d59829b150a24, 00m40s elapsed][0m[0m
+[0m[1maws_eks_node_group.main: Still destroying... [id=iit-test-eks:iit-test-eks-node-group, 00m50s elapsed][0m[0m
+[0m[1maws_nat_gateway.main: Still destroying... [id=nat-0983d59829b150a24, 00m50s elapsed][0m[0m
+[0m[1maws_nat_gateway.main: Destruction complete after 51s[0m
+[0m[1maws_internet_gateway.main: Destroying... [id=igw-0c7181b63dfaf4278][0m[0m
+[0m[1maws_eip.nat: Destroying... [id=eipalloc-0598465467c52c666][0m[0m
+[0m[1maws_internet_gateway.main: Destruction complete after 0s[0m
+[0m[1maws_eip.nat: Destruction complete after 1s[0m
+[0m[1maws_eks_node_group.main: Still destroying... [id=iit-test-eks:iit-test-eks-node-group, 01m00s elapsed][0m[0m
+[0m[1maws_eks_node_group.main: Still destroying... [id=iit-test-eks:iit-test-eks-node-group, 01m10s elapsed][0m[0m
+[0m[1maws_eks_node_group.main: Still destroying... [id=iit-test-eks:iit-test-eks-node-group, 01m20s elapsed][0m[0m
+[0m[1maws_eks_node_group.main: Still destroying... [id=iit-test-eks:iit-test-eks-node-group, 01m30s elapsed][0m[0m
+[0m[1maws_eks_node_group.main: Still destroying... [id=iit-test-eks:iit-test-eks-node-group, 01m40s elapsed][0m[0m
+[0m[1maws_eks_node_group.main: Still destroying... [id=iit-test-eks:iit-test-eks-node-group, 01m50s elapsed][0m[0m
+[0m[1maws_eks_node_group.main: Still destroying... [id=iit-test-eks:iit-test-eks-node-group, 02m00s elapsed][0m[0m
+[0m[1maws_eks_node_group.main: Still destroying... [id=iit-test-eks:iit-test-eks-node-group, 02m10s elapsed][0m[0m
+[0m[1maws_eks_node_group.main: Still destroying... [id=iit-test-eks:iit-test-eks-node-group, 02m20s elapsed][0m[0m
+[0m[1maws_eks_node_group.main: Still destroying... [id=iit-test-eks:iit-test-eks-node-group, 02m30s elapsed][0m[0m
+[0m[1maws_eks_node_group.main: Still destroying... [id=iit-test-eks:iit-test-eks-node-group, 02m40s elapsed][0m[0m
+[0m[1maws_eks_node_group.main: Still destroying... [id=iit-test-eks:iit-test-eks-node-group, 02m50s elapsed][0m[0m
+[0m[1maws_eks_node_group.main: Still destroying... [id=iit-test-eks:iit-test-eks-node-group, 03m00s elapsed][0m[0m
+[0m[1maws_eks_node_group.main: Still destroying... [id=iit-test-eks:iit-test-eks-node-group, 03m10s elapsed][0m[0m
+[0m[1maws_eks_node_group.main: Still destroying... [id=iit-test-eks:iit-test-eks-node-group, 03m20s elapsed][0m[0m
+[0m[1maws_eks_node_group.main: Still destroying... [id=iit-test-eks:iit-test-eks-node-group, 03m30s elapsed][0m[0m
+[0m[1maws_eks_node_group.main: Still destroying... [id=iit-test-eks:iit-test-eks-node-group, 03m40s elapsed][0m[0m
+[0m[1maws_eks_node_group.main: Still destroying... [id=iit-test-eks:iit-test-eks-node-group, 03m50s elapsed][0m[0m
+[0m[1maws_eks_node_group.main: Still destroying... [id=iit-test-eks:iit-test-eks-node-group, 04m00s elapsed][0m[0m
+[0m[1maws_eks_node_group.main: Still destroying... [id=iit-test-eks:iit-test-eks-node-group, 04m10s elapsed][0m[0m
+[0m[1maws_eks_node_group.main: Still destroying... [id=iit-test-eks:iit-test-eks-node-group, 04m20s elapsed][0m[0m
+[0m[1maws_eks_node_group.main: Still destroying... [id=iit-test-eks:iit-test-eks-node-group, 04m30s elapsed][0m[0m
+[0m[1maws_eks_node_group.main: Still destroying... [id=iit-test-eks:iit-test-eks-node-group, 04m40s elapsed][0m[0m
+[0m[1maws_eks_node_group.main: Still destroying... [id=iit-test-eks:iit-test-eks-node-group, 04m50s elapsed][0m[0m
+[0m[1maws_eks_node_group.main: Still destroying... [id=iit-test-eks:iit-test-eks-node-group, 05m00s elapsed][0m[0m
+[0m[1maws_eks_node_group.main: Still destroying... [id=iit-test-eks:iit-test-eks-node-group, 05m10s elapsed][0m[0m
+[0m[1maws_eks_node_group.main: Still destroying... [id=iit-test-eks:iit-test-eks-node-group, 05m20s elapsed][0m[0m
+[0m[1maws_eks_node_group.main: Still destroying... [id=iit-test-eks:iit-test-eks-node-group, 05m30s elapsed][0m[0m
+[0m[1maws_eks_node_group.main: Still destroying... [id=iit-test-eks:iit-test-eks-node-group, 05m40s elapsed][0m[0m
+[0m[1maws_eks_node_group.main: Still destroying... [id=iit-test-eks:iit-test-eks-node-group, 05m50s elapsed][0m[0m
+[0m[1maws_eks_node_group.main: Still destroying... [id=iit-test-eks:iit-test-eks-node-group, 06m00s elapsed][0m[0m
+[0m[1maws_eks_node_group.main: Still destroying... [id=iit-test-eks:iit-test-eks-node-group, 06m10s elapsed][0m[0m
+[0m[1maws_eks_node_group.main: Destruction complete after 6m12s[0m
+[0m[1maws_iam_role_policy_attachment.eks_container_registry: Destroying... [id=iit-test-eks-node-role-20260215055226728700000001][0m[0m
+[0m[1maws_iam_role_policy_attachment.eks_worker_node_policy: Destroying... [id=iit-test-eks-node-role-20260215055226941300000002][0m[0m
+[0m[1maws_iam_role_policy_attachment.eks_cni_policy: Destroying... [id=iit-test-eks-node-role-20260215055227023900000003][0m[0m
+[0m[1maws_eks_cluster.main: Destroying... [id=iit-test-eks][0m[0m
+[0m[1maws_iam_role_policy_attachment.eks_worker_node_policy: Destruction complete after 2s[0m
+[0m[1maws_iam_role_policy_attachment.eks_container_registry: Destruction complete after 2s[0m
+[0m[1maws_iam_role_policy_attachment.eks_cni_policy: Destruction complete after 2s[0m
+[0m[1maws_iam_role.eks_nodes: Destroying... [id=iit-test-eks-node-role][0m[0m
+[0m[1maws_iam_role.eks_nodes: Destruction complete after 1s[0m
+[0m[1maws_eks_cluster.main: Still destroying... [id=iit-test-eks, 00m10s elapsed][0m[0m
+[0m[1maws_eks_cluster.main: Still destroying... [id=iit-test-eks, 00m20s elapsed][0m[0m
+[0m[1maws_eks_cluster.main: Still destroying... [id=iit-test-eks, 00m30s elapsed][0m[0m
+[0m[1maws_eks_cluster.main: Still destroying... [id=iit-test-eks, 00m40s elapsed][0m[0m
+[0m[1maws_eks_cluster.main: Still destroying... [id=iit-test-eks, 00m50s elapsed][0m[0m
+[0m[1maws_eks_cluster.main: Still destroying... [id=iit-test-eks, 01m00s elapsed][0m[0m
+[0m[1maws_eks_cluster.main: Still destroying... [id=iit-test-eks, 01m10s elapsed][0m[0m
+[0m[1maws_eks_cluster.main: Still destroying... [id=iit-test-eks, 01m20s elapsed][0m[0m
+[0m[1maws_eks_cluster.main: Still destroying... [id=iit-test-eks, 01m30s elapsed][0m[0m
+[0m[1maws_eks_cluster.main: Still destroying... [id=iit-test-eks, 01m40s elapsed][0m[0m
+[0m[1maws_eks_cluster.main: Still destroying... [id=iit-test-eks, 01m50s elapsed][0m[0m
+[0m[1maws_eks_cluster.main: Still destroying... [id=iit-test-eks, 02m00s elapsed][0m[0m
+[0m[1maws_eks_cluster.main: Still destroying... [id=iit-test-eks, 02m10s elapsed][0m[0m
+[0m[1maws_eks_cluster.main: Still destroying... [id=iit-test-eks, 02m20s elapsed][0m[0m
+[0m[1maws_eks_cluster.main: Still destroying... [id=iit-test-eks, 02m30s elapsed][0m[0m
+[0m[1maws_eks_cluster.main: Still destroying... [id=iit-test-eks, 02m40s elapsed][0m[0m
+[0m[1maws_eks_cluster.main: Destruction complete after 2m48s[0m
+[0m[1maws_iam_role_policy_attachment.eks_vpc_resource_controller: Destroying... [id=iit-test-eks-cluster-role-20260215055227224800000004][0m[0m
+[0m[1maws_iam_role_policy_attachment.eks_cluster_policy: Destroying... [id=iit-test-eks-cluster-role-20260215055227306400000005][0m[0m
+[0m[1maws_subnet.private[0]: Destroying... [id=subnet-029dd7feef3c598d2][0m[0m
+[0m[1maws_subnet.public[1]: Destroying... [id=subnet-08db29161deee96f4][0m[0m
+[0m[1maws_subnet.private[1]: Destroying... [id=subnet-0c00d59df1e54c954][0m[0m
+[0m[1maws_security_group.eks_cluster: Destroying... [id=sg-09498288af0911bd3][0m[0m
+[0m[1maws_subnet.public[0]: Destroying... [id=subnet-0cdb0877fd887bd2e][0m[0m
+[0m[1maws_subnet.private[0]: Destruction complete after 1s[0m
+[0m[1maws_subnet.private[1]: Destruction complete after 1s[0m
+[0m[1maws_subnet.public[1]: Destruction complete after 1s[0m
+[0m[1maws_subnet.public[0]: Destruction complete after 1s[0m
+[0m[1maws_security_group.eks_cluster: Destruction complete after 1s[0m
+[0m[1maws_vpc.main: Destroying... [id=vpc-002ce125909e750ec][0m[0m
+[0m[1maws_iam_role_policy_attachment.eks_vpc_resource_controller: Destruction complete after 1s[0m
+[0m[1maws_iam_role_policy_attachment.eks_cluster_policy: Destruction complete after 1s[0m
+[0m[1maws_iam_role.eks_cluster: Destroying... [id=iit-test-eks-cluster-role][0m[0m
+[0m[1maws_iam_role.eks_cluster: Destruction complete after 1s[0m
+[0m[1maws_vpc.main: Still destroying... [id=vpc-002ce125909e750ec, 00m10s elapsed][0m[0m
+[0m[1maws_vpc.main: Still destroying... [id=vpc-002ce125909e750ec, 00m20s elapsed][0m[0m
+[0m[1maws_vpc.main: Still destroying... [id=vpc-002ce125909e750ec, 00m30s elapsed][0m[0m
+[0m[1maws_vpc.main: Still destroying... [id=vpc-002ce125909e750ec, 00m40s elapsed][0m[0m
+[0m[1maws_vpc.main: Still destroying... [id=vpc-002ce125909e750ec, 00m50s elapsed][0m[0m
+[0m[1maws_vpc.main: Still destroying... [id=vpc-002ce125909e750ec, 01m00s elapsed][0m[0m
+[0m[1maws_vpc.main: Still destroying... [id=vpc-002ce125909e750ec, 01m10s elapsed][0m[0m
+[0m[1maws_vpc.main: Still destroying... [id=vpc-002ce125909e750ec, 01m20s elapsed][0m[0m
+[0m[1maws_vpc.main: Still destroying... [id=vpc-002ce125909e750ec, 01m30s elapsed][0m[0m
+[0m[1maws_vpc.main: Still destroying... [id=vpc-002ce125909e750ec, 01m40s elapsed][0m[0m
+[0m[1maws_vpc.main: Still destroying... [id=vpc-002ce125909e750ec, 01m50s elapsed][0m[0m
+[0m[1maws_vpc.main: Still destroying... [id=vpc-002ce125909e750ec, 02m00s elapsed][0m[0m
+[0m[1maws_vpc.main: Still destroying... [id=vpc-002ce125909e750ec, 02m10s elapsed][0m[0m
+[0m[1maws_vpc.main: Still destroying... [id=vpc-002ce125909e750ec, 02m20s elapsed][0m[0m
+[0m[1maws_vpc.main: Still destroying... [id=vpc-002ce125909e750ec, 02m30s elapsed][0m[0m
+[0m[1maws_vpc.main: Still destroying... [id=vpc-002ce125909e750ec, 02m40s elapsed][0m[0m
+[0m[1maws_vpc.main: Still destroying... [id=vpc-002ce125909e750ec, 02m50s elapsed][0m[0m
+[0m[1maws_vpc.main: Still destroying... [id=vpc-002ce125909e750ec, 03m00s elapsed][0m[0m
+[0m[1maws_vpc.main: Still destroying... [id=vpc-002ce125909e750ec, 03m10s elapsed][0m[0m
+[0m[1maws_vpc.main: Still destroying... [id=vpc-002ce125909e750ec, 03m20s elapsed][0m[0m
+[0m[1maws_vpc.main: Still destroying... [id=vpc-002ce125909e750ec, 03m30s elapsed][0m[0m
+[0m[1maws_vpc.main: Still destroying... [id=vpc-002ce125909e750ec, 03m40s elapsed][0m[0m
+[0m[1maws_vpc.main: Still destroying... [id=vpc-002ce125909e750ec, 03m50s elapsed][0m[0m
+[0m[1maws_vpc.main: Still destroying... [id=vpc-002ce125909e750ec, 04m00s elapsed][0m[0m
+[0m[1maws_vpc.main: Still destroying... [id=vpc-002ce125909e750ec, 04m10s elapsed][0m[0m
+[0m[1maws_vpc.main: Still destroying... [id=vpc-002ce125909e750ec, 04m20s elapsed][0m[0m
+[0m[1maws_vpc.main: Still destroying... [id=vpc-002ce125909e750ec, 04m30s elapsed][0m[0m
+[0m[1maws_vpc.main: Still destroying... [id=vpc-002ce125909e750ec, 04m40s elapsed][0m[0m
+[0m[1maws_vpc.main: Still destroying... [id=vpc-002ce125909e750ec, 04m50s elapsed][0m[0m
+[0m[1maws_vpc.main: Still destroying... [id=vpc-002ce125909e750ec, 05m00s elapsed][0m[0m
+[0m[1maws_vpc.main: Still destroying... [id=vpc-002ce125909e750ec, 05m10s elapsed][0m[0m
+[0m[1maws_vpc.main: Still destroying... [id=vpc-002ce125909e750ec, 05m20s elapsed][0m[0m
+[0m[1maws_vpc.main: Still destroying... [id=vpc-002ce125909e750ec, 05m30s elapsed][0m[0m
+[0m[1maws_vpc.main: Still destroying... [id=vpc-002ce125909e750ec, 05m40s elapsed][0m[0m
+[0m[1maws_vpc.main: Still destroying... [id=vpc-002ce125909e750ec, 05m50s elapsed][0m[0m
+[0m[1maws_vpc.main: Still destroying... [id=vpc-002ce125909e750ec, 06m00s elapsed][0m[0m
+[0m[1maws_vpc.main: Still destroying... [id=vpc-002ce125909e750ec, 06m10s elapsed][0m[0m
+[0m[1maws_vpc.main: Still destroying... [id=vpc-002ce125909e750ec, 06m20s elapsed][0m[0m
+[0m[1maws_vpc.main: Still destroying... [id=vpc-002ce125909e750ec, 06m30s elapsed][0m[0m
+[0m[1maws_vpc.main: Still destroying... [id=vpc-002ce125909e750ec, 06m40s elapsed][0m[0m
+[0m[1maws_vpc.main: Still destroying... [id=vpc-002ce125909e750ec, 06m50s elapsed][0m[0m
+[0m[1maws_vpc.main: Still destroying... [id=vpc-002ce125909e750ec, 07m00s elapsed][0m[0m
+[0m[1maws_vpc.main: Still destroying... [id=vpc-002ce125909e750ec, 07m10s elapsed][0m[0m
+[0m[1maws_vpc.main: Still destroying... [id=vpc-002ce125909e750ec, 07m20s elapsed][0m[0m
+[0m[1maws_vpc.main: Still destroying... [id=vpc-002ce125909e750ec, 07m30s elapsed][0m[0m
+[0m[1maws_vpc.main: Still destroying... [id=vpc-002ce125909e750ec, 07m40s elapsed][0m[0m
+[0m[1maws_vpc.main: Still destroying... [id=vpc-002ce125909e750ec, 07m50s elapsed][0m[0m
+[0m[1maws_vpc.main: Still destroying... [id=vpc-002ce125909e750ec, 08m00s elapsed][0m[0m
+[0m[1maws_vpc.main: Still destroying... [id=vpc-002ce125909e750ec, 08m10s elapsed][0m[0m
+[0m[1maws_vpc.main: Still destroying... [id=vpc-002ce125909e750ec, 08m20s elapsed][0m[0m
+[0m[1maws_vpc.main: Still destroying... [id=vpc-002ce125909e750ec, 08m30s elapsed][0m[0m
+[0m[1maws_vpc.main: Still destroying... [id=vpc-002ce125909e750ec, 08m40s elapsed][0m[0m
+[0m[1maws_vpc.main: Still destroying... [id=vpc-002ce125909e750ec, 08m50s elapsed][0m[0m
+[0m[1maws_vpc.main: Still destroying... [id=vpc-002ce125909e750ec, 09m00s elapsed][0m[0m
+[0m[1maws_vpc.main: Still destroying... [id=vpc-002ce125909e750ec, 09m10s elapsed][0m[0m
+[0m[1maws_vpc.main: Still destroying... [id=vpc-002ce125909e750ec, 09m20s elapsed][0m[0m
+[0m[1maws_vpc.main: Still destroying... [id=vpc-002ce125909e750ec, 09m30s elapsed][0m[0m
+[0m[1maws_vpc.main: Still destroying... [id=vpc-002ce125909e750ec, 09m40s elapsed][0m[0m
+[0m[1maws_vpc.main: Still destroying... [id=vpc-002ce125909e750ec, 09m50s elapsed][0m[0m
+[0m[1maws_vpc.main: Still destroying... [id=vpc-002ce125909e750ec, 10m00s elapsed][0m[0m
+[0m[1maws_vpc.main: Still destroying... [id=vpc-002ce125909e750ec, 10m10s elapsed][0m[0m
+[0m[1maws_vpc.main: Still destroying... [id=vpc-002ce125909e750ec, 10m20s elapsed][0m[0m
+[0m[1maws_vpc.main: Still destroying... [id=vpc-002ce125909e750ec, 10m30s elapsed][0m[0m
+[0m[1maws_vpc.main: Still destroying... [id=vpc-002ce125909e750ec, 10m40s elapsed][0m[0m
+[0m[1maws_vpc.main: Still destroying... [id=vpc-002ce125909e750ec, 10m50s elapsed][0m[0m
+[0m[1maws_vpc.main: Still destroying... [id=vpc-002ce125909e750ec, 11m00s elapsed][0m[0m
+[0m[1maws_vpc.main: Still destroying... [id=vpc-002ce125909e750ec, 11m10s elapsed][0m[0m
+[0m[1maws_vpc.main: Still destroying... [id=vpc-002ce125909e750ec, 11m20s elapsed][0m[0m
+[0m[1maws_vpc.main: Still destroying... [id=vpc-002ce125909e750ec, 11m30s elapsed][0m[0m
+[0m[1maws_vpc.main: Still destroying... [id=vpc-002ce125909e750ec, 11m40s elapsed][0m[0m
+[0m[1maws_vpc.main: Still destroying... [id=vpc-002ce125909e750ec, 11m50s elapsed][0m[0m
+[0m[1maws_vpc.main: Still destroying... [id=vpc-002ce125909e750ec, 12m00s elapsed][0m[0m
+[0m[1maws_vpc.main: Still destroying... [id=vpc-002ce125909e750ec, 12m10s elapsed][0m[0m
+[0m[1maws_vpc.main: Still destroying... [id=vpc-002ce125909e750ec, 12m20s elapsed][0m[0m
+[0m[1maws_vpc.main: Still destroying... [id=vpc-002ce125909e750ec, 12m30s elapsed][0m[0m
+[0m[1maws_vpc.main: Still destroying... [id=vpc-002ce125909e750ec, 12m40s elapsed][0m[0m
+[0m[1maws_vpc.main: Still destroying... [id=vpc-002ce125909e750ec, 12m50s elapsed][0m[0m
+[0m[1maws_vpc.main: Still destroying... [id=vpc-002ce125909e750ec, 13m00s elapsed][0m[0m
+[0m[1maws_vpc.main: Still destroying... [id=vpc-002ce125909e750ec, 13m10s elapsed][0m[0m
+[0m[1maws_vpc.main: Still destroying... [id=vpc-002ce125909e750ec, 13m20s elapsed][0m[0m
+[0m[1maws_vpc.main: Still destroying... [id=vpc-002ce125909e750ec, 13m30s elapsed][0m[0m
+[0m[1maws_vpc.main: Still destroying... [id=vpc-002ce125909e750ec, 13m40s elapsed][0m[0m
+[0m[1maws_vpc.main: Still destroying... [id=vpc-002ce125909e750ec, 13m50s elapsed][0m[0m
+[0m[1maws_vpc.main: Still destroying... [id=vpc-002ce125909e750ec, 14m00s elapsed][0m[0m
+[0m[1maws_vpc.main: Still destroying... [id=vpc-002ce125909e750ec, 14m10s elapsed][0m[0m
+[0m[1maws_vpc.main: Still destroying... [id=vpc-002ce125909e750ec, 14m20s elapsed][0m[0m
+[0m[1maws_vpc.main: Still destroying... [id=vpc-002ce125909e750ec, 14m30s elapsed][0m[0m
+[0m[1maws_vpc.main: Still destroying... [id=vpc-002ce125909e750ec, 14m40s elapsed][0m[0m
+[0m[1maws_vpc.main: Still destroying... [id=vpc-002ce125909e750ec, 14m50s elapsed][0m[0m
+[0m[1maws_vpc.main: Destruction complete after 14m51s[0m
+[0m[1m[32m
+Destroy complete! Resources: 24 destroyed.[0m

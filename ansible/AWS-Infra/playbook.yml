@@ -1,0 +1,300 @@
+---
+# ===========================================
+# AWS Infrastructure — One-Command Deployment
+# ===========================================
+# This playbook:
+#   1. Provisions AWS infra with Terraform (VPC + EKS)
+#   2. Connects to the new EKS cluster
+#   3. Installs K8s platform (Helm charts)
+#   4. Deploys application manifests
+# ===========================================
+# Usage:
+#   cd ansible/AWS-Infra
+#   ansible-playbook playbook.yml -i inventory.ini
+# ===========================================
+
+- name: AWS Infrastructure — Provision & Configure
+  hosts: local
+  become: false
+  vars:
+    project_root: "{{ playbook_dir }}/../.."
+    terraform_dir: "{{ playbook_dir }}/terraform"
+    k8s_dir: "{{ project_root }}/packages/k8s"
+    mychart_path: "{{ project_root }}/packages/mychart"
+    aws_region: "ap-south-1"
+    cluster_name: "iit-test-eks"
+
+  vars_files:
+    - "{{ project_root }}/ansible/vars/secrets.yml"
+
+  tasks:
+    # ============================================
+    # PHASE 1: TERRAFORM — Provision AWS Infra
+    # ============================================
+    - name: "PHASE 1 · Terraform Init"
+      shell: terraform init > init.log 2>&1
+      args:
+        chdir: "{{ terraform_dir }}"
+      register: terraform_init
+
+    - name: Display Terraform init log location
+      debug:
+        msg: "Terraform init logs are being written to {{ terraform_dir }}/init.log"
+
+    - name: "PHASE 1 · Terraform Apply"
+      shell: terraform apply -auto-approve > apply.log 2>&1
+      args:
+        chdir: "{{ terraform_dir }}"
+      register: terraform_apply
+      async: 3600  # Allow up to 1 hour
+      poll: 10     # Check every 10 seconds
+
+    - name: Display Terraform apply log location
+      debug:
+        msg: "Terraform apply logs are being written to {{ terraform_dir }}/apply.log"
+
+    - name: Wait for EKS cluster to stabilise (5 min)
+      pause:
+        minutes: 5
+      when: terraform_apply.rc == 0
+
+    # ============================================
+    # PHASE 2: CONNECT — Configure kubectl
+    # ============================================
+    - name: "PHASE 2 · Update kubeconfig for EKS"
+      command: >
+        aws eks update-kubeconfig
+        --name {{ cluster_name }}
+        --region {{ aws_region }}
+      register: eks_kubeconfig
+
+    - name: Display kubeconfig result
+      debug:
+        msg: "{{ eks_kubeconfig.stdout | default(eks_kubeconfig.stderr | default('Connected to EKS cluster')) }}"
+
+    - name: Verify kubectl connection
+      command: kubectl cluster-info
+      register: cluster_info
+
+    - name: Display cluster info
+      debug:
+        msg: "{{ cluster_info.stdout_lines }}"
+
+    # ============================================
+    # PHASE 3: HELM — Repository & Platform Setup
+    # ============================================
+    - name: "PHASE 3 · Add Helm repositories"
+      command: "helm repo add {{ item.name }} {{ item.url }}"
+      loop:
+        - { name: traefik, url: "https://traefik.github.io/charts" }
+        - { name: argo, url: "https://argoproj.github.io/argo-helm" }
+        - { name: external-secrets, url: "https://charts.external-secrets.io" }
+      failed_when: false
+
+    - name: Update Helm repositories
+      command: helm repo update
+      register: helm_update
+
+    - name: Display Helm repo update
+      debug:
+        msg: "{{ helm_update.stdout }}"
+
+    - name: Update Helm chart dependencies
+      command: helm dependency update .
+      args:
+        chdir: "{{ mychart_path }}"
+      register: dependency_update
+
+    - name: Create argocd namespace
+      command: kubectl create namespace argocd
+      failed_when: false
+
+    - name: Install platform Helm chart
+      command: helm install platform ./mychart --create-namespace
+      args:
+        chdir: "{{ project_root }}/packages"
+      register: platform_install
+      failed_when: false
+
+    - name: Upgrade platform if already installed
+      command: helm upgrade platform ./mychart
+      args:
+        chdir: "{{ project_root }}/packages"
+      when: platform_install.rc != 0 and 'cannot re-use' in platform_install.stderr
+
+    - name: Display platform result
+      debug:
+        msg: "Platform Helm chart installed/upgraded successfully"
+
+    # ============================================
+    # PHASE 4: EXTERNAL SECRETS
+    # ============================================
+    - name: "PHASE 4 · Install External Secrets operator"
+      command: >
+        helm upgrade --install external-secrets external-secrets/external-secrets
+        --namespace external-secrets --create-namespace
+        --set installCRDs=true
+        --wait --timeout=300s
+      register: external_secrets_install
+
+    - name: Display External Secrets result
+      debug:
+        msg: "{{ external_secrets_install.stdout_lines[-5:] | default(['Success']) }}"
+
+    - name: Check if aws-sm-credentials secret exists
+      command: kubectl get secret aws-sm-credentials -n external-secrets
+      register: secret_check
+      failed_when: false
+      changed_when: false
+
+    - name: Create AWS Secrets Manager credentials
+      command: >
+        kubectl create secret generic aws-sm-credentials
+        --namespace=external-secrets
+        --from-literal=accessKeyId={{ aws_access_key_id }}
+        --from-literal=secretAccessKey={{ aws_secret_access_key }}
+      when: secret_check.rc != 0
+
+    - name: Rollout restart External Secrets
+      command: kubectl rollout restart deployment -n external-secrets
+
+    - name: Wait for External Secrets to be ready
+      command: kubectl rollout status deployment -n external-secrets --timeout=120s
+      failed_when: false
+
+    # ============================================
+    # PHASE 5: KUBERNETES MANIFESTS
+    # ============================================
+    - name: "PHASE 5 · Apply ClusterSecretStore & ExternalSecrets"
+      command: kubectl apply -f {{ item }}
+      args:
+        chdir: "{{ k8s_dir }}"
+      loop:
+        - aws-secrets.yaml
+        - user-be-secret.yaml
+        - admin-be-secret.yaml
+      register: secrets_apply
+
+    - name: Apply optional secrets
+      command: kubectl apply -f {{ item }}
+      args:
+        chdir: "{{ k8s_dir }}"
+      loop:
+        - comp-queue-secret.yaml
+        - self-secret.yaml
+      failed_when: false
+
+    - name: Wait for secrets to sync
+      pause:
+        seconds: 15
+
+    - name: Apply middlewares
+      command: kubectl apply -f {{ item }}
+      args:
+        chdir: "{{ k8s_dir }}"
+      loop:
+        - cors-middleware.yaml
+        - ws-middleware.yaml
+
+    - name: Apply deployments
+      command: kubectl apply -f {{ item }}
+      args:
+        chdir: "{{ k8s_dir }}"
+      loop:
+        - user-be-deployment.yaml
+        - admin-be-deployment.yaml
+
+    - name: Apply optional deployments
+      command: kubectl apply -f {{ item }}
+      args:
+        chdir: "{{ k8s_dir }}"
+      loop:
+        - comp-queue-deployment.yaml
+        - self-deployment.yaml
+      failed_when: false
+
+    - name: Apply ingresses
+      command: kubectl apply -f {{ item }}
+      args:
+        chdir: "{{ k8s_dir }}"
+      loop:
+        - ingress.yaml
+        - admin-be-ingress.yaml
+        - argo-ingress.yaml
+
+    - name: Apply optional ingresses
+      command: kubectl apply -f {{ item }}
+      args:
+        chdir: "{{ k8s_dir }}"
+      loop:
+        - comp-queue-ingress.yaml
+        - self-ingress.yaml
+      failed_when: false
+
+    # ============================================
+    # PHASE 6: FINAL STATUS
+    # ============================================
+    - name: "PHASE 6 · Wait for deployments to settle"
+      pause:
+        seconds: 30
+
+    - name: Get all pods
+      command: kubectl get pods -A
+      register: all_pods
+
+    - name: Get all services
+      command: kubectl get svc -A
+      register: all_svc
+
+    - name: Get all ingresses
+      command: kubectl get ingress -A
+      register: all_ingress
+
+    - name: Get Helm releases
+      command: helm list -A
+      register: helm_releases
+
+    - name: Get ArgoCD admin password
+      shell: |
+        kubectl -n argocd get secret argocd-initial-admin-secret \
+          -o jsonpath="{.data.password}" | base64 -d
+      register: argocd_password
+      failed_when: false
+
+    - name: "🎉 Deployment Complete"
+      debug:
+        msg: |
+          ============================================
+          AWS EKS DEPLOYMENT COMPLETE!
+          ============================================
+
+          CLUSTER: {{ cluster_name }}
+          REGION:  {{ aws_region }}
+
+          PODS:
+          {{ all_pods.stdout }}
+
+          SERVICES:
+          {{ all_svc.stdout }}
+
+          INGRESSES:
+          {{ all_ingress.stdout }}
+
+          HELM RELEASES:
+          {{ helm_releases.stdout }}
+
+          ============================================
+          ARGOCD CREDENTIALS
+          ============================================
+          Username: admin
+          Password: {{ argocd_password.stdout | default('Not yet available') }}
+
+          ============================================
+          NEXT STEPS
+          ============================================
+          1. Get Traefik External IP:
+             kubectl get svc platform-traefik
+          2. Update DNS records in Cloudflare
+          3. Create AWS Secrets Manager secrets
+          4. Access ArgoCD at your configured domain
+          ============================================

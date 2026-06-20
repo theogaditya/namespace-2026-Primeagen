@@ -1,0 +1,117 @@
+tail -f ansible/AWS-Infra/terraform/destroy.log---
+# ===========================================
+# AWS Infrastructure — Destroy
+# ===========================================
+# Tears down all AWS resources provisioned by
+# the main playbook (VPC, EKS, NAT, etc.)
+# ===========================================
+# Usage:
+#   cd ansible/AWS-Infra
+#   ansible-playbook destroy.yml -i inventory.ini
+# ===========================================
+
+- name: AWS Infrastructure — Destroy
+  hosts: local
+  become: false
+  vars:
+    terraform_dir: "{{ playbook_dir }}/terraform"
+
+  tasks:
+    # --------------------------------------------------------
+    # STEP 0: CLEANUP - Remove Lingering Kubernetes Resources
+    # --------------------------------------------------------
+    - name: "Cleanup · Get VPC ID from Terraform state"
+      shell: terraform output -raw vpc_id
+      args:
+        chdir: "{{ terraform_dir }}"
+      register: vpc_id_output
+      ignore_errors: true
+
+    - name: Set VPC ID fact
+      set_fact:
+        vpc_id: "{{ vpc_id_output.stdout }}"
+      when: vpc_id_output.rc == 0
+
+    - block:
+        - name: "Cleanup · Find lingering Load Balancers (ELBv2)"
+          shell: >
+            aws elbv2 describe-load-balancers --region ap-south-1
+            --query "LoadBalancers[?VpcId=='{{ vpc_id }}'].LoadBalancerArn"
+            --output text
+          register: elbv2_arns
+
+        - name: "Cleanup · Delete lingering Load Balancers (ELBv2)"
+          shell: "aws elbv2 delete-load-balancer --load-balancer-arn {{ item }} --region ap-south-1"
+          loop: "{{ elbv2_arns.stdout.split() }}"
+          when: elbv2_arns.stdout != ""
+          ignore_errors: true
+
+        - name: "Cleanup · Find lingering Classic Load Balancers"
+          shell: >
+            aws elb describe-load-balancers --region ap-south-1
+            --query "LoadBalancerDescriptions[?VPCId=='{{ vpc_id }}'].LoadBalancerName"
+            --output text
+          register: elb_names
+
+        - name: "Cleanup · Delete lingering Classic Load Balancers"
+          shell: "aws elb delete-load-balancer --load-balancer-name {{ item }} --region ap-south-1"
+          loop: "{{ elb_names.stdout.split() }}"
+          when: elb_names.stdout != ""
+          ignore_errors: true
+
+        - name: Wait for Load Balancers to be deleted
+          pause:
+            seconds: 15
+          when: elbv2_arns.stdout != "" or elb_names.stdout != ""
+
+        - name: "Cleanup · Find lingering Security Groups (k8s-elb)"
+          shell: >
+            aws ec2 describe-security-groups --region ap-south-1
+            --filters Name=vpc-id,Values={{ vpc_id }}
+            --query "SecurityGroups[?starts_with(GroupName, 'k8s-elb')].GroupId"
+            --output text
+          register: sg_ids
+
+        - name: "Cleanup · Delete lingering Security Groups"
+          shell: "aws ec2 delete-security-group --group-id {{ item }} --region ap-south-1"
+          loop: "{{ sg_ids.stdout.split() }}"
+          when: sg_ids.stdout != ""
+          ignore_errors: true
+
+        - name: "PHASE 1 · Delete all K8s Services (triggers LB deletion)"
+          command: kubectl delete svc --all -A
+          ignore_errors: true
+
+        - name: Wait for Load Balancers to be deleted (30s)
+          pause:
+            seconds: 30
+
+
+        - name: "Cleanup · Run deep VPC cleaner (Subnets, IGWs, etc.)"
+          script: "{{ playbook_dir }}/scripts/cleanup_vpc.sh {{ vpc_id }} ap-south-1"
+          ignore_errors: true
+          when: vpc_id is defined and vpc_id != ""
+
+      when: vpc_id is defined and vpc_id != ""
+
+    - name: "Terraform Destroy — Remove all AWS resources"
+      shell: terraform destroy -auto-approve > destroy.log 2>&1
+      args:
+        chdir: "{{ terraform_dir }}"
+      register: terraform_destroy
+      async: 3600
+      poll: 10
+
+    - name: Display destroy log location
+      debug:
+        msg: "Terraform destroy logs are being written to {{ terraform_dir }}/destroy.log"
+
+    - name: "🗑️ Infrastructure Destroyed"
+      debug:
+        msg: |
+          ============================================
+          ALL AWS RESOURCES HAVE BEEN DESTROYED
+          ============================================
+          VPC, EKS cluster, node groups, NAT gateway,
+          and all associated resources are now removed.
+          ============================================

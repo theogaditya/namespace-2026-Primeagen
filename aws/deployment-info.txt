@@ -1,0 +1,9 @@
+=== DEPLOYMENT INFO ===
+Traefik LoadBalancer Hostname:
+a50ffd9ac298742738cc1abadb76cb25-1877024613.ap-south-1.elb.amazonaws.com
+
+ArgoCD Application URL: https://iit-argo.adityahota.online
+ArgoCD Admin Password:
+AwZyd3Sob4q8-HL1
+
+=== INGRESSES ===
