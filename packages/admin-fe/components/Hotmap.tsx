@@ -1,31 +1,12 @@
 "use client";
-import { useEffect, useState, useMemo } from "react";
+import { useEffect, useState, useMemo, useCallback } from "react";
 import 'leaflet/dist/leaflet.css';
-import { MapContainer, Marker, Popup, useMap, TileLayer, Circle } from "react-leaflet";
+import { MapContainer, Marker, Popup, useMap, Circle } from "react-leaflet";
 import L from "leaflet";
 
-// Jharkhand state bounds (approximate)
-const JHARKHAND_BOUNDS = {
-  minLat: 21.95,
-  maxLat: 25.35,
-  minLng: 83.30,
-  maxLng: 87.95,
-};
-
-// Center point between Ranchi, Dhanbad, and Jamshedpur (the 3 major districts)
-const JHARKHAND_CENTER: [number, number] = [23.233236, 85.964145];
-const DEFAULT_ZOOM = 8;
-
-// Helper to check if coordinates are within Jharkhand
-function isWithinJharkhand(lat: number | null, lng: number | null): boolean {
-  if (lat == null || lng == null) return false;
-  return (
-    lat >= JHARKHAND_BOUNDS.minLat &&
-    lat <= JHARKHAND_BOUNDS.maxLat &&
-    lng >= JHARKHAND_BOUNDS.minLng &&
-    lng <= JHARKHAND_BOUNDS.maxLng
-  );
-}
+// Default center (India) — used only when no complaints are available
+const DEFAULT_CENTER: [number, number] = [22.9734, 78.6569];
+const DEFAULT_ZOOM = 5;
 
 // fix default marker icon paths
 delete (L.Icon.Default.prototype as any)._getIconUrl;
@@ -35,35 +16,17 @@ L.Icon.Default.mergeOptions({
   shadowUrl: require("leaflet/dist/images/marker-shadow.png"),
 });
 
-// Custom red marker for hotspots
-const redIcon = new L.Icon({
-  iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-red.png',
-  shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-shadow.png',
-  iconSize: [25, 41],
-  iconAnchor: [12, 41],
-  popupAnchor: [1, -34],
-  shadowSize: [41, 41]
-});
-
-// Custom orange marker for medium hotspots
-const orangeIcon = new L.Icon({
-  iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-orange.png',
-  shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-shadow.png',
-  iconSize: [25, 41],
-  iconAnchor: [12, 41],
-  popupAnchor: [1, -34],
-  shadowSize: [41, 41]
-});
-
+// Marker icons by density
 const blueIcon = new L.Icon({
   iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-blue.png',
   shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-shadow.png',
   iconSize: [25, 41],
   iconAnchor: [12, 41],
   popupAnchor: [1, -34],
-  shadowSize: [41, 41]
+  shadowSize: [41, 41],
 });
 
+// ---------- Types ----------
 interface ComplaintLocation {
   id: string;
   seq: number;
@@ -72,15 +35,13 @@ interface ComplaintLocation {
   status: string;
   urgency: string;
   submissionDate: string;
-  location: {
-    latitude: number | null;
-    longitude: number | null;
-    district: string;
-    city: string;
-    locality: string;
-    pin: string;
-  } | null;
-  category: { name: string } | null;
+  latitude: number;
+  longitude: number;
+  district: string | null;
+  city: string | null;
+  locality: string | null;
+  pin: string | null;
+  category: string;
 }
 
 interface HotspotCluster {
@@ -90,6 +51,8 @@ interface HotspotCluster {
   district: string;
 }
 
+// ---------- Map helper components ----------
+
 function MapController({ center, zoom }: { center: [number, number]; zoom: number }) {
   const map = useMap();
   useEffect(() => {
@@ -98,56 +61,145 @@ function MapController({ center, zoom }: { center: [number, number]; zoom: numbe
   return null;
 }
 
-// Component to handle map clicks and open modal with current view
 function MapClickHandler({ onMapClick }: { onMapClick: (center: [number, number], zoom: number) => void }) {
   const map = useMap();
   useEffect(() => {
     const handleClick = () => {
-      const center = map.getCenter();
-      const zoom = map.getZoom();
-      onMapClick([center.lat, center.lng], zoom);
+      const c = map.getCenter();
+      onMapClick([c.lat, c.lng], map.getZoom());
     };
     map.on('click', handleClick);
-    return () => {
-      map.off('click', handleClick);
-    };
+    return () => { map.off('click', handleClick); };
   }, [map, onMapClick]);
   return null;
 }
 
-// Component to track map view changes and update state
 function MapViewTracker({ onViewChange }: { onViewChange: (center: [number, number], zoom: number) => void }) {
   const map = useMap();
   useEffect(() => {
-    const handleMoveEnd = () => {
-      const center = map.getCenter();
-      const zoom = map.getZoom();
-      onViewChange([center.lat, center.lng], zoom);
+    const handler = () => {
+      const c = map.getCenter();
+      onViewChange([c.lat, c.lng], map.getZoom());
     };
-    map.on('moveend', handleMoveEnd);
-    map.on('zoomend', handleMoveEnd);
-    return () => {
-      map.off('moveend', handleMoveEnd);
-      map.off('zoomend', handleMoveEnd);
-    };
+    map.on('moveend', handler);
+    map.on('zoomend', handler);
+    return () => { map.off('moveend', handler); map.off('zoomend', handler); };
   }, [map, onViewChange]);
   return null;
 }
 
+// Google Maps tile layer via Leaflet (no react-leaflet TileLayer needed)
+function GoogleTileLayer({ url, attribution, maxZoom }: { url: string; attribution?: string; maxZoom?: number }) {
+  const map = useMap();
+  useEffect(() => {
+    if (!map) return;
+    let layer: L.TileLayer | null = null;
+    try {
+      layer = L.tileLayer(url, { attribution, maxZoom });
+      layer.addTo(map);
+    } catch { /* ignore */ }
+    return () => { if (layer && map.hasLayer(layer)) map.removeLayer(layer); };
+  }, [map, url, attribution, maxZoom]);
+  return null;
+}
+
+// ---------- Clustering helpers ----------
+
+/** Haversine distance in meters between two lat/lng points */
+function metersBetween(a: [number, number], b: [number, number]): number {
+  const toRad = (v: number) => (v * Math.PI) / 180;
+  const R = 6371000;
+  const dLat = toRad(b[0] - a[0]);
+  const dLon = toRad(b[1] - a[1]);
+  const sinDLat = Math.sin(dLat / 2);
+  const sinDLon = Math.sin(dLon / 2);
+  const aa = sinDLat * sinDLat + Math.cos(toRad(a[0])) * Math.cos(toRad(b[0])) * sinDLon * sinDLon;
+  return R * 2 * Math.atan2(Math.sqrt(aa), Math.sqrt(1 - aa));
+}
+
+/** Build clusters from complaints. Uses a grid of ~0.05° (~5 km) cells, then merges overlapping circles. */
+function buildClusters(complaints: ComplaintLocation[]): HotspotCluster[] {
+  if (complaints.length === 0) return [];
+
+  // Grid-based initial clustering (~5 km cells)
+  const cellSize = 0.05;
+  const gridMap: Record<string, ComplaintLocation[]> = {};
+  for (const c of complaints) {
+    const key = `${Math.floor(c.latitude / cellSize)}|${Math.floor(c.longitude / cellSize)}`;
+    (gridMap[key] ||= []).push(c);
+  }
+
+  // Convert to cluster objects
+  let clusters: HotspotCluster[] = Object.values(gridMap).map((list) => {
+    const avgLat = list.reduce((s, c) => s + c.latitude, 0) / list.length;
+    const avgLng = list.reduce((s, c) => s + c.longitude, 0) / list.length;
+    // Most common district
+    const districtCounts: Record<string, number> = {};
+    list.forEach((c) => { const d = c.district || "Unknown"; districtCounts[d] = (districtCounts[d] || 0) + 1; });
+    const district = Object.entries(districtCounts).sort((a, b) => b[1] - a[1])[0]?.[0] || "Unknown";
+    return { center: [avgLat, avgLng] as [number, number], count: list.length, complaints: list, district };
+  });
+
+  // Merge overlapping clusters iteratively
+  const radiusForCount = (n: number) => n * 500 + 1000;
+  let merged = true;
+  while (merged) {
+    merged = false;
+    outer: for (let i = 0; i < clusters.length; i++) {
+      for (let j = i + 1; j < clusters.length; j++) {
+        if (metersBetween(clusters[i].center, clusters[j].center) <= radiusForCount(clusters[i].count) + radiusForCount(clusters[j].count)) {
+          const combined = [...clusters[i].complaints, ...clusters[j].complaints];
+          const avgLat = combined.reduce((s, c) => s + c.latitude, 0) / combined.length;
+          const avgLng = combined.reduce((s, c) => s + c.longitude, 0) / combined.length;
+          const dc: Record<string, number> = {};
+          combined.forEach((c) => { const d = c.district || "Unknown"; dc[d] = (dc[d] || 0) + 1; });
+          const dist = Object.entries(dc).sort((a, b) => b[1] - a[1])[0]?.[0] || "Unknown";
+          clusters[i] = { center: [avgLat, avgLng], count: combined.length, complaints: combined, district: dist };
+          clusters.splice(j, 1);
+          merged = true;
+          break outer;
+        }
+      }
+    }
+  }
+
+  return clusters;
+}
+
+/** Returns the center + zoom for the densest cluster */
+function findFocusPoint(clusters: HotspotCluster[]): { center: [number, number]; zoom: number } {
+  if (clusters.length === 0) return { center: DEFAULT_CENTER, zoom: DEFAULT_ZOOM };
+  const top = clusters.reduce((best, c) => (c.count > best.count ? c : best), clusters[0]);
+  const zoom = top.count >= 10 ? 13 : top.count >= 5 ? 12 : top.count >= 3 ? 11 : 10;
+  return { center: top.center, zoom };
+}
+
+// ---------- Color helpers ----------
+function getCircleColor(count: number): string {
+  if (count >= 5) return "#ef4444";
+  if (count >= 2) return "#f97316";
+  return "#3b82f6";
+}
+
+// ============================
+// Main Component
+// ============================
 export default function Hotmap() {
   const [complaints, setComplaints] = useState<ComplaintLocation[]>([]);
   const [loading, setLoading] = useState(true);
   const [mapReady, setMapReady] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
-  const [focusCenter, setFocusCenter] = useState<[number, number]>(JHARKHAND_CENTER);
+  const [focusCenter, setFocusCenter] = useState<[number, number]>(DEFAULT_CENTER);
   const [focusZoom, setFocusZoom] = useState(DEFAULT_ZOOM);
-  // Track current preview map view for modal
-  const [currentCenter, setCurrentCenter] = useState<[number, number]>(JHARKHAND_CENTER);
+  const [currentCenter, setCurrentCenter] = useState<[number, number]>(DEFAULT_CENTER);
   const [currentZoom, setCurrentZoom] = useState(DEFAULT_ZOOM);
 
-  // Fetch complaints with location data from dedicated endpoint
+  const googleMapsKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY;
+  const tileUrl = `https://mt1.google.com/vt/lyrs=m&x={x}&y={y}&z={z}&key=${googleMapsKey}`;
+
+  // ---- Fetch complaint locations from the backend ----
   useEffect(() => {
-    const fetchComplaints = async () => {
+    const fetchLocations = async () => {
       try {
         const token = localStorage.getItem("token");
         if (!token) {
@@ -157,20 +209,18 @@ export default function Hotmap() {
           return;
         }
 
-        // Use the local Next.js API route which proxies to the backend
         const res = await fetch(`/api/complaints/locations`, {
           headers: { Authorization: `Bearer ${token}` },
         });
 
         if (!res.ok) {
-          console.warn("[Hotmap] Failed to fetch complaint locations:", res.status);
+          console.warn("[Hotmap] Failed to fetch locations:", res.status);
           setLoading(false);
           setMapReady(true);
           return;
         }
 
         const data = await res.json();
-        
         if (!data.success) {
           console.warn("[Hotmap] API returned error:", data.message);
           setLoading(false);
@@ -178,50 +228,36 @@ export default function Hotmap() {
           return;
         }
 
-        // Transform to expected format and filter to only Jharkhand locations
-        const allLocations: ComplaintLocation[] = (data.locations || []).map((loc: any) => ({
-          id: loc.id,
-          seq: loc.seq,
-          description: loc.description,
-          subCategory: loc.subCategory,
-          status: loc.status,
-          urgency: loc.urgency,
-          submissionDate: loc.submissionDate,
-          category: { name: loc.category },
-          location: {
+        // Map backend response to our type (no filtering — show all locations)
+        const locations: ComplaintLocation[] = (data.locations || [])
+          .filter((loc: any) => loc.latitude != null && loc.longitude != null)
+          .map((loc: any) => ({
+            id: loc.id,
+            seq: loc.seq,
+            description: loc.description,
+            subCategory: loc.subCategory,
+            status: loc.status,
+            urgency: loc.urgency,
+            submissionDate: loc.submissionDate,
             latitude: loc.latitude,
             longitude: loc.longitude,
             district: loc.district,
             city: loc.city,
             locality: loc.locality,
             pin: loc.pin,
-          },
-        }));
-        
-        // Filter to only include complaints within Jharkhand bounds
-        const locations = allLocations.filter((c) => 
-          isWithinJharkhand(c.location?.latitude ?? null, c.location?.longitude ?? null)
-        );
-        
-        console.log(`[Hotmap] Fetched ${allLocations.length} total, ${locations.length} within Jharkhand`);
+            category: loc.category || "Unknown",
+          }));
+
+        console.log(`[Hotmap] Loaded ${locations.length} complaint locations`);
         setComplaints(locations);
 
-        // Find the hotspot with most complaints and zoom in on it
-        if (locations.length > 0) {
-          const hotspot = findHotspotCenter(locations);
-          if (hotspot) {
-            setFocusCenter(hotspot.center);
-            setCurrentCenter(hotspot.center);
-            // Zoom level based on complaint count: more complaints = closer zoom (increased by 1 for better visibility)
-            const zoomLevel = hotspot.count >= 5 ? 12 : hotspot.count >= 3 ? 11 : 10;
-            setFocusZoom(zoomLevel);
-            setCurrentZoom(zoomLevel);
-          }
-        } else {
-          // Fallback to Jharkhand center if no complaints
-          setFocusCenter(JHARKHAND_CENTER);
-          setFocusZoom(DEFAULT_ZOOM);
-        }
+        // Auto-focus on the densest cluster
+        const clusters = buildClusters(locations);
+        const focus = findFocusPoint(clusters);
+        setFocusCenter(focus.center);
+        setFocusZoom(focus.zoom);
+        setCurrentCenter(focus.center);
+        setCurrentZoom(focus.zoom);
       } catch (error) {
         console.error("[Hotmap] Error fetching complaints:", error);
       } finally {
@@ -230,195 +266,35 @@ export default function Hotmap() {
       }
     };
 
-    fetchComplaints();
+    fetchLocations();
   }, []);
 
-  // Find the area with most complaints
-  const findHotspotCenter = (complaintsWithCoords: ComplaintLocation[]): { center: [number, number]; count: number } | null => {
-    if (complaintsWithCoords.length === 0) return null;
-    // Build initial clusters by rounded coords
-    const clusterMap: Record<string, ComplaintLocation[]> = {};
-    complaintsWithCoords.forEach((c) => {
-      const lat = c.location?.latitude ?? 0;
-      const lng = c.location?.longitude ?? 0;
-      const key = `${lat.toFixed(3)}|${lng.toFixed(3)}`;
-      if (!clusterMap[key]) clusterMap[key] = [];
-      clusterMap[key].push(c);
-    });
+  // ---- Memoised clusters ----
+  const hotspotClusters = useMemo(() => buildClusters(complaints), [complaints]);
 
-    let clusters: { center: [number, number]; complaints: ComplaintLocation[]; count: number }[] = Object.entries(clusterMap).map(([k, list]) => {
-      const [latStr, lngStr] = k.split("|");
-      return { center: [parseFloat(latStr), parseFloat(lngStr)], complaints: list, count: list.length };
-    });
-
-    // haversine helper
-    const toRad = (v: number) => (v * Math.PI) / 180;
-    const metersBetween = (a: [number, number], b: [number, number]) => {
-      const R = 6371000;
-      const dLat = toRad(b[0] - a[0]);
-      const dLon = toRad(b[1] - a[1]);
-      const lat1 = toRad(a[0]);
-      const lat2 = toRad(b[0]);
-      const sinDLat = Math.sin(dLat / 2);
-      const sinDLon = Math.sin(dLon / 2);
-      const aa = sinDLat * sinDLat + Math.cos(lat1) * Math.cos(lat2) * sinDLon * sinDLon;
-      const c = 2 * Math.atan2(Math.sqrt(aa), Math.sqrt(1 - aa));
-      return R * c;
-    };
-
-    const radiusForCount = (count: number) => count * 500 + 1000;
-
-    // merge overlapping clusters
-    let merged = true;
-    while (merged) {
-      merged = false;
-      outer: for (let i = 0; i < clusters.length; i++) {
-        for (let j = i + 1; j < clusters.length; j++) {
-          const a = clusters[i];
-          const b = clusters[j];
-          const dist = metersBetween(a.center, b.center);
-          if (dist <= radiusForCount(a.count) + radiusForCount(b.count)) {
-            const combined = [...a.complaints, ...b.complaints];
-            const avgLat = combined.reduce((s, c) => s + (c.location?.latitude ?? 0), 0) / combined.length;
-            const avgLng = combined.reduce((s, c) => s + (c.location?.longitude ?? 0), 0) / combined.length;
-            clusters[i] = { center: [avgLat, avgLng], complaints: combined, count: combined.length };
-            clusters.splice(j, 1);
-            merged = true;
-            break outer;
-          }
-        }
-      }
-    }
-
-    if (clusters.length === 0) return null;
-    // pick the largest cluster
-    clusters.sort((a, b) => b.count - a.count);
-    const top = clusters[0];
-    return { center: [parseFloat(top.center[0].toFixed(6)), parseFloat(top.center[1].toFixed(6))], count: top.count };
-  };
-
-  // Cluster complaints by rounded lat/lng so circle density equals number of pins at that spot
-  // Merge clusters iteratively when their display circles would intersect
-  const hotspotClusters = useMemo((): HotspotCluster[] => {
-    if (complaints.length === 0) return [];
-
-    const clusterMap: Record<string, { list: ComplaintLocation[]; lat: number; lng: number; districtCounts: Record<string, number> }> = {};
-
-    complaints.forEach((c) => {
-      const lat = c.location?.latitude ?? 0;
-      const lng = c.location?.longitude ?? 0;
-      const key = `${lat.toFixed(3)}|${lng.toFixed(3)}`;
-      if (!clusterMap[key]) {
-        clusterMap[key] = { list: [], lat: parseFloat(lat.toFixed(3)), lng: parseFloat(lng.toFixed(3)), districtCounts: {} };
-      }
-      clusterMap[key].list.push(c);
-      const district = c.location?.district || "Unknown";
-      clusterMap[key].districtCounts[district] = (clusterMap[key].districtCounts[district] || 0) + 1;
-    });
-
-    // initial clusters
-    let clusters: HotspotCluster[] = Object.entries(clusterMap).map(([_, val]) => {
-      const districtEntries = Object.entries(val.districtCounts);
-      const district = districtEntries.sort((a, b) => b[1] - a[1])[0]?.[0] || "Unknown";
-      return {
-        center: [val.lat, val.lng] as [number, number],
-        count: val.list.length,
-        complaints: val.list,
-        district,
-      };
-    });
-
-    // helper: haversine distance in meters
-    const metersBetween = (a: [number, number], b: [number, number]) => {
-      const toRad = (v: number) => (v * Math.PI) / 180;
-      const R = 6371000; // Earth's radius in meters
-      const dLat = toRad(b[0] - a[0]);
-      const dLon = toRad(b[1] - a[1]);
-      const lat1 = toRad(a[0]);
-      const lat2 = toRad(b[0]);
-      const sinDLat = Math.sin(dLat / 2);
-      const sinDLon = Math.sin(dLon / 2);
-      const aa = sinDLat * sinDLat + Math.cos(lat1) * Math.cos(lat2) * sinDLon * sinDLon;
-      const c = 2 * Math.atan2(Math.sqrt(aa), Math.sqrt(1 - aa));
-      return R * c;
-    };
-
-    const radiusForCount = (count: number) => count * 500 + 1000;
-
-    // merge overlapping clusters iteratively
-    let merged = true;
-    while (merged) {
-      merged = false;
-      outer: for (let i = 0; i < clusters.length; i++) {
-        for (let j = i + 1; j < clusters.length; j++) {
-          const a = clusters[i];
-          const b = clusters[j];
-          const dist = metersBetween(a.center, b.center);
-          const rA = radiusForCount(a.count);
-          const rB = radiusForCount(b.count);
-          if (dist <= rA + rB) {
-            // merge b into a
-            const combined = [...a.complaints, ...b.complaints];
-            // recompute center as average of complaints' coords
-            const avgLat = combined.reduce((s, c) => s + (c.location?.latitude ?? 0), 0) / combined.length;
-            const avgLng = combined.reduce((s, c) => s + (c.location?.longitude ?? 0), 0) / combined.length;
-            // recompute district (most common)
-            const districtCounts: Record<string, number> = {};
-            combined.forEach((c) => {
-              const d = c.location?.district || "Unknown";
-              districtCounts[d] = (districtCounts[d] || 0) + 1;
-            });
-            const district = Object.entries(districtCounts).sort((x, y) => y[1] - x[1])[0]?.[0] || "Unknown";
-            clusters[i] = {
-              center: [parseFloat(avgLat.toFixed(6)), parseFloat(avgLng.toFixed(6))],
-              count: combined.length,
-              complaints: combined,
-              district,
-            };
-            // remove j
-            clusters.splice(j, 1);
-            merged = true;
-            break outer;
-          }
-        }
-      }
-    }
-
-    return clusters;
-  }, [complaints]);
-
-  // Get circle color based on complaint count
-  const getCircleColor = (count: number) => {
-    if (count >= 5) return "#ef4444";
-    if (count >= 2) return "#f97316";
-    return "#3b82f6";
-  };
-
-  // Escape key closes modal
+  // ---- Escape key closes modal ----
   useEffect(() => {
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape" && isOpen) setIsOpen(false);
-    };
+    const onKey = (e: KeyboardEvent) => { if (e.key === "Escape" && isOpen) setIsOpen(false); };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
   }, [isOpen]);
 
-  // Open modal with current map view (center and zoom)
-  const openModalWithView = (center: [number, number], zoom: number) => {
+  // ---- Callbacks ----
+  const openModalWithView = useCallback((center: [number, number], zoom: number) => {
     if (!mapReady) return;
     setCurrentCenter(center);
     setCurrentZoom(zoom);
     setIsOpen(true);
-  };
+  }, [mapReady]);
 
-  // Track view changes from preview map
-  const handleViewChange = (center: [number, number], zoom: number) => {
+  const handleViewChange = useCallback((center: [number, number], zoom: number) => {
     setCurrentCenter(center);
     setCurrentZoom(zoom);
-  };
+  }, []);
 
   const closeModal = () => setIsOpen(false);
 
+  // ---- Styles ----
   const previewStyle: React.CSSProperties = {
     width: "100%",
     height: 350,
@@ -429,19 +305,14 @@ export default function Hotmap() {
     zIndex: 0,
   };
 
+  // ---- Loading state ----
   if (loading) {
     return (
       <div
         style={{
-          width: "100%",
-          height: 350,
-          border: "1px solid #e5e7eb",
-          borderRadius: 8,
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          background: "#f9fafb",
-          color: "#6b7280",
+          width: "100%", height: 350, border: "1px solid #e5e7eb", borderRadius: 8,
+          display: "flex", alignItems: "center", justifyContent: "center",
+          background: "#f9fafb", color: "#6b7280",
         }}
       >
         Loading complaint locations...
@@ -449,27 +320,9 @@ export default function Hotmap() {
     );
   }
 
-  // Always use the Google Maps tile layer as it has better coverage in India and doesn't require API keys 
-  // It also shows Jammu and Kashmir region properly and it being part of India
-  const googleMapsKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY;
-  function GoogleTileLayer({ url, attribution, maxZoom }: { url: string; attribution?: string; maxZoom?: number }) {
-    const map = useMap();
-    useEffect(() => {
-      if (!map) return;
-      let layer: L.TileLayer | null = null;
-      try {
-        layer = L.tileLayer(url, { attribution, maxZoom });
-        layer.addTo(map);
-      } catch (e) {
-        // ignore
-      }
-      return () => {
-        if (layer && map.hasLayer(layer)) map.removeLayer(layer);
-      };
-    }, [map, url, attribution, maxZoom]);
-    return null;
-  }
-
+  // ============================
+  // Render
+  // ============================
   return (
     <>
       {/* Preview map */}
@@ -484,17 +337,12 @@ export default function Hotmap() {
             dragging={true}
             zoomControl={true}
           >
-            {/* <TileLayer
-              url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-              attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
-            /> */}
-            <GoogleTileLayer url={`https://mt1.google.com/vt/lyrs=m&x={x}&y={y}&z={z}&key=${googleMapsKey}`} attribution='&copy; <a href="https://www.google.com/maps">Google Maps</a>' maxZoom={20} />
-
+            <GoogleTileLayer url={tileUrl} attribution='&copy; <a href="https://www.google.com/maps">Google Maps</a>' maxZoom={20} />
             <MapController center={focusCenter} zoom={focusZoom} />
             <MapClickHandler onMapClick={openModalWithView} />
             <MapViewTracker onViewChange={handleViewChange} />
-            
-            {/* Show hotspot circles */}
+
+            {/* Density circles */}
             {hotspotClusters.map((cluster, idx) => (
               <Circle
                 key={`circle-${idx}`}
@@ -508,41 +356,23 @@ export default function Hotmap() {
               />
             ))}
 
-            {/* Show individual complaint markers */}
+            {/* Individual complaint markers */}
             {complaints.map((c) => (
               <Marker
                 key={`preview-${c.id}`}
-                position={[c.location!.latitude!, c.location!.longitude!]}
+                position={[c.latitude, c.longitude]}
                 icon={blueIcon}
               />
             ))}
           </MapContainer>
-          
-          {/* Info badge - shows complaint count */}
-          <div
-            style={{
-              position: "absolute",
-              bottom: 12,
-              left: "50%",
-              transform: "translateX(-50%)",
-              pointerEvents: "none",
-              zIndex: 1000,
-            }}
-          >
-          </div>
 
           {/* Legend */}
           <div
             style={{
-              position: "absolute",
-              top: 10,
-              right: 50,
-              background: "rgba(255,255,255,0.95)",
-              padding: "8px 12px",
-              borderRadius: 6,
-              fontSize: 11,
-              boxShadow: "0 2px 6px rgba(0,0,0,0.1)",
-              zIndex: 1000,
+              position: "absolute", top: 10, right: 50,
+              background: "rgba(255,255,255,0.95)", padding: "8px 12px",
+              borderRadius: 6, fontSize: 11,
+              boxShadow: "0 2px 6px rgba(0,0,0,0.1)", zIndex: 1000,
             }}
           >
             <div style={{ fontWeight: 600, marginBottom: 4 }}>Complaint Density</div>
@@ -566,13 +396,8 @@ export default function Hotmap() {
       {isOpen && (
         <div
           style={{
-            position: "fixed",
-            inset: 0,
-            background: "rgba(0,0,0,0.5)",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            zIndex: 9999,
+            position: "fixed", inset: 0, background: "rgba(0,0,0,0.5)",
+            display: "flex", alignItems: "center", justifyContent: "center", zIndex: 9999,
           }}
           onClick={closeModal}
         >
@@ -581,51 +406,31 @@ export default function Hotmap() {
             aria-modal="true"
             onClick={(e) => e.stopPropagation()}
             style={{
-              width: "90vw",
-              maxWidth: 1200,
-              height: "80vh",
-              background: "#fff",
-              borderRadius: 10,
+              width: "90vw", maxWidth: 1200, height: "80vh",
+              background: "#fff", borderRadius: 10,
               boxShadow: "0 8px 30px rgba(0,0,0,0.3)",
-              position: "relative",
-              overflow: "hidden",
+              position: "relative", overflow: "hidden",
             }}
           >
             {/* Header */}
             <div
               style={{
-                position: "absolute",
-                top: 0,
-                left: 0,
-                right: 0,
-                height: 50,
-                background: "rgba(255,255,255,0.95)",
-                borderBottom: "1px solid #e5e7eb",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "space-between",
-                padding: "0 16px",
-                zIndex: 10001,
+                position: "absolute", top: 0, left: 0, right: 0, height: 50,
+                background: "rgba(255,255,255,0.95)", borderBottom: "1px solid #e5e7eb",
+                display: "flex", alignItems: "center", justifyContent: "space-between",
+                padding: "0 16px", zIndex: 10001,
               }}
             >
               <span style={{ fontWeight: 600, fontSize: 16 }}>
-                Complaint Hotspots - Jharkhand ({complaints.length} complaints)
+                Complaint Hotspots ({complaints.length} complaints)
               </span>
               <button
                 onClick={closeModal}
                 aria-label="Close map"
                 style={{
-                  background: "#f3f4f6",
-                  color: "#374151",
-                  border: "none",
-                  width: 32,
-                  height: 32,
-                  borderRadius: 6,
-                  cursor: "pointer",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  fontSize: 18,
+                  background: "#f3f4f6", color: "#374151", border: "none",
+                  width: 32, height: 32, borderRadius: 6, cursor: "pointer",
+                  display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18,
                 }}
               >
                 ✕
@@ -640,13 +445,9 @@ export default function Hotmap() {
                 zoom={currentZoom}
                 style={{ height: "100%", width: "100%", zIndex: 0, position: 'relative' }}
               >
-                {/* <TileLayer
-                  url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-                  attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
-                /> */}
-                <GoogleTileLayer url={`https://mt1.google.com/vt/lyrs=m&x={x}&y={y}&z={z}&key=${googleMapsKey}`} attribution='&copy; <a href="https://www.google.com/maps">Google Maps</a>' maxZoom={20} />
+                <GoogleTileLayer url={tileUrl} attribution='&copy; <a href="https://www.google.com/maps">Google Maps</a>' maxZoom={20} />
 
-                {/* Hotspot circles */}
+                {/* Density circles with popups */}
                 {hotspotClusters.map((cluster, idx) => (
                   <Circle
                     key={`modal-circle-${idx}`}
@@ -669,82 +470,45 @@ export default function Hotmap() {
                   </Circle>
                 ))}
 
-                {/* Individual complaint markers */}
+                {/* Individual complaint markers with popups */}
                 {complaints.map((c) => (
                   <Marker
                     key={`modal-${c.id}`}
-                    position={[c.location!.latitude!, c.location!.longitude!]}
+                    position={[c.latitude, c.longitude]}
                     icon={blueIcon}
                   >
                     <Popup>
                       <div style={{ minWidth: 220, maxWidth: 280 }}>
                         <div style={{ fontWeight: 700, marginBottom: 4 }}>
-                          #{c.seq} - {c.category?.name || "N/A"}
+                          #{c.seq} - {c.category || "N/A"}
                         </div>
                         <div style={{ fontSize: 13, marginBottom: 6 }}>{c.subCategory}</div>
                         <div
                           style={{
-                            fontSize: 12,
-                            color: "#6b7280",
-                            marginBottom: 6,
-                            maxHeight: 60,
-                            overflow: "hidden",
-                            textOverflow: "ellipsis",
+                            fontSize: 12, color: "#6b7280", marginBottom: 6,
+                            maxHeight: 60, overflow: "hidden", textOverflow: "ellipsis",
                           }}
                         >
-                          {c.description.length > 100
-                            ? c.description.substring(0, 100) + "..."
-                            : c.description}
+                          {c.description.length > 100 ? c.description.substring(0, 100) + "..." : c.description}
                         </div>
                         <div style={{ fontSize: 11, color: "#9ca3af" }}>
-                          {c.location?.locality}, {c.location?.city}
+                          {c.locality}, {c.city}
                         </div>
-                        <div
-                          style={{
-                            marginTop: 6,
-                            display: "flex",
-                            gap: 6,
-                            alignItems: "center",
-                          }}
-                        >
+                        <div style={{ marginTop: 6, display: "flex", gap: 6, alignItems: "center" }}>
                           <span
                             style={{
-                              padding: "2px 6px",
-                              borderRadius: 4,
-                              fontSize: 10,
-                              background:
-                                c.status === "COMPLETED"
-                                  ? "#dcfce7"
-                                  : c.status === "REGISTERED"
-                                  ? "#dbeafe"
-                                  : "#fef3c7",
-                              color:
-                                c.status === "COMPLETED"
-                                  ? "#166534"
-                                  : c.status === "REGISTERED"
-                                  ? "#1e40af"
-                                  : "#92400e",
+                              padding: "2px 6px", borderRadius: 4, fontSize: 10,
+                              background: c.status === "COMPLETED" ? "#dcfce7" : c.status === "REGISTERED" ? "#dbeafe" : "#fef3c7",
+                              color: c.status === "COMPLETED" ? "#166534" : c.status === "REGISTERED" ? "#1e40af" : "#92400e",
                             }}
                           >
                             {c.status.replace(/_/g, " ")}
                           </span>
                           <span
                             style={{
-                              padding: "2px 6px",
-                              borderRadius: 4,
-                              fontSize: 10,
-                              background:
-                                c.urgency === "CRITICAL"
-                                  ? "#fee2e2"
-                                  : c.urgency === "HIGH"
-                                  ? "#ffedd5"
-                                  : "#f3f4f6",
-                              color:
-                                c.urgency === "CRITICAL"
-                                  ? "#991b1b"
-                                  : c.urgency === "HIGH"
-                                  ? "#9a3412"
-                                  : "#374151",
+                              padding: "2px 6px", borderRadius: 4, fontSize: 10,
+                              background: c.urgency === "CRITICAL" ? "#fee2e2" : c.urgency === "HIGH" ? "#ffedd5" : "#f3f4f6",
+                              color: c.urgency === "CRITICAL" ? "#991b1b" : c.urgency === "HIGH" ? "#9a3412" : "#374151",
                             }}
                           >
                             {c.urgency}
@@ -760,34 +524,23 @@ export default function Hotmap() {
             {/* Legend in modal */}
             <div
               style={{
-                position: "absolute",
-                bottom: 20,
-                left: 20,
-                background: "rgba(255,255,255,0.95)",
-                padding: "10px 14px",
-                borderRadius: 8,
-                fontSize: 12,
-                boxShadow: "0 2px 8px rgba(0,0,0,0.15)",
-                zIndex: 10001,
+                position: "absolute", bottom: 20, left: 20,
+                background: "rgba(255,255,255,0.95)", padding: "10px 14px",
+                borderRadius: 8, fontSize: 12,
+                boxShadow: "0 2px 8px rgba(0,0,0,0.15)", zIndex: 10001,
               }}
             >
               <div style={{ fontWeight: 600, marginBottom: 6 }}>Complaint Density</div>
               <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 4 }}>
-                <span
-                  style={{ width: 12, height: 12, borderRadius: "50%", background: "#ef4444" }}
-                ></span>
+                <span style={{ width: 12, height: 12, borderRadius: "50%", background: "#ef4444" }}></span>
                 <span>High density (5+ complaints)</span>
               </div>
               <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 4 }}>
-                <span
-                  style={{ width: 12, height: 12, borderRadius: "50%", background: "#f97316" }}
-                ></span>
+                <span style={{ width: 12, height: 12, borderRadius: "50%", background: "#f97316" }}></span>
                 <span>Medium density (2-4 complaints)</span>
               </div>
               <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                <span
-                  style={{ width: 12, height: 12, borderRadius: "50%", background: "#3b82f6" }}
-                ></span>
+                <span style={{ width: 12, height: 12, borderRadius: "50%", background: "#3b82f6" }}></span>
                 <span>Low density (1 complaint)</span>
               </div>
             </div>
