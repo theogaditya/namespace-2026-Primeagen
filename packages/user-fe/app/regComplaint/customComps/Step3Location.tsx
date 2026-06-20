@@ -171,7 +171,7 @@ export function Step3Location({
     const value = e.target.value;
     updateField("district", value);
     setDistrictSearchTerm(value);
-    
+
     // Show dropdown with suggestions as user types
     if (value.length > 0) {
       setShowDistrictList(true);
@@ -188,7 +188,7 @@ export function Step3Location({
       setShowDistrictList(false);
       setDistrictValidationStatus("idle");
     }
-    
+
     // Clear PIN and city when district changes
     if (value !== formData.district) {
       updateField("pin", "");
@@ -213,7 +213,7 @@ export function Step3Location({
     setDistrictValidationStatus("valid");
     setErrors((prev) => ({ ...prev, district: undefined }));
     setFieldTouched("district");
-    
+
     // Clear PIN validation when district changes
     setPinValidationStatus("idle");
     updateField("pin", "");
@@ -275,7 +275,7 @@ export function Step3Location({
   const handlePinChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value.replace(/\D/g, "").slice(0, 6);
     updateField("pin", value);
-    
+
     if (value.length === 6) {
       validatePin(value);
     } else {
@@ -301,7 +301,7 @@ export function Step3Location({
           const service = new window.google.maps.places.AutocompleteService();
           // Include district and PIN in search to ensure results are within the area
           const searchQuery = `${input}, ${formData.pin}, ${formData.district}, India`;
-          
+
           service.getPlacePredictions(
             {
               input: searchQuery,
@@ -337,7 +337,7 @@ export function Step3Location({
   const handleLocalityChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
     updateField("locality", value);
-    
+
     // Debounced fetch
     const timeoutId = setTimeout(() => {
       fetchLocalityPredictions(value);
@@ -401,7 +401,7 @@ export function Step3Location({
             {showDistrictList ? "Hide" : "Browse"} districts
           </Button>
         </div>
-        
+
         <div className="relative">
           <div className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">
             <MapPin className="h-5 w-5" />
@@ -470,7 +470,7 @@ export function Step3Location({
             >
               <div className="sticky top-0 bg-gray-50 px-4 py-3 border-b flex items-center justify-between">
                 <span className="text-sm font-semibold text-gray-700">
-                  {filteredDistricts.length > 0 
+                  {filteredDistricts.length > 0
                     ? `Available Districts (${filteredDistricts.length})`
                     : "No Matches Found"}
                 </span>
@@ -492,7 +492,7 @@ export function Step3Location({
                   <div className="p-6 text-center">
                     <XCircle className="h-8 w-8 mx-auto mb-2 text-red-400" />
                     <p className="text-red-600 font-medium">
-                      {formData.district 
+                      {formData.district
                         ? `"${formData.district}" is not available`
                         : "No districts found"}
                     </p>
@@ -506,7 +506,7 @@ export function Step3Location({
                     const searchTerm = formData.district.toLowerCase();
                     const districtName = district.name;
                     const matchIndex = districtName.toLowerCase().indexOf(searchTerm);
-                    
+
                     let highlightedName;
                     if (matchIndex >= 0 && searchTerm.length > 0) {
                       const before = districtName.slice(0, matchIndex);
@@ -522,7 +522,7 @@ export function Step3Location({
                     } else {
                       highlightedName = districtName;
                     }
-                    
+
                     return (
                       <motion.button
                         key={district.id}
@@ -688,7 +688,7 @@ export function Step3Location({
             </div>
           )}
         </div>
-        
+
         {/* Locality Predictions Dropdown */}
         <AnimatePresence>
           {showLocalityDropdown && localityPredictions.length > 0 && (
@@ -746,7 +746,7 @@ export function Step3Location({
           <div className="flex items-center gap-2 mb-4">
             <Map className="h-5 w-5 text-emerald-500" />
             <span className="text-sm font-semibold text-gray-700">
-              Select Location on Map <span className="text-gray-400 font-normal">(Optional)</span>
+              Select Location on Map - If your location is disabled, please enable it to use this feature and refresh the page<span className="text-gray-400 font-normal">(Optional)</span>
             </span>
           </div>
           <p className="text-xs text-gray-500 mb-4">
