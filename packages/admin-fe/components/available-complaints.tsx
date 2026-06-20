@@ -19,6 +19,8 @@ import { Search, MoreHorizontal, Eye, UserPlus, User, FileText, Clock, AlertTria
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Modal } from "@/components/ui/modal"
 
+const AI_API_URL = process.env.NEXT_PUBLIC_API_URL_SELF_MATCH || 'http://localhost:3030/api/match'
+
 interface OverviewStats {
   total: number
   registered: number
@@ -112,7 +114,7 @@ export function AvailableComplaints() {
   const [compareError, setCompareError] = useState<string | null>(null)
   const [customCompareUrl, setCustomCompareUrl] = useState('')
   const [activeCompareUrl, setActiveCompareUrl] = useState('')
-  
+
   // Reference images for comparison (one for each of the top 3 complaints)
   const referenceImages = [
     'https://pub-a7deba7d0b9642f8afcfd3aebbcb446f.r2.dev/uploads/1765265732822_pothole_2.jpg', // 1st complaint
@@ -239,7 +241,7 @@ export function AvailableComplaints() {
   useEffect(() => {
     // Skip the initial render - the pagination.page effect handles the first load
     if (!initialLoadDone) return
-    
+
     const debounce = setTimeout(() => {
       if (pagination.page === 1) {
         // Don't show loading skeleton for search - just update data silently
@@ -408,9 +410,9 @@ export function AvailableComplaints() {
     },
     {
       title: "ESCALATED",
-      value: complaints.filter((c) => 
-        c.status?.includes('ESCALATED') || 
-        !!c.managedByMunicipalAdmin?.id || 
+      value: complaints.filter((c) =>
+        c.status?.includes('ESCALATED') ||
+        !!c.managedByMunicipalAdmin?.id ||
         !!c.escalationLevel
       ).length.toString(),
       subtitle: "⚠ Awaiting Review",
@@ -423,7 +425,7 @@ export function AvailableComplaints() {
   const displayedComplaints = complaints.filter((complaint) => {
     // Urgency filter
     if (urgencyFilter !== 'all' && complaint.urgency !== urgencyFilter) return false
-    
+
     // Assignment filter
     if (assignmentFilter === 'all') return true
     if (assignmentFilter === 'assigned') return !!complaint.assignedAgent?.id || !!complaint.managedByMunicipalAdmin?.id
@@ -445,7 +447,7 @@ export function AvailableComplaints() {
     setActiveCompareUrl(referenceImageUrl)
 
     try {
-      const response = await fetch('http://localhost:3030/api/match', {
+      const response = await fetch(AI_API_URL, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -533,7 +535,7 @@ export function AvailableComplaints() {
             <div key={i} className="bg-gray-200 rounded-2xl p-6 shadow-lg relative overflow-hidden animate-pulse">
               <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -translate-y-1/2 translate-x-1/2" />
               <div className="absolute bottom-0 left-0 w-24 h-24 bg-white/10 rounded-full translate-y-1/2 -translate-x-1/2" />
-              
+
               <div className="relative flex items-start justify-between">
                 <div className="space-y-3">
                   <div className="h-3 bg-gray-300 rounded w-24"></div>
@@ -550,7 +552,7 @@ export function AvailableComplaints() {
               {/* Background decoration */}
               <div className="absolute top-0 right-0 w-32 h-32 bg-white/5 rounded-full -translate-y-1/2 translate-x-1/2" />
               <div className="absolute bottom-0 left-0 w-24 h-24 bg-white/5 rounded-full translate-y-1/2 -translate-x-1/2" />
-              
+
               <div className="relative flex items-start justify-between">
                 <div className="space-y-1">
                   <p className="text-xs font-semibold tracking-wider text-white/80 uppercase">{stat.title}</p>
@@ -647,9 +649,9 @@ export function AvailableComplaints() {
       {/* Complaints Table */}
       <Card>
         <CardHeader>
-            <CardTitle>{getHeaderTitle()}</CardTitle>
-            <CardDescription>{getHeaderDescription()}</CardDescription>
-          </CardHeader>
+          <CardTitle>{getHeaderTitle()}</CardTitle>
+          <CardDescription>{getHeaderDescription()}</CardDescription>
+        </CardHeader>
         <CardContent>
           <div className="flex flex-col sm:flex-row gap-4 mb-6">
             <div className="relative flex-1">
@@ -661,29 +663,29 @@ export function AvailableComplaints() {
                 className="pl-10"
               />
             </div>
-                <Select value={assignmentFilter} onValueChange={(v) => setAssignmentFilter(v as any)}>
-                  <SelectTrigger className="w-full sm:w-[200px]">
-                    <SelectValue placeholder="Filter" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all">All Complaints</SelectItem>
-                    <SelectItem value="unassigned">Unassigned</SelectItem>
-                    <SelectItem value="assigned">Assigned</SelectItem>
-                    <SelectItem value="escalated">Escalated</SelectItem>
-                  </SelectContent>
-                </Select>
-                <Select value={urgencyFilter} onValueChange={(v) => setUrgencyFilter(v as any)}>
-                  <SelectTrigger className="w-full sm:w-[180px]">
-                    <SelectValue placeholder="Priority" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all">All Priorities</SelectItem>
-                    <SelectItem value="CRITICAL">Critical</SelectItem>
-                    <SelectItem value="HIGH">High</SelectItem>
-                    <SelectItem value="MEDIUM">Medium</SelectItem>
-                    <SelectItem value="LOW">Low</SelectItem>
-                  </SelectContent>
-                </Select>
+            <Select value={assignmentFilter} onValueChange={(v) => setAssignmentFilter(v as any)}>
+              <SelectTrigger className="w-full sm:w-[200px]">
+                <SelectValue placeholder="Filter" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Complaints</SelectItem>
+                <SelectItem value="unassigned">Unassigned</SelectItem>
+                <SelectItem value="assigned">Assigned</SelectItem>
+                <SelectItem value="escalated">Escalated</SelectItem>
+              </SelectContent>
+            </Select>
+            <Select value={urgencyFilter} onValueChange={(v) => setUrgencyFilter(v as any)}>
+              <SelectTrigger className="w-full sm:w-[180px]">
+                <SelectValue placeholder="Priority" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Priorities</SelectItem>
+                <SelectItem value="CRITICAL">Critical</SelectItem>
+                <SelectItem value="HIGH">High</SelectItem>
+                <SelectItem value="MEDIUM">Medium</SelectItem>
+                <SelectItem value="LOW">Low</SelectItem>
+              </SelectContent>
+            </Select>
           </div>
 
           <div className="rounded-md border">
@@ -772,13 +774,13 @@ export function AvailableComplaints() {
                                 <Eye className="mr-2 h-4 w-4 text-blue-500 group-hover:text-black transition-colors" />
                                 View details
                               </DropdownMenuItem>
-                                  <DropdownMenuItem
-                                    onClick={() => handleAssignToMe(complaint.id)}
-                                    className={assigning === complaint.id ? "opacity-50 pointer-events-none" : ""}
-                                  >
-                                    <UserPlus className="mr-2 h-4 w-4" />
-                                    {assigning === complaint.id ? "Claiming..." : "Claim complaint"}
-                                  </DropdownMenuItem>
+                              <DropdownMenuItem
+                                onClick={() => handleAssignToMe(complaint.id)}
+                                className={assigning === complaint.id ? "opacity-50 pointer-events-none" : ""}
+                              >
+                                <UserPlus className="mr-2 h-4 w-4" />
+                                {assigning === complaint.id ? "Claiming..." : "Claim complaint"}
+                              </DropdownMenuItem>
                             </DropdownMenuContent>
                           </DropdownMenu>
                         ) : (
@@ -846,11 +848,11 @@ export function AvailableComplaints() {
                   selectedComplaint?.AIStandardizedSubcategory ||
                   selectedComplaint?.AIstandardizedSubCategory
                 ) && (
-                  <p className="text-sm text-gray-500 mt-1 flex items-center">
-                    <Sparkles className="mr-2 h-4 w-4 text-emerald-500" />
-                    <span>SwarajAI classification: {selectedComplaint?.AIStandardizedSubcategory || selectedComplaint?.AIstandardizedSubCategory}</span>
-                  </p>
-                )}
+                    <p className="text-sm text-gray-500 mt-1 flex items-center">
+                      <Sparkles className="mr-2 h-4 w-4 text-emerald-500" />
+                      <span>SwarajAI classification: {selectedComplaint?.AIStandardizedSubcategory || selectedComplaint?.AIstandardizedSubCategory}</span>
+                    </p>
+                  )}
                 {/* Assigned agent / municipal admin (non-sensitive) */}
                 {selectedComplaint?.assignedAgent ? (
                   <p className="text-sm text-gray-500 mt-2 flex items-center">
@@ -1013,15 +1015,15 @@ export function AvailableComplaints() {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="flex flex-col">
                   <h4 className="text-sm font-semibold text-gray-700">Complainant</h4>
-                    {selectedComplaint?.complainant ? (
-                      <div className="text-sm text-gray-800 mt-1">
-                        <div>{selectedComplaint.complainant.name}</div>
-                        <div className="text-xs text-gray-500">Contact information withheld</div>
-                      </div>
-                    ) : (
-                      <p className="text-sm text-gray-500 mt-1">N/A</p>
-                    )}
-                  </div>
+                  {selectedComplaint?.complainant ? (
+                    <div className="text-sm text-gray-800 mt-1">
+                      <div>{selectedComplaint.complainant.name}</div>
+                      <div className="text-xs text-gray-500">Contact information withheld</div>
+                    </div>
+                  ) : (
+                    <p className="text-sm text-gray-500 mt-1">N/A</p>
+                  )}
+                </div>
                 <div className="flex flex-col">
                   <h4 className="text-sm font-semibold text-gray-700">Location</h4>
                   {selectedComplaint?.location ? (
