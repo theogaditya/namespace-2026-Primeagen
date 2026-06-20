@@ -1,0 +1,67 @@
+---
+- name: Prepare SwarajDesk EC2
+  hosts: all
+  become: true
+  vars_files:
+    - vars.yml
+
+  tasks:
+
+    - name: Install system dependencies
+      apt:
+        name:
+          - docker.io
+          - nginx
+        update_cache: yes
+        state: present
+
+    - name: Start and enable Docker
+      service:
+        name: docker
+        state: started
+        enabled: yes
+
+    - name: Pull Admin BE image
+      docker_image:
+        name: "{{ images.admin_be }}"
+        source: pull
+
+    - name: Pull Comp Queue image
+      docker_image:
+        name: "{{ images.comp_queue }}"
+        source: pull
+
+    - name: Pull Self image
+      docker_image:
+        name: "{{ images.self }}"
+        source: pull
+
+    - name: Pull User BE image
+      docker_image:
+        name: "{{ images.user_be }}"
+        source: pull
+
+    - name: Configure Nginx
+      template:
+        src: nginx.conf.j2
+        dest: /etc/nginx/sites-available/swaraj
+      notify: Reload Nginx
+
+    - name: Enable Nginx Site
+      file:
+        src: /etc/nginx/sites-available/swaraj
+        dest: /etc/nginx/sites-enabled/swaraj
+        state: link
+      notify: Reload Nginx
+
+    - name: Remove Default Nginx Site
+      file:
+        path: /etc/nginx/sites-enabled/default
+        state: absent
+      notify: Reload Nginx
+
+  handlers:
+    - name: Reload Nginx
+      service:
+        name: nginx
+        state: reloaded

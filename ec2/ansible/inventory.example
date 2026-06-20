@@ -1,0 +1,5 @@
+[webservers]
+# Replace <INSTANCE_IP> with the actual IP address from terraform output
+# Example:
+# 1.2.3.4 ansible_user=ubuntu ansible_ssh_private_key_file=../.key/ec2-iit-pair
+<INSTANCE_IP> ansible_user=ubuntu ansible_ssh_private_key_file=../.key/ec2-iit-pair

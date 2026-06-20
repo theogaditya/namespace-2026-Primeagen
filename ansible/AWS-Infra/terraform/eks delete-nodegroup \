@@ -1,0 +1,229 @@
+{
+    "ResourceTagMappingList": [
+        {
+            "ResourceARN": "arn:aws:ec2:ap-south-1:637245294687:natgateway/nat-0dca3404fc5cbb1be",
+            "Tags": [
+                {
+                    "Key": "Project",
+                    "Value": "iit-test"
+                },
+                {
+                    "Key": "ManagedBy",
+                    "Value": "terraform"
+                },
+                {
+                    "Key": "Environment",
+                    "Value": "production"
+                },
+                {
+                    "Key": "Name",
+                    "Value": "iit-test-nat"
+                }
+            ]
+        },
+        {
+            "ResourceARN": "arn:aws:ec2:ap-south-1:637245294687:network-interface/eni-01938f3ee7b3df4d7",
+            "Tags": [
+                {
+                    "Key": "eks:eni:owner",
+                    "Value": "amazon-vpc-cni"
+                },
+                {
+                    "Key": "node.k8s.amazonaws.com/instance_id",
+                    "Value": "i-0012d787b669158f4"
+                },
+                {
+                    "Key": "node.k8s.amazonaws.com/createdAt",
+                    "Value": "2026-02-15T09:54:52Z"
+                },
+                {
+                    "Key": "cluster.k8s.amazonaws.com/name",
+                    "Value": "iit-test-eks"
+                }
+            ]
+        },
+        {
+            "ResourceARN": "arn:aws:ec2:ap-south-1:637245294687:network-interface/eni-09ae396979e87a3c0",
+            "Tags": [
+                {
+                    "Key": "eks:eni:owner",
+                    "Value": "amazon-vpc-cni"
+                },
+                {
+                    "Key": "node.k8s.amazonaws.com/instance_id",
+                    "Value": "i-0f1a58ef6e8c15dcc"
+                },
+                {
+                    "Key": "node.k8s.amazonaws.com/createdAt",
+                    "Value": "2026-02-15T10:01:17Z"
+                },
+                {
+                    "Key": "cluster.k8s.amazonaws.com/name",
+                    "Value": "iit-test-eks"
+                }
+            ]
+        },
+        {
+            "ResourceARN": "arn:aws:ec2:ap-south-1:637245294687:network-interface/eni-0b1ecf3eb5efbaa7c",
+            "Tags": [
+                {
+                    "Key": "eks:eni:owner",
+                    "Value": "amazon-vpc-cni"
+                },
+                {
+                    "Key": "node.k8s.amazonaws.com/instance_id",
+                    "Value": "i-0f1a58ef6e8c15dcc"
+                },
+                {
+                    "Key": "node.k8s.amazonaws.com/createdAt",
+                    "Value": "2026-02-15T09:54:54Z"
+                },
+                {
+                    "Key": "cluster.k8s.amazonaws.com/name",
+                    "Value": "iit-test-eks"
+                }
+            ]
+        },
+        {
+            "ResourceARN": "arn:aws:events:ap-south-1:637245294687:rule/AutoScalingManagedRule",
+            "Tags": []
+        },
+        {
+            "ResourceARN": "arn:aws:ec2:ap-south-1:637245294687:network-interface/eni-0fa50a2e7ae050b58",
+            "Tags": [
+                {
+                    "Key": "eks:eni:owner",
+                    "Value": "amazon-vpc-cni"
+                },
+                {
+                    "Key": "node.k8s.amazonaws.com/instance_id",
+                    "Value": "i-0f1a58ef6e8c15dcc"
+                },
+                {
+                    "Key": "cluster.k8s.amazonaws.com/name",
+                    "Value": "iit-test-eks"
+                }
+            ]
+        },
+        {
+            "ResourceARN": "arn:aws:ec2:ap-south-1:637245294687:network-interface/eni-078d520526ce85939",
+            "Tags": [
+                {
+                    "Key": "eks:eni:owner",
+                    "Value": "amazon-vpc-cni"
+                },
+                {
+                    "Key": "node.k8s.amazonaws.com/instance_id",
+                    "Value": "i-0012d787b669158f4"
+                },
+                {
+                    "Key": "cluster.k8s.amazonaws.com/name",
+                    "Value": "iit-test-eks"
+                }
+            ]
+        },
+        {
+            "ResourceARN": "arn:aws:ec2:ap-south-1:637245294687:instance/i-0012d787b669158f4",
+            "Tags": [
+                {
+                    "Key": "aws:autoscaling:groupName",
+                    "Value": "eks-iit-test-eks-node-group-dace305c-2515-f379-36cd-eeb27e36acb4"
+                },
+                {
+                    "Key": "aws:ec2:fleet-id",
+                    "Value": "fleet-96bfe5a4-4286-c61e-0e10-adaa8e82e08c"
+                },
+                {
+                    "Key": "k8s.io/cluster-autoscaler/iit-test-eks",
+                    "Value": "owned"
+                },
+                {
+                    "Key": "kubernetes.io/cluster/iit-test-eks",
+                    "Value": "owned"
+                },
+                {
+                    "Key": "eks:cluster-name",
+                    "Value": "iit-test-eks"
+                },
+                {
+                    "Key": "aws:ec2launchtemplate:version",
+                    "Value": "1"
+                },
+                {
+                    "Key": "eks:nodegroup-name",
+                    "Value": "iit-test-eks-node-group"
+                },
+                {
+                    "Key": "k8s.io/cluster-autoscaler/enabled",
+                    "Value": "true"
+                },
+                {
+                    "Key": "aws:ec2launchtemplate:id",
+                    "Value": "lt-0bc3b9a394f5af5bc"
+                }
+            ]
+        },
+        {
+            "ResourceARN": "arn:aws:ec2:ap-south-1:637245294687:instance/i-0f1a58ef6e8c15dcc",
+            "Tags": [
+                {
+                    "Key": "aws:autoscaling:groupName",
+                    "Value": "eks-iit-test-eks-node-group-dace305c-2515-f379-36cd-eeb27e36acb4"
+                },
+                {
+                    "Key": "aws:ec2:fleet-id",
+                    "Value": "fleet-009ff997-d786-c40d-2c90-01282e5853f1"
+                },
+                {
+                    "Key": "k8s.io/cluster-autoscaler/iit-test-eks",
+                    "Value": "owned"
+                },
+                {
+                    "Key": "kubernetes.io/cluster/iit-test-eks",
+                    "Value": "owned"
+                },
+                {
+                    "Key": "eks:cluster-name",
+                    "Value": "iit-test-eks"
+                },
+                {
+                    "Key": "aws:ec2launchtemplate:version",
+                    "Value": "1"
+                },
+                {
+                    "Key": "eks:nodegroup-name",
+                    "Value": "iit-test-eks-node-group"
+                },
+                {
+                    "Key": "k8s.io/cluster-autoscaler/enabled",
+                    "Value": "true"
+                },
+                {
+                    "Key": "aws:ec2launchtemplate:id",
+                    "Value": "lt-0bc3b9a394f5af5bc"
+                }
+            ]
+        },
+        {
+            "ResourceARN": "arn:aws:ec2:ap-south-1:637245294687:network-interface/eni-0997da11438602205",
+            "Tags": [
+                {
+                    "Key": "eks:eni:owner",
+                    "Value": "amazon-vpc-cni"
+                },
+                {
+                    "Key": "node.k8s.amazonaws.com/instance_id",
+                    "Value": "i-0012d787b669158f4"
+                },
+                {
+                    "Key": "node.k8s.amazonaws.com/createdAt",
+                    "Value": "2026-02-15T10:01:19Z"
+                },
+                {
+                    "Key": "cluster.k8s.amazonaws.com/name",
+                    "Value": "iit-test-eks"
+                }
+            ]
+        }
+    ]
+}

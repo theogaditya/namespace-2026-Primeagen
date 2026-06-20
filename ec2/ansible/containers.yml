@@ -1,0 +1,186 @@
+---
+- name: Deploy SwarajDesk Containers
+  hosts: all
+  become: true
+  vars_files:
+    - vars.yml
+
+  tasks:
+
+    # ----------------------------
+    # Install AWS CLI + jq
+    # ----------------------------
+
+    - name: Install awscli and jq
+      apt:
+        name:
+          - awscli
+          - jq
+        update_cache: yes
+        state: present
+
+    # ----------------------------
+    # Configure AWS Credentials (Non-interactive)
+    # ----------------------------
+
+    - name: Create AWS credentials directory
+      file:
+        path: /root/.aws
+        state: directory
+        mode: '0700'
+
+    - name: Write AWS credentials file
+      copy:
+        dest: /root/.aws/credentials
+        mode: '0600'
+        content: |
+          [default]
+          aws_access_key_id={{ aws_access_key }}
+          aws_secret_access_key={{ aws_secret_key }}
+
+    - name: Write AWS config file
+      copy:
+        dest: /root/.aws/config
+        mode: '0600'
+        content: |
+          [default]
+          region={{ aws_region }}
+          output={{ output_format }}
+
+    # ----------------------------
+    # Generate ENV Files
+    # ----------------------------
+
+    - name: Generate admin.env
+      shell: |
+        aws secretsmanager get-secret-value \
+          --secret-id {{ secrets_map.admin_be }} \
+          --region {{ aws_region }} \
+          --query SecretString \
+          --output text | jq -r '
+        {
+          NODE_ENV: "production",
+          SECRETS_AWS_ACCESS_KEY_ID: .SECRETS_AWS_ACCESS_KEY_ID,
+          SECRETS_AWS_SECRET_ACCESS_KEY: .SECRETS_AWS_SECRET_ACCESS_KEY,
+          AWS_REGION: .AWS_REGION,
+          SECRET_NAME_AWS_USER_BE: "{{ secrets_map.admin_be }}"
+        }
+        | to_entries
+        | map("\(.key)=\(.value)")
+        | .[]' > /root/admin.env
+      args:
+        executable: /bin/bash
+
+    - name: Generate comp.env
+      shell: |
+        aws secretsmanager get-secret-value \
+          --secret-id {{ secrets_map.comp_queue }} \
+          --region {{ aws_region }} \
+          --query SecretString \
+          --output text | jq -r '
+        {
+          NODE_ENV: "production",
+          SECRETS_AWS_ACCESS_KEY_ID: .SECRETS_AWS_ACCESS_KEY_ID,
+          SECRETS_AWS_SECRET_ACCESS_KEY: .SECRETS_AWS_SECRET_ACCESS_KEY,
+          AWS_REGION: .AWS_REGION,
+          SECRET_NAME_AWS_USER_BE: "{{ secrets_map.comp_queue }}"
+        }
+        | to_entries
+        | map("\(.key)=\(.value)")
+        | .[]' > /root/comp.env
+      args:
+        executable: /bin/bash
+
+    - name: Generate user.env
+      shell: |
+        aws secretsmanager get-secret-value \
+          --secret-id {{ secrets_map.user_be }} \
+          --region {{ aws_region }} \
+          --query SecretString \
+          --output text | jq -r '
+        {
+          NODE_ENV: "production",
+          SECRETS_AWS_ACCESS_KEY_ID: .SECRETS_AWS_ACCESS_KEY_ID,
+          SECRETS_AWS_SECRET_ACCESS_KEY: .SECRETS_AWS_SECRET_ACCESS_KEY,
+          AWS_REGION: .AWS_REGION,
+          SECRET_NAME_AWS_USER_BE: "{{ secrets_map.user_be }}"
+        }
+        | to_entries
+        | map("\(.key)=\(.value)")
+        | .[]' > /root/user.env
+      args:
+        executable: /bin/bash
+
+    - name: Generate self.env (full secret)
+      shell: |
+        aws secretsmanager get-secret-value \
+          --secret-id {{ secrets_map.self }} \
+          --region {{ aws_region }} \
+          --query SecretString \
+          --output text | jq -r '
+        to_entries
+        | map("\(.key)=\(.value)")
+        | .[]' > /root/self.env
+      args:
+        executable: /bin/bash
+
+    # ----------------------------
+    # Remove Old Containers
+    # ----------------------------
+
+    - name: Remove old containers
+      docker_container:
+        name: "{{ item }}"
+        state: absent
+        force_kill: true
+      loop:
+        - admin-be
+        - comp-queue
+        - user-be
+        - self
+      ignore_errors: true
+
+    # ----------------------------
+    # Run Containers
+    # ----------------------------
+
+    - name: Run Admin BE
+      docker_container:
+        name: admin-be
+        image: "{{ images.admin_be }}"
+        state: started
+        restart_policy: always
+        env_file: /root/admin.env
+        published_ports:
+          - "3002:3002"
+
+    - name: Run Comp Queue
+      docker_container:
+        name: comp-queue
+        image: "{{ images.comp_queue }}"
+        state: started
+        restart_policy: always
+        env_file: /root/comp.env
+        published_ports:
+          - "3005:3005"
+
+    - name: Run User BE
+      docker_container:
+        name: user-be
+        image: "{{ images.user_be }}"
+        state: started
+        restart_policy: always
+        env_file: /root/user.env
+        published_ports:
+          - "3000:3000"
+          - "3001:3001"
+
+    - name: Run Self
+      docker_container:
+        name: self
+        image: "{{ images.self }}"
+        state: started
+        restart_policy: always
+        env_file: /root/self.env
+        published_ports:
+          - "3030:3030"
