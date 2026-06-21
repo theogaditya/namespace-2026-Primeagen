@@ -382,6 +382,9 @@
   connection: local
   gather_facts: false
 
+  vars_files:
+    - "{{ playbook_dir }}/../ansible/vars.yml"
+
   vars:
     ec2_dir: "{{ playbook_dir }}/.."
     dns_only: false
@@ -419,18 +422,36 @@
           - ""
           - "═══════════════════════════════════════════════════"
 
-    - name: "Update DNS records with new EC2 IP"
-      ansible.builtin.replace:
-        path: "{{ playbook_dir }}/../../test/adityahota.online.txt"
-        regexp: '({{ item }}\.\t1\tIN\tA\t)\S+'
-        replace: '\g<1>{{ deployed_ip }}'
-      loop:
-        - iit-bbsr-swaraj-admin-be\.adityahota\.online
-        - iit-bbsr-swaraj-comp-queue\.adityahota\.online
-        - iit-bbsr-swaraj-self\.adityahota\.online
-        - iit-bbsr-swaraj-user-be\.adityahota\.online
-        - iit-bbsr-swaraj-ws-user-be\.adityahota\.online
+    - name: "Fetch DNS record ID for each domain"
+      ansible.builtin.uri:
+        url: "https://api.cloudflare.com/client/v4/zones/{{ cloudflare.zone_id }}/dns_records?type=A&name={{ item.value }}"
+        method: GET
+        headers:
+          Authorization: "Bearer {{ cloudflare.api_token }}"
+          Content-Type: "application/json"
+        return_content: true
+        status_code: 200
+      register: cf_record_lookup
+      loop: "{{ domains | dict2items }}"
+      loop_control:
+        label: "{{ item.value }}"
 
-    - name: "  ✓  DNS records updated"
+    - name: "Update Cloudflare A record → {{ deployed_ip }}"
+      ansible.builtin.uri:
+        url: "https://api.cloudflare.com/client/v4/zones/{{ cloudflare.zone_id }}/dns_records/{{ (item.json.result | first).id }}"
+        method: PATCH
+        headers:
+          Authorization: "Bearer {{ cloudflare.api_token }}"
+          Content-Type: "application/json"
+        body_format: json
+        body:
+          content: "{{ deployed_ip }}"
+        status_code: 200
+      when: item.json.result | length > 0
+      loop: "{{ cf_record_lookup.results }}"
+      loop_control:
+        label: "{{ (item.json.result | first).name | default('unknown') }}"
+
+    - name: "  ✓  Cloudflare DNS records updated"
       ansible.builtin.debug:
-        msg: "Updated 5 DNS A records in adityahota.online.txt → {{ deployed_ip }}"
+        msg: "All 5 A records in Cloudflare updated → {{ deployed_ip }}"

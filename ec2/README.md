@@ -210,6 +210,11 @@ ansible-playbook deploy.yml --check
 ssh -i .key/ec2-iit-pair ubuntu@<IP from output>
 ```
 
+**Update DNS records (Only):**
+```bash
+ansible-playbook deploy.yml -e dns_only=true
+```
+
 ### See Logs
 ```bash
 ssh -i .key/ec2-iit-pair ubuntu@<IP_ADDRESS>
@@ -228,3 +233,8 @@ docker logs -f comp-queue
 docker logs -f user-be
 docker logs -f self
 ```
+
+### Get Cloudflare DNS Records
+curl -X GET "https://api.cloudflare.com/client/v4/zones/<zone_id>/dns_records" \
+-H "Authorization: Bearer <API_KEY>" \
+-H "Content-Type: application/json"
