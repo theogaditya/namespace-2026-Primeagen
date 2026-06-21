@@ -8,6 +8,7 @@
 #  Usage:
 #    ansible-playbook deploy.yml                    # Full run
 #    ansible-playbook deploy.yml -e skip_terraform=true  # Ansible only
+#    ansible-playbook deploy.yml -e dns_only=true   # DNS update only
 #    ansible-playbook deploy.yml --check            # Dry run
 # ═══════════════════════════════════════════════════════════════
 
@@ -23,8 +24,13 @@
     ec2_dir: "{{ playbook_dir }}/.."
     key_file: "{{ ec2_dir }}/.key/ec2-iit-pair"
     skip_terraform: false
+    dns_only: false
 
   tasks:
+
+    - name: "Skip Play 1 (dns_only mode)"
+      ansible.builtin.meta: end_play
+      when: dns_only | bool
 
     # ── 1. Validate ──────────────────────────────────────────
     - name: "Step 1/7 · Terraform validate"
@@ -115,7 +121,14 @@
   vars_files:
     - "{{ playbook_dir }}/../ansible/vars.yml"
 
+  vars:
+    dns_only: false
+
   tasks:
+
+    - name: "Skip Play 2 (dns_only mode)"
+      ansible.builtin.meta: end_play
+      when: dns_only | bool
 
     - name: "Install system dependencies"
       ansible.builtin.apt:
@@ -176,7 +189,14 @@
   vars_files:
     - "{{ playbook_dir }}/../ansible/vars.yml"
 
+  vars:
+    dns_only: false
+
   tasks:
+
+    - name: "Skip Play 3 (dns_only mode)"
+      ansible.builtin.meta: end_play
+      when: dns_only | bool
 
     # ── AWS CLI + jq ─────────────────────────────────────────
     - name: "Install awscli and jq"
@@ -320,16 +340,29 @@
         published_ports:
           - "3005:3005"
 
-    - name: "Run User BE"
-      community.docker.docker_container:
-        name: user-be
-        image: "{{ images.user_be }}"
-        state: started
-        restart_policy: always
-        env_file: /root/user.env
-        published_ports:
-          - "3000:3000"
-          - "3001:3001"
+    - name: "Install Docker Compose v2 binary"
+      ansible.builtin.shell: |
+        curl -SL "https://github.com/docker/compose/releases/latest/download/docker-compose-linux-x86_64" \
+          -o /usr/local/bin/docker-compose
+        chmod +x /usr/local/bin/docker-compose
+        mkdir -p /usr/lib/docker/cli-plugins
+        ln -sf /usr/local/bin/docker-compose /usr/lib/docker/cli-plugins/docker-compose
+      args:
+        executable: /bin/bash
+        creates: /usr/local/bin/docker-compose
+
+    - name: "Copy user-be docker-compose file"
+      ansible.builtin.copy:
+        src: "{{ playbook_dir }}/../../test/user/docker-compose.yml"
+        dest: /root/user-compose.yml
+        mode: "0644"
+
+    - name: "Run User BE via Docker Compose"
+      ansible.builtin.shell: |
+        docker compose -f /root/user-compose.yml pull
+        docker compose -f /root/user-compose.yml up -d
+      args:
+        executable: /bin/bash
 
     - name: "Run Self"
       community.docker.docker_container:
@@ -349,7 +382,24 @@
   connection: local
   gather_facts: false
 
+  vars:
+    ec2_dir: "{{ playbook_dir }}/.."
+    dns_only: false
+
   tasks:
+
+    - name: "Fetch EC2 IP from Terraform (dns_only mode)"
+      ansible.builtin.command:
+        cmd: terraform output -raw instance_public_ip
+        chdir: "{{ ec2_dir }}"
+      register: tf_ip_dns
+      changed_when: false
+      when: dns_only | bool
+
+    - name: "Set deployed_ip for dns_only mode"
+      ansible.builtin.set_fact:
+        deployed_ip: "{{ tf_ip_dns.stdout }}"
+      when: dns_only | bool
     - name: "Print deployment summary"
       ansible.builtin.debug:
         msg:
@@ -368,3 +418,19 @@
           - "    self        → http://{{ deployed_ip }}:3030"
           - ""
           - "═══════════════════════════════════════════════════"
+
+    - name: "Update DNS records with new EC2 IP"
+      ansible.builtin.replace:
+        path: "{{ playbook_dir }}/../../test/adityahota.online.txt"
+        regexp: '({{ item }}\.\t1\tIN\tA\t)\S+'
+        replace: '\g<1>{{ deployed_ip }}'
+      loop:
+        - iit-bbsr-swaraj-admin-be\.adityahota\.online
+        - iit-bbsr-swaraj-comp-queue\.adityahota\.online
+        - iit-bbsr-swaraj-self\.adityahota\.online
+        - iit-bbsr-swaraj-user-be\.adityahota\.online
+        - iit-bbsr-swaraj-ws-user-be\.adityahota\.online
+
+    - name: "  ✓  DNS records updated"
+      ansible.builtin.debug:
+        msg: "Updated 5 DNS A records in adityahota.online.txt → {{ deployed_ip }}"

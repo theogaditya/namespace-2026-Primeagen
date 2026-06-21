@@ -62,7 +62,9 @@ aws secretsmanager get-secret-value \
   SECRETS_AWS_ACCESS_KEY_ID: .SECRETS_AWS_ACCESS_KEY_ID,
   SECRETS_AWS_SECRET_ACCESS_KEY: .SECRETS_AWS_SECRET_ACCESS_KEY,
   AWS_REGION: .AWS_REGION,
-  SECRET_NAME_AWS_USER_BE: "sih-swaraj-user-be-prod"
+  SECRET_NAME_AWS_USER_BE: "sih-swaraj-user-be-prod",
+  DATABASE_URL: .DATABASE_URL,
+  REDIS_URL: .REDIS_URL,
 }
 | to_entries
 | map("\(.key)=\(.value)")
@@ -206,4 +208,23 @@ ansible-playbook deploy.yml --check
 **After deployment, SSH into the instance:**
 ```bash
 ssh -i .key/ec2-iit-pair ubuntu@<IP from output>
+```
+
+### See Logs
+```bash
+ssh -i .key/ec2-iit-pair ubuntu@<IP_ADDRESS>
+```
+
+```bash
+cd /root
+
+cat admin.env
+cat comp.env
+cat user.env
+cat self.env
+
+docker logs -f admin-be
+docker logs -f comp-queue
+docker logs -f user-be
+docker logs -f self
 ```
