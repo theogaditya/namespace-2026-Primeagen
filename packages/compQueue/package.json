@@ -24,7 +24,6 @@
   },
   "dependencies": {
     "@aws-sdk/client-secrets-manager": "^3.946.0",
-    "@google-cloud/vertexai": "^1.10.0",
     "@prisma/adapter-pg": "^7.0.1",
     "@prisma/client": "^7.0.1",
     "@redis/client": "^5.10.0",

@@ -1,7 +1,7 @@
 import { Server } from "./index";
 import dotenv from "dotenv";
 import { getPrisma } from "./lib/prisma";
-import { initializeGCP } from "./lib/gcp/gcp";
+
 import { redisClient, RedisClientforComplaintQueue } from './lib/redis/redisClient';
 import { retrieveAndInjectSecrets } from './middleware/retriveSecrets';
 
@@ -33,14 +33,7 @@ async function bootstrap() {
       console.warn('Failed to initialize Redis clients:', redisInitErr);
     }
 
-    // Initialize GCP Vertex AI client (optional - for AI standardization)
-    try {
-      const gcpConfig = await initializeGCP();
-      console.log('GCP Vertex AI client initialized');
-      console.log(`  Endpoint: ${gcpConfig.endpointId}`);
-    } catch (gcpErr) {
-      console.warn('GCP initialization failed (non-blocking):', gcpErr);
-    }
+
 
     // Initialize server
     const server = new Server(prisma);
