@@ -52,13 +52,13 @@ export class Server {
     this.app.use('/api/complaint', complaintProcessingRouter(this.db));
     this.app.use('/api/users', userComplaintsRouter(this.db));
     this.app.use('/api/auto-assign', autoAssignRouter);
-  
+
     this.app.use('/api', healthPoint(this.db));
     this.app.get('/health', (req, res) => {
       res.status(200).send('OK');
     });
 
-    startComplaintPolling(this.db);
+    // startComplaintPolling(this.db);
     startAutoAssignPolling();
   }
 

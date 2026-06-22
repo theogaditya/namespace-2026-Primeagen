@@ -126,9 +126,11 @@ curl -H "Host: iit-bbsr-swaraj-admin-be.adityahota.online" http://localhost:3002
 
 ### [CLEAN-UP SSH-Key]
 ##### Do this if stuck at SSH-Handshake
+
 ```bash
-ssh -i /home/abhas/node/Projects/iit-test/ec2/.key/ec2-iit-pair ubuntu@<IP_ADDRESS>
+ssh-keygen -R <IP_ADDRESS>
 ```
+
 
 ### Automated Deployment Commands
 

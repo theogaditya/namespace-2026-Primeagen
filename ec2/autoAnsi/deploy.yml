@@ -233,61 +233,40 @@
           output={{ output_format }}
 
     # ── Generate ENV files ───────────────────────────────────
-    - name: "Generate admin.env"
+    - name: "Generate admin.env (full secret)"
       ansible.builtin.shell: |
         aws secretsmanager get-secret-value \
           --secret-id {{ secrets_map.admin_be }} \
           --region {{ aws_region }} \
           --query SecretString \
           --output text | jq -r '
-        {
-          NODE_ENV: "production",
-          SECRETS_AWS_ACCESS_KEY_ID: .SECRETS_AWS_ACCESS_KEY_ID,
-          SECRETS_AWS_SECRET_ACCESS_KEY: .SECRETS_AWS_SECRET_ACCESS_KEY,
-          AWS_REGION: .AWS_REGION,
-          SECRET_NAME_AWS_USER_BE: "{{ secrets_map.admin_be }}"
-        }
-        | to_entries
+        to_entries
         | map("\(.key)=\(.value)")
         | .[]' > /root/admin.env
       args:
         executable: /bin/bash
 
-    - name: "Generate comp.env"
+    - name: "Generate comp.env (full secret)"
       ansible.builtin.shell: |
         aws secretsmanager get-secret-value \
           --secret-id {{ secrets_map.comp_queue }} \
           --region {{ aws_region }} \
           --query SecretString \
           --output text | jq -r '
-        {
-          NODE_ENV: "production",
-          SECRETS_AWS_ACCESS_KEY_ID: .SECRETS_AWS_ACCESS_KEY_ID,
-          SECRETS_AWS_SECRET_ACCESS_KEY: .SECRETS_AWS_SECRET_ACCESS_KEY,
-          AWS_REGION: .AWS_REGION,
-          SECRET_NAME_AWS_USER_BE: "{{ secrets_map.comp_queue }}"
-        }
-        | to_entries
+        to_entries
         | map("\(.key)=\(.value)")
         | .[]' > /root/comp.env
       args:
         executable: /bin/bash
 
-    - name: "Generate user.env"
+    - name: "Generate user.env (full secret)"
       ansible.builtin.shell: |
         aws secretsmanager get-secret-value \
           --secret-id {{ secrets_map.user_be }} \
           --region {{ aws_region }} \
           --query SecretString \
           --output text | jq -r '
-        {
-          NODE_ENV: "production",
-          SECRETS_AWS_ACCESS_KEY_ID: .SECRETS_AWS_ACCESS_KEY_ID,
-          SECRETS_AWS_SECRET_ACCESS_KEY: .SECRETS_AWS_SECRET_ACCESS_KEY,
-          AWS_REGION: .AWS_REGION,
-          SECRET_NAME_AWS_USER_BE: "{{ secrets_map.user_be }}"
-        }
-        | to_entries
+        to_entries
         | map("\(.key)=\(.value)")
         | .[]' > /root/user.env
       args:
