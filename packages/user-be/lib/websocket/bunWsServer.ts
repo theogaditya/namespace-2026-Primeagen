@@ -23,14 +23,14 @@ export class BunWsServer {
   private syncWorker: LikeSyncWorker;
   private db: PrismaClient;
   private port: number;
-  
+
   constructor(config: BunWsServerConfig) {
     this.db = config.db;
     this.port = config.port;
     this.wsHandler = createWsHandler(config.db);
     this.syncWorker = createLikeSyncWorker(config.db);
   }
-  
+
   /**
    * Start the WebSocket server
    */
@@ -39,12 +39,12 @@ export class BunWsServer {
     try {
       const redisService = getLikeCounterService();
       await redisService.connect();
-      
+
       // Subscribe to Redis pub/sub for multi-instance sync
       await redisService.subscribeToUpdates((data) => {
         // Update local memory store
         likeStore.setLikeCount(data.complaintId, data.newCount);
-        
+
         // Broadcast to all connected clients
         if (this.server) {
           this.server.publish("likes:global", JSON.stringify({
@@ -52,6 +52,7 @@ export class BunWsServer {
             payload: {
               complaintId: data.complaintId,
               count: data.newCount,
+              userId: data.userId,  // so clients can ignore their own echo
             },
             timestamp: data.timestamp,
           }));
@@ -60,32 +61,32 @@ export class BunWsServer {
     } catch (error) {
       console.warn("⚠️ Redis not available, running in memory-only mode:", error);
     }
-    
+
     // Start sync worker
     this.syncWorker.start();
-    
+
     // Create Bun WebSocket server
     const wsHandler = this.wsHandler;
-    
+
     this.server = Bun.serve<WsUserData>({
       port: this.port,
-      
+
       fetch(req, server) {
         // Handle WebSocket upgrade
         const url = new URL(req.url);
-        
+
         if (url.pathname === "/ws" || url.pathname === "/ws/") {
           const upgraded = server.upgrade(req, {
             data: wsHandler.createUserData(),
           });
-          
+
           if (upgraded) {
             return undefined; // Upgrade successful
           }
-          
+
           return new Response("WebSocket upgrade failed", { status: 400 });
         }
-        
+
         // Health check endpoint
         if (url.pathname === "/health" || url.pathname === "/ws/health") {
           return new Response(JSON.stringify({
@@ -97,7 +98,7 @@ export class BunWsServer {
             headers: { "Content-Type": "application/json" },
           });
         }
-        
+
         // Stats endpoint
         if (url.pathname === "/stats" || url.pathname === "/ws/stats") {
           return new Response(JSON.stringify({
@@ -107,10 +108,10 @@ export class BunWsServer {
             headers: { "Content-Type": "application/json" },
           });
         }
-        
+
         return new Response("Not Found", { status: 404 });
       },
-      
+
       websocket: {
         // Called when a message is received
         async message(ws: ServerWebSocket<WsUserData>, message: string | Buffer) {
@@ -125,23 +126,23 @@ export class BunWsServer {
             }));
           }
         },
-        
+
         // Called when connection is opened
         open(ws: ServerWebSocket<WsUserData>) {
           console.log(`🔌 WebSocket connected`);
         },
-        
+
         // Called when connection is closed
         close(ws: ServerWebSocket<WsUserData>, code: number, reason: string) {
           console.log(`🔌 WebSocket disconnected: ${code} - ${reason}`);
           wsHandler.handleClose(ws);
         },
-        
+
         // Called on drain (when backpressure is relieved)
         drain(ws: ServerWebSocket<WsUserData>) {
           // Can be used for flow control if needed
         },
-        
+
         // Settings for stable connections
         perMessageDeflate: false, // Disable compression for lower latency
         maxPayloadLength: 64 * 1024, // 64KB max message size
@@ -150,12 +151,12 @@ export class BunWsServer {
         closeOnBackpressureLimit: false, // Don't close on backpressure
       },
     });
-    
+
     console.log(`🚀 WebSocket server running on ws://localhost:${this.port}/ws`);
-    
+
     return this.server;
   }
-  
+
   /**
    * Stop the WebSocket server
    */
@@ -163,12 +164,12 @@ export class BunWsServer {
     // Force sync pending likes before shutdown
     await this.syncWorker.forceSync();
     this.syncWorker.stop();
-    
+
     if (this.server) {
       this.server.stop();
       this.server = null;
     }
-    
+
     // Disconnect Redis
     try {
       const redisService = getLikeCounterService();
@@ -176,17 +177,17 @@ export class BunWsServer {
     } catch (error) {
       console.warn("Error disconnecting Redis:", error);
     }
-    
+
     console.log("🛑 WebSocket server stopped");
   }
-  
+
   /**
    * Get server instance
    */
   getServer(): Server<WsUserData> | null {
     return this.server;
   }
-  
+
   /**
    * Broadcast message to a topic
    */

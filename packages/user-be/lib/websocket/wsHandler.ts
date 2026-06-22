@@ -265,48 +265,66 @@ export class WsHandler {
     try {
       const userId = ws.data.userId;
 
-      // Toggle in memory store (O(1))
+      // Toggle in memory store (O(1)) — tracks user-liked-complaint relationship
       const result = likeStore.toggle(userId, complaintId);
 
-      // Also update Redis (async, non-blocking)
+      // Use Redis as the authoritative source for the count.
+      // Redis has the real cumulative count; in-memory starts at 0 and is unreliable.
+      let authoritativeCount = result.count;
       const redisService = getLikeCounterService();
-      if (redisService.isReady()) {
-        // Fire and forget - don't await
-        (async () => {
-          try {
-            if (result.liked) {
-              await redisService.addUserLike(userId, complaintId);
-              await redisService.incrementLikeCount(complaintId);
-            } else {
-              await redisService.removeUserLike(userId, complaintId);
-              await redisService.decrementLikeCount(complaintId);
-            }
 
-            // Publish update for multi-instance sync
-            await redisService.publishUpdate({
-              type: result.liked ? 'like' : 'unlike',
-              userId,
-              complaintId,
-              newCount: result.count,
-              timestamp: Date.now(),
+      if (redisService.isReady()) {
+        try {
+          // Ensure the Redis counter is seeded from the DB before first increment/decrement.
+          // Without this, INCR on a non-existent key starts from 0, giving wrong counts.
+          const existingCount = await redisService.getLikeCount(complaintId);
+          if (existingCount === 0) {
+            // Check if this is genuinely 0 or just uninitialized — load from DB
+            const dbComplaint = await this.db.complaint.findUnique({
+              where: { id: complaintId },
+              select: { upvoteCount: true },
             });
-          } catch (err) {
-            console.error('Redis update error (non-blocking):', err);
+            if (dbComplaint && dbComplaint.upvoteCount > 0) {
+              await redisService.setLikeCount(complaintId, dbComplaint.upvoteCount);
+            }
           }
-        })();
+
+          if (result.liked) {
+            await redisService.addUserLike(userId, complaintId);
+            authoritativeCount = await redisService.incrementLikeCount(complaintId);
+          } else {
+            await redisService.removeUserLike(userId, complaintId);
+            authoritativeCount = await redisService.decrementLikeCount(complaintId);
+          }
+
+          // Sync in-memory count to match Redis
+          likeStore.setLikeCount(complaintId, authoritativeCount);
+
+          // Publish update for multi-instance sync
+          await redisService.publishUpdate({
+            type: result.liked ? 'like' : 'unlike',
+            userId,
+            complaintId,
+            newCount: authoritativeCount,
+            timestamp: Date.now(),
+          });
+        } catch (err) {
+          console.error('Redis update error:', err);
+          // Fall back to in-memory count if Redis fails
+        }
       }
 
-      // Send confirmation to the user who liked
+      // Send confirmation to the user who liked (includes `liked` field)
       ws.send(this.createMessage(WsMessageType.LIKE_UPDATE, {
         complaintId,
-        count: result.count,
+        count: authoritativeCount,
         liked: result.liked,
       }));
 
-      // Broadcast to all subscribers (except sender)
+      // Broadcast count update to all subscribers (no `liked` field — it's per-user)
       const broadcastMessage = this.createMessage(WsMessageType.LIKE_UPDATE, {
         complaintId,
-        count: result.count,
+        count: authoritativeCount,
       });
 
       server.publish("likes:global", broadcastMessage);

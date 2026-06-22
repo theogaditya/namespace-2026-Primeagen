@@ -8,7 +8,8 @@
     "start": "bun run bin.ts",
     "build": "bun build bin.ts --outdir ./dist --target bun",
     "worker": "bun run workers/startWorker.ts",
-    "test:unit": "vitest test --run"
+    "test:unit": "vitest test --run",
+    "test:coverage": "vitest test --run --coverage"
   },
   "keywords": [],
   "author": "",
@@ -23,6 +24,7 @@
     "@types/node": "^24.10.1",
     "@types/pg": "^8.15.6",
     "@types/supertest": "^6.0.3",
+    "@vitest/coverage-v8": "^4.0.18",
     "jest-mock-extended": "^2.0.4",
     "nodemon": "^3.1.11",
     "prisma": "^7.0.1",

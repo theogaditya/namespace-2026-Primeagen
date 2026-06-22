@@ -3,7 +3,19 @@
   "module": "index.ts",
   "type": "module",
   "private": true,
-  "workspaces": ["packages/*"],
+  "workspaces": [
+    "packages/*"
+  ],
+  "scripts": {
+    "test": "bun run test:admin-be && bun run test:compQueue && bun run test:user-be",
+    "test:admin-be": "cd packages/admin-be && bun run test:unit",
+    "test:compQueue": "cd packages/compQueue && bun run test:unit",
+    "test:user-be": "cd packages/user-be && bun run test:unit",
+    "test:coverage": "bun run test:coverage:admin-be && bun run test:coverage:compQueue && bun run test:coverage:user-be",
+    "test:coverage:admin-be": "cd packages/admin-be && bun run test:coverage",
+    "test:coverage:compQueue": "cd packages/compQueue && bun run test:coverage",
+    "test:coverage:user-be": "cd packages/user-be && bun run test:coverage"
+  },
   "devDependencies": {
     "@types/bun": "latest",
     "baseline-browser-mapping": "^2.8.32"

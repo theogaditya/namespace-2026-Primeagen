@@ -27,7 +27,7 @@ export interface WsMessage {
 
 export interface LikeUpdate {
   complaintId: string;
-  liked: boolean;
+  liked?: boolean;  // undefined for broadcast messages (only set for the user who triggered)
   count: number;
   userId?: string;
 }
@@ -182,7 +182,7 @@ export function useLikeWebSocket({
               if (message.payload) {
                 callbacksRef.current.onLikeUpdate?.({
                   complaintId: message.payload.complaintId as string,
-                  liked: message.payload.liked as boolean,
+                  liked: message.payload.liked != null ? (message.payload.liked as boolean) : undefined,
                   count: message.payload.count as number,
                   userId: message.payload.userId as string | undefined,
                 });
