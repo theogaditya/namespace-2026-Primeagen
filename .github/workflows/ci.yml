@@ -9,9 +9,6 @@ on:
 jobs:
   test:
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        package: [admin-be, compQueue, user-be]
 
     steps:
       - uses: actions/checkout@v4
@@ -21,14 +18,20 @@ jobs:
         with:
           bun-version: latest
 
-      - name: Install dependencies
-        run: bun install
-        working-directory: packages/${{ matrix.package }}
+      # admin-be
+      - name: Install dependencies (admin-be)
+        run: cd packages/admin-be && bun install
+      - name: Run tests with coverage (admin-be)
+        run: cd packages/admin-be && bun run test:coverage
 
-      - name: Run tests
-        run: bun run test:unit
-        working-directory: packages/${{ matrix.package }}
+      # compQueue
+      - name: Install dependencies (compQueue)
+        run: cd packages/compQueue && bun install
+      - name: Run tests with coverage (compQueue)
+        run: cd packages/compQueue && bun run test:coverage
 
-      - name: Run tests with coverage
-        run: bun run test:coverage
-        working-directory: packages/${{ matrix.package }}
+      # user-be
+      - name: Install dependencies (user-be)
+        run: cd packages/user-be && bun install
+      - name: Run tests with coverage (user-be)
+        run: cd packages/user-be && bun run test:coverage
