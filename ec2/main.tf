@@ -114,7 +114,7 @@ resource "aws_key_pair" "deployer" {
 
 resource "aws_instance" "web" {
   ami           = data.aws_ami.ubuntu.id
-  instance_type = "t3.xlarge"
+  instance_type = "t3.large"
 
   key_name               = "ec2-iit-pair"
   vpc_security_group_ids = [local.web_sg_id]
