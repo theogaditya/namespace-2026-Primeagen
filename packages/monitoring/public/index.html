@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SwarajDesk Monitor</title>
+  <meta name="description" content="Real-time health monitoring dashboard for SwarajDesk infrastructure" />
+  <link rel="stylesheet" href="/style.css" />
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+</head>
+<body>
+  <div class="app">
+    <!-- Header -->
+    <header class="header">
+      <div class="header-left">
+        <h1>🛡️ SwarajDesk Monitor</h1>
+        <span class="badge" id="lastRun">—</span>
+      </div>
+      <div class="header-right">
+        <button class="btn btn-primary" id="runNow" onclick="triggerCheck()">⚡ Run Now</button>
+        <button class="btn btn-secondary" onclick="exportCSV()">📥 Export CSV</button>
+        <div class="auto-refresh">
+          <label><input type="checkbox" id="autoRefresh" checked /> Auto-refresh (15m)</label>
+        </div>
+      </div>
+    </header>
+
+    <!-- Summary Cards -->
+    <section class="summary-cards" id="summaryCards">
+      <div class="card card-total"><div class="card-num" id="totalCount">—</div><div class="card-label">Total Checks</div></div>
+      <div class="card card-up"><div class="card-num" id="upCount">—</div><div class="card-label">✅ Up</div></div>
+      <div class="card card-down"><div class="card-num" id="downCount">—</div><div class="card-label">❌ Down</div></div>
+      <div class="card card-warn"><div class="card-num" id="warnCount">—</div><div class="card-label">⚠️ Warning</div></div>
+    </section>
+
+    <!-- Filters -->
+    <section class="filters">
+      <select id="filterGroup" onchange="renderChecks()">
+        <option value="all">All Groups</option>
+        <option value="backend-health">Backend Health</option>
+        <option value="feature-api">Feature API</option>
+        <option value="frontend-api">Frontend API</option>
+        <option value="database">Database</option>
+        <option value="redis">Redis</option>
+        <option value="s3">S3</option>
+        <option value="ec2">EC2</option>
+        <option value="dns-tls">DNS / TLS</option>
+      </select>
+      <select id="filterStatus" onchange="renderChecks()">
+        <option value="all">All Statuses</option>
+        <option value="UP">✅ Up</option>
+        <option value="DOWN">❌ Down</option>
+        <option value="WARNING">⚠️ Warning</option>
+      </select>
+    </section>
+
+    <!-- Tabs -->
+    <nav class="tabs">
+      <button class="tab active" data-tab="checks" onclick="switchTab('checks')">Checks</button>
+      <button class="tab" data-tab="chart" onclick="switchTab('chart')">Response Times</button>
+      <button class="tab" data-tab="incidents" onclick="switchTab('incidents')">Incidents</button>
+      <button class="tab" data-tab="alerts" onclick="switchTab('alerts')">Alert History</button>
+      <button class="tab" data-tab="logs" onclick="switchTab('logs')">EC2 Logs</button>
+    </nav>
+
+    <!-- Tab Content -->
+    <main class="content">
+      <div id="tab-checks" class="tab-panel active">
+        <div class="checks-grid" id="checksGrid"></div>
+      </div>
+      <div id="tab-chart" class="tab-panel">
+        <canvas id="responseChart" height="400"></canvas>
+      </div>
+      <div id="tab-incidents" class="tab-panel">
+        <table class="data-table" id="incidentsTable">
+          <thead><tr><th>Time</th><th>Check</th><th>Group</th><th>Transition</th><th>Message</th></tr></thead>
+          <tbody></tbody>
+        </table>
+      </div>
+      <div id="tab-alerts" class="tab-panel">
+        <table class="data-table" id="alertsTable">
+          <thead><tr><th>Time</th><th>Check</th><th>Severity</th><th>Type</th><th>Subject</th></tr></thead>
+          <tbody></tbody>
+        </table>
+      </div>
+      <div id="tab-logs" class="tab-panel">
+        <div id="logsContainer" style="padding: 20px;"></div>
+      </div>
+    </main>
+  </div>
+
+  <script src="/app.js"></script>
+</body>
+</html>
