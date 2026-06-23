@@ -8,7 +8,7 @@ terraform {
 }
 
 provider "aws" {
-  region = "ap-south-1"
+  region = "ap-south-2"
 }
 
 data "aws_vpc" "default" {
@@ -47,6 +47,22 @@ resource "aws_security_group" "web_sg" {
     description = "HTTP from anywhere"
     from_port   = 80
     to_port     = 80
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  ingress {
+    description = "Backend services (admin-be, user-be, user-ws, comp-queue)"
+    from_port   = 3000
+    to_port     = 3005
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  ingress {
+    description = "Self service"
+    from_port   = 3030
+    to_port     = 3030
     protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
   }
@@ -98,7 +114,7 @@ resource "aws_key_pair" "deployer" {
 
 resource "aws_instance" "web" {
   ami           = data.aws_ami.ubuntu.id
-  instance_type = "m7i-flex.large"
+  instance_type = "t3.xlarge"
 
   key_name               = "ec2-iit-pair"
   vpc_security_group_ids = [local.web_sg_id]

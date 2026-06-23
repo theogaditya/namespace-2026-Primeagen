@@ -2,15 +2,23 @@ import { S3Client, PutObjectCommand } from "@aws-sdk/client-s3";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 import { randomUUID } from "crypto";
 
-const s3Client = new S3Client({
-  region: process.env.AWS_REGION || "ap-south-2",
-  credentials: {
-    accessKeyId: process.env.S3_AWS_ACCESS_KEY_ID!,
-    secretAccessKey: process.env.S3_AWS_SECRET_ACCESS_KEY!,
-  },
-});
+// Lazy-initialized — created on first use so env vars are available
+// (dotenv.config + retrieveAndInjectSecrets run before any S3 call)
+let _s3Client: S3Client | null = null;
 
-const BUCKET_NAME = process.env.AWS_BUCKET || "sih-swaraj";
+function getS3Client(): S3Client {
+  if (!_s3Client) {
+    _s3Client = new S3Client({
+      region: process.env.AWS_REGION || "ap-south-2",
+      credentials: {
+        accessKeyId: process.env.S3_AWS_ACCESS_KEY_ID!,
+        secretAccessKey: process.env.S3_AWS_SECRET_ACCESS_KEY!,
+      },
+    });
+  }
+  return _s3Client;
+}
+
 const COMPLAINTS_FOLDER = "complaints";
 
 export interface UploadResult {
@@ -34,17 +42,18 @@ export async function uploadComplaintImage(
     const uniqueFilename = `${randomUUID()}.${fileExtension}`;
     const key = `${COMPLAINTS_FOLDER}/${uniqueFilename}`;
 
+    const bucketName = process.env.AWS_BUCKET || "sih-swaraj";
     const command = new PutObjectCommand({
-      Bucket: BUCKET_NAME,
+      Bucket: bucketName,
       Key: key,
       Body: fileBuffer,
       ContentType: mimeType,
     });
 
-    await s3Client.send(command);
+    await getS3Client().send(command);
 
     // Construct the public URL
-    const url = `https://${BUCKET_NAME}.s3.${process.env.AWS_REGION || "ap-south-2"}.amazonaws.com/${key}`;
+    const url = `https://${bucketName}.s3.${process.env.AWS_REGION || "ap-south-2"}.amazonaws.com/${key}`;
 
     return {
       success: true,
@@ -73,14 +82,14 @@ export async function getPresignedUploadUrl(
   const key = `${COMPLAINTS_FOLDER}/${uniqueFilename}`;
 
   const command = new PutObjectCommand({
-    Bucket: BUCKET_NAME,
+    Bucket: process.env.AWS_BUCKET || "sih-swaraj",
     Key: key,
     ContentType: mimeType,
   });
 
-  const url = await getSignedUrl(s3Client, command, { expiresIn });
+  const url = await getSignedUrl(getS3Client(), command, { expiresIn });
 
   return { url, key };
 }
 
-export { s3Client, BUCKET_NAME, COMPLAINTS_FOLDER };
+export { getS3Client, COMPLAINTS_FOLDER };

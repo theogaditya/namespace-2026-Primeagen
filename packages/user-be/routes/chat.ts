@@ -6,15 +6,20 @@ import { uploadMiddleware } from "../middleware/multerConfig";
 import { S3Client, PutObjectCommand } from "@aws-sdk/client-s3";
 import { randomUUID } from "crypto";
 
-// S3 configuration for chat images
-const s3Client = new S3Client({
-  region: process.env.AWS_REGION || "ap-south-2",
-  credentials: {
-    accessKeyId: process.env.S3_AWS_ACCESS_KEY_ID!,
-    secretAccessKey: process.env.S3_AWS_SECRET_ACCESS_KEY!,
-  },
-});
-const BUCKET_NAME = process.env.AWS_BUCKET || "sih-swaraj";
+// S3 configuration for chat images — lazy-initialized
+let _chatS3Client: S3Client | null = null;
+function getChatS3Client(): S3Client {
+  if (!_chatS3Client) {
+    _chatS3Client = new S3Client({
+      region: process.env.AWS_REGION || "ap-south-2",
+      credentials: {
+        accessKeyId: process.env.S3_AWS_ACCESS_KEY_ID!,
+        secretAccessKey: process.env.S3_AWS_SECRET_ACCESS_KEY!,
+      },
+    });
+  }
+  return _chatS3Client;
+}
 const CHAT_IMAGES_FOLDER = "chat-images";
 
 async function uploadChatImage(
@@ -26,17 +31,18 @@ async function uploadChatImage(
     const fileExtension = originalFilename.split(".").pop() || "jpg";
     const uniqueFilename = `${randomUUID()}.${fileExtension}`;
     const key = `${CHAT_IMAGES_FOLDER}/${uniqueFilename}`;
+    const bucketName = process.env.AWS_BUCKET || "sih-swaraj";
 
     const command = new PutObjectCommand({
-      Bucket: BUCKET_NAME,
+      Bucket: bucketName,
       Key: key,
       Body: fileBuffer,
       ContentType: mimeType,
     });
 
-    await s3Client.send(command);
+    await getChatS3Client().send(command);
 
-    const url = `https://${BUCKET_NAME}.s3.${process.env.AWS_REGION || "ap-south-2"}.amazonaws.com/${key}`;
+    const url = `https://${bucketName}.s3.${process.env.AWS_REGION || "ap-south-2"}.amazonaws.com/${key}`;
     return { success: true, url };
   } catch (error) {
     console.error("S3 chat image upload error:", error);

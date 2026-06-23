@@ -9,3 +9,4 @@ inventory.ini
 vars.yml
 .key
 deploy.yml
+autoAnsi/deploy-staged.yml
