@@ -8,3 +8,4 @@ inventory.ini
 .terraform.tfstate.lock.info
 vars.yml
 .key
+deploy.yml

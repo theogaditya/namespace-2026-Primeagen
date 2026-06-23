@@ -207,7 +207,7 @@ export function ProfileCard({ userData, isLoading = false }: ProfileCardProps) {
 
             {/* CTA Button */}
             <a
-              href="https://sepolia.etherscan.io/address/0x3b345b7f156669807A0900c11e6675222A1Dd433"
+              href="https://sepolia.etherscan.io/address/0x05265De49C8893559474bc3FeE70B01f6d6Ac6aC"
               target="_blank"
               rel="noopener noreferrer"
               className="group flex items-center justify-center gap-2 w-full py-2.5 bg-indigo-600 hover:bg-indigo-700 rounded-lg border border-indigo-700 transition-all duration-300 hover:scale-[1.02]"
