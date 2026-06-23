@@ -61,7 +61,7 @@ export const config = {
 
   // EC2 SSH for log retrieval
   ec2Ssh: {
-    keyPath: process.env.EC2_SSH_KEY || 'ec2/.key/ec2-iit-pair',
+    keyPath: process.env.EC2_SSH_KEY || '../../ec2/.key/ec2-iit-pair',
     user: process.env.EC2_SSH_USER || 'ubuntu',
   },
 };
