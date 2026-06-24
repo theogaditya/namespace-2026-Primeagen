@@ -1,0 +1,2 @@
+# Ignore all log files in this directory, but keep the directory itself
+logs/run-*.json

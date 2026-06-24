@@ -64,4 +64,10 @@ export const config = {
     keyPath: process.env.EC2_SSH_KEY || '../../ec2/.key/ec2-iit-pair',
     user: process.env.EC2_SSH_USER || 'ubuntu',
   },
+
+  // Cloudflare
+  cloudflare: {
+    apiToken: process.env.CF_API_TOKEN || '',
+    zoneId: process.env.CF_ZONE_ID || '',
+  },
 };

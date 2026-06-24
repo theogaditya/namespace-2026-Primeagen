@@ -6,6 +6,7 @@ import { getLatestResults, getLastRunTime, runAllChecks } from './scheduler';
 import { getCheckStates, getAlertLog } from './alerter';
 import { getHistory, getIncidents } from './history';
 import { getCachedLogs } from './checkers/ec2LogChecker';
+import { getCheckLog, getRunLogFiles, getRunLog } from './runLogger';
 
 export function startDashboard() {
   const app = express();
@@ -49,6 +50,25 @@ export function startDashboard() {
   // EC2 Logs
   app.get('/api/logs', (_req, res) => {
     res.json(getCachedLogs());
+  });
+
+  // Per-check log from latest run (used by dashboard modal)
+  app.get('/api/check-log/:checkId', (req, res) => {
+    const log = getCheckLog(req.params.checkId);
+    if (!log) return res.status(404).json({ error: 'No log found for this check' });
+    res.json(log);
+  });
+
+  // List all run log files
+  app.get('/api/run-logs', (_req, res) => {
+    res.json(getRunLogFiles());
+  });
+
+  // Fetch a specific run log by filename
+  app.get('/api/run-logs/:filename', (req, res) => {
+    const log = getRunLog(req.params.filename);
+    if (!log) return res.status(404).json({ error: 'Log file not found' });
+    res.json(log);
   });
 
   // Trigger manual check

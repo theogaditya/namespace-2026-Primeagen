@@ -11,6 +11,7 @@ import { runDnsChecks } from './checkers/dnsChecker';
 import { runTlsChecks } from './checkers/tlsChecker';
 import { processResults } from './alerter';
 import { recordResults } from './history';
+import { writeRunLog } from './runLogger';
 import type { CheckResult } from './types';
 
 let latestResults: CheckResult[] = [];
@@ -113,6 +114,9 @@ export async function runAllChecks(): Promise<CheckResult[]> {
 
   // Record history
   recordResults(allResults);
+
+  // Write per-cycle log file
+  writeRunLog(allResults);
 
   const elapsed = Date.now() - start;
   const up = allResults.filter((r) => r.status === 'UP').length;

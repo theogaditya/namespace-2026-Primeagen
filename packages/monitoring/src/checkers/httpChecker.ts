@@ -12,67 +12,99 @@ interface HttpCheckOptions {
   body?: any;
   timeout?: number;
   severity?: Severity;
-  // Validate response — return null if OK, error message if not
+  /** If true, skip retries — used for bulk feature probes to keep cycles fast */
+  noRetry?: boolean;
+  /** Mark UP responses slower than this as "⚠️ Slow" without failing them */
+  slowThresholdMs?: number;
   validate?: (status: number, data: any) => string | null;
 }
 
+const HTTP_RETRY_COUNT = 2;       // retries for critical health checks
+const HTTP_RETRY_DELAY_MS = 1500;
+const DEFAULT_TIMEOUT = 10_000;
+const DEFAULT_SLOW_THRESHOLD = 8_000; // 8s — responses above this get a ⚠️ Slow tag
+
+function sleep(ms: number) {
+  return new Promise<void>((resolve) => setTimeout(resolve, ms));
+}
+
 export async function httpCheck(opts: HttpCheckOptions): Promise<CheckResult> {
-  const start = Date.now();
   const method = opts.method || 'GET';
-  const timeout = opts.timeout || 10000;
+  const timeout = opts.timeout ?? DEFAULT_TIMEOUT;
+  const slowThreshold = opts.slowThresholdMs ?? DEFAULT_SLOW_THRESHOLD;
+  const maxAttempts = opts.noRetry ? 1 : HTTP_RETRY_COUNT + 1;
 
-  try {
-    const resp = await axios({
-      method,
-      url: opts.url,
-      headers: opts.headers || {},
-      data: opts.body,
-      timeout,
-      validateStatus: () => true, // don't throw on non-2xx
-      httpsAgent: new https.Agent({ rejectUnauthorized: false }), // Ignore expired certs
-    });
+  let lastError: string | null = null;
+  let lastHttpStatus: number | undefined;
+  let totalElapsed = 0;
 
-    const elapsed = Date.now() - start;
-    const validator = opts.validate || defaultValidator;
-    const error = validator(resp.status, resp.data);
+  for (let attempt = 0; attempt < maxAttempts; attempt++) {
+    if (attempt > 0) await sleep(HTTP_RETRY_DELAY_MS);
 
-    if (error) {
-      return {
-        id: opts.id,
-        name: opts.name,
-        group: opts.group,
-        status: 'DOWN',
-        responseTimeMs: elapsed,
-        message: error,
-        timestamp: new Date().toISOString(),
-        severity: opts.severity || 'CRITICAL',
-        details: { httpStatus: resp.status },
-      };
+    const start = Date.now();
+    try {
+      const resp = await axios({
+        method,
+        url: opts.url,
+        headers: opts.headers || {},
+        data: opts.body,
+        timeout,
+        validateStatus: () => true,
+        httpsAgent: new https.Agent({ rejectUnauthorized: false }),
+      });
+
+      const elapsed = Date.now() - start;
+      totalElapsed += elapsed;
+
+      const validator = opts.validate || defaultValidator;
+      const error = validator(resp.status, resp.data);
+
+      if (!error) {
+        // ── Response Time Grading ──────────────────────────────
+        const isSlow = elapsed > slowThreshold;
+        const retryNote = attempt > 0
+          ? ` (recovered after ${attempt} retr${attempt === 1 ? 'y' : 'ies'})`
+          : '';
+        const slowNote = isSlow ? `⚠️ Slow (${elapsed}ms) — ` : '';
+
+        return {
+          id: opts.id,
+          name: opts.name,
+          group: opts.group,
+          status: 'UP',
+          responseTimeMs: elapsed,
+          message: `${slowNote}${method} ${resp.status} OK${retryNote}`,
+          timestamp: new Date().toISOString(),
+          severity: opts.severity || 'CRITICAL',
+          details: { httpStatus: resp.status, attempts: attempt + 1, slow: isSlow },
+        };
+      }
+
+      lastError = error;
+      lastHttpStatus = resp.status;
+    } catch (err: any) {
+      const elapsed = Date.now() - start;
+      totalElapsed += elapsed;
+      lastError = err.code === 'ECONNABORTED'
+        ? `Timeout after ${timeout}ms`
+        : (err.message || 'Connection failed');
     }
-
-    return {
-      id: opts.id,
-      name: opts.name,
-      group: opts.group,
-      status: 'UP',
-      responseTimeMs: elapsed,
-      message: `${method} ${resp.status} OK`,
-      timestamp: new Date().toISOString(),
-      severity: opts.severity || 'CRITICAL',
-      details: { httpStatus: resp.status },
-    };
-  } catch (err: any) {
-    return {
-      id: opts.id,
-      name: opts.name,
-      group: opts.group,
-      status: 'DOWN',
-      responseTimeMs: Date.now() - start,
-      message: err.code === 'ECONNABORTED' ? 'Timeout' : (err.message || 'Connection failed'),
-      timestamp: new Date().toISOString(),
-      severity: opts.severity || 'CRITICAL',
-    };
   }
+
+  // All attempts exhausted
+  return {
+    id: opts.id,
+    name: opts.name,
+    group: opts.group,
+    status: 'DOWN',
+    responseTimeMs: totalElapsed,
+    message: maxAttempts > 1
+      ? `${lastError} (failed after ${maxAttempts} attempts)`
+      : `${lastError}`,
+    timestamp: new Date().toISOString(),
+    severity: opts.severity || 'CRITICAL',
+    details: { httpStatus: lastHttpStatus, attempts: maxAttempts },
+  };
 }
 
 function defaultValidator(status: number, _data: any): string | null {
@@ -96,7 +128,6 @@ export function aliveValidator(status: number, _data: any): string | null {
 
 /** Validate 200 OK gracefully (fallback to aliveValidator for FE) */
 export function okValidator(status: number, _data: any): string | null {
-  // We accept 404 for frontends because some routes are just missing but the Next instance is UP
   if (status >= 500) return `Server error: ${status}`;
   if (status !== 200 && status !== 404) return `Expected 200/404, got ${status}`;
   return null;

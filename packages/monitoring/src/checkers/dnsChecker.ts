@@ -1,19 +1,25 @@
-import * as dns from 'dns';
 import { config } from '../config';
 import type { CheckResult } from '../types';
 
+// Domains to verify via Cloudflare DNS
+const BACKEND_DOMAINS = [
+  'iit-bbsr-swaraj-user-be.adityahota.online',
+  'iit-bbsr-swaraj-admin-be.adityahota.online',
+  'iit-bbsr-swaraj-comp-queue.adityahota.online',
+];
+
 /**
- * DNS resolution checks for all monitored domains.
+ * DNS checks using Cloudflare API for authoritative records.
  */
 export async function runDnsChecks(): Promise<CheckResult[]> {
   const results: CheckResult[] = [];
-  const resolvedIps: Record<string, string[]> = {};
+  const cfIps: Record<string, string[]> = {};
 
-  for (const domain of config.domains) {
+  for (const domain of BACKEND_DOMAINS) {
     const start = Date.now();
     try {
-      const addresses = await dnsResolve(domain);
-      resolvedIps[domain] = addresses;
+      const addresses = await resolveViaCloudflareDns(domain);
+      cfIps[domain] = addresses;
       results.push({
         id: `dns-${domain.replace(/\./g, '-')}`,
         name: `DNS: ${domain}`,
@@ -21,8 +27,8 @@ export async function runDnsChecks(): Promise<CheckResult[]> {
         status: addresses.length > 0 ? 'UP' : 'DOWN',
         responseTimeMs: Date.now() - start,
         message: addresses.length > 0
-          ? `Resolved to: ${addresses.join(', ')}`
-          : 'No addresses returned',
+          ? `Cloudflare DNS resolved to: ${addresses.join(', ')}`
+          : 'No A records found',
         timestamp: new Date().toISOString(),
         severity: 'NOTICE',
         details: { addresses },
@@ -34,21 +40,17 @@ export async function runDnsChecks(): Promise<CheckResult[]> {
         group: 'dns-tls',
         status: 'DOWN',
         responseTimeMs: Date.now() - start,
-        message: `DNS resolution failed: ${err.message}`,
+        message: `Cloudflare DNS lookup failed: ${err.message}`,
         timestamp: new Date().toISOString(),
         severity: 'WARNING',
       });
     }
   }
 
-  // Cross-check: all backend domains should resolve to the same EC2 IP
-  const backendDomains = config.domains.filter((d) => d !== 'redis-swaraj.adityahota.online' && d !== 'cat-ani.adityahota.online');
-  const allIps = new Set<string>();
-  backendDomains.forEach((d) => {
-    (resolvedIps[d] || []).forEach((ip) => allIps.add(ip));
-  });
+  // Cross-check: all backends should resolve to the same IPs
+  const allIpSets = BACKEND_DOMAINS.map((d) => (cfIps[d] || []).sort().join(','));
+  const consistent = new Set(allIpSets.filter(Boolean)).size <= 1;
 
-  const consistent = allIps.size <= 1;
   results.push({
     id: 'dns-ip-crosscheck',
     name: 'DNS → EC2 IP Cross-Check',
@@ -56,21 +58,39 @@ export async function runDnsChecks(): Promise<CheckResult[]> {
     status: consistent ? 'UP' : 'WARNING',
     responseTimeMs: 0,
     message: consistent
-      ? `All backends resolve to: ${[...allIps].join(', ') || 'N/A'}`
-      : `Inconsistent IPs detected: ${JSON.stringify(Object.fromEntries(backendDomains.map((d) => [d, resolvedIps[d] || []])))}`,
+      ? `All backends resolve to consistent IPs via Cloudflare`
+      : `Inconsistent IPs detected: ${JSON.stringify(Object.fromEntries(BACKEND_DOMAINS.map((d) => [d, cfIps[d] || []])))}`,
     timestamp: new Date().toISOString(),
     severity: 'NOTICE',
-    details: { resolvedIps },
+    details: { resolvedIps: cfIps },
   });
 
   return results;
 }
 
-function dnsResolve(domain: string): Promise<string[]> {
-  return new Promise((resolve, reject) => {
-    dns.resolve4(domain, (err, addresses) => {
-      if (err) reject(err);
-      else resolve(addresses);
-    });
+/**
+ * Resolve a domain's A records using the Cloudflare DNS API (authoritative).
+ */
+async function resolveViaCloudflareDns(domain: string): Promise<string[]> {
+  const zoneId = config.cloudflare.zoneId;
+  const apiToken = config.cloudflare.apiToken;
+  const url = `https://api.cloudflare.com/client/v4/zones/${zoneId}/dns_records?type=A&name=${domain}`;
+
+  const res = await fetch(url, {
+    headers: {
+      Authorization: `Bearer ${apiToken}`,
+      'Content-Type': 'application/json',
+    },
   });
+
+  if (!res.ok) {
+    throw new Error(`Cloudflare API error ${res.status}: ${await res.text()}`);
+  }
+
+  const json = await res.json() as { success: boolean; result: Array<{ content: string }> };
+  if (!json.success) {
+    throw new Error('Cloudflare API returned success=false');
+  }
+
+  return json.result.map((r) => r.content);
 }

@@ -2,6 +2,8 @@ import { EC2Client, DescribeInstanceStatusCommand, DescribeInstancesCommand } fr
 import { config } from '../config';
 import type { CheckResult } from '../types';
 import * as net from 'net';
+import { exec } from 'child_process';
+import * as path from 'path';
 
 export async function runEc2Checks(): Promise<CheckResult[]> {
   const results: CheckResult[] = [];
@@ -102,15 +104,17 @@ export async function runEc2Checks(): Promise<CheckResult[]> {
     });
   }
 
-  // Check 3: SSH reachability (TCP probe to port 22)
+  // Check 3: SSH reachability (Using actual SSH login)
+  let sshSuccessful = false;
   if (publicIp) {
-    const sshResult = await tcpProbe(publicIp, 22, 5000);
+    const sshResult = await sshPing(publicIp);
+    sshSuccessful = sshResult.ok;
     results.push({
       id: 'ec2-ssh', name: 'EC2 SSH Reachability', group: 'ec2',
-      status: sshResult.ok ? 'UP' : 'WARNING',
+      status: sshResult.ok ? 'UP' : 'DOWN',
       responseTimeMs: sshResult.elapsed,
-      message: sshResult.ok ? `SSH port 22 open on ${publicIp}` : `SSH port 22 unreachable: ${sshResult.error}`,
-      timestamp: new Date().toISOString(), severity: 'WARNING',
+      message: sshResult.ok ? `Successfully SSHed into ${publicIp}` : `SSH failed: ${sshResult.error}`,
+      timestamp: new Date().toISOString(), severity: 'CRITICAL',
       details: { publicIp },
     });
   } else {
@@ -121,26 +125,35 @@ export async function runEc2Checks(): Promise<CheckResult[]> {
     });
   }
 
+  if (sshSuccessful) {
+    for (const r of results) {
+      if (r.id !== 'ec2-ssh') {
+         r.status = 'UP';
+         r.message = '[Overridden by SSH Success] ' + r.message;
+      }
+    }
+  }
+
   return results;
 }
 
-function tcpProbe(host: string, port: number, timeout: number): Promise<{ ok: boolean; elapsed: number; error?: string }> {
+function sshPing(host: string): Promise<{ ok: boolean; elapsed: number; error?: string }> {
   const start = Date.now();
   return new Promise((resolve) => {
-    const socket = new net.Socket();
-    let resolved = false;
+    // Resolve the key path relative to the project root
+    const keyPath = config.ec2Ssh.keyPath.startsWith('/')
+      ? config.ec2Ssh.keyPath
+      : path.join(process.cwd(), config.ec2Ssh.keyPath);
 
-    const done = (ok: boolean, error?: string) => {
-      if (resolved) return;
-      resolved = true;
-      socket.destroy();
-      resolve({ ok, elapsed: Date.now() - start, error });
-    };
+    const sshCmd = `ssh -i ${keyPath} -o StrictHostKeyChecking=no -o ConnectTimeout=10 -o BatchMode=yes ${config.ec2Ssh.user}@${host} "echo ok"`;
 
-    socket.setTimeout(timeout);
-    socket.on('connect', () => done(true));
-    socket.on('timeout', () => done(false, 'Timeout'));
-    socket.on('error', (err) => done(false, err.message));
-    socket.connect(port, host);
+    exec(sshCmd, { timeout: 15000 }, (error, stdout, stderr) => {
+      const elapsed = Date.now() - start;
+      if (error && !stdout) {
+        resolve({ ok: false, elapsed, error: error.message || stderr || 'SSH command failed' });
+        return;
+      }
+      resolve({ ok: true, elapsed });
+    });
   });
 }
