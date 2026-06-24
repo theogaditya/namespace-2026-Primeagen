@@ -49,17 +49,20 @@ export async function runDnsChecks(): Promise<CheckResult[]> {
 
   // Cross-check: all backends should resolve to the same IPs
   const allIpSets = BACKEND_DOMAINS.map((d) => (cfIps[d] || []).sort().join(','));
-  const consistent = new Set(allIpSets.filter(Boolean)).size <= 1;
+  const nonEmpty = allIpSets.filter(Boolean);
+  const consistent = nonEmpty.length > 0 && new Set(nonEmpty).size <= 1;
 
   results.push({
     id: 'dns-ip-crosscheck',
     name: 'DNS → EC2 IP Cross-Check',
     group: 'dns-tls',
-    status: consistent ? 'UP' : 'WARNING',
+    status: nonEmpty.length === 0 ? 'WARNING' : consistent ? 'UP' : 'WARNING',
     responseTimeMs: 0,
-    message: consistent
-      ? `All backends resolve to consistent IPs via Cloudflare`
-      : `Inconsistent IPs detected: ${JSON.stringify(Object.fromEntries(BACKEND_DOMAINS.map((d) => [d, cfIps[d] || []])))}`,
+    message: nonEmpty.length === 0
+      ? 'No domains resolved — cannot cross-check IPs'
+      : consistent
+        ? `All backends resolve to consistent IPs via Cloudflare`
+        : `Inconsistent IPs detected: ${JSON.stringify(Object.fromEntries(BACKEND_DOMAINS.map((d) => [d, cfIps[d] || []])))}`,
     timestamp: new Date().toISOString(),
     severity: 'NOTICE',
     details: { resolvedIps: cfIps },

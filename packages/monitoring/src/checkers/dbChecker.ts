@@ -114,7 +114,7 @@ async function tcpProbeDb(): Promise<CheckResult> {
       try {
         const url = new URL(config.neonDbUrl);
         host = url.hostname;
-      } catch (e) {}
+      } catch (e) { }
     }
     socket.connect(5432, host);
   });

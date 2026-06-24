@@ -9,12 +9,14 @@ import { runEc2Checks } from './checkers/ec2Checker';
 import { fetchEc2Logs } from './checkers/ec2LogChecker';
 import { runDnsChecks } from './checkers/dnsChecker';
 import { runTlsChecks } from './checkers/tlsChecker';
+import { runAiMlChecks as runAiMlProbes } from './checkers/aimlChecker';
 import { processResults } from './alerter';
 import { recordResults } from './history';
 import { writeRunLog } from './runLogger';
 import type { CheckResult } from './types';
 
 let latestResults: CheckResult[] = [];
+let latestAiMlResults: CheckResult[] = [];
 let lastRunTime: string | null = null;
 let isRunning = false;
 
@@ -85,7 +87,7 @@ export async function runAllChecks(): Promise<CheckResult[]> {
     // 8. EC2 checks (3 checks) + EC2 Logs (5 checks)
     const ec2Results = await runEc2Checks();
     allResults.push(...ec2Results);
-    
+
     // Find the public IP from the ec2-status check to fetch logs
     const ec2StatusCheck = ec2Results.find((r) => r.id === 'ec2-status');
     const publicIp = ec2StatusCheck?.details?.publicIp;
@@ -125,7 +127,13 @@ export async function runAllChecks(): Promise<CheckResult[]> {
   console.log(`✅ Check cycle complete: ${allResults.length} checks in ${elapsed}ms — ✅${up} ❌${down} ⚠️${warn}`);
 
   isRunning = false;
-  return allResults;
+
+  // Merge cached AI/ML results so the dashboard always shows them
+  if (latestAiMlResults.length > 0) {
+    latestResults = [...latestResults, ...latestAiMlResults];
+  }
+
+  return latestResults;
 }
 
 function settledValue(r: PromiseSettledResult<CheckResult>): CheckResult {
@@ -149,4 +157,37 @@ function parseRedisFromHealth(id: string, name: string, healthResult: PromiseSet
   }
   // If health endpoint returned successfully, Redis is likely accessible from the backend
   return { id, name, group: 'redis', status: 'UP', responseTimeMs: res.responseTimeMs, message: 'Redis accessible via backend health', timestamp: now, severity: 'WARNING' };
+}
+
+/**
+ * Run AI/ML health checks separately (called on 6h cron).
+ */
+export async function runAiMlCheckCycle(): Promise<CheckResult[]> {
+  console.log(`\n🤖 Starting AI/ML health check cycle at ${new Date().toISOString()}`);
+  const start = Date.now();
+
+  try {
+    const results = await runAiMlProbes();
+    latestAiMlResults = results;
+
+    // Merge into latestResults (replace old AI/ML entries)
+    latestResults = [
+      ...latestResults.filter((r) => r.group !== 'ai-ml'),
+      ...results,
+    ];
+
+    // Process alerts for AI/ML checks
+    await processResults(results);
+    recordResults(results);
+
+    const elapsed = Date.now() - start;
+    const up = results.filter((r) => r.status === 'UP').length;
+    const down = results.filter((r) => r.status === 'DOWN').length;
+    console.log(`🤖 AI/ML check complete: ${results.length} checks in ${elapsed}ms — ✅${up} ❌${down}`);
+
+    return results;
+  } catch (err: any) {
+    console.error('❌ Error during AI/ML check cycle:', err.message);
+    return [];
+  }
 }

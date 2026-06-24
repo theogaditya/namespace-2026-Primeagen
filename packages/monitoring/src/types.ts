@@ -8,7 +8,8 @@ export type ServiceGroup =
   | 'redis'
   | 's3'
   | 'ec2'
-  | 'dns-tls';
+  | 'dns-tls'
+  | 'ai-ml';
 
 export interface CheckResult {
   id: string;

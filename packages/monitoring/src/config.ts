@@ -26,16 +26,16 @@ export const config = {
   },
 
   // Databases
-  neonDbUrl: process.env.NEONDB_URL || '',
+  neonDbUrl: (process.env.NEONDB_URL || '').trim(),
 
   // Service URLs
   urls: {
-    userBe: process.env.USER_BE_URL || 'https://iit-bbsr-swaraj-user-be.adityahota.online',
-    adminBe: process.env.ADMIN_BE_URL || 'https://iit-bbsr-swaraj-admin-be.adityahota.online',
-    compQueue: process.env.COMP_QUEUE_URL || 'https://iit-bbsr-swaraj-comp-queue.adityahota.online',
-    blockRit: process.env.BLOCK_RIT_URL || 'https://block-rit.adityahota.online',
-    userFe: process.env.USER_FE_URL || 'https://iit-bbsr-swaraj-user-fe.adityahota.online',
-    adminFe: process.env.ADMIN_FE_URL || 'https://admin.swarajdesk.co.in',
+    userBe: (process.env.USER_BE_URL || 'https://iit-bbsr-swaraj-user-be.adityahota.online').trim(),
+    adminBe: (process.env.ADMIN_BE_URL || 'https://iit-bbsr-swaraj-admin-be.adityahota.online').trim(),
+    compQueue: (process.env.COMP_QUEUE_URL || 'https://iit-bbsr-swaraj-comp-queue.adityahota.online').trim(),
+    blockRit: (process.env.BLOCK_RIT_URL || 'https://block-rit.adityahota.online').trim(),
+    userFe: (process.env.USER_FE_URL || 'https://iit-bbsr-swaraj-user-fe.adityahota.online').trim(),
+    adminFe: (process.env.ADMIN_FE_URL || 'https://admin.swarajdesk.co.in').trim(),
   },
 
   // Domains for DNS/TLS checks
@@ -63,6 +63,15 @@ export const config = {
   ec2Ssh: {
     keyPath: process.env.EC2_SSH_KEY || '../../ec2/.key/ec2-iit-pair',
     user: process.env.EC2_SSH_USER || 'ubuntu',
+  },
+
+  // AI/ML model URLs
+  aiml: {
+    catAni: (process.env.CAT_ANI_URL || 'https://cat-ani.adityahota.online').trim(),
+    voiceAni: (process.env.VOICE_ANI_URL || 'https://voice-ani.adityahota.online').trim(),
+    toxicAni: (process.env.TOXIC_ANI_URL || 'https://toxic-ani.adityahota.online').trim(),
+    visionAni: (process.env.VISION_ANI_URL || 'https://vision-ani.adityahota.online').trim(),
+    checkIntervalHours: parseInt(process.env.AI_CHECK_INTERVAL_HOURS || '6'),
   },
 
   // Cloudflare

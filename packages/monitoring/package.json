@@ -4,8 +4,8 @@
   "description": "Standalone health-check and alerting tool for SwarajDesk",
   "main": "src/index.ts",
   "scripts": {
-    "start": "tsx src/index.ts",
-    "dev": "tsx watch src/index.ts",
+    "start": "bun src/index.ts",
+    "dev": "bun --watch src/index.ts",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "dependencies": {

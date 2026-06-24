@@ -18,6 +18,10 @@ export async function runFrontendProbes(): Promise<CheckResult[]> {
     httpCheck({ id: 'fe-ufe-badges-stats', name: 'user-fe: GET Badges Stats', group: 'frontend-api', url: `${userFe}/api/badges/stats`, validate: aliveValidator, timeout: 20000 }),
     httpCheck({ id: 'fe-ufe-image-validate', name: 'user-fe: GET Image Validate', group: 'frontend-api', url: `${userFe}/api/image/validate`, validate: aliveValidator, timeout: 20000 }),
 
+    httpCheck({ id: 'fe-ufe-categories', name: 'user-fe: GET Categories', group: 'frontend-api', url: `${userFe}/api/categories`, validate: aliveValidator, timeout: 20000 }),
+    httpCheck({ id: 'fe-ufe-districts', name: 'user-fe: GET Districts', group: 'frontend-api', url: `${userFe}/api/districts`, validate: aliveValidator, timeout: 20000 }),
+    httpCheck({ id: 'fe-ufe-chat', name: 'user-fe: GET Chat proxy', group: 'frontend-api', url: `${userFe}/api/chat`, validate: aliveValidator, timeout: 20000 }),
+
     // ── admin-fe (5 probes) ───────────────────────────────────────────
     httpCheck({ id: 'fe-afe-health', name: 'admin-fe: GET Health', group: 'frontend-api', url: `${adminFe}/api/health`, validate: okValidator, timeout: 15000 }),
     httpCheck({ id: 'fe-afe-auth-verify', name: 'admin-fe: GET Auth Verify', group: 'frontend-api', url: `${adminFe}/api/auth/verify`, validate: aliveValidator, timeout: 15000 }),
@@ -30,14 +34,14 @@ export async function runFrontendProbes(): Promise<CheckResult[]> {
     r.status === 'fulfilled'
       ? r.value
       : {
-          id: 'fe-unknown',
-          name: 'Frontend Probe Error',
-          group: 'frontend-api' as const,
-          status: 'DOWN' as const,
-          responseTimeMs: 0,
-          message: (r as PromiseRejectedResult).reason?.message || 'Unknown error',
-          timestamp: new Date().toISOString(),
-          severity: 'CRITICAL' as const,
-        }
+        id: 'fe-unknown',
+        name: 'Frontend Probe Error',
+        group: 'frontend-api' as const,
+        status: 'DOWN' as const,
+        responseTimeMs: 0,
+        message: (r as PromiseRejectedResult).reason?.message || 'Unknown error',
+        timestamp: new Date().toISOString(),
+        severity: 'CRITICAL' as const,
+      }
   );
 }

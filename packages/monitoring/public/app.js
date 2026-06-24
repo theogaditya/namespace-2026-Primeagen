@@ -101,11 +101,11 @@ function renderSkeletons() {
   const grid = document.getElementById('checksGrid');
   let html = '';
   // Show 4 mock groups of skeletons to look realistic
-  for(let i=0; i<4; i++) {
+  for (let i = 0; i < 4; i++) {
     html += `<div class="group-section">`;
     html += `<div class="skeleton skeleton-title"></div>`;
     html += `<div class="checks-grid">`;
-    for(let j=0; j<3; j++) {
+    for (let j = 0; j < 3; j++) {
       html += `
         <div class="check-card" style="border:1px solid var(--border);">
           <div class="skeleton skeleton-title" style="width: 40%"></div>
@@ -134,7 +134,7 @@ function renderChecks() {
 
   // Group by service group
   const groups = {};
-  const groupOrder = ['backend-health', 'feature-api', 'frontend-api', 'database', 'redis', 's3', 'ec2', 'dns-tls'];
+  const groupOrder = ['backend-health', 'feature-api', 'frontend-api', 'database', 'redis', 's3', 'ec2', 'dns-tls', 'ai-ml'];
   checks.forEach(c => {
     if (!groups[c.group]) groups[c.group] = [];
     groups[c.group].push(c);
@@ -149,9 +149,10 @@ function renderChecks() {
     's3': '<i data-lucide="cloud" style="width:16px;height:16px;"></i> AWS S3',
     'ec2': '<i data-lucide="monitor" style="width:16px;height:16px;"></i> EC2 Instance',
     'dns-tls': '<i data-lucide="globe" style="width:16px;height:16px;"></i> DNS & TLS',
+    'ai-ml': '<i data-lucide="bot" style="width:16px;height:16px;"></i> AI/ML Models',
   };
 
-  window.toggleGroupExpand = function(groupId) {
+  window.toggleGroupExpand = function (groupId) {
     if (expandedGroups.has(groupId)) expandedGroups.delete(groupId);
     else expandedGroups.add(groupId);
     renderChecks(); // re-render to apply the expansion
@@ -160,17 +161,17 @@ function renderChecks() {
   let html = '';
   groupOrder.forEach(g => {
     if (!groups[g] || groups[g].length === 0) return;
-    
+
     // Sort failed checks to the top
     const groupChecks = groups[g].sort((a, b) => {
       const aFail = a.status !== 'UP' ? 1 : 0;
       const bFail = b.status !== 'UP' ? 1 : 0;
-      return bFail - aFail; 
+      return bFail - aFail;
     });
 
     const up = groupChecks.filter(c => c.status === 'UP').length;
     const isExpanded = expandedGroups.has(g);
-    
+
     // Limit to 6 by default
     const limit = 6;
     const visibleChecks = isExpanded ? groupChecks : groupChecks.slice(0, limit);
@@ -186,7 +187,7 @@ function renderChecks() {
         ${hiddenCount > 0 || isExpanded ? `<button class="btn btn-secondary" onclick="toggleGroupExpand('${g}')" style="padding:4px 8px;font-size:0.7rem;"><i data-lucide="${isExpanded ? 'chevron-up' : 'chevron-down'}" style="width:14px;height:14px;"></i></button>` : ''}
       </div>
     `;
-    
+
     html += `<div class="checks-grid">`;
     visibleChecks.forEach(c => {
       const safeId = CSS.escape(c.id);
@@ -370,7 +371,7 @@ async function exportCSV() {
 
 // ── Auto Refresh ─────────────────────────────────────────
 function startAutoRefresh() {
-  // 15 minutes interval = 900000 ms (matching backend check interval)
+  // 1 hour 15 minutes interval = 4500000 ms (matching backend check interval)
   refreshTimer = setInterval(() => {
     if (document.getElementById('autoRefresh').checked) {
       fetchStatus();
@@ -378,7 +379,7 @@ function startAutoRefresh() {
       if (activeTab === 'logs') fetchLogs();
       if (activeTab === 'chart') fetchHistory();
     }
-  }, 900000);
+  }, 4500000);
 }
 
 function statusIcon(s) {
@@ -441,7 +442,7 @@ async function showCheckDetail(checkId) {
   try {
     const res = await fetch(`/api/check-log/${encodeURIComponent(checkId)}`);
     if (res.ok) runLog = await res.json();
-  } catch (_) {}
+  } catch (_) { }
 
   // Build details section from the run log (falls back to in-memory data)
   const src = runLog || check;
