@@ -9,6 +9,7 @@
 - name: Deploy SwarajDesk Applications on AWS EKS
   hosts: local
   become: false
+  
   vars:
     project_root: "/home/abhas/node/Projects/iit-test"
     k8s_dir: "{{ project_root }}/packages/k8s"
