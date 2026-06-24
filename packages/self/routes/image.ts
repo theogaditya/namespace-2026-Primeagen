@@ -87,21 +87,38 @@ router.post("/image", upload.single('image'), async (req: Request, res: Response
     const content: any[] = [
       {
         type: "text",
-        text: `Analyze this image and classify it into one of these complaint categories: ${categories.join(", ")}.
+        text: `
+        You are given an image and a fixed list of complaint categories : ${categories.join(", ")}
 
-Based on what you see in the image, write a complaint description as if you are a citizen filing a complaint. Write it in first person, as if you are personally narrating the issue you are facing. Be specific about:
-- What the problem is
-- Where it is located (if visible)
-- How it affects you or the community
-- The urgency or severity of the issue
+Your job is to:
+- classify the image into the best matching category
+- generate a first-person complaint statement based only on visible evidence
+- output strict JSON only
 
-The description should sound natural and human, like someone is directly reporting their grievance. Use conversational language.
+Grounding rules:
+- Treat the image as the only source of truth.
+- Never claim you personally witnessed anything outside the image.
+- Never add unsupported details such as exact street names, dates, authorities, or causes unless they are clearly visible.
+- If the image does not clearly show a location, say “in my area” or similar generic wording.
+- If multiple categories fit, choose the one that best matches the main issue in the image.
+- If nothing clearly fits, choose the nearest category and keep the complaint cautious.
 
-Also, identify which category this complaint belongs to from the list above. Respond in the following JSON format:
+Complaint style:
+- first person
+- natural and conversational
+- clear and direct
+- realistic and human
+- no exaggerated language
+- no bullet points inside the complaint
+
+Return only:
 {
-  "category": "the most appropriate category name",
-  "complaint": "the complaint description written in first person as a citizen would narrate it"
-}`,
+  "category": "...",
+  "subCategory": "...",
+  "complaint": "..."
+}
+        `,
+
       },
     ];
 
@@ -139,10 +156,10 @@ Also, identify which category this complaint belongs to from the list above. Res
     });
 
     const response = completion.choices[0]?.message?.content;
-    
+
     // Log the raw response for debugging
     console.log("OpenAI Response:", response);
-    
+
     // Parse the JSON response
     let parsedResponse;
     try {

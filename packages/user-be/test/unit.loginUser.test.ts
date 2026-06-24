@@ -9,8 +9,16 @@ import { loginUserRouter } from '../routes/loginUser';
 
 const JWT_SECRET = "my123";
 
+// Helper to create a mock fetch response for reCAPTCHA
+function mockCaptchaResponse(success: boolean) {
+    return vi.fn().mockResolvedValue({
+        json: () => Promise.resolve({ success }),
+    });
+}
+
 describe('Login User Routes', () => {
     let app: express.Express;
+    let originalFetch: typeof globalThis.fetch;
 
     const mockUser = {
         id: 'user-123',
@@ -37,10 +45,15 @@ describe('Login User Routes', () => {
 
         // Hash password for tests
         mockUser.password = await bcrypt.hash('password123', 10);
+
+        // Mock fetch for reCAPTCHA verification (default: success)
+        originalFetch = globalThis.fetch;
+        globalThis.fetch = mockCaptchaResponse(true) as any;
     });
 
     afterEach(() => {
         vi.restoreAllMocks();
+        globalThis.fetch = originalFetch;
     });
 
     describe('POST /api/auth/login', () => {
@@ -50,7 +63,7 @@ describe('Login User Routes', () => {
 
             const res = await request(app)
                 .post('/api/auth/login')
-                .send({ email: 'test@example.com', password: 'password123' });
+                .send({ email: 'test@example.com', password: 'password123', captchaToken: 'valid-token' });
 
             expect(res.status).toBe(200);
             expect(res.body.success).toBe(true);
@@ -65,7 +78,7 @@ describe('Login User Routes', () => {
 
             const res = await request(app)
                 .post('/api/auth/login')
-                .send({ email: 'test@example.com', password: 'password123' });
+                .send({ email: 'test@example.com', password: 'password123', captchaToken: 'valid-token' });
 
             const decoded = jwt.verify(res.body.data.token, JWT_SECRET) as any;
             expect(decoded.userId).toBe('user-123');
@@ -78,7 +91,7 @@ describe('Login User Routes', () => {
 
             const res = await request(app)
                 .post('/api/auth/login')
-                .send({ email: 'nonexistent@example.com', password: 'password123' });
+                .send({ email: 'nonexistent@example.com', password: 'password123', captchaToken: 'valid-token' });
 
             expect(res.status).toBe(401);
             expect(res.body.message).toBe('Invalid email or password');
@@ -90,7 +103,7 @@ describe('Login User Routes', () => {
 
             const res = await request(app)
                 .post('/api/auth/login')
-                .send({ email: 'test@example.com', password: 'wrongpassword' });
+                .send({ email: 'test@example.com', password: 'wrongpassword', captchaToken: 'valid-token' });
 
             expect(res.status).toBe(401);
             expect(res.body.message).toBe('Invalid email or password');
@@ -105,7 +118,7 @@ describe('Login User Routes', () => {
 
             const res = await request(app)
                 .post('/api/auth/login')
-                .send({ email: 'test@example.com', password: 'password123' });
+                .send({ email: 'test@example.com', password: 'password123', captchaToken: 'valid-token' });
 
             expect(res.status).toBe(403);
             expect(res.body.message).toContain('suspended');
@@ -114,7 +127,7 @@ describe('Login User Routes', () => {
         it('returns 400 for invalid email format', async () => {
             const res = await request(app)
                 .post('/api/auth/login')
-                .send({ email: 'not-an-email', password: 'password123' });
+                .send({ email: 'not-an-email', password: 'password123', captchaToken: 'valid-token' });
 
             expect(res.status).toBe(400);
         });
@@ -122,9 +135,29 @@ describe('Login User Routes', () => {
         it('returns 400 for missing password', async () => {
             const res = await request(app)
                 .post('/api/auth/login')
-                .send({ email: 'test@example.com' });
+                .send({ email: 'test@example.com', captchaToken: 'valid-token' });
 
             expect(res.status).toBe(400);
+        });
+
+        it('returns 400 when captchaToken is missing', async () => {
+            const res = await request(app)
+                .post('/api/auth/login')
+                .send({ email: 'test@example.com', password: 'password123' });
+
+            expect(res.status).toBe(400);
+        });
+
+        it('returns 400 when CAPTCHA verification fails', async () => {
+            // Override fetch mock to return failure
+            globalThis.fetch = mockCaptchaResponse(false) as any;
+
+            const res = await request(app)
+                .post('/api/auth/login')
+                .send({ email: 'test@example.com', password: 'password123', captchaToken: 'invalid-token' });
+
+            expect(res.status).toBe(400);
+            expect(res.body.message).toContain('CAPTCHA verification failed');
         });
 
         it('returns 500 on database error', async () => {
@@ -133,7 +166,7 @@ describe('Login User Routes', () => {
 
             const res = await request(app)
                 .post('/api/auth/login')
-                .send({ email: 'test@example.com', password: 'password123' });
+                .send({ email: 'test@example.com', password: 'password123', captchaToken: 'valid-token' });
 
             expect(res.status).toBe(500);
         });

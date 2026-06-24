@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -10,6 +10,12 @@ import {
   LoadingPopup,
 } from "./custom-comp";
 import { CheckCircle, Loader2, LogIn } from "lucide-react";
+
+const RECAPTCHA_SITE_KEY = process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY || "";
+
+// const USER_BE_URL = typeof window !== "undefined"
+//   ? (process.env.NEXT_PUBLIC_USER_BE_URL?.replace("localhost", window.location.hostname) || `http://${window.location.hostname}:3000`)
+//   : (process.env.NEXT_PUBLIC_USER_BE_URL || "http://localhost:3000");
 
 const USER_BE_URL = process.env.NEXT_PUBLIC_USER_BE_URL || "http://localhost:3000";
 
@@ -28,6 +34,8 @@ export default function LoginUser() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitSuccess, setSubmitSuccess] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
+  const [captchaToken, setCaptchaToken] = useState<string | null>(null);
+  const recaptchaWidgetId = useRef<number | null>(null);
 
   // Check if user is already logged in
   useEffect(() => {
@@ -38,11 +46,68 @@ export default function LoginUser() {
       }
     }
   }, [router]);
+  // Load reCAPTCHA script and render widget
+  useEffect(() => {
+    // Check if script is already loaded
+    if (!document.getElementById("recaptcha-script")) {
+      const script = document.createElement("script");
+      script.id = "recaptcha-script";
+      script.src = "https://www.google.com/recaptcha/api.js?render=explicit";
+      script.async = true;
+      script.defer = true;
+      document.body.appendChild(script);
+    }
+
+    // Function to initialize widget
+    const initWidget = () => {
+      if (window.grecaptcha && window.grecaptcha.render && recaptchaWidgetId.current === null) {
+        try {
+          recaptchaWidgetId.current = window.grecaptcha.render("recaptcha-container", {
+            sitekey: RECAPTCHA_SITE_KEY,
+            callback: (token: string) => {
+              setCaptchaToken(token);
+            },
+            "expired-callback": () => {
+              setCaptchaToken(null);
+            },
+          });
+        } catch (e) {
+          console.error("Failed to render reCAPTCHA", e);
+        }
+      }
+    };
+
+    // If already loaded, initialize immediately
+    if (window.grecaptcha && window.grecaptcha.render) {
+      initWidget();
+    } else {
+      // Otherwise wait for the script to load (Google SDK calls onload if specified, but polling is safer here without a global callback)
+      const interval = setInterval(() => {
+        if (window.grecaptcha && window.grecaptcha.render) {
+          initWidget();
+          clearInterval(interval);
+        }
+      }, 100);
+      return () => clearInterval(interval);
+    }
+  }, []);
+
+  const resetCaptcha = () => {
+    if (window.grecaptcha && window.grecaptcha.reset && recaptchaWidgetId.current !== null) {
+      window.grecaptcha.reset(recaptchaWidgetId.current);
+    }
+    setCaptchaToken(null);
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!validateForm()) {
+      return;
+    }
+
+    if (!captchaToken) {
+      setSubmitError("Please complete the CAPTCHA verification.");
       return;
     }
 
@@ -58,6 +123,7 @@ export default function LoginUser() {
         body: JSON.stringify({
           email: formData.email,
           password: formData.password,
+          captchaToken,
         }),
       });
 
@@ -67,12 +133,12 @@ export default function LoginUser() {
         // Store JWT token and user data in localStorage
         localStorage.setItem("authToken", data.data.token);
         localStorage.setItem("userData", JSON.stringify(data.data.user));
-        
+
         // Dispatch auth change event to update navbar
         window.dispatchEvent(new Event('authChange'));
-        
+
         setSubmitSuccess(true);
-        
+
         // Redirect to dashboard after a short delay
         setTimeout(() => {
           router.push("/dashboard");
@@ -86,10 +152,14 @@ export default function LoginUser() {
         } else {
           setSubmitError(data.message || "Login failed. Please try again.");
         }
+        // Reset captcha on failed attempt
+        resetCaptcha();
       }
     } catch (error) {
       console.error("Login error:", error);
       setSubmitError("Network error. Please check your connection and try again.");
+      // Reset captcha on error
+      resetCaptcha();
     } finally {
       setIsSubmitting(false);
     }
@@ -159,6 +229,11 @@ export default function LoginUser() {
                 updateField={updateField}
                 setFieldTouched={setFieldTouched}
               />
+
+              {/* reCAPTCHA Widget */}
+              <div className="mt-6 flex justify-center">
+                <div id="recaptcha-container"></div>
+              </div>
 
               {/* Submit Button */}
               <div className="mt-8">

@@ -35,6 +35,7 @@ import bcrypt from 'bcrypt';
 const JWT_SECRET = process.env.JWT_SECRET || "my123";
 
 let app: express.Express;
+let originalFetch: typeof globalThis.fetch;
 
 beforeEach(() => {
   app = express();
@@ -44,10 +45,17 @@ beforeEach(() => {
   app.use('/api/users', loginUserRouter(prismaMock));
   app.use('/api/users', logoutUserRouter(prismaMock));
   vi.clearAllMocks();
+
+  // Mock fetch for reCAPTCHA verification (default: success)
+  originalFetch = globalThis.fetch;
+  globalThis.fetch = vi.fn().mockResolvedValue({
+    json: () => Promise.resolve({ success: true }),
+  }) as any;
 });
 
 afterEach(() => {
   vi.restoreAllMocks();
+  globalThis.fetch = originalFetch;
 });
 
 describe('Add User routes', () => {
@@ -134,6 +142,7 @@ describe('Login User routes', () => {
     const loginPayload = {
       email: 'test@example.com',
       password: 'password123',
+      captchaToken: 'valid-token',
     };
 
     const mockUser = {
@@ -174,6 +183,7 @@ describe('Login User routes', () => {
     const loginPayload = {
       email: 'nonexistent@example.com',
       password: 'password123',
+      captchaToken: 'valid-token',
     };
 
     // @ts-ignore
@@ -189,6 +199,7 @@ describe('Login User routes', () => {
     const loginPayload = {
       email: 'test@example.com',
       password: 'wrongpassword',
+      captchaToken: 'valid-token',
     };
 
     const mockUser = {
@@ -220,6 +231,7 @@ describe('Login User routes', () => {
     const loginPayload = {
       email: 'test@example.com',
       password: 'password123',
+      captchaToken: 'valid-token',
     };
 
     const mockUser = {
@@ -250,6 +262,7 @@ describe('Login User routes', () => {
     const loginPayload = {
       email: 'test@example.com',
       password: 'password123',
+      captchaToken: 'valid-token',
     };
 
     const mockUser = {

@@ -127,24 +127,29 @@ describe('User Validation Schemas', () => {
             const result = userLoginSchema.safeParse({
                 email: 'test@example.com',
                 password: 'password123',
+                captchaToken: 'valid-token',
             });
             expect(result.success).toBe(true);
         });
 
         it('rejects invalid email', () => {
-            expect(userLoginSchema.safeParse({ email: 'invalid', password: 'pass' }).success).toBe(false);
+            expect(userLoginSchema.safeParse({ email: 'invalid', password: 'pass', captchaToken: 'token' }).success).toBe(false);
         });
 
         it('rejects empty password', () => {
-            expect(userLoginSchema.safeParse({ email: 'test@test.com', password: '' }).success).toBe(false);
+            expect(userLoginSchema.safeParse({ email: 'test@test.com', password: '', captchaToken: 'token' }).success).toBe(false);
         });
 
         it('rejects missing email', () => {
-            expect(userLoginSchema.safeParse({ password: 'pass' }).success).toBe(false);
+            expect(userLoginSchema.safeParse({ password: 'pass', captchaToken: 'token' }).success).toBe(false);
         });
 
         it('rejects missing password', () => {
-            expect(userLoginSchema.safeParse({ email: 'test@test.com' }).success).toBe(false);
+            expect(userLoginSchema.safeParse({ email: 'test@test.com', captchaToken: 'token' }).success).toBe(false);
+        });
+
+        it('rejects missing captchaToken', () => {
+            expect(userLoginSchema.safeParse({ email: 'test@test.com', password: 'pass' }).success).toBe(false);
         });
     });
 });

@@ -2,7 +2,7 @@ version: '3.8'
 
 services:
   monitoring:
-    build: .
+    image: ogadityahota/swaraj-ec2-depy-monitor:latest
     container_name: monitoring_service
     restart: unless-stopped
     ports:
@@ -12,7 +12,6 @@ services:
     volumes:
       - ./data:/app/data
       - ./logs:/app/logs
-      # Map the local EC2 key directory if available, adjusting SSH_KEY path in .env
-      - ../../ec2/.key:/ec2-keys:ro
+      - ./.key:/ec2-keys:ro
     environment:
       - EC2_SSH_KEY=/ec2-keys/ec2-iit-pair

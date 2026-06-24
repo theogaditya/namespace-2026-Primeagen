@@ -69,27 +69,50 @@ router.post("/match", upload.fields([
 		const content: any[] = [
 			{
 				type: "text",
-				text: `You are an image comparison assistant for a complaint management system. Your task is to determine if two images show THE SAME LOCATION, SCENE, or SUBJECT — even if photographed from different angles, viewpoints, or at different times.
+				text: `
+				You are an image comparison assistant for a complaint management system.
 
-MATCHING CRITERIA (return match=true if ANY of these apply):
-1. SAME EXACT IMAGE: Identical photo (possibly with compression/cropping differences)
-2. SAME LOCATION/SCENE: Same physical place photographed from different angles (e.g., ground-level vs top-down/CCTV view, front vs side angle)
-3. SAME SUBJECT: Same specific object, building, damage, or incident from different perspectives
-4. SAME INCIDENT: Photos documenting the same problem/complaint (e.g., same pothole, same broken wall, same damaged infrastructure)
+Your task is to determine whether two images show the same location, scene, subject, or incident.
 
-NOT A MATCH (return match=false):
-- Two DIFFERENT locations that happen to look similar (e.g., two different brick walls, two different potholes)
-- Generic similar-looking scenes without identifiable shared features
-- Completely unrelated images
+Decide match=true if the images clearly refer to the same:
+- exact photo, even if cropped, resized, compressed, or slightly edited
+- physical location from a different angle or viewpoint
+- specific object, structure, damage, or landmark
+- complaint incident or problem documented from different perspectives or at different times
 
-Look for distinctive identifying features: unique damage patterns, specific structural elements, identical objects/debris, same graffiti, same surroundings, timestamps suggesting same location, etc.
+Decide match=false if the images show:
+- different locations, even if they look similar
+- different objects, structures, or damage
+- generic scenes without enough shared identifying details
+- unrelated content
 
-Return a JSON object exactly in this format (no extra text):
+How to judge:
+- Prefer visible, specific evidence over guesswork.
+- Look for distinctive shared features such as:
+  - same cracks, stains, potholes, debris, graffiti, markings, layout, or damage pattern
+  - same buildings, walls, poles, roads, signs, trees, or surrounding structures
+  - same camera position differences that still clearly indicate the same scene
+- Do not rely on vague similarity alone.
+- If the evidence is weak or ambiguous, return match=false.
+- Confidence must reflect certainty:
+  - 0.90–1.00 = very strong visual match
+  - 0.70–0.89 = likely match with some uncertainty
+  - 0.50–0.69 = weak or borderline evidence
+  - below 0.50 = probably not a match
+
+Return only valid JSON in exactly this format:
 {
-	"match": true|false,
-	"confidence": number, // 0-1, higher if more certain
-	"reason": "short explanation of why they match or don't match"
-}`,
+  "match": true,
+  "confidence": 0.0,
+  "reason": "short, specific explanation based only on visible evidence"
+}
+
+Rules:
+- Output JSON only.
+- Do not add markdown, code fences, or extra text.
+- Do not mention uncertainty unless it affects the decision.
+- Do not invent details that are not visible in the images.
+				`,
 			},
 			{
 				type: "image_url",

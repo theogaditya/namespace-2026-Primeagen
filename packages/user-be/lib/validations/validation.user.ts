@@ -29,4 +29,5 @@ export const userSignupSchema = z.object({
 export const userLoginSchema = z.object({
   email: z.string().email('Invalid email address'),
   password: z.string().min(1, 'Password is required'),
+  captchaToken: z.string().min(1, 'CAPTCHA verification is required'),
 });

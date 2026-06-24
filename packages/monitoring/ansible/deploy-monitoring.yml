@@ -1,0 +1,74 @@
+---
+- name: Deploy monitoring stack on existing EC2
+  hosts: all
+  become: true
+
+  vars:
+    monitoring_root: "/home/ubuntu/monitoring"
+
+  tasks:
+    - name: Ensure apt cache is up to date
+      apt:
+        update_cache: yes
+        cache_valid_time: 3600
+
+    - name: Ensure Docker, Docker Compose plugin and nano are installed
+      apt:
+        name:
+          - docker.io
+          - docker-compose-plugin
+          - nano
+        state: present
+
+    - name: Ensure Docker service is enabled and running
+      service:
+        name: docker
+        state: started
+        enabled: yes
+
+    - name: Ensure monitoring base directory exists
+      file:
+        path: "{{ monitoring_root }}"
+        state: directory
+        owner: ubuntu
+        group: ubuntu
+        mode: "0755"
+
+    - name: Ensure monitoring data directory exists
+      file:
+        path: "{{ monitoring_root }}/data"
+        state: directory
+        owner: ubuntu
+        group: ubuntu
+        mode: "0755"
+
+    - name: Ensure monitoring logs directory exists
+      file:
+        path: "{{ monitoring_root }}/logs"
+        state: directory
+        owner: ubuntu
+        group: ubuntu
+        mode: "0755"
+
+    - name: Copy docker-compose.yml to server
+      copy:
+        src: "../docker-compose.yml"
+        dest: "{{ monitoring_root }}/docker-compose.yml"
+        owner: ubuntu
+        group: ubuntu
+        mode: "0644"
+
+    - name: Create .env file on server if it does not exist
+      copy:
+        dest: "{{ monitoring_root }}/.env"
+        content: ""
+        force: no
+        owner: ubuntu
+        group: ubuntu
+        mode: "0640"
+
+    - name: Start or update monitoring stack with docker compose
+      command: docker compose up -d
+      args:
+        chdir: "{{ monitoring_root }}"
+
