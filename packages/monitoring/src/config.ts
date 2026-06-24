@@ -30,12 +30,16 @@ export const config = {
 
   // Service URLs
   urls: {
-    userBe: (process.env.USER_BE_URL || 'https://iit-bbsr-swaraj-user-be.adityahota.online').trim(),
-    adminBe: (process.env.ADMIN_BE_URL || 'https://iit-bbsr-swaraj-admin-be.adityahota.online').trim(),
-    compQueue: (process.env.COMP_QUEUE_URL || 'https://iit-bbsr-swaraj-comp-queue.adityahota.online').trim(),
-    blockRit: (process.env.BLOCK_RIT_URL || 'https://block-rit.adityahota.online').trim(),
-    userFe: (process.env.USER_FE_URL || 'https://iit-bbsr-swaraj-user-fe.adityahota.online').trim(),
-    adminFe: (process.env.ADMIN_FE_URL || 'https://admin.swarajdesk.co.in').trim(),
+    userBe: process.env.USER_BE_URL || 'https://iit-bbsr-swaraj-user-be.adityahota.online',
+    adminBe: process.env.ADMIN_BE_URL || 'https://iit-bbsr-swaraj-admin-be.adityahota.online',
+    compQueue: process.env.COMP_QUEUE_URL || 'https://iit-bbsr-swaraj-comp-queue.adityahota.online',
+    blockRit: process.env.BLOCK_RIT_URL || 'https://block-rit.adityahota.online',
+    userFe: process.env.USER_FE_URL || 'https://iit-bbsr-swaraj-user-fe.adityahota.online',
+    adminFe: process.env.ADMIN_FE_URL || 'https://admin.swarajdesk.co.in',
+    toxicAni: process.env.TOXIC_ANI_URL || 'https://toxic-ani.adityahota.online',
+    voiceAni: process.env.VOICE_ANI_URL || 'https://voice-ani.adityahota.online',
+    catAni: process.env.CAT_ANI_URL || 'https://cat-ani.adityahota.online',
+    visionAni: process.env.VISION_ANI_URL || 'https://vision-ani.adityahota.online',
   },
 
   // Domains for DNS/TLS checks
@@ -48,9 +52,23 @@ export const config = {
     'cat-ani.adityahota.online',
   ],
 
+  //  ###################################
+  //  CHECK INTERVAL SECONDS            #
+  //  ###################################
+  //  15 Minutes = 900 seconds
+  //  30 Minutes = 1800 seconds
+  //  60 Minutes = 3600 seconds
+  //  75 Minutes = 4500 seconds
+  //  90 Minutes = 5400 seconds
+  //  180 Minutes = 10800 seconds
+  //  360 Minutes = 21600 seconds
+  //  720 Minutes = 43200 seconds
+  //  ###################################
+
+  // HEALTH CHECK REFRESH INTERVAL
   // Dashboard
   dashboardPort: parseInt(process.env.DASHBOARD_PORT || '4000'),
-  checkIntervalSeconds: parseInt(process.env.CHECK_INTERVAL_SECONDS || '900'),
+  checkIntervalSeconds: parseInt(process.env.CHECK_INTERVAL_SECONDS || '5400'),
 
   // Thresholds
   queueBacklogThreshold: parseInt(process.env.QUEUE_BACKLOG_THRESHOLD || '100'),
@@ -61,7 +79,7 @@ export const config = {
 
   // EC2 SSH for log retrieval
   ec2Ssh: {
-    keyPath: process.env.EC2_SSH_KEY || '../../ec2/.key/ec2-iit-pair',
+    keyPath: process.env.EC2_SSH_KEY || '.key/ec2-iit-pair',
     user: process.env.EC2_SSH_USER || 'ubuntu',
   },
 

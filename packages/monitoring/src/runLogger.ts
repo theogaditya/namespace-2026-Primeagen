@@ -63,8 +63,31 @@ export function writeRunLog(results: CheckResult[]): void {
     fs.writeFileSync(filePath, JSON.stringify(payload, null, 2), 'utf8');
     latestLogFile = filePath;
     console.log(`📝 Run log written: ${filename}`);
+    pruneOldLogs(); // rotate old files after every successful write
   } catch (err: any) {
     console.error(`❌ Failed to write run log: ${err.message}`);
+  }
+}
+
+const MAX_LOG_FILES = 10;
+const PRUNE_COUNT = 4; // how many oldest files to delete when limit is exceeded
+
+/**
+ * When more than MAX_LOG_FILES run logs exist, delete the oldest PRUNE_COUNT.
+ * Called automatically after every successful writeRunLog().
+ */
+function pruneOldLogs(): void {
+  const files = getRunLogFiles(); // already sorted oldest → newest
+  if (files.length <= MAX_LOG_FILES) return;
+
+  const toDelete = files.slice(0, PRUNE_COUNT);
+  for (const f of toDelete) {
+    try {
+      fs.unlinkSync(path.join(LOGS_DIR, f));
+      console.log(`🗑️  Pruned old log: ${f}`);
+    } catch (err: any) {
+      console.error(`⚠️  Could not delete log ${f}: ${err.message}`);
+    }
   }
 }
 

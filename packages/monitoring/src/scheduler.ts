@@ -1,5 +1,5 @@
 import { config } from './config';
-import { httpCheck, okValidator } from './checkers/httpChecker';
+import { httpCheck, okValidator, aliveValidator } from './checkers/httpChecker';
 import { runFeatureProbes } from './checkers/featureProber';
 import { runFrontendProbes } from './checkers/frontendProber';
 import { runRedisChecks } from './checkers/redisChecker';
@@ -48,15 +48,19 @@ export async function runAllChecks(): Promise<CheckResult[]> {
   const allResults: CheckResult[] = [];
 
   try {
-    // 1. Backend health endpoints (5 checks)
-    const [ube, abeDeep, abeSimple, cq, brt] = await Promise.allSettled([
+    // 1. Backend health endpoints (9 checks)
+    const [ube, abeDeep, abeSimple, cq, brt, toxic, voice, cat, vision] = await Promise.allSettled([
       httpCheck({ id: 'health-ube', name: 'user-be Health', group: 'backend-health', url: `${config.urls.userBe}/api/health`, validate: okValidator, severity: 'CRITICAL' }),
       httpCheck({ id: 'health-abe-deep', name: 'admin-be Deep Health', group: 'backend-health', url: `${config.urls.adminBe}/api/health`, validate: okValidator, severity: 'CRITICAL' }),
       httpCheck({ id: 'health-abe-simple', name: 'admin-be Simple Health', group: 'backend-health', url: `${config.urls.adminBe}/health`, validate: okValidator, severity: 'CRITICAL' }),
       httpCheck({ id: 'health-cq', name: 'comp-queue Health', group: 'backend-health', url: `${config.urls.compQueue}/health`, validate: okValidator, severity: 'CRITICAL' }),
       httpCheck({ id: 'health-brt', name: 'block-rit Health', group: 'backend-health', url: `${config.urls.blockRit}/health`, validate: okValidator, severity: 'CRITICAL' }),
+      httpCheck({ id: 'health-toxic-ani', name: 'toxic-ani Health', group: 'backend-health', url: `${config.urls.toxicAni}/`, validate: aliveValidator, severity: 'CRITICAL' }),
+      httpCheck({ id: 'health-voice-ani', name: 'voice-ani Health', group: 'backend-health', url: `${config.urls.voiceAni}/`, validate: aliveValidator, severity: 'CRITICAL' }),
+      httpCheck({ id: 'health-cat-ani', name: 'cat-ani Health', group: 'backend-health', url: `${config.urls.catAni}/`, validate: aliveValidator, severity: 'CRITICAL' }),
+      httpCheck({ id: 'health-vision-ani', name: 'vision-ani Health', group: 'backend-health', url: `${config.urls.visionAni}/`, validate: aliveValidator, severity: 'CRITICAL' }),
     ]);
-    allResults.push(...[ube, abeDeep, abeSimple, cq, brt].map(settledValue));
+    allResults.push(...[ube, abeDeep, abeSimple, cq, brt, toxic, voice, cat, vision].map(settledValue));
 
     // 2. Feature API probes (47 checks)
     const featureResults = await runFeatureProbes();
@@ -124,7 +128,7 @@ export async function runAllChecks(): Promise<CheckResult[]> {
   const up = allResults.filter((r) => r.status === 'UP').length;
   const down = allResults.filter((r) => r.status === 'DOWN').length;
   const warn = allResults.filter((r) => r.status === 'WARNING').length;
-  console.log(`✅ Check cycle complete: ${allResults.length} checks in ${elapsed}ms — ✅${up} ❌${down} ⚠️${warn}`);
+  console.log(`✅ Check cycle complete: ${allResults.length} checks in ${elapsed}ms — ✅${up} ❌${down} ⚠️  ${warn}`);
 
   isRunning = false;
 

@@ -8,6 +8,7 @@
   <meta name="description" content="Real-time health monitoring dashboard for SwarajDesk infrastructure" />
   <link rel="stylesheet" href="/style.css" />
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns@3.0.0/dist/chartjs-adapter-date-fns.bundle.min.js"></script>
   <script src="https://unpkg.com/lucide@latest"></script>
 </head>
 
@@ -51,12 +52,12 @@
         <div class="card-label" style="display:flex;align-items:center;justify-content:center;gap:6px;"><i
             data-lucide="check-circle-2" style="width:14px;height:14px;color:var(--green)"></i> Up</div>
       </div>
-      <div class="card card-down">
+      <div class="card card-down" style="cursor:pointer;" onclick="showAggregatedLogs('DOWN')">
         <div class="card-num" id="downCount">—</div>
         <div class="card-label" style="display:flex;align-items:center;justify-content:center;gap:6px;"><i
             data-lucide="x-circle" style="width:14px;height:14px;color:var(--red)"></i> Down</div>
       </div>
-      <div class="card card-warn">
+      <div class="card card-warn" style="cursor:pointer;" onclick="showAggregatedLogs('WARNING')">
         <div class="card-num" id="warnCount">—</div>
         <div class="card-label" style="display:flex;align-items:center;justify-content:center;gap:6px;"><i
             data-lucide="alert-triangle" style="width:14px;height:14px;color:var(--yellow)"></i> Warning</div>
@@ -145,6 +146,15 @@
       <button onclick="closeCheckDetail()"
         style="position:absolute;top:12px;right:16px;background:none;border:none;color:var(--text-dim,#8892b0);font-size:1.4rem;cursor:pointer;line-height:1;">✕</button>
       <div id="checkDetailContent"></div>
+    </div>
+  </div>
+
+  <!-- Aggregated Logs Modal -->
+  <div id="aggregatedLogModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.4);backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);z-index:1000;align-items:center;justify-content:center;padding:20px;">
+    <div style="background:var(--surface,#112240);border:1px solid var(--border,#1e3a5f);border-radius:12px;width:100%;max-width:800px;height:85vh;display:flex;flex-direction:column;padding:24px;position:relative;">
+      <button onclick="closeAggregatedLogs()" style="position:absolute;top:12px;right:16px;background:none;border:none;color:var(--text-dim,#8892b0);font-size:1.4rem;cursor:pointer;line-height:1;">✕</button>
+      <h3 id="aggregatedLogTitle" style="margin:0 0 16px 0;font-size:1.3rem;font-weight:600;padding-bottom:12px;border-bottom:1px solid var(--border,#1e3a5f);">Logs</h3>
+      <div id="aggregatedLogContent" style="flex:1;overflow-y:auto;padding-right:8px;display:flex;flex-direction:column;gap:16px;"></div>
     </div>
   </div>
 

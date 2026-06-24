@@ -32,7 +32,7 @@ export async function httpCheck(opts: HttpCheckOptions): Promise<CheckResult> {
   const method = opts.method || 'GET';
   const timeout = opts.timeout ?? DEFAULT_TIMEOUT;
   const slowThreshold = opts.slowThresholdMs ?? DEFAULT_SLOW_THRESHOLD;
-  const maxAttempts = opts.noRetry ? 1 : HTTP_RETRY_COUNT + 1;
+  let maxAttempts = opts.noRetry ? 1 : HTTP_RETRY_COUNT + 1;
 
   let lastError: string | null = null;
   let lastHttpStatus: number | undefined;
@@ -85,9 +85,19 @@ export async function httpCheck(opts: HttpCheckOptions): Promise<CheckResult> {
     } catch (err: any) {
       const elapsed = Date.now() - start;
       totalElapsed += elapsed;
-      lastError = err.code === 'ECONNABORTED'
-        ? `Timeout after ${timeout}ms`
-        : (err.message || 'Connection failed');
+      
+      if (err.code === 'ECONNABORTED') {
+        lastError = `Timeout after ${timeout}ms`;
+      } else if (err.code === 'ECONNRESET') {
+        lastError = 'Connection reset by peer (ECONNRESET)';
+        // Force a retry on ECONNRESET even if noRetry is set to true, 
+        // as this usually indicates a server-side TCP timeout on a slow DB query.
+        if (opts.noRetry && attempt === 0) {
+          maxAttempts = 2; // Allow one more try just for this error
+        }
+      } else {
+        lastError = err.message || 'Connection failed';
+      }
     }
   }
 

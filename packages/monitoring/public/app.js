@@ -35,10 +35,14 @@ function updateThemeIcon(theme) {
 }
 
 // ── Fetch ─────────────────────────────────────────────────
-async function fetchStatus() {
+async function fetchStatus(showSkeletons = false) {
   const loader = document.getElementById('globalLoader');
-  if (loader) loader.style.display = 'flex';
-  renderSkeletons(); // Show skeletons immediately
+
+  // Only show skeletons and banner if explicitly requested (e.g. Run Now)
+  if (showSkeletons) {
+    if (loader) loader.style.display = 'flex';
+    renderSkeletons();
+  }
 
   try {
     const res = await fetch('/api/status');
@@ -48,7 +52,10 @@ async function fetchStatus() {
   } catch (err) {
     console.error('Failed to fetch status:', err);
   } finally {
-    if (loader) loader.style.display = 'none';
+    if (showSkeletons && loader) {
+      loader.style.display = 'none';
+      lucide.createIcons();
+    }
   }
 }
 
@@ -120,8 +127,8 @@ function renderSkeletons() {
 
 // ── Render Checks ─────────────────────────────────────────
 
-// Global state to track which groups are expanded
-const expandedGroups = new Set();
+// Global state to track visible limits per group
+const visibleLimits = {};
 
 function renderChecks() {
   const grid = document.getElementById('checksGrid');
@@ -152,15 +159,26 @@ function renderChecks() {
     'ai-ml': '<i data-lucide="bot" style="width:16px;height:16px;"></i> AI/ML Models',
   };
 
-  window.toggleGroupExpand = function (groupId) {
-    if (expandedGroups.has(groupId)) expandedGroups.delete(groupId);
-    else expandedGroups.add(groupId);
-    renderChecks(); // re-render to apply the expansion
+  window.toggleGroupExpandAll = function(groupId, totalItems) {
+    if (visibleLimits[groupId] >= totalItems) {
+      visibleLimits[groupId] = 6; // collapse
+    } else {
+      visibleLimits[groupId] = totalItems; // expand all
+    }
+    renderChecks();
+  };
+
+  window.showMoreChecks = function(groupId) {
+    visibleLimits[groupId] = (visibleLimits[groupId] || 6) + 5;
+    renderChecks();
   };
 
   let html = '';
   groupOrder.forEach(g => {
     if (!groups[g] || groups[g].length === 0) return;
+
+    // Initialize visible limit to 6 if not set
+    if (visibleLimits[g] === undefined) visibleLimits[g] = 6;
 
     // Sort failed checks to the top
     const groupChecks = groups[g].sort((a, b) => {
@@ -170,21 +188,20 @@ function renderChecks() {
     });
 
     const up = groupChecks.filter(c => c.status === 'UP').length;
-    const isExpanded = expandedGroups.has(g);
+    const limit = visibleLimits[g];
+    const isFullyExpanded = limit >= groupChecks.length;
 
-    // Limit to 6 by default
-    const limit = 6;
-    const visibleChecks = isExpanded ? groupChecks : groupChecks.slice(0, limit);
+    const visibleChecks = groupChecks.slice(0, limit);
     const hiddenCount = groupChecks.length - visibleChecks.length;
 
     html += `<div class="group-section">`;
     html += `
       <div class="group-title" style="display:flex;align-items:center;justify-content:space-between;">
         <span style="display:flex;align-items:center;gap:8px;">
-          ${groupLabels[g] || g} 
+          ${groupLabels[g] || g}
           <span style="font-size:0.75rem;color:var(--text-dim);font-weight:500;text-transform:none;">(${up}/${groupChecks.length} up)</span>
         </span>
-        ${hiddenCount > 0 || isExpanded ? `<button class="btn btn-secondary" onclick="toggleGroupExpand('${g}')" style="padding:4px 8px;font-size:0.7rem;"><i data-lucide="${isExpanded ? 'chevron-up' : 'chevron-down'}" style="width:14px;height:14px;"></i></button>` : ''}
+        ${groupChecks.length > 6 ? `<button class="btn btn-secondary" onclick="toggleGroupExpandAll('${g}', ${groupChecks.length})" style="padding:4px 8px;font-size:0.7rem;"><i data-lucide="${isFullyExpanded ? 'chevron-up' : 'chevron-down'}" style="width:14px;height:14px;"></i></button>` : ''}
       </div>
     `;
 
@@ -206,10 +223,11 @@ function renderChecks() {
     });
     html += `</div>`;
 
-    if (!isExpanded && hiddenCount > 0) {
+    if (hiddenCount > 0) {
+      const showAmount = Math.min(hiddenCount, 5);
       html += `
-        <button class="view-more-btn" onclick="toggleGroupExpand('${g}')">
-          <i data-lucide="chevron-down" style="width:16px;height:16px;"></i> Show ${hiddenCount} more checks
+        <button class="view-more-btn" onclick="showMoreChecks('${g}')">
+          <i data-lucide="chevron-down" style="width:16px;height:16px;"></i> Show ${showAmount} more checks
         </button>
       `;
     }
@@ -228,12 +246,21 @@ function renderIncidents(incidents) {
     tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;color:var(--text-dim);">No incidents recorded</td></tr>';
     return;
   }
+
+  const getStatusColor = (s) => {
+    return { UP: 'var(--green)', DOWN: 'var(--red)', WARNING: 'var(--yellow)', UNKNOWN: 'var(--text-dim)' }[s] || 'var(--text-dim)';
+  };
+
   tbody.innerHTML = incidents.slice().reverse().map(inc => `
     <tr>
       <td>${new Date(inc.timestamp).toLocaleString()}</td>
       <td>${escHtml(inc.checkName)}</td>
       <td>${inc.group}</td>
-      <td>${statusIconHtml(inc.from)} ${inc.from} → ${statusIconHtml(inc.to)} ${inc.to}</td>
+      <td style="display:flex;align-items:center;gap:6px;font-weight:600;">
+        <span style="color:${getStatusColor(inc.from)};display:flex;align-items:center;gap:4px;">${statusIconHtml(inc.from)} ${inc.from}</span>
+        <i data-lucide="arrow-right" style="width:14px;height:14px;color:var(--text-dim);"></i>
+        <span style="color:${getStatusColor(inc.to)};display:flex;align-items:center;gap:4px;">${statusIconHtml(inc.to)} ${inc.to}</span>
+      </td>
       <td>${escHtml(inc.message)}</td>
     </tr>
   `).join('');
@@ -317,12 +344,25 @@ function renderChart(history) {
     data: { datasets },
     options: {
       responsive: true,
+      maintainAspectRatio: false,
+      interaction: {
+        mode: 'index',
+        intersect: false,
+      },
       scales: {
         x: { type: 'timeseries', time: { unit: 'hour' }, ticks: { color: '#a1a1aa' }, grid: { color: '#333333' } },
         y: { title: { display: true, text: 'Response Time (ms)', color: '#a1a1aa' }, ticks: { color: '#a1a1aa' }, grid: { color: '#333333' } },
       },
       plugins: {
         legend: { labels: { color: '#ededed', font: { size: 11, family: 'Inter' } } },
+        tooltip: {
+          backgroundColor: 'rgba(17, 34, 64, 0.95)',
+          titleColor: '#ededed',
+          bodyColor: '#a1a1aa',
+          borderColor: 'rgba(255, 255, 255, 0.1)',
+          borderWidth: 1,
+          padding: 12
+        }
       },
     },
   });
@@ -342,14 +382,25 @@ function switchTab(name) {
 // ── Actions ──────────────────────────────────────────────
 async function triggerCheck() {
   const btn = document.getElementById('runNow');
-  btn.textContent = '⏳ Running...';
+  btn.innerHTML = `<i data-lucide="loader-2" class="loading" style="width:16px;height:16px;"></i> Running...`;
   btn.disabled = true;
+  lucide.createIcons();
+
+  // Show skeletons only on the checks grid
+  renderSkeletons();
+
+  const loader = document.getElementById('globalLoader');
+  if (loader) loader.style.display = 'flex';
+
   try {
     await fetch('/api/check/run', { method: 'POST' });
-    await fetchStatus();
+    await fetchStatus(false); // don't re-skeleton
   } catch (err) { console.error(err); }
-  btn.textContent = '⚡ Run Now';
+
+  if (loader) loader.style.display = 'none';
+  btn.innerHTML = `<i data-lucide="zap" style="width:16px;height:16px;"></i> Run Now`;
   btn.disabled = false;
+  lucide.createIcons();
 }
 
 async function exportCSV() {
@@ -511,4 +562,107 @@ document.addEventListener('DOMContentLoaded', () => {
       if (e.target === modal) closeCheckDetail();
     });
   }
+
+  const aggModal = document.getElementById('aggregatedLogModal');
+  if (aggModal) {
+    aggModal.addEventListener('click', (e) => {
+      if (e.target === aggModal) closeAggregatedLogs();
+    });
+  }
 });
+
+// ── Aggregated Logs Modal ────────────────────────────────
+async function showAggregatedLogs(targetStatus) {
+  // targetStatus = 'DOWN' or 'WARNING'
+  const matchingChecks = (currentData.checks || []).filter(c => c.status === targetStatus);
+  if (matchingChecks.length === 0) return; // Nothing to show
+
+  const modal = document.getElementById('aggregatedLogModal');
+  const content = document.getElementById('aggregatedLogContent');
+  const title = document.getElementById('aggregatedLogTitle');
+
+  const statusColor = { UP: '#22c55e', DOWN: '#ef4444', WARNING: '#eab308' }[targetStatus] || '#6b7280';
+
+  title.innerHTML = `Logs for <span style="display:inline-flex;align-items:center;color:${statusColor};gap:6px;margin-left:8px;background:rgba(255,255,255,0.05);padding:4px 10px;border-radius:20px;border:1px solid rgba(255,255,255,0.1); font-size: 1rem;">${statusIcon(targetStatus)} ${targetStatus}</span> <span style="font-size: 0.9rem; color: var(--text-dim); margin-left: 8px; font-weight: 500;">(${matchingChecks.length} checks)</span>`;
+
+  // 1. Show loading skeleton for all cards immediately
+  content.innerHTML = matchingChecks.map(c => `
+    <div style="background:var(--surface2,#1a2b4c);border:1px solid var(--border,#1e3a5f);border-radius:8px;padding:16px;">
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:12px;">
+        <h4 style="margin:0;font-size:1.05rem;font-weight:600;color:var(--text);">${escHtml(c.name)}</h4>
+        <span style="background:rgba(0,0,0,0.3);padding:2px 8px;border-radius:12px;font-size:0.75rem;color:var(--text-dim);white-space:nowrap;">${c.group}</span>
+      </div>
+      <div style="color:var(--text-dim);font-size:0.85rem;display:flex;align-items:center;gap:6px;">
+        <i data-lucide="loader-2" class="loading" style="width:14px;height:14px;"></i> Fetching log...
+      </div>
+    </div>
+  `).join('');
+
+  modal.style.display = 'flex';
+  lucide.createIcons();
+
+  // 2. Fetch all logs in parallel (using the /api/check-log/ endpoint)
+  const logPromises = matchingChecks.map(async (check) => {
+    let runLog = null;
+    try {
+      const res = await fetch(`/api/check-log/${encodeURIComponent(check.id)}`);
+      if (res.ok) runLog = await res.json();
+    } catch (_) {}
+    return { check, runLog };
+  });
+
+  const results = await Promise.all(logPromises);
+
+  // 3. Render the actual loaded data
+  content.innerHTML = results.map(({ check, runLog }) => {
+    const src = runLog || check;
+
+    // Check specific details representation
+    let detailsHtml = '';
+    if (src.details && Object.keys(src.details).length > 0) {
+      const detailsStr = JSON.stringify(src.details, null, 2);
+      detailsHtml = `
+        <div style="margin-top:12px;">
+          <div style="font-size:0.75rem;color:var(--text-dim);text-transform:uppercase;letter-spacing:0.05em;margin-bottom:4px;">Details</div>
+          <pre style="background:rgba(0,0,0,0.3);border-radius:6px;padding:10px;font-size:0.8rem;color:#a8b2d1;overflow-x:auto;white-space:pre-wrap;max-height:150px;overflow-y:auto;margin:0;">${escHtml(detailsStr)}</pre>
+        </div>`;
+    }
+
+    const runLogSection = runLog
+      ? `<div style="margin-top:12px;">
+           <div style="font-size:0.75rem;color:var(--text-dim);text-transform:uppercase;letter-spacing:0.05em;margin-bottom:4px;display:flex;align-items:center;gap:6px;"><i data-lucide="file-json" style="width:14px;height:14px;"></i> Run Log JSON</div>
+           <pre style="background:rgba(0,0,0,0.5);border:1px solid var(--border);border-radius:6px;padding:10px;font-size:0.75rem;color:var(--text);overflow-x:auto;white-space:pre-wrap;max-height:200px;overflow-y:auto;margin:0;font-family:var(--font-mono);">${escHtml(JSON.stringify(runLog, null, 2))}</pre>
+         </div>`
+      : `<p style="color:var(--text-dim);font-size:0.75rem;margin-top:8px;">No historical run log found.</p>`;
+
+    return `
+      <div style="background:var(--surface2,#1a2b4c);border:1px solid var(--border,#1e3a5f);border-radius:8px;padding:16px;">
+        <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:12px;">
+          <h4 style="margin:0;font-size:1.05rem;font-weight:600;color:var(--text);">${escHtml(check.name)}</h4>
+          <span style="background:rgba(0,0,0,0.3);padding:2px 8px;border-radius:12px;font-size:0.75rem;color:var(--text-dim);white-space:nowrap;">${check.group}</span>
+        </div>
+
+        <div style="display:grid;grid-template-columns:auto auto;justify-content:start;gap:24px;margin-bottom:12px;">
+          <div><span style="font-size:0.7rem;color:var(--text-dim);display:block;margin-bottom:2px;">SEVERITY</span><span style="font-size:0.85rem;">${severityBadge(check.severity)}</span></div>
+          <div><span style="font-size:0.7rem;color:var(--text-dim);display:block;margin-bottom:2px;">RESPONSE</span><span style="font-size:0.85rem;">${check.responseTimeMs}ms</span></div>
+        </div>
+
+        <div>
+          <div style="font-size:0.7rem;color:var(--text-dim);margin-bottom:4px;">MESSAGE</div>
+          <div style="background:rgba(0,0,0,0.3);border-left:3px solid ${statusColor};padding:8px 12px;border-radius:0 4px 4px 0;font-size:0.85rem;color:var(--text);font-family:var(--font-mono);word-break:break-word;">
+            ${escHtml(src.message || check.message)}
+          </div>
+        </div>
+
+        ${detailsHtml}
+        ${runLogSection}
+      </div>
+    `;
+  }).join('');
+
+  lucide.createIcons();
+}
+
+function closeAggregatedLogs() {
+  document.getElementById('aggregatedLogModal').style.display = 'none';
+}

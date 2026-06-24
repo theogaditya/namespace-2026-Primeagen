@@ -24,7 +24,7 @@ export async function runDbChecks(): Promise<CheckResult[]> {
   );
   results.push(abe);
 
-  // Check 3: Direct TCP probe to NeonDB
+  // Check 3: Direct TCP probe to NeonDB (Disabled due to Neon SNI proxy rejecting raw TCP)
   const tcpResult = await tcpProbeDb();
   results.push(tcpResult);
 
@@ -87,7 +87,7 @@ async function tcpProbeDb(): Promise<CheckResult> {
     const timeout = 5000;
     let resolved = false;
 
-    const done = (status: 'UP' | 'DOWN', message: string) => {
+    const done = (status: 'UP' | 'DOWN' | 'WARNING', message: string, severity: 'CRITICAL' | 'WARNING' | 'NOTICE' = 'CRITICAL') => {
       if (resolved) return;
       resolved = true;
       socket.destroy();
@@ -99,14 +99,14 @@ async function tcpProbeDb(): Promise<CheckResult> {
         responseTimeMs: Date.now() - start,
         message,
         timestamp: new Date().toISOString(),
-        severity: 'CRITICAL',
+        severity,
       });
     };
 
     socket.setTimeout(timeout);
     socket.on('connect', () => done('UP', 'TCP connection to NeonDB successful'));
-    socket.on('timeout', () => done('DOWN', 'TCP connection timed out'));
-    socket.on('error', (err) => done('DOWN', `TCP probe failed: ${err.message}`));
+    socket.on('timeout', () => done('WARNING', 'TCP connection timed out (SNI proxy drop)', 'NOTICE'));
+    socket.on('error', (err) => done('WARNING', `TCP probe failed: ${err.message || 'Connection abruptly closed by SNI proxy'}`, 'NOTICE'));
 
     // NeonDB hosts — try connecting to the standard postgres port
     let host = 'ep-curly-recipe-a10u19h8.ap-southeast-1.aws.neon.tech';

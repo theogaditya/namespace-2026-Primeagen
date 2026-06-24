@@ -10,17 +10,46 @@ const AGENT_PASSWORD = process.env.MONITOR_AGENT_PASSWORD || '123123123';
 const MUNI_EMAIL = process.env.MONITOR_MUNI_EMAIL || 'sourab@gmail.com';
 const MUNI_PASSWORD = process.env.MONITOR_MUNI_PASSWORD || '123123123';
 
-const httpsAgent = new https.Agent({ rejectUnauthorized: false });
+// Shared keep-alive agent with a generous socket pool.
+// Without this Node uses max 5 sockets/host by default, causing queued
+// requests to time out when 50+ probes fire simultaneously.
+const httpsAgent = new https.Agent({
+  rejectUnauthorized: false,
+  keepAlive: true,
+  maxSockets: 30,          // allow 30 concurrent sockets to each host
+  maxFreeSockets: 10,      // keep 10 idle sockets warm between cycles
+});
+
+// Simple concurrency limiter – runs at most `concurrency` tasks at a time.
+async function runWithConcurrency<T>(tasks: (() => Promise<T>)[], concurrency = 10): Promise<PromiseSettledResult<T>[]> {
+  const results: PromiseSettledResult<T>[] = [];
+  let index = 0;
+
+  async function worker() {
+    while (index < tasks.length) {
+      const i = index++;
+      try {
+        results[i] = { status: 'fulfilled', value: await tasks[i]() };
+      } catch (reason) {
+        results[i] = { status: 'rejected', reason };
+      }
+    }
+  }
+
+  const workers = Array.from({ length: Math.min(concurrency, tasks.length) }, () => worker());
+  await Promise.all(workers);
+  return results;
+}
 
 // ── Timeout tiers (in ms) ─────────────────────────────────────────────────────
 // Simple auth / health pings
-const T_FAST = 15_000;
+const T_FAST = 10_000;
 // Standard DB-backed GETs
-const T_NORMAL = 30_000;
+const T_NORMAL = 15_000;
 // Heavy DB reads (feed queries, complaint lists, heatmaps)
-const T_HEAVY = 35_000;
+const T_HEAVY = 60_000;     // Some DB aggregations take longer than 30s
 // POST operations that write to DB / trigger side effects
-const T_POST = 30_000;
+const T_POST = 20_000;
 // Blockchain / queue operations that may be intentionally slow
 const T_BLOCKCHAIN = 45_000;
 // ─────────────────────────────────────────────────────────────────────────────
@@ -46,7 +75,7 @@ async function loginAdmin(adminBeUrl: string, email: string, password: string, a
 
 // Shorthand: noRetry probe (all feature probes skip retries to keep cycle fast)
 function probe(opts: Parameters<typeof httpCheck>[0]) {
-  return httpCheck({ ...opts, noRetry: true });
+  return () => httpCheck({ ...opts, noRetry: true });
 }
 
 /**
@@ -66,7 +95,9 @@ export async function runFeatureProbes(): Promise<CheckResult[]> {
   const agentHeaders: Record<string, string> = agentToken ? { Authorization: `Bearer ${agentToken}` } : {};
   const muniHeaders: Record<string, string> = muniToken ? { Authorization: `Bearer ${muniToken}` } : {};
 
-  const checks = await Promise.allSettled([
+  // Run all probes with a concurrency cap of 10.
+  // Running all 52+ at once floods the socket pool and causes false timeouts.
+  const probeDefinitions: Array<() => Promise<CheckResult>> = [
     // ── user-be (16 probes) ──────────────────────────────────────────
     probe({ id: 'feat-ube-categories', name: 'user-be: GET Categories', group: 'feature-api', url: `${userBe}/api/categories`, validate: aliveValidator, timeout: T_FAST }),
     probe({ id: 'feat-ube-districts', name: 'user-be: GET Districts', group: 'feature-api', url: `${userBe}/api/districts`, validate: aliveValidator, timeout: T_FAST }),
@@ -154,15 +185,6 @@ export async function runFeatureProbes(): Promise<CheckResult[]> {
     probe({ id: 'feat-abe-comp-by-id', name: 'admin-be: GET Complaint By ID', group: 'feature-api', url: `${adminBe}/api/complaints/00000000-0000-0000-0000-000000000000`, headers: agentHeaders, validate: aliveValidator, timeout: T_NORMAL }),
     probe({ id: 'feat-abe-comp-timeline', name: 'admin-be: GET Complaint Timeline', group: 'feature-api', url: `${adminBe}/api/complaints/00000000-0000-0000-0000-000000000000/timeline`, headers: agentHeaders, validate: aliveValidator, timeout: T_NORMAL }),
 
-    // ── admin-be (Missing Probes) ──────────────────────────────────────
-    probe({ id: 'feat-abe-cproc-status', name: 'admin-be: GET Complaint Proc. Status', group: 'feature-api', url: `${adminBe}/api/complaint/processing/status`, validate: aliveValidator, timeout: T_NORMAL }),
-    probe({ id: 'feat-abe-cproc-trigger', name: 'admin-be: POST Complaint Proc. Trigger', group: 'feature-api', url: `${adminBe}/api/complaint/processing`, method: 'POST', validate: aliveValidator, timeout: T_BLOCKCHAIN }),
-    probe({ id: 'feat-abe-user-comps', name: 'admin-be: GET User Complaints', group: 'feature-api', url: `${adminBe}/api/users/00000000-0000-0000-0000-000000000000/complaints`, headers: agentHeaders, validate: aliveValidator, timeout: T_NORMAL }),
-    probe({ id: 'feat-abe-comp-trends', name: 'admin-be: GET Complaint Trends', group: 'feature-api', url: `${adminBe}/api/complaints/stats/trends`, headers: agentHeaders, validate: aliveValidator, timeout: T_HEAVY }),
-    probe({ id: 'feat-abe-comp-dept', name: 'admin-be: GET Complaint Dept Stats', group: 'feature-api', url: `${adminBe}/api/complaints/stats/department`, headers: agentHeaders, validate: aliveValidator, timeout: T_HEAVY }),
-    probe({ id: 'feat-abe-comp-by-id', name: 'admin-be: GET Complaint By ID', group: 'feature-api', url: `${adminBe}/api/complaints/00000000-0000-0000-0000-000000000000`, headers: agentHeaders, validate: aliveValidator, timeout: T_NORMAL }),
-    probe({ id: 'feat-abe-comp-timeline', name: 'admin-be: GET Complaint Timeline', group: 'feature-api', url: `${adminBe}/api/complaints/00000000-0000-0000-0000-000000000000/timeline`, headers: agentHeaders, validate: aliveValidator, timeout: T_NORMAL }),
-
 
     // ── comp-queue (6 probes) ──────────────────────────────────────────
     probe({ id: 'feat-cq-status', name: 'comp-queue: GET Processing Status', group: 'feature-api', url: `${compQueue}/api/processing/status`, validate: aliveValidator, timeout: T_NORMAL }),
@@ -172,7 +194,9 @@ export async function runFeatureProbes(): Promise<CheckResult[]> {
     probe({ id: 'feat-cq-blockchain', name: 'comp-queue: GET Blockchain Queue', group: 'feature-api', url: `${compQueue}/api/auto-assign/blockchain-queue-status`, validate: aliveValidator, timeout: T_BLOCKCHAIN, severity: 'WARNING' }),
     // Re-start polling after stop test
     probe({ id: 'feat-cq-restart', name: 'comp-queue: POST Restart Polling', group: 'feature-api', url: `${compQueue}/api/processing/start`, method: 'POST', validate: aliveValidator, timeout: T_NORMAL }),
-  ]);
+  ];
+
+  const checks = await runWithConcurrency(probeDefinitions, 10);
 
   return checks.map((r) =>
     r.status === 'fulfilled'
@@ -189,3 +213,4 @@ export async function runFeatureProbes(): Promise<CheckResult[]> {
       }
   );
 }
+
