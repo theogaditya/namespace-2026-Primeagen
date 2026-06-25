@@ -14,7 +14,7 @@ const transporter = nodemailer.createTransport({
 
 // State tracking for each check
 const checkStates: Record<string, CheckState> = {};
-const alertLog: Array<{ id: string; checkId: string; checkName: string; severity: Severity; subject: string; timestamp: string; type: 'FAILURE' | 'RECOVERY' }> = [];
+const alertLog: Array<{ id: string; checkId: string; checkName: string; severity: Severity; subject: string; timestamp: string; type: 'FAILURE' | 'RECOVERY'; emailStatus: 'queued' | 'sent' | 'partial' | 'failed' }> = [];
 
 export function getCheckStates(): Record<string, CheckState> {
   return checkStates;
@@ -24,8 +24,25 @@ export function getAlertLog() {
   return alertLog;
 }
 
+type EmailSendStatus = {
+  status: 'idle' | 'queued' | 'sent' | 'partial' | 'failed';
+  accepted: string[];
+  rejected: string[];
+  subject: string;
+  sentAt: string | null;
+};
+
+let lastEmailStatus: EmailSendStatus = {
+  status: 'idle', accepted: [], rejected: [], subject: '', sentAt: null,
+};
+
+export function getEmailSendStatus(): EmailSendStatus {
+  return lastEmailStatus;
+}
+
 // Alert only after this many consecutive confirmed failures (each already survived HTTP retries)
-const FAILURE_THRESHOLD_BEFORE_ALERT = 2;
+// Set to 1 to alert on the first confirmed failure.
+const FAILURE_THRESHOLD_BEFORE_ALERT = 1;
 
 /**
  * Process check results and send alerts on state transitions.
@@ -43,7 +60,7 @@ export async function processResults(results: CheckResult[]): Promise<void> {
 
     if (!prevState) {
       // First time seeing this check — initialize state
-      checkStates[result.id] = {
+      const newState: CheckState = {
         id: result.id,
         currentStatus: result.status,
         previousStatus: 'UNKNOWN',
@@ -52,10 +69,20 @@ export async function processResults(results: CheckResult[]): Promise<void> {
         consecutiveFailures: result.status === 'DOWN' ? 1 : 0,
         lastAlertSent: null,
       };
-      // 1st failure: dampen to WARNING, don't alert yet
+      checkStates[result.id] = newState;
+
+      // BUG FIX: Don't just `continue` — alert immediately if DOWN on first sight
       if (result.status === 'DOWN') {
-        result.status = 'WARNING';
-        result.message = `[1st failure — watching] ${result.message}`;
+        if (FAILURE_THRESHOLD_BEFORE_ALERT > 1) {
+          // Dampen to WARNING, hold off alerting
+          result.status = 'WARNING';
+          result.message = `[1st failure — watching] ${result.message}`;
+          newState.currentStatus = 'WARNING';
+        } else if (result.severity === 'CRITICAL') {
+          // Threshold = 1: alert right away on first confirmed DOWN
+          combinedAlerts.push({ result, type: 'FAILURE' });
+          newState.lastAlertSent = now;
+        }
       }
       continue;
     }
@@ -71,8 +98,6 @@ export async function processResults(results: CheckResult[]): Promise<void> {
     }
 
     // ── Status Dampening ──────────────────────────────────────
-    // 1st failure → WARNING (visible but not alarming)
-    // 2nd+ failure → real DOWN
     if (result.status === 'DOWN' && prevState.consecutiveFailures < FAILURE_THRESHOLD_BEFORE_ALERT) {
       result.status = 'WARNING';
       result.message = `[Failure ${prevState.consecutiveFailures}/${FAILURE_THRESHOLD_BEFORE_ALERT} — watching] ${result.message}`;
@@ -80,25 +105,36 @@ export async function processResults(results: CheckResult[]): Promise<void> {
 
     prevState.currentStatus = result.status;
 
-    // ── State Transition Checks ───────────────────────────────
+    // ── State Transition: UP→DOWN or WARNING→DOWN ─────────────
     if (prevState.previousStatus !== result.status) {
       prevState.lastChange = now;
 
-      // Escalated to real DOWN → send failure alert
-      if (result.status === 'DOWN' && prevState.previousStatus !== 'UNKNOWN') {
+      if (result.status === 'DOWN') {
         if (canSendAlert(prevState) && result.severity === 'CRITICAL') {
           combinedAlerts.push({ result, type: 'FAILURE' });
           prevState.lastAlertSent = now;
         }
       }
 
-      // Recovered to UP from DOWN (not just WARNING) → send recovery alert
       if (result.status === 'UP' && prevState.previousStatus === 'DOWN') {
         if (canSendAlert(prevState) && result.severity === 'CRITICAL') {
           combinedAlerts.push({ result, type: 'RECOVERY' });
           prevState.lastAlertSent = now;
         }
       }
+    }
+
+    // ── BUG FIX: Persistent DOWN that was never alerted ───────
+    // Catches: service was DOWN in cycle 1 (init, no alert), still DOWN in cycle 2+.
+    // Since there's no transition, the block above is skipped — so we catch it here.
+    if (
+      result.status === 'DOWN' &&
+      result.severity === 'CRITICAL' &&
+      prevState.lastAlertSent === null &&
+      canSendAlert(prevState)
+    ) {
+      combinedAlerts.push({ result, type: 'FAILURE' });
+      prevState.lastAlertSent = now;
     }
   }
 
@@ -120,11 +156,11 @@ async function sendAlert(result: CheckResult, type: 'FAILURE' | 'RECOVERY'): Pro
 async function sendCombinedAlerts(alerts: Array<{ result: CheckResult; type: 'FAILURE' | 'RECOVERY' }>): Promise<void> {
   const failureCount = alerts.filter(a => a.type === 'FAILURE').length;
   const recoveryCount = alerts.filter(a => a.type === 'RECOVERY').length;
-  
+
   let mainEmoji = '🔴';
   if (failureCount === 0 && recoveryCount > 0) mainEmoji = '🟢';
   else if (failureCount > 0 && recoveryCount > 0) mainEmoji = '🟡';
-  
+
   const subject = `${mainEmoji} SwarajDesk Monitor: ${failureCount} Failures, ${recoveryCount} Recoveries`;
 
   let rowsHtml = alerts.map(({ result, type }) => {
@@ -162,15 +198,24 @@ async function sendCombinedAlerts(alerts: Array<{ result: CheckResult; type: 'FA
     </div>
   `;
 
+  lastEmailStatus = { status: 'queued', accepted: [], rejected: [], subject, sentAt: null };
+  let emailStatus: 'sent' | 'partial' | 'failed' = 'failed';
   try {
-    await transporter.sendMail({
+    const info = await transporter.sendMail({
       from: `"SwarajDesk Monitor" <${config.smtp.user}>`,
       to: config.alertTo,
       subject,
       html,
     });
-    console.log(`📧 Combined Alert sent: ${subject}`);
+    const accepted: string[] = Array.isArray(info.accepted)
+      ? (info.accepted as string[])
+      : config.alertTo.split(',').map(s => s.trim());
+    const rejected: string[] = Array.isArray(info.rejected) ? (info.rejected as string[]) : [];
+    emailStatus = accepted.length === 0 ? 'failed' : rejected.length > 0 ? 'partial' : 'sent';
+    lastEmailStatus = { status: emailStatus, accepted, rejected, subject, sentAt: new Date().toISOString() };
+    console.log(`📧 Combined Alert sent: ${subject} (✅ ${accepted.length} accepted, ❌ ${rejected.length} rejected)`);
   } catch (err: any) {
+    lastEmailStatus = { status: 'failed', accepted: [], rejected: [], subject, sentAt: new Date().toISOString() };
     console.error(`❌ Failed to send combined alert: ${err.message}`);
   }
 
@@ -184,9 +229,22 @@ async function sendCombinedAlerts(alerts: Array<{ result: CheckResult; type: 'FA
       subject: `${type === 'FAILURE' ? '🔴' : '🟢'} [${type}] ${result.name} — ${result.status}`,
       timestamp: result.timestamp,
       type,
+      emailStatus,
     });
   }
 
   // Keep only last 500 alerts (rough limit because we insert multiple at once)
   if (alertLog.length > 500) alertLog.splice(0, alertLog.length - 500);
+}
+
+/**
+ * Manually trigger an alert email for all currently DOWN/WARNING checks.
+ * Called from the dashboard "Send Alert" button.
+ */
+export async function sendManualAlert(results: CheckResult[]): Promise<{ sent: number }> {
+  const targets = results.filter(r => r.status === 'DOWN' || r.status === 'WARNING');
+  if (targets.length === 0) return { sent: 0 };
+  const alerts = targets.map(result => ({ result, type: 'FAILURE' as const }));
+  await sendCombinedAlerts(alerts);
+  return { sent: targets.length };
 }

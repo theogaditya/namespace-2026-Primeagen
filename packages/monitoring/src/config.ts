@@ -11,12 +11,27 @@ export const config = {
   },
   alertTo: process.env.ALERT_TO || '',
 
-  // AWS
+  // AWS — kept for legacy/fallback if needed elsewhere
   aws: {
     accessKeyId: process.env.AWS_ACCESS_KEY_ID || '',
     secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY || '',
     region: process.env.AWS_REGION || 'ap-south-2',
     s3Bucket: process.env.S3_BUCKET || 'sih-swaraj',
+  },
+
+  // S3 — may be on a DIFFERENT AWS account from EC2
+  // Falls back to the generic AWS_* vars if S3-specific ones are not set
+  s3: {
+    accessKeyId: process.env.S3_AWS_ACCESS_KEY_ID || process.env.AWS_ACCESS_KEY_ID || '',
+    secretAccessKey: process.env.S3_AWS_SECRET_ACCESS_KEY || process.env.AWS_SECRET_ACCESS_KEY || '',
+    region: process.env.S3_AWS_REGION || process.env.AWS_REGION || 'ap-south-2',
+    bucket: process.env.S3_BUCKET || 'sih-swaraj',
+  },
+
+  // EC2 — static instance IPs, no AWS SDK needed
+  // Comma-separated list e.g. EC2_INSTANCE_IPS=13.233.x.x,15.207.x.x
+  ec2: {
+    instanceIps: (process.env.EC2_INSTANCE_IPS || '').split(',').map(s => s.trim()).filter(Boolean),
   },
 
   // Redis
@@ -79,7 +94,8 @@ export const config = {
 
   // EC2 SSH for log retrieval
   ec2Ssh: {
-    keyPath: process.env.EC2_SSH_KEY || '.key/ec2-iit-pair',
+    // Default to baked-in path inside the container. Can be overridden by EC2_SSH_KEY env.
+    keyPath: process.env.EC2_SSH_KEY || '/ec2-keys/ec2-iit-pair',
     user: process.env.EC2_SSH_USER || 'ubuntu',
   },
 

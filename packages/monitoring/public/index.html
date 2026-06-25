@@ -27,6 +27,8 @@
         <button class="btn btn-primary" id="runNow" onclick="triggerCheck()"
           style="display:flex;align-items:center;gap:6px;"><i data-lucide="zap" style="width:16px;height:16px;"></i> Run
           Now</button>
+        <button class="btn btn-secondary" id="sendAlertBtn" onclick="sendManualAlert()"
+          style="display:flex;align-items:center;gap:6px;border-color:#f97316;color:#f97316;"><i data-lucide="bell" style="width:16px;height:16px;"></i> Send Alert</button>
         <button class="btn btn-secondary" onclick="exportCSV()" style="display:flex;align-items:center;gap:6px;"><i
             data-lucide="download" style="width:16px;height:16px;"></i> Export CSV</button>
         <div class="auto-refresh">
@@ -41,6 +43,9 @@
       <i data-lucide="loader-2" class="loading" style="width:16px;height:16px;color:var(--accent);"></i> Health Check
       Cycle in progress...
     </div>
+
+    <!-- Email Alert Status Banner -->
+    <div id="emailStatusBanner" style="display:none;align-items:center;gap:10px;border-radius:8px;padding:10px 16px;margin-bottom:16px;font-size:0.85rem;font-weight:600;border:1px solid;"></div>
 
     <section class="summary-cards" id="summaryCards">
       <div class="card card-total">
@@ -126,6 +131,7 @@
               <th>Severity</th>
               <th>Type</th>
               <th>Subject</th>
+              <th>Email</th>
             </tr>
           </thead>
           <tbody></tbody>

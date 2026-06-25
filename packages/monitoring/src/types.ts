@@ -52,6 +52,7 @@ export interface AlertRecord {
   subject: string;
   timestamp: string;
   type: 'FAILURE' | 'RECOVERY';
+  emailStatus?: 'queued' | 'sent' | 'partial' | 'failed';
 }
 
 export interface HistoryEntry {

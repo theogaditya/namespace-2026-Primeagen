@@ -7,7 +7,9 @@ let refreshTimer = null;
 document.addEventListener('DOMContentLoaded', () => {
   initTheme();
   fetchStatus();
+  fetchEmailStatus();
   startAutoRefresh();
+  setInterval(fetchEmailStatus, 10000); // poll email status every 10s
   lucide.createIcons();
 });
 
@@ -89,6 +91,35 @@ async function fetchLogs() {
     const logs = await res.json();
     renderLogs(logs);
   } catch (err) { console.error(err); }
+}
+
+async function fetchEmailStatus() {
+  try {
+    const res = await fetch('/api/email-status');
+    const data = await res.json();
+    renderEmailStatusBanner(data);
+  } catch (err) { /* silently ignore */ }
+}
+
+function renderEmailStatusBanner(data) {
+  const el = document.getElementById('emailStatusBanner');
+  if (!el) return;
+  const { status, accepted = [], rejected = [], subject, sentAt } = data;
+  if (status === 'idle') { el.style.display = 'none'; return; }
+  const cfgs = {
+    queued:  { bg: 'rgba(234,179,8,0.12)',  border: '#ca8a04', color: '#ca8a04', icon: 'loader-2',   cls: 'loading', label: '⏳ Alert email queued — sending...' },
+    sent:    { bg: 'rgba(34,197,94,0.10)',   border: '#16a34a', color: '#16a34a', icon: 'mail-check', cls: '',        label: `✅ Alert email delivered to all ${accepted.length} recipient(s)` },
+    partial: { bg: 'rgba(234,179,8,0.12)',  border: '#ca8a04', color: '#ca8a04', icon: 'mail',       cls: '',        label: `⚠️ Partial — ${accepted.length} sent, ${rejected.length} failed (${rejected.join(', ')})` },
+    failed:  { bg: 'rgba(239,68,68,0.12)',  border: '#dc2626', color: '#dc2626', icon: 'mail-x',     cls: '',        label: '❌ Alert email failed to send' },
+  };
+  const cfg = cfgs[status] || cfgs.failed;
+  const timeStr = sentAt ? ` · ${new Date(sentAt).toLocaleTimeString()}` : '';
+  el.style.display = 'flex';
+  el.style.background = cfg.bg;
+  el.style.borderColor = cfg.border;
+  el.style.color = cfg.color;
+  el.innerHTML = `<i data-lucide="${cfg.icon}" class="${cfg.cls}" style="width:16px;height:16px;flex-shrink:0;"></i><span>${cfg.label}${timeStr}</span>${subject ? `<span style="margin-left:auto;font-size:0.75rem;opacity:0.65;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:320px;">${escHtml(subject)}</span>` : ''}`;
+  lucide.createIcons();
 }
 
 // ── Summary ───────────────────────────────────────────────
@@ -271,9 +302,15 @@ function renderIncidents(incidents) {
 function renderAlerts(alerts) {
   const tbody = document.querySelector('#alertsTable tbody');
   if (!alerts.length) {
-    tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;color:var(--text-dim);">No alerts sent</td></tr>';
+    tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;color:var(--text-dim);">No alerts sent</td></tr>';
     return;
   }
+  const emailBadgeHtml = (s) => ({
+    sent:    '<span style="color:#16a34a;display:flex;align-items:center;gap:3px;font-size:0.78rem;"><i data-lucide="mail-check" style="width:13px;height:13px;"></i> Sent</span>',
+    partial: '<span style="color:#ca8a04;display:flex;align-items:center;gap:3px;font-size:0.78rem;"><i data-lucide="mail" style="width:13px;height:13px;"></i> Partial</span>',
+    failed:  '<span style="color:#dc2626;display:flex;align-items:center;gap:3px;font-size:0.78rem;"><i data-lucide="mail-x" style="width:13px;height:13px;"></i> Failed</span>',
+    queued:  '<span style="color:#ca8a04;display:flex;align-items:center;gap:3px;font-size:0.78rem;"><i data-lucide="loader-2" class="loading" style="width:13px;height:13px;"></i> Queued</span>',
+  })[s] || '<span style="color:var(--text-dim);font-size:0.78rem;">—</span>';
   tbody.innerHTML = alerts.slice().reverse().map(a => `
     <tr>
       <td>${new Date(a.timestamp).toLocaleString()}</td>
@@ -281,6 +318,7 @@ function renderAlerts(alerts) {
       <td>${severityBadge(a.severity)}</td>
       <td>${a.type === 'FAILURE' ? '<span style="color:var(--red);display:flex;align-items:center;gap:4px;"><i data-lucide="alert-circle" style="width:14px;height:14px;"></i> FAILURE</span>' : '<span style="color:var(--green);display:flex;align-items:center;gap:4px;"><i data-lucide="check-circle-2" style="width:14px;height:14px;"></i> RECOVERY</span>'}</td>
       <td>${escHtml(a.subject)}</td>
+      <td>${emailBadgeHtml(a.emailStatus)}</td>
     </tr>
   `).join('');
   lucide.createIcons();
@@ -395,12 +433,39 @@ async function triggerCheck() {
   try {
     await fetch('/api/check/run', { method: 'POST' });
     await fetchStatus(false); // don't re-skeleton
+    await fetchEmailStatus();
   } catch (err) { console.error(err); }
 
   if (loader) loader.style.display = 'none';
   btn.innerHTML = `<i data-lucide="zap" style="width:16px;height:16px;"></i> Run Now`;
   btn.disabled = false;
   lucide.createIcons();
+}
+
+async function sendManualAlert() {
+  const btn = document.getElementById('sendAlertBtn');
+  btn.innerHTML = `<i data-lucide="loader-2" class="loading" style="width:16px;height:16px;"></i> Sending...`;
+  btn.disabled = true;
+  lucide.createIcons();
+  try {
+    const res = await fetch('/api/alert/send', { method: 'POST' });
+    const data = await res.json();
+    if (data.sent === 0) {
+      btn.innerHTML = `<i data-lucide="check" style="width:16px;height:16px;"></i> Nothing Down`;
+    } else {
+      btn.innerHTML = `<i data-lucide="check" style="width:16px;height:16px;"></i> Sent (${data.sent})`;
+      await fetchAlerts();
+      await fetchEmailStatus();
+    }
+  } catch (err) {
+    console.error(err);
+    btn.innerHTML = `<i data-lucide="x" style="width:16px;height:16px;"></i> Failed`;
+  }
+  setTimeout(() => {
+    btn.innerHTML = `<i data-lucide="bell" style="width:16px;height:16px;"></i> Send Alert`;
+    btn.disabled = false;
+    lucide.createIcons();
+  }, 3000);
 }
 
 async function exportCSV() {

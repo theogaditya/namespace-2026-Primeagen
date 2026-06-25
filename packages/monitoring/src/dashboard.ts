@@ -3,7 +3,7 @@ import cors from 'cors';
 import path from 'path';
 import { config } from './config';
 import { getLatestResults, getLastRunTime, runAllChecks } from './scheduler';
-import { getCheckStates, getAlertLog } from './alerter';
+import { getCheckStates, getAlertLog, sendManualAlert, getEmailSendStatus } from './alerter';
 import { getHistory, getIncidents } from './history';
 import { getCachedLogs } from './checkers/ec2LogChecker';
 import { getCheckLog, getRunLogFiles, getRunLog } from './runLogger';
@@ -69,6 +69,22 @@ export function startDashboard() {
     const log = getRunLog(req.params.filename);
     if (!log) return res.status(404).json({ error: 'Log file not found' });
     res.json(log);
+  });
+
+  // Email send status (for dashboard banner)
+  app.get('/api/email-status', (_req, res) => {
+    res.json(getEmailSendStatus());
+  });
+
+  // Trigger manual alert email for all DOWN/WARNING checks
+  app.post('/api/alert/send', async (_req, res) => {
+    try {
+      const results = getLatestResults();
+      const { sent } = await sendManualAlert(results);
+      res.json({ success: true, sent });
+    } catch (err: any) {
+      res.status(500).json({ success: false, error: err.message });
+    }
   });
 
   // Trigger manual check
