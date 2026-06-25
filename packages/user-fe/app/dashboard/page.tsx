@@ -1,81 +1,78 @@
 "use client";
 
-import React, { useState, useEffect, useCallback, useMemo } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
+import { Loader2 } from "lucide-react";
 import {
-  ComplaintCard,
   ComplaintDetailModal,
-  ProfileCard,
-  SearchBar,
-  TabNavigation,
   CommunityFeed,
   Complaint,
   UserData,
-  TabType,
 } from "./customComps";
-import { Loader2, AlertCircle, FolderOpen, Plus, RefreshCw } from "lucide-react";
-import Link from "next/link";
 import { SwarajAIChat } from "@/components/swaraj-ai-chat";
 import { LikeProvider } from "@/contexts/LikeContext";
-import { PullToRefresh } from "@/components/ui/pull-to-refresh";
 import { NewBadgeNotification } from "@/components/badges/NewBadgeNotification";
-import { Footer7 } from "@/components/footer";
+import LandingFooter from "@/components/landing/LandingFooter";
+import DashboardSidebar, { type DashboardView } from "@/components/dashboard/DashboardSidebar";
+import DashboardTopBar from "@/components/dashboard/DashboardTopBar";
+import DashboardHeroBanner from "@/components/dashboard/DashboardHeroBanner";
+import CivicStandingSection from "@/components/dashboard/CivicStandingSection";
+import ActiveReportsGrid from "@/components/dashboard/ActiveReportsGrid";
+import LiveAreaMapWidget from "@/components/dashboard/LiveAreaMapWidget";
+import AnnouncementsWidget from "@/components/dashboard/AnnouncementsWidget";
+import BlockchainWidget from "@/components/dashboard/BlockchainWidget";
+import HelpfulLinksWidget from "@/components/dashboard/HelpfulLinksWidget";
+import ReportHistoryView from "@/components/dashboard/ReportHistoryView";
+import AllBadgesModal from "@/components/dashboard/AllBadgesModal";
+import ProfileSettingsModal from "@/components/dashboard/ProfileSettingsModal";
 
-// Animation variants
-const containerVariants = {
-  hidden: { opacity: 0 },
-  visible: {
-    opacity: 1,
-    transition: {
-      staggerChildren: 0.1,
-    },
-  },
-};
+interface StatsData {
+  civicScore: number;
+  scoreDelta: number;
+  levelName: string;
+  levelNumber: number;
+  currentXP: number;
+  xpToNextLevel: number;
+  totalComplaints: number;
+  resolvedComplaints: number;
+  earnedBadges: number;
+  complaintsByStatus: Record<string, number>;
+}
 
-const itemVariants = {
-  hidden: { opacity: 0, y: 20 },
-  visible: {
-    opacity: 1,
-    y: 0,
-    transition: {
-      type: "spring" as const,
-      stiffness: 300,
-      damping: 24,
-    },
-  },
-};
+interface BadgeData {
+  id: string;
+  name: string;
+  icon: string;
+  description?: string;
+  rarity?: string;
+  earned: boolean;
+  earnedAt?: string | null;
+}
+
 
 export default function DashboardPage() {
   const router = useRouter();
 
-  // Auth state
   const [user, setUser] = useState<UserData | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [authToken, setAuthToken] = useState<string | null>(null);
+  const [activeView, setActiveView] = useState<DashboardView>("dashboard");
 
-  // Tab state
-  const [activeTab, setActiveTab] = useState<TabType>("my-dashboard");
-
-  // Complaints state (only for my-dashboard)
   const [myComplaints, setMyComplaints] = useState<Complaint[]>([]);
   const [loadingComplaints, setLoadingComplaints] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  // Search and filter state (only for my-dashboard)
-  const [searchQuery, setSearchQuery] = useState("");
-  const [statusFilter, setStatusFilter] = useState("all");
-  const [isSearching, setIsSearching] = useState(false);
+  const [stats, setStats] = useState<StatsData | null>(null);
+  const [badges, setBadges] = useState<BadgeData[]>([]);
 
-  // Modal state
   const [selectedComplaint, setSelectedComplaint] = useState<Complaint | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isCommunityComplaint, setIsCommunityComplaint] = useState(false);
+  const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
+  const [isBadgesModalOpen, setIsBadgesModalOpen] = useState(false);
+  const [isProfileOpen, setIsProfileOpen] = useState(false);
 
-  // Mobile profile sheet state
-  const [isMobileProfileOpen, setIsMobileProfileOpen] = useState(false);
-
-  // Check authentication on mount
   useEffect(() => {
     const token = localStorage.getItem("authToken");
     const userData = localStorage.getItem("userData");
@@ -89,8 +86,7 @@ export default function DashboardPage() {
 
     if (userData) {
       try {
-        const parsed = JSON.parse(userData);
-        setUser(parsed);
+        setUser(JSON.parse(userData));
       } catch (e) {
         console.error("Failed to parse user data:", e);
       }
@@ -99,7 +95,6 @@ export default function DashboardPage() {
     setIsLoading(false);
   }, [router]);
 
-  // Fetch complaints
   const fetchMyComplaints = useCallback(async () => {
     if (!authToken) return;
 
@@ -107,12 +102,7 @@ export default function DashboardPage() {
     setError(null);
 
     try {
-      const params = new URLSearchParams();
-      if (statusFilter && statusFilter !== "all") {
-        params.set("status", statusFilter);
-      }
-
-      const response = await fetch(`/api/complaint/my?${params.toString()}`, {
+      const response = await fetch(`/api/complaint/my`, {
         headers: {
           Authorization: `Bearer ${authToken}`,
         },
@@ -129,7 +119,6 @@ export default function DashboardPage() {
       }
 
       const data = await response.json();
-      // API returns { success, message, data: [...complaints...] }
       setMyComplaints(data.data || []);
     } catch (err) {
       console.error("Error fetching my complaints:", err);
@@ -137,43 +126,77 @@ export default function DashboardPage() {
     } finally {
       setLoadingComplaints(false);
     }
-  }, [authToken, statusFilter, router]);
+  }, [authToken, router]);
 
-  // Fetch only when my-dashboard is active
-  useEffect(() => {
-    if (isLoading) return;
+  const fetchStats = useCallback(async () => {
+    if (!authToken) return;
 
-    if (activeTab === "my-dashboard") {
-      fetchMyComplaints();
+    try {
+      const response = await fetch("/api/users/stats", {
+        headers: {
+          Authorization: `Bearer ${authToken}`,
+        },
+      });
+
+      if (!response.ok) return;
+      const data = await response.json();
+      if (data.success) {
+        setStats(data.data);
+      }
+    } catch (err) {
+      console.error("Error fetching user stats:", err);
     }
-  }, [activeTab, isLoading, fetchMyComplaints]);
+  }, [authToken]);
 
-  // Handle search
-  const handleSearch = useCallback((query: string) => {
-    setSearchQuery(query);
-    setIsSearching(!!query);
-  }, []);
+  const fetchBadges = useCallback(async () => {
+    if (!authToken) return;
 
-  // Handle status filter
-  const handleStatusFilter = useCallback((status: string) => {
-    setStatusFilter(status);
-  }, []);
+    try {
+      const response = await fetch("/api/badges", {
+        headers: {
+          Authorization: `Bearer ${authToken}`,
+        },
+      });
 
-  // Handle complaint click (for my-dashboard)
+      if (!response.ok) return;
+      const data = await response.json();
+      if (data.success && Array.isArray(data.badges)) {
+        const mapped = data.badges.map((badge: any) => ({
+          id: badge.id,
+          name: badge.name,
+          icon: badge.icon || "",
+          description: badge.description || "",
+          rarity: badge.rarity || "common",
+          category: badge.category || "",
+          earned: Boolean(badge.earnedAt) || badge.earned === true,
+          earnedAt: badge.earnedAt || null,
+        }));
+        setBadges(mapped);
+      }
+    } catch (err) {
+      console.error("Error fetching badges:", err);
+    }
+  }, [authToken]);
+
+  useEffect(() => {
+    if (isLoading || !authToken) return;
+    fetchMyComplaints();
+    fetchStats();
+    fetchBadges();
+  }, [isLoading, authToken, fetchMyComplaints, fetchStats, fetchBadges]);
+
   const handleComplaintClick = useCallback((complaint: Complaint) => {
     setSelectedComplaint(complaint);
     setIsCommunityComplaint(false);
     setIsModalOpen(true);
   }, []);
 
-  // Handle complaint click (for community feed)
   const handleCommunityComplaintClick = useCallback((complaint: Complaint) => {
     setSelectedComplaint(complaint);
     setIsCommunityComplaint(true);
     setIsModalOpen(true);
   }, []);
 
-  // Handle modal close
   const handleCloseModal = useCallback(() => {
     setIsModalOpen(false);
     setTimeout(() => {
@@ -182,42 +205,48 @@ export default function DashboardPage() {
     }, 300);
   }, []);
 
-  // Filter my complaints based on search query (only for my-dashboard)
-  const filteredComplaints = useMemo(() => {
-    if (!searchQuery.trim()) {
-      return myComplaints;
-    }
+  const handleSearchResultClick = useCallback(
+    async (id: string) => {
+      const found = myComplaints.find((c) => c.id === id);
+      if (found) {
+        handleComplaintClick(found);
+      } else {
+        // Fetch the full complaint from the API
+        try {
+          const token = localStorage.getItem("authToken");
+          const res = await fetch(`/api/complaint/${id}`, {
+            headers: { Authorization: `Bearer ${token}` },
+          });
+          const json = await res.json();
+          if (json.success && json.data) {
+            setSelectedComplaint(json.data);
+          } else {
+            setSelectedComplaint({ id } as Complaint);
+          }
+        } catch {
+          setSelectedComplaint({ id } as Complaint);
+        }
+        setIsCommunityComplaint(true);
+        setIsModalOpen(true);
+      }
+    },
+    [myComplaints, handleComplaintClick]
+  );
 
-    const query = searchQuery.toLowerCase();
-    return myComplaints.filter((complaint: Complaint) => {
-      const searchableFields = [
-        complaint.id,
-        complaint.seq?.toString(),
-        complaint.description,
-        complaint.location?.locality,
-        complaint.location?.district,
-        complaint.category?.name,
-        complaint.assignedDepartment,
-        complaint.status,
-      ];
+  const handleUserUpdated = useCallback((updated: UserData) => {
+    setUser(updated);
+  }, []);
 
-      return searchableFields.some(
-        (field) => field?.toLowerCase().includes(query)
-      );
-    });
-  }, [myComplaints, searchQuery]);
-
-  // Loading state
   if (isLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+      <div className="min-h-screen flex items-center justify-center bg-[var(--dash-surface)]">
         <motion.div
           initial={{ opacity: 0, scale: 0.9 }}
           animate={{ opacity: 1, scale: 1 }}
           className="flex flex-col items-center gap-4"
         >
-          <Loader2 className="w-10 h-10 animate-spin text-blue-600" />
-          <p className="text-gray-600">Loading your dashboard...</p>
+          <Loader2 className="w-10 h-10 animate-spin text-[var(--dash-primary)]" />
+          <p className="text-slate-600">Loading your dashboard...</p>
         </motion.div>
       </div>
     );
@@ -225,320 +254,143 @@ export default function DashboardPage() {
 
   return (
     <LikeProvider authToken={authToken}>
-      <div className="min-h-screen bg-gray-50 py-25">
-        {/* Header */}
-        <motion.header
-          initial={{ opacity: 0, y: -20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="bg-white border-b border-gray-200 sticky top-0 z-40"
-        >
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                {/* Mobile Profile Avatar (visible on mobile) */}
-                <button
-                onClick={() => setIsMobileProfileOpen(true)}
-                className="lg:hidden w-10 h-10 rounded-full bg-linear-to-r from-blue-600 to-purple-600 flex items-center justify-center text-white font-bold text-sm shadow-md hover:shadow-lg transition-shadow"
-              >
-                {user?.name?.[0]?.toUpperCase() || "U"}
-              </button>
-              <div>
-                <h1 className="text-2xl font-bold text-gray-900">Dashboard</h1>
-                <p className="text-sm text-gray-500">
-                  Welcome back, {user?.name || "User"}!
-                </p>
-              </div>
-            </div>
-            <Link
-              href="/regComplaint"
-              className="inline-flex items-center gap-2 px-4 py-2 bg-linear-to-r from-blue-600 to-purple-600 text-white rounded-xl font-medium hover:opacity-90 transition-opacity"
-            >
-              <Plus className="w-5 h-5" />
-              <span className="hidden sm:inline">New Complaint</span>
-            </Link>
-          </div>
-        </div>
-      </motion.header>
+      <div className="min-h-screen bg-[var(--dash-surface)] flex">
+        <DashboardSidebar
+          activeView={activeView}
+          onNavigate={setActiveView}
+          isMobileOpen={isMobileSidebarOpen}
+          onMobileClose={() => setIsMobileSidebarOpen(false)}
+        />
 
-      {/* Main Content */}
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-        <div className="flex flex-col lg:flex-row gap-6">
-          {/* Sidebar - Profile Card (Desktop) */}
-          <motion.aside
-            initial={{ opacity: 0, x: -20 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ delay: 0.1 }}
-            className="hidden lg:block lg:w-80 shrink-0"
-          >
-            <div className="sticky top-24">
-              <ProfileCard userData={user} />
-            </div>
-          </motion.aside>
+        <div className="flex-1 flex flex-col lg:pl-64 min-h-screen">
+          <DashboardTopBar
+            user={user}
+            onMenuToggle={() => setIsMobileSidebarOpen((prev) => !prev)}
+            onSettingsClick={() => setIsProfileOpen(true)}
+            onSearchResultClick={handleSearchResultClick}
+          />
 
-          {/* Main Content Area */}
-          <div className="flex-1 space-y-6">
-            {/* Tab Navigation */}
-            <motion.div
-              initial={{ opacity: 0, y: -10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.2 }}
-            >
-              <TabNavigation
-                activeTab={activeTab}
-                onTabChange={setActiveTab}
-              />
-            </motion.div>
+          <main className="flex-1 overflow-auto">
+            {activeView === "dashboard" && (
+              <div className="pt-8 px-4 lg:px-8 pb-12 max-w-7xl mx-auto w-full">
+                <DashboardHeroBanner user={user} resolvedCount={stats?.resolvedComplaints ?? 0} />
 
-            {/* My Dashboard View */}
-            {activeTab === "my-dashboard" && (
-              <PullToRefresh
-                onRefresh={fetchMyComplaints}
-                disabled={loadingComplaints}
-                className="space-y-6"
-              >
-                {/* Section Header with Refresh */}
-                <motion.div
-                  initial={{ opacity: 0, y: -10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.25 }}
-                  className="flex items-center justify-between"
-                >
-                  <h2 className="text-lg font-semibold text-gray-900">My Complaints</h2>
-                  <button
-                    onClick={fetchMyComplaints}
-                    disabled={loadingComplaints}
-                    className="flex items-center gap-2 px-3 py-1.5 text-sm font-medium text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-colors disabled:opacity-50"
-                  >
-                    <RefreshCw className={`w-4 h-4 ${loadingComplaints ? 'animate-spin' : ''}`} />
-                    <span className="hidden sm:inline">Refresh</span>
-                  </button>
-                </motion.div>
-
-                {/* Search Bar */}
-                <motion.div
-                  initial={{ opacity: 0, y: -10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.3 }}
-                >
-                  <SearchBar
-                    onSearch={handleSearch}
-                    onStatusFilter={handleStatusFilter}
-                    isSearching={loadingComplaints && isSearching}
-                    placeholder="Search your complaints..."
-                  />
-                </motion.div>
-
-                {/* Error State */}
-                <AnimatePresence>
-                  {error && (
-                    <motion.div
-                      initial={{ opacity: 0, y: -10 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      exit={{ opacity: 0, y: -10 }}
-                      className="flex items-center gap-3 p-4 bg-red-50 border border-red-200 text-red-700 rounded-xl"
-                    >
-                      <AlertCircle className="w-5 h-5 shrink-0" />
-                      <p>{error}</p>
-                      <button
-                        onClick={fetchMyComplaints}
-                        className="ml-auto px-3 py-1 text-sm font-medium bg-red-100 hover:bg-red-200 rounded-lg transition-colors"
-                      >
-                        Retry
-                      </button>
-                    </motion.div>
-                  )}
-                </AnimatePresence>
-
-                {/* Loading State */}
-                {loadingComplaints && !isSearching && (
-                  <div className="flex items-center justify-center py-12">
-                    <motion.div
-                      initial={{ opacity: 0 }}
-                      animate={{ opacity: 1 }}
-                      className="flex flex-col items-center gap-3"
-                    >
-                      <Loader2 className="w-8 h-8 animate-spin text-blue-600" />
-                      <p className="text-gray-500">Loading your complaints...</p>
-                    </motion.div>
-                  </div>
-                )}
-
-                {/* Empty State */}
-                {!loadingComplaints && filteredComplaints.length === 0 && (
-                  <motion.div
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    className="flex flex-col items-center justify-center py-16 text-center"
-                  >
-                    <div className="w-20 h-20 bg-gray-100 rounded-full flex items-center justify-center mb-4">
-                      <FolderOpen className="w-10 h-10 text-gray-400" />
-                    </div>
-                    <h3 className="text-lg font-semibold text-gray-900 mb-2">
-                      {searchQuery ? "No complaints found" : "No complaints yet"}
-                    </h3>
-                    <p className="text-gray-500 max-w-sm mb-6">
-                      {searchQuery
-                        ? "Try adjusting your search or filters to find what you're looking for."
-                        : "You haven't submitted any complaints. Register your first complaint to get started."}
-                    </p>
-                    {!searchQuery && (
-                      <Link
-                        href="/regComplaint"
-                        className="inline-flex items-center gap-2 px-5 py-2.5 bg-linear-to-r from-blue-600 to-purple-600 text-white rounded-xl font-medium hover:opacity-90 transition-opacity"
-                      >
-                        <Plus className="w-5 h-5" />
-                        Register Complaint
-                      </Link>
-                    )}
-                  </motion.div>
-                )}
-
-                {/* Complaints Grid */}
-                {!loadingComplaints && filteredComplaints.length > 0 && (
-                  <motion.div
-                    variants={containerVariants}
-                    initial="hidden"
-                    animate="visible"
-                    className="grid gap-4 sm:grid-cols-2"
-                  >
-                    {filteredComplaints.map((complaint: Complaint) => (
-                      <motion.div
-                        key={complaint.id}
-                        variants={itemVariants}
-                        layout
-                      >
-                        <ComplaintCard
-                          complaint={complaint}
-                          onClick={() => handleComplaintClick(complaint)}
-                        />
-                      </motion.div>
-                    ))}
-                  </motion.div>
-                )}
-
-                {/* Results count */}
-                {!loadingComplaints && filteredComplaints.length > 0 && (
-                  <motion.p
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    className="text-sm text-gray-500 text-center pt-4"
-                  >
-                    Showing {filteredComplaints.length}{" "}
-                    {filteredComplaints.length === 1 ? "complaint" : "complaints"}
-                    {searchQuery && ` for "${searchQuery}"`}
-                  </motion.p>
-                )}
-              </PullToRefresh>
-            )}
-
-            {/* Community Feed View */}
-            {activeTab === "community-feed" && (
-              <motion.div
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.2 }}
-              >
-                <CommunityFeed
-                  authToken={authToken}
-                  onComplaintClick={handleCommunityComplaintClick}
+                <CivicStandingSection
+                  stats={stats}
+                  badges={badges}
+                  userLocality={user?.location?.locality || user?.location?.city || "your region"}
+                  onViewAllBadges={() => setIsBadgesModalOpen(true)}
                 />
-              </motion.div>
-            )}
-          </div>
-        </div>
-      </main>
 
-      {/* Mobile Profile Modal - Full Screen Slide Up */}
-      <AnimatePresence>
-        {isMobileProfileOpen && (
-          <>
-            {/* Backdrop */}
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              onClick={() => setIsMobileProfileOpen(false)}
-              className="lg:hidden fixed inset-0 bg-black/50 z-50"
-            />
-            
-            {/* Profile Sheet */}
-            <motion.div
-              initial={{ y: "100%" }}
-              animate={{ y: 0 }}
-              exit={{ y: "100%" }}
-              transition={{ type: "spring", stiffness: 300, damping: 30 }}
-              className="lg:hidden fixed bottom-0 left-0 right-0 bg-white z-50 rounded-t-3xl shadow-2xl max-h-[85vh] overflow-hidden"
-            >
-              {/* Handle bar */}
-              <div 
-                className="flex justify-center py-3 cursor-pointer border-b border-gray-100"
-                onClick={() => setIsMobileProfileOpen(false)}
-              >
-                <div className="w-12 h-1.5 bg-gray-300 rounded-full" />
-              </div>
-              
-              {/* Profile Header */}
-              <div className="px-4 py-3 bg-linear-to-r from-blue-600 to-purple-600">
-                <div className="flex items-center gap-3">
-                  <div className="w-14 h-14 rounded-full bg-white/20 flex items-center justify-center text-white font-bold text-xl border-2 border-white/30">
-                    {user?.name?.[0]?.toUpperCase() || "U"}
+                <div className="grid grid-cols-12 gap-6">
+                  <div className="col-span-12 lg:col-span-8 space-y-8">
+                    <ActiveReportsGrid
+                      complaints={myComplaints}
+                      onComplaintClick={handleComplaintClick}
+                      onViewAll={() => setActiveView("reports")}
+                      loading={loadingComplaints}
+                    />
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                      <LiveAreaMapWidget />
+                      <AnnouncementsWidget />
+                    </div>
                   </div>
-                  <div className="flex-1 min-w-0 text-white">
-                    <p className="font-bold text-lg truncate">
-                      {user?.name || "User"}
-                    </p>
-                    <p className="text-sm text-white/80 truncate">
-                      {user?.email || ""}
-                    </p>
-                  </div>
-                  <div className="text-right">
-                    <p className="text-2xl font-bold text-white">
-                      {myComplaints.length}
-                    </p>
-                    <p className="text-xs text-white/70">Complaints</p>
+
+                  <div className="col-span-12 lg:col-span-4 space-y-6">
+                    <BlockchainWidget />
+                    <HelpfulLinksWidget />
                   </div>
                 </div>
               </div>
+            )}
 
-              {/* Profile Content */}
-              <div className="overflow-y-auto max-h-[60vh] px-4 py-4">
-                <ProfileCard userData={user} />
-              </div>
-              
-              {/* Close Button */}
-              <div className="px-4 py-3 border-t border-gray-100">
-                <button
-                  onClick={() => setIsMobileProfileOpen(false)}
-                  className="w-full py-3 bg-gray-100 hover:bg-gray-200 text-gray-700 font-medium rounded-xl transition-colors"
+            {activeView === "reports" && (
+              <ReportHistoryView
+                complaints={myComplaints}
+                loading={loadingComplaints}
+                onComplaintClick={handleComplaintClick}
+                onRefresh={fetchMyComplaints}
+                onNavigateDashboard={() => setActiveView("dashboard")}
+              />
+            )}
+
+            {activeView === "community" && (
+              <div className="pt-8 px-4 lg:px-8 pb-12 max-w-5xl mx-auto w-full">
+                <motion.div
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.1 }}
                 >
-                  Close
-                </button>
+                  <CommunityFeed
+                    authToken={authToken}
+                    onComplaintClick={handleCommunityComplaintClick}
+                  />
+                </motion.div>
               </div>
-            </motion.div>
-          </>
-        )}
-      </AnimatePresence>
+            )}
 
-      {/* Complaint Detail Modal */}
-      <ComplaintDetailModal
-        complaint={selectedComplaint}
-        isOpen={isModalOpen}
-        onClose={handleCloseModal}
-        hideAssignmentTimeline={isCommunityComplaint}
-      />
+            {activeView === "analytics" && (
+              <div className="pt-8 px-4 lg:px-8 pb-12 max-w-5xl mx-auto w-full">
+                <div className="flex flex-col items-center justify-center py-24 text-center">
+                  <div className="w-20 h-20 bg-slate-100 rounded-full flex items-center justify-center mb-4">
+                    <svg className="w-10 h-10 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                    </svg>
+                  </div>
+                  <h3 className="text-lg font-semibold text-slate-900 mb-2">Analytics Coming Soon</h3>
+                  <p className="text-slate-500 max-w-sm">
+                    Community analytics and insights will be available here in a future update.
+                  </p>
+                </div>
+              </div>
+            )}
 
-      {/* Swaraj AI Chat - Floating chatbot */}
-      <SwarajAIChat />
+            {activeView === "map" && (
+              <div className="pt-8 px-4 lg:px-8 pb-12 max-w-5xl mx-auto w-full">
+                <div className="flex flex-col items-center justify-center py-24 text-center">
+                  <div className="w-20 h-20 bg-slate-100 rounded-full flex items-center justify-center mb-4">
+                    <svg className="w-10 h-10 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7" />
+                    </svg>
+                  </div>
+                  <h3 className="text-lg font-semibold text-slate-900 mb-2">Full Map Coming Soon</h3>
+                  <p className="text-slate-500 max-w-sm">
+                    An interactive city-wide map with all reported issues will be available soon.
+                  </p>
+                </div>
+              </div>
+            )}
+          </main>
 
-      {/* Badge Achievement Notification */}
-      <NewBadgeNotification />
+          <LandingFooter />
+        </div>
 
-      {/* Footer */}
-      <Footer7 />
+        <ComplaintDetailModal
+          complaint={selectedComplaint}
+          isOpen={isModalOpen}
+          onClose={handleCloseModal}
+          hideAssignmentTimeline={isCommunityComplaint}
+        />
 
-      {/* Bottom padding for mobile */}
-      <div className="h-24 lg:hidden" />
-    </div>
+        <SwarajAIChat />
+        <NewBadgeNotification />
+
+        <AllBadgesModal
+          isOpen={isBadgesModalOpen}
+          onClose={() => setIsBadgesModalOpen(false)}
+          badges={badges}
+          stats={stats}
+          onNavigateDashboard={() => { setIsBadgesModalOpen(false); setActiveView("dashboard"); }}
+        />
+
+        <ProfileSettingsModal
+          isOpen={isProfileOpen}
+          onClose={() => setIsProfileOpen(false)}
+          user={user}
+          onUserUpdated={handleUserUpdated}
+        />
+      </div>
     </LikeProvider>
   );
 }

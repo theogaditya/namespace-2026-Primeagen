@@ -6,6 +6,7 @@ import { userLoginSchema } from "../lib/validations/validation.user";
 
 const JWT_SECRET = process.env.JWT_SECRET || "my123";
 const RECAPTCHA_SECRET_KEY = process.env.RECAPTCHA_SECRET_KEY || "";
+const SKIP_CAPTCHA = process.env.SKIP_CAPTCHA === "true";
 
 export function loginUserRouter(db: PrismaClient) {
   const router = Router();
@@ -24,23 +25,25 @@ export function loginUserRouter(db: PrismaClient) {
 
       const { email, password, captchaToken } = validationResult.data;
 
-      // Verify reCAPTCHA token with Google
-      const captchaResponse = await fetch(
-        "https://www.google.com/recaptcha/api/siteverify",
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/x-www-form-urlencoded" },
-          body: `secret=${encodeURIComponent(RECAPTCHA_SECRET_KEY)}&response=${encodeURIComponent(captchaToken)}`,
+      // Verify reCAPTCHA token with Google (skip in local dev)
+      if (!SKIP_CAPTCHA) {
+        const captchaResponse = await fetch(
+          "https://www.google.com/recaptcha/api/siteverify",
+          {
+            method: "POST",
+            headers: { "Content-Type": "application/x-www-form-urlencoded" },
+            body: `secret=${encodeURIComponent(RECAPTCHA_SECRET_KEY)}&response=${encodeURIComponent(captchaToken)}`,
+          }
+        );
+
+        const captchaData = (await captchaResponse.json()) as { success: boolean };
+
+        if (!captchaData.success) {
+          return res.status(400).json({
+            success: false,
+            message: "CAPTCHA verification failed. Please try again.",
+          });
         }
-      );
-
-      const captchaData = (await captchaResponse.json()) as { success: boolean };
-
-      if (!captchaData.success) {
-        return res.status(400).json({
-          success: false,
-          message: "CAPTCHA verification failed. Please try again.",
-        });
       }
       const user = await db.user.findUnique({
         where: { email },

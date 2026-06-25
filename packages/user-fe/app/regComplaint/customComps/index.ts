@@ -7,9 +7,11 @@ export { Step4Review } from "./Step4Review";
 // UI Components
 export { StepProgress, COMPLAINT_STEP_ICONS } from "./StepProgress";
 export { LoadingPopup } from "./LoadingPopup";
+export { LocationPermissionModal } from "./LocationPermissionModal";
 
 // Hooks
 export { useComplaintForm } from "./useComplaintForm";
+export { useAutoFillSequence, type AutoFillPhase, type AIResult } from "./useAutoFillSequence";
 
 // Types
 export * from "./types";

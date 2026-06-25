@@ -18,6 +18,9 @@ import { createAuthMiddleware } from "./middleware/authRoute";
 import { chatRouter } from "./routes/chat";
 import { createBadgeRouter } from "./routes/badges";
 import { createUserProfileRouter } from "./routes/userProfile";
+import { createUserStatsRouter } from "./routes/userStats";
+import { createAnnouncementsRouter } from "./routes/announcements";
+import { createUpdateProfileRouter } from "./routes/updateProfile";
 
 dotenv.config();
 
@@ -85,6 +88,12 @@ export class Server {
       this.app.use('/api/chat', authMiddleware, chatRouter(this.db));
       // Badge routes (authenticated)
       this.app.use('/api/badges', authMiddleware, createBadgeRouter());
+      // User stats route (authenticated)
+      this.app.use('/api/users', authMiddleware, createUserStatsRouter(this.db));
+      // Announcements route (authenticated)
+      this.app.use('/api/announcements', authMiddleware, createAnnouncementsRouter());
+      // Profile update route (authenticated)
+      this.app.use('/api/users', authMiddleware, createUpdateProfileRouter(this.db));
     }
 
   public getApp(): Express {

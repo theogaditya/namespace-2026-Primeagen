@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, usePathname } from 'next/navigation';
 import Image from 'next/image';
 import Link from 'next/link';
 import { User, LogOut, ChevronDown, Globe, ChevronRight } from 'lucide-react';
@@ -128,6 +128,7 @@ const LanguageSelector = ({ onClose }: { onClose: () => void }) => {
 
 const Navbar = () => {
   const router = useRouter();
+  const pathname = usePathname();
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [userName, setUserName] = useState('');
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
@@ -185,18 +186,22 @@ const Navbar = () => {
     router.push('/');
   };
 
+  if (pathname?.startsWith('/dashboard')) {
+    return null;
+  }
+
   return (
-    <nav className='fixed top-0 left-0 right-0 z-99999 bg-white/80 backdrop-blur-md shadow-sm'>
+    <nav className='fixed top-0 left-0 right-0 z-99999 bg-white/80 backdrop-blur-md border-b border-gray-100/80'>
       <div className='max-w-7xl mx-auto px-4 sm:px-6 lg:px-8'>
-        <div className='flex items-center justify-between h-25'>
+        <div className='flex items-center justify-between h-14'>
           {/* Logo */}
           <Link href='/' className='flex items-center gap-2 shrink-0'>
             <Image
               src='https://swarajdesk.adityahota.online/logo.png'
               alt='SwarajDesk Logo'
-              width={160}
-              height={160}
-              className='object-contain w-28 sm:w-32 md:w-40'
+              width={200}
+              height={140}
+              className='object-contain h-20 w-auto'
             />
           </Link>
 
@@ -239,15 +244,15 @@ const Navbar = () => {
               <>
                 <Link
                   href='/loginUser'
-                  className='px-4 sm:px-5 py-2 rounded-lg bg-gray-900 text-white text-sm font-medium hover:bg-gray-800 transition-colors'
+                  className='px-3 py-1.5 text-sm font-medium text-gray-600 hover:text-gray-900 transition-colors'
                 >
                   Login
                 </Link>
                 <Link
                   href='/addUser'
-                  className='px-4 sm:px-5 py-2 rounded-lg bg-gray-900 text-white text-sm font-medium hover:bg-gray-800 transition-colors'
+                  className='px-4 py-2 rounded-full bg-violet-600 text-white text-sm font-semibold hover:bg-violet-700 transition-colors shadow-sm shadow-violet-200'
                 >
-                  Sign Up
+                  Get Started
                 </Link>
               </>
             )}

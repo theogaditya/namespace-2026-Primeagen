@@ -83,23 +83,25 @@ export const CATEGORY_DEPARTMENT_MAP: Record<string, Department> = {
 export const CATEGORY_DISPLAY: {
   name: string;
   icon: string;
+  lucideIcon: string;
+  keywords: string;
   color: string;
   bgColor: string;
   borderColor: string;
 }[] = [
-  { name: "Infrastructure", icon: "🏗️", color: "text-orange-600", bgColor: "bg-orange-50", borderColor: "border-orange-200" },
-  { name: "Education", icon: "📚", color: "text-blue-600", bgColor: "bg-blue-50", borderColor: "border-blue-200" },
-  { name: "Revenue", icon: "💰", color: "text-green-600", bgColor: "bg-green-50", borderColor: "border-green-200" },
-  { name: "Health", icon: "🏥", color: "text-red-600", bgColor: "bg-red-50", borderColor: "border-red-200" },
-  { name: "Water Supply & Sanitation", icon: "💧", color: "text-cyan-600", bgColor: "bg-cyan-50", borderColor: "border-cyan-200" },
-  { name: "Electricity & Power", icon: "⚡", color: "text-yellow-600", bgColor: "bg-yellow-50", borderColor: "border-yellow-200" },
-  { name: "Transportation", icon: "🚌", color: "text-purple-600", bgColor: "bg-purple-50", borderColor: "border-purple-200" },
-  { name: "Municipal Services", icon: "🏛️", color: "text-indigo-600", bgColor: "bg-indigo-50", borderColor: "border-indigo-200" },
-  { name: "Police Services", icon: "👮", color: "text-slate-600", bgColor: "bg-slate-50", borderColor: "border-slate-200" },
-  { name: "Environment", icon: "🌳", color: "text-emerald-600", bgColor: "bg-emerald-50", borderColor: "border-emerald-200" },
-  { name: "Housing & Urban Development", icon: "🏠", color: "text-amber-600", bgColor: "bg-amber-50", borderColor: "border-amber-200" },
-  { name: "Social Welfare", icon: "🤝", color: "text-pink-600", bgColor: "bg-pink-50", borderColor: "border-pink-200" },
-  { name: "Public Grievances", icon: "📝", color: "text-gray-600", bgColor: "bg-gray-50", borderColor: "border-gray-200" },
+  { name: "Infrastructure", icon: "🏗️", lucideIcon: "Wrench", keywords: "Roads, Bridges, Buildings", color: "text-orange-600", bgColor: "bg-orange-50", borderColor: "border-orange-200" },
+  { name: "Education", icon: "📚", lucideIcon: "GraduationCap", keywords: "Schools, Colleges, Libraries", color: "text-blue-600", bgColor: "bg-blue-50", borderColor: "border-blue-200" },
+  { name: "Revenue", icon: "💰", lucideIcon: "Coins", keywords: "Tax, Land Records, Property", color: "text-green-600", bgColor: "bg-green-50", borderColor: "border-green-200" },
+  { name: "Health", icon: "🏥", lucideIcon: "HeartPulse", keywords: "Hospitals, Clinics, Medicine", color: "text-red-600", bgColor: "bg-red-50", borderColor: "border-red-200" },
+  { name: "Water Supply & Sanitation", icon: "💧", lucideIcon: "Droplets", keywords: "Water, Drainage, Sewage", color: "text-cyan-600", bgColor: "bg-cyan-50", borderColor: "border-cyan-200" },
+  { name: "Electricity & Power", icon: "⚡", lucideIcon: "Zap", keywords: "Power Supply, Outages, Meters", color: "text-yellow-600", bgColor: "bg-yellow-50", borderColor: "border-yellow-200" },
+  { name: "Transportation", icon: "🚌", lucideIcon: "Bus", keywords: "Roads, Public Transit, Traffic", color: "text-purple-600", bgColor: "bg-purple-50", borderColor: "border-purple-200" },
+  { name: "Municipal Services", icon: "🏛️", lucideIcon: "Building2", keywords: "Waste, Street Lights, Parks", color: "text-indigo-600", bgColor: "bg-indigo-50", borderColor: "border-indigo-200" },
+  { name: "Police Services", icon: "👮", lucideIcon: "Shield", keywords: "Safety, Complaints, Security", color: "text-slate-600", bgColor: "bg-slate-50", borderColor: "border-slate-200" },
+  { name: "Environment", icon: "🌳", lucideIcon: "TreePine", keywords: "Pollution, Wildlife, Forests", color: "text-emerald-600", bgColor: "bg-emerald-50", borderColor: "border-emerald-200" },
+  { name: "Housing & Urban Development", icon: "🏠", lucideIcon: "LayoutGrid", keywords: "Housing, Planning, Permits", color: "text-amber-600", bgColor: "bg-amber-50", borderColor: "border-amber-200" },
+  { name: "Social Welfare", icon: "🤝", lucideIcon: "HandHelping", keywords: "Pensions, Aid, Disabilities", color: "text-pink-600", bgColor: "bg-pink-50", borderColor: "border-pink-200" },
+  { name: "Public Grievances", icon: "📝", lucideIcon: "Users", keywords: "General Issues, Feedback", color: "text-gray-600", bgColor: "bg-gray-50", borderColor: "border-gray-200" },
 ];
 
 // Urgency levels with display info
@@ -110,10 +112,9 @@ export const URGENCY_OPTIONS: {
   color: string;
   bgColor: string;
 }[] = [
-  { value: "LOW", label: "Low", description: "Non-urgent issue, can wait", color: "text-green-600", bgColor: "bg-green-50" },
-  { value: "MEDIUM", label: "Medium", description: "Should be addressed soon", color: "text-yellow-600", bgColor: "bg-yellow-50" },
-  { value: "HIGH", label: "High", description: "Requires quick attention", color: "text-orange-600", bgColor: "bg-orange-50" },
-  { value: "CRITICAL", label: "Critical", description: "Emergency, needs immediate action", color: "text-red-600", bgColor: "bg-red-50" },
+  { value: "LOW", label: "Low", description: "General maintenance", color: "text-green-600", bgColor: "bg-green-50" },
+  { value: "MEDIUM", label: "Medium", description: "Routine priority", color: "text-yellow-600", bgColor: "bg-yellow-50" },
+  { value: "HIGH", label: "High", description: "Needs urgent attention", color: "text-orange-600", bgColor: "bg-orange-50" },
 ];
 
 // Helper function to count words

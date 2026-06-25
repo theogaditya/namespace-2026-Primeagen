@@ -3,12 +3,27 @@ import { NextResponse } from 'next/server'
 const MODERATION_URL = process.env.MODERATION_URL || process.env.IMAGE_VALIDATION_URL
 const TIMEOUT_MS = 20000 // 20 second timeout
 
+function unavailableFallback(reason: string, upstreamStatus?: number) {
+  return NextResponse.json(
+    {
+      is_valid: false,
+      sector: null,
+      category: null,
+      confidence_vlm: null,
+      confidence_vit: null,
+      service_unavailable: true,
+      source: 'moderation-fallback',
+      error: reason,
+      upstream_status: upstreamStatus ?? null,
+    },
+    { status: 200 }
+  )
+}
+
 export async function POST(req: Request) {
   if (!MODERATION_URL) {
-    return NextResponse.json(
-      { error: 'MODERATION_URL is not configured', is_valid: false, service_unavailable: true },
-      { status: 500 }
-    )
+    console.warn('[api/image/validate] MODERATION_URL is not configured, returning fallback response')
+    return unavailableFallback('Moderation service unavailable (configuration missing)')
   }
 
   try {
@@ -42,11 +57,9 @@ export async function POST(req: Request) {
       })
     } catch (err) {
       clearTimeout(timeoutId)
-      console.error('[api/image/validate] fetch failed:', err)
-      return NextResponse.json(
-        { error: 'Moderation service unavailable', is_valid: false, service_unavailable: true },
-        { status: 503 }
-      )
+      const message = err instanceof Error ? err.message : String(err)
+      console.warn('[api/image/validate] moderation fetch failed, returning fallback response:', message)
+      return unavailableFallback('Moderation service unavailable')
     }
 
     clearTimeout(timeoutId)
@@ -61,13 +74,28 @@ export async function POST(req: Request) {
     console.log('[api/image/validate] Moderation response status:', proxied.status)
 
     if (!proxied.ok) {
+      if (proxied.status >= 500) {
+        console.warn(
+          '[api/image/validate] moderation service returned 5xx, returning fallback response:',
+          proxied.status
+        )
+        return unavailableFallback('Moderation service unavailable', proxied.status)
+      }
+
+      // For 4xx upstream responses, keep request flow non-blocking while marking invalid.
       return NextResponse.json(
         {
-          error: data?.error || `Moderation service error ${proxied.status}`,
           is_valid: false,
-          service_unavailable: proxied.status >= 500,
+          sector: null,
+          category: null,
+          confidence_vlm: null,
+          confidence_vit: null,
+          service_unavailable: false,
+          source: 'moderation',
+          error: data?.error || `Moderation rejected request (${proxied.status})`,
+          upstream_status: proxied.status,
         },
-        { status: proxied.status }
+        { status: 200 }
       )
     }
 
@@ -82,6 +110,7 @@ export async function POST(req: Request) {
         confidence_vlm: data?.confidence_vlm ?? null,
         confidence_vit: data?.confidence_vit ?? null,
         service_unavailable: false,
+        source: data?.source ?? 'moderation',
       },
       { status: 200 }
     )

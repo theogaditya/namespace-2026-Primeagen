@@ -17,10 +17,12 @@ import {
   List,
   X,
   Navigation,
-  Sparkles,
   ChevronDown,
   Building,
   Map,
+  Info,
+  Search,
+  LocateFixed,
 } from "lucide-react";
 
 interface Prediction {
@@ -86,6 +88,8 @@ interface Step3Props {
   ) => void;
   setFieldTouched: (field: string) => void;
   setErrors: React.Dispatch<React.SetStateAction<{ [key: string]: string | undefined }>>;
+  /** Called when a district is detected (manual or auto-fill) that isn't in our operating list */
+  onUnserviceableLocation?: (detectedDistrict: string, availableDistricts: string[]) => void;
 }
 
 export function Step3Location({
@@ -95,6 +99,7 @@ export function Step3Location({
   updateField,
   setFieldTouched,
   setErrors,
+  onUnserviceableLocation,
 }: Step3Props) {
   // District state
   const [districts, setDistricts] = useState<OperatingDistrict[]>([]);
@@ -135,6 +140,96 @@ export function Step3Location({
     fetchDistricts();
   }, []);
 
+  // Track last externally-validated values to avoid duplicate triggers
+  const lastAutoValidatedDistrict = React.useRef("");
+  const lastAutoValidatedPin = React.useRef("");
+
+  // Auto-validate district when pre-filled externally (e.g. by auto-fill)
+  useEffect(() => {
+    if (
+      districts.length > 0 &&
+      formData.district &&
+      districtValidationStatus === "idle" &&
+      formData.district !== lastAutoValidatedDistrict.current
+    ) {
+      lastAutoValidatedDistrict.current = formData.district;
+      // District was set externally — run validation
+      const found = districts.find(
+        (d) => d.name.toLowerCase() === formData.district.trim().toLowerCase()
+      );
+      if (found) {
+        setDistrictValidationStatus("valid");
+        if (found.name !== formData.district) {
+          updateField("district", found.name);
+        }
+        setErrors((prev) => ({ ...prev, district: undefined }));
+        setFieldTouched("district");
+      } else {
+        setDistrictValidationStatus("invalid");
+        setErrors((prev) => ({
+          ...prev,
+          district: "Invalid district. Please select an operational district.",
+        }));
+        // Fire unserviceable callback
+        onUnserviceableLocation?.(
+          formData.district,
+          districts.map((d) => d.name)
+        );
+      }
+    }
+  }, [districts, formData.district, districtValidationStatus, updateField, setErrors, setFieldTouched, onUnserviceableLocation]);
+
+  // Auto-validate PIN when pre-filled externally (e.g. by auto-fill)
+  useEffect(() => {
+    if (
+      formData.pin &&
+      /^\d{6}$/.test(formData.pin) &&
+      formData.district &&
+      districtValidationStatus === "valid" &&
+      pinValidationStatus === "idle" &&
+      formData.pin !== lastAutoValidatedPin.current
+    ) {
+      lastAutoValidatedPin.current = formData.pin;
+      // PIN was set externally — trigger validation
+      const validateExternalPin = async () => {
+        setPinValidationStatus("validating");
+        setPinValidationMessage("Validating PIN code...");
+        try {
+          const response = await fetch(
+            `/api/complaint/validate-pin?pin=${formData.pin}&district=${encodeURIComponent(formData.district)}`
+          );
+          const data = await response.json();
+          if (data.success && data.data?.valid) {
+            if (data.data.matchesSelectedDistrict) {
+              setPinValidationStatus("valid");
+              setPinValidationMessage("");
+              if (data.data.city) {
+                updateField("city", data.data.city);
+              }
+              setErrors((prev) => ({ ...prev, pin: undefined, city: undefined }));
+              setFieldTouched("pin");
+            } else {
+              setPinValidationStatus("invalid");
+              setPinValidationMessage(
+                `This PIN code belongs to ${data.data.district}, not ${formData.district}`
+              );
+            }
+          } else {
+            setPinValidationStatus("invalid");
+            setPinValidationMessage("Invalid PIN code");
+          }
+        } catch (error) {
+          console.error("Auto PIN validation error:", error);
+          // If validation API fails, mark as valid so flow isn't blocked
+          setPinValidationStatus("valid");
+          setPinValidationMessage("");
+          setFieldTouched("pin");
+        }
+      };
+      validateExternalPin();
+    }
+  }, [formData.pin, formData.district, districtValidationStatus, pinValidationStatus, updateField, setErrors, setFieldTouched]);
+
   // Validate district against operating districts (case-insensitive)
   const validateDistrict = useCallback(
     (districtName: string) => {
@@ -161,9 +256,14 @@ export function Step3Location({
           ...prev,
           district: "Invalid district. Please select an operational district.",
         }));
+        // Notify parent that the selected district is unserviceable
+        onUnserviceableLocation?.(
+          districtName,
+          districts.map((d) => d.name)
+        );
       }
     },
-    [districts, setErrors, updateField]
+    [districts, setErrors, updateField, onUnserviceableLocation]
   );
 
   // Handle district input change
@@ -369,408 +469,413 @@ export function Step3Location({
       initial="hidden"
       animate="visible"
     >
-      <motion.div className="text-center mb-8" variants={headerVariants}>
-        <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-linear-to-r from-emerald-100 to-teal-100 text-emerald-700 text-sm font-medium mb-4">
-          <Sparkles className="w-4 h-4" />
+      <motion.div className="text-center mb-6" variants={headerVariants}>
+        <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-[#630ed4]/10 text-[#630ed4] text-xs font-semibold uppercase tracking-wide mb-4">
           Step 3 of 4
         </div>
         <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-2">Location Details</h2>
         <p className="text-gray-500">Help us locate the issue accurately for faster resolution</p>
       </motion.div>
 
-      {/* District Input */}
-      <motion.div className="space-y-2 relative" variants={itemVariants}>
-        <div className="flex items-center justify-between">
-          <Label
-            htmlFor="district"
-            className={cn(
-              "text-sm font-semibold",
-              touched.district && errors.district && "text-red-600"
-            )}
-          >
-            District <span className="text-red-500">*</span>
-          </Label>
-          <Button
-            type="button"
-            variant="ghost"
-            size="sm"
-            onClick={() => setShowDistrictList(!showDistrictList)}
-            className="text-xs text-emerald-600 hover:text-emerald-700 gap-1 h-auto py-1 hover:bg-emerald-50"
-          >
-            <List className="h-3 w-3" />
-            {showDistrictList ? "Hide" : "Browse"} districts
-          </Button>
-        </div>
-
-        <div className="relative">
-          <div className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">
-            <MapPin className="h-5 w-5" />
-          </div>
-          <Input
-            id="district"
-            value={formData.district}
-            onChange={handleDistrictChange}
-            onBlur={(e) => {
-              // Delay blur to allow click on dropdown items
-              setTimeout(() => {
-                handleDistrictBlur();
-                // Only hide if not clicking on dropdown
-                if (!e.relatedTarget?.closest('.district-dropdown')) {
-                  setShowDistrictList(false);
-                }
-              }, 150);
-            }}
-            onFocus={() => setShowDistrictList(true)}
-            placeholder="Enter or select your district"
-            className={cn(
-              "pl-11 pr-12 h-12 rounded-xl border-2 text-base transition-all",
-              touched.district && errors.district && "border-red-300",
-              districtValidationStatus === "valid" && "border-emerald-400 bg-emerald-50/50"
-            )}
-          />
-          <div className="absolute right-3 top-1/2 -translate-y-1/2">
-            {districtValidationStatus === "validating" && (
-              <Loader2 className="h-5 w-5 animate-spin text-gray-400" />
-            )}
-            {districtValidationStatus === "valid" && (
-              <motion.div
-                initial={{ scale: 0 }}
-                animate={{ scale: 1 }}
-                transition={{ type: "spring", stiffness: 300 }}
+      {/* 2-Column Layout */}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+        {/* Left Column - Form Fields */}
+        <div className="lg:col-span-6 space-y-5">
+          {/* District Input */}
+          <motion.div className="space-y-2 relative" variants={itemVariants}>
+            <div className="flex items-center justify-between">
+              <Label
+                htmlFor="district"
+                className={cn(
+                  "text-sm font-semibold",
+                  touched.district && errors.district && "text-red-600"
+                )}
               >
-                <CheckCircle className="h-5 w-5 text-emerald-500" />
-              </motion.div>
-            )}
-            {districtValidationStatus === "invalid" && (
-              <XCircle className="h-5 w-5 text-red-500" />
-            )}
-          </div>
-        </div>
+                District <span className="text-red-500">*</span>
+              </Label>
+              <Button
+                type="button"
+                variant="ghost"
+                size="sm"
+                onClick={() => setShowDistrictList(!showDistrictList)}
+                className="text-xs text-[#630ed4] hover:text-[#5108b8] gap-1 h-auto py-1 hover:bg-[#630ed4]/5"
+              >
+                <List className="h-3 w-3" />
+                {showDistrictList ? "Hide" : "Browse"}
+              </Button>
+            </div>
 
-        {touched.district && errors.district && (
-          <motion.p
-            initial={{ opacity: 0, y: -10 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="text-sm text-red-600 flex items-center gap-1"
-          >
-            <AlertCircle className="h-4 w-4" />
-            {errors.district}
-          </motion.p>
-        )}
-
-        {/* District List Modal */}
-        <AnimatePresence>
-          {showDistrictList && (
-            <motion.div
-              initial={{ opacity: 0, y: -10, scale: 0.98 }}
-              animate={{ opacity: 1, y: 0, scale: 1 }}
-              exit={{ opacity: 0, y: -10, scale: 0.98 }}
-              transition={{ type: "spring", stiffness: 300, damping: 25 }}
-              className="district-dropdown absolute left-0 right-0 z-50 mt-1 bg-white border-2 border-gray-200 rounded-2xl shadow-2xl max-h-64 overflow-hidden"
-            >
-              <div className="sticky top-0 bg-gray-50 px-4 py-3 border-b flex items-center justify-between">
-                <span className="text-sm font-semibold text-gray-700">
-                  {filteredDistricts.length > 0
-                    ? `Available Districts (${filteredDistricts.length})`
-                    : "No Matches Found"}
-                </span>
-                <button
-                  type="button"
-                  onClick={() => setShowDistrictList(false)}
-                  className="p-1 text-gray-400 hover:text-gray-600 hover:bg-gray-200 rounded-lg transition-colors"
-                >
-                  <X className="h-4 w-4" />
-                </button>
+            <div className="relative">
+              <div className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">
+                <MapPin className="h-5 w-5" />
               </div>
-              <div className="overflow-auto max-h-48">
-                {isLoadingDistricts ? (
-                  <div className="p-6 text-center text-gray-500">
-                    <Loader2 className="h-6 w-6 animate-spin mx-auto mb-2 text-emerald-500" />
-                    Loading districts...
+              <Input
+                id="district"
+                value={formData.district}
+                onChange={handleDistrictChange}
+                onBlur={(e) => {
+                  setTimeout(() => {
+                    handleDistrictBlur();
+                    if (!e.relatedTarget?.closest('.district-dropdown')) {
+                      setShowDistrictList(false);
+                    }
+                  }, 150);
+                }}
+                onFocus={() => setShowDistrictList(true)}
+                placeholder="Enter or select your district"
+                className={cn(
+                  "pl-11 pr-12 h-11 rounded-xl border-2 text-sm transition-all",
+                  touched.district && errors.district && "border-red-300",
+                  districtValidationStatus === "valid" && "border-emerald-400 bg-emerald-50/50"
+                )}
+              />
+              <div className="absolute right-3 top-1/2 -translate-y-1/2">
+                {districtValidationStatus === "validating" && (
+                  <Loader2 className="h-5 w-5 animate-spin text-gray-400" />
+                )}
+                {districtValidationStatus === "valid" && (
+                  <CheckCircle className="h-5 w-5 text-emerald-500" />
+                )}
+                {districtValidationStatus === "invalid" && (
+                  <XCircle className="h-5 w-5 text-red-500" />
+                )}
+              </div>
+            </div>
+
+            {touched.district && errors.district && (
+              <motion.p
+                initial={{ opacity: 0, y: -10 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="text-sm text-red-600 flex items-center gap-1"
+              >
+                <AlertCircle className="h-4 w-4" />
+                {errors.district}
+              </motion.p>
+            )}
+
+            {/* District List Modal */}
+            <AnimatePresence>
+              {showDistrictList && (
+                <motion.div
+                  initial={{ opacity: 0, y: -10, scale: 0.98 }}
+                  animate={{ opacity: 1, y: 0, scale: 1 }}
+                  exit={{ opacity: 0, y: -10, scale: 0.98 }}
+                  transition={{ type: "spring", stiffness: 300, damping: 25 }}
+                  className="district-dropdown absolute left-0 right-0 z-50 mt-1 bg-white border-2 border-gray-200 rounded-xl shadow-2xl max-h-64 overflow-hidden"
+                >
+                  <div className="sticky top-0 bg-gray-50 px-4 py-3 border-b flex items-center justify-between">
+                    <span className="text-sm font-semibold text-gray-700">
+                      {filteredDistricts.length > 0
+                        ? `Available Districts (${filteredDistricts.length})`
+                        : "No Matches Found"}
+                    </span>
+                    <button
+                      type="button"
+                      onClick={() => setShowDistrictList(false)}
+                      className="p-1 text-gray-400 hover:text-gray-600 hover:bg-gray-200 rounded-lg transition-colors"
+                    >
+                      <X className="h-4 w-4" />
+                    </button>
                   </div>
-                ) : filteredDistricts.length === 0 ? (
-                  <div className="p-6 text-center">
-                    <XCircle className="h-8 w-8 mx-auto mb-2 text-red-400" />
-                    <p className="text-red-600 font-medium">
-                      {formData.district
-                        ? `"${formData.district}" is not available`
-                        : "No districts found"}
-                    </p>
-                    <p className="text-gray-500 text-sm mt-1">
-                      Please select from available operating districts
-                    </p>
+                  <div className="overflow-auto max-h-48">
+                    {isLoadingDistricts ? (
+                      <div className="p-6 text-center text-gray-500">
+                        <Loader2 className="h-6 w-6 animate-spin mx-auto mb-2 text-[#630ed4]" />
+                        Loading districts...
+                      </div>
+                    ) : filteredDistricts.length === 0 ? (
+                      <div className="p-6 text-center">
+                        <XCircle className="h-8 w-8 mx-auto mb-2 text-red-400" />
+                        <p className="text-red-600 font-medium">
+                          {formData.district
+                            ? `"${formData.district}" is not available`
+                            : "No districts found"}
+                        </p>
+                        <p className="text-gray-500 text-sm mt-1">
+                          Please select from available operating districts
+                        </p>
+                      </div>
+                    ) : (
+                      filteredDistricts.map((district, index) => {
+                        const searchTerm = formData.district.toLowerCase();
+                        const districtName = district.name;
+                        const matchIndex = districtName.toLowerCase().indexOf(searchTerm);
+
+                        let highlightedName;
+                        if (matchIndex >= 0 && searchTerm.length > 0) {
+                          const before = districtName.slice(0, matchIndex);
+                          const match = districtName.slice(matchIndex, matchIndex + searchTerm.length);
+                          const after = districtName.slice(matchIndex + searchTerm.length);
+                          highlightedName = (
+                            <>
+                              {before}
+                              <span className="bg-[#630ed4]/20 text-[#630ed4] rounded px-0.5">{match}</span>
+                              {after}
+                            </>
+                          );
+                        } else {
+                          highlightedName = districtName;
+                        }
+
+                        return (
+                          <motion.button
+                            key={district.id}
+                            type="button"
+                            onClick={() => handleDistrictSelect(district)}
+                            initial={{ opacity: 0, x: -10 }}
+                            animate={{ opacity: 1, x: 0 }}
+                            transition={{ delay: index * 0.02 }}
+                            className="w-full px-4 py-3 text-left hover:bg-[#630ed4]/5 transition-colors flex items-center justify-between group"
+                          >
+                            <div className="flex items-center gap-3">
+                              <div className="p-1.5 bg-gray-100 rounded-lg group-hover:bg-[#630ed4]/10 transition-colors">
+                                <Building className="h-4 w-4 text-gray-500 group-hover:text-[#630ed4]" />
+                              </div>
+                              <span className="font-medium text-gray-800">{highlightedName}</span>
+                            </div>
+                            <span className="text-xs text-gray-400 bg-gray-100 px-2 py-1 rounded-lg">
+                              {district.state}
+                            </span>
+                          </motion.button>
+                        );
+                      })
+                    )}
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </motion.div>
+
+          {/* PIN Code + City (side by side) */}
+          <div className="grid grid-cols-2 gap-4">
+            <motion.div className="space-y-2" variants={itemVariants}>
+              <Label
+                htmlFor="pin"
+                className={cn(
+                  "text-sm font-semibold",
+                  touched.pin && errors.pin && "text-red-600"
+                )}
+              >
+                PIN Code <span className="text-red-500">*</span>
+              </Label>
+              <div className="relative">
+                <Input
+                  id="pin"
+                  value={formData.pin}
+                  onChange={handlePinChange}
+                  onBlur={() => setFieldTouched("pin")}
+                  placeholder="6-digit PIN"
+                  maxLength={6}
+                  disabled={!formData.district || districtValidationStatus !== "valid"}
+                  className={cn(
+                    "h-11 rounded-xl border-2 text-sm pr-10 font-mono tracking-wider transition-all",
+                    touched.pin && errors.pin && "border-red-300",
+                    pinValidationStatus === "valid" && "border-emerald-400 bg-emerald-50/50",
+                    (!formData.district || districtValidationStatus !== "valid") && "bg-gray-50 cursor-not-allowed"
+                  )}
+                />
+                <div className="absolute right-3 top-1/2 -translate-y-1/2">
+                  {pinValidationStatus === "validating" && (
+                    <Loader2 className="h-4 w-4 animate-spin text-gray-400" />
+                  )}
+                  {pinValidationStatus === "valid" && (
+                    <CheckCircle className="h-4 w-4 text-emerald-500" />
+                  )}
+                  {pinValidationStatus === "invalid" && (
+                    <XCircle className="h-4 w-4 text-red-500" />
+                  )}
+                </div>
+              </div>
+              {pinValidationMessage && (
+                <p className={cn(
+                  "text-xs flex items-center gap-1",
+                  pinValidationStatus === "invalid" ? "text-red-600" : "text-gray-500"
+                )}>
+                  <AlertCircle className="h-3 w-3" />
+                  {pinValidationMessage}
+                </p>
+              )}
+              {touched.pin && errors.pin && !pinValidationMessage && (
+                <p className="text-xs text-red-600 flex items-center gap-1">
+                  <AlertCircle className="h-3 w-3" />
+                  {errors.pin}
+                </p>
+              )}
+            </motion.div>
+
+            <motion.div className="space-y-2" variants={itemVariants}>
+              <Label htmlFor="city" className="text-sm font-semibold">
+                City <span className="text-red-500">*</span>
+              </Label>
+              <div className={cn(
+                "h-11 px-3 rounded-xl border-2 flex items-center transition-all text-sm",
+                formData.city
+                  ? "bg-emerald-50/50 border-emerald-200 text-gray-900"
+                  : "bg-gray-50 border-gray-200 text-gray-400"
+              )}>
+                {formData.city ? (
+                  <div className="flex items-center gap-2">
+                    <CheckCircle className="h-4 w-4 text-emerald-500" />
+                    <span className="font-medium">{formData.city}</span>
                   </div>
                 ) : (
-                  filteredDistricts.map((district, index) => {
-                    // Highlight matching text
-                    const searchTerm = formData.district.toLowerCase();
-                    const districtName = district.name;
-                    const matchIndex = districtName.toLowerCase().indexOf(searchTerm);
-
-                    let highlightedName;
-                    if (matchIndex >= 0 && searchTerm.length > 0) {
-                      const before = districtName.slice(0, matchIndex);
-                      const match = districtName.slice(matchIndex, matchIndex + searchTerm.length);
-                      const after = districtName.slice(matchIndex + searchTerm.length);
-                      highlightedName = (
-                        <>
-                          {before}
-                          <span className="bg-emerald-200 text-emerald-800 rounded px-0.5">{match}</span>
-                          {after}
-                        </>
-                      );
-                    } else {
-                      highlightedName = districtName;
-                    }
-
-                    return (
-                      <motion.button
-                        key={district.id}
-                        type="button"
-                        onClick={() => handleDistrictSelect(district)}
-                        initial={{ opacity: 0, x: -10 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        transition={{ delay: index * 0.02 }}
-                        className="w-full px-4 py-3 text-left hover:bg-emerald-50 transition-colors flex items-center justify-between group"
-                      >
-                        <div className="flex items-center gap-3">
-                          <div className="p-1.5 bg-gray-100 rounded-lg group-hover:bg-emerald-100 transition-colors">
-                            <Building className="h-4 w-4 text-gray-500 group-hover:text-emerald-600" />
-                          </div>
-                          <span className="font-medium text-gray-800">{highlightedName}</span>
-                        </div>
-                        <span className="text-xs text-gray-400 bg-gray-100 px-2 py-1 rounded-lg">
-                          {district.state}
-                        </span>
-                      </motion.button>
-                    );
-                  })
+                  <span className="italic text-xs">Auto-filled from PIN</span>
                 )}
               </div>
             </motion.div>
-          )}
-        </AnimatePresence>
-      </motion.div>
-
-      {/* PIN Code */}
-      <motion.div className="space-y-2" variants={itemVariants}>
-        <Label
-          htmlFor="pin"
-          className={cn(
-            "text-sm font-semibold",
-            touched.pin && errors.pin && "text-red-600"
-          )}
-        >
-          PIN Code <span className="text-red-500">*</span>
-        </Label>
-        <div className="relative">
-          <Input
-            id="pin"
-            value={formData.pin}
-            onChange={handlePinChange}
-            onBlur={() => setFieldTouched("pin")}
-            placeholder="Enter 6-digit PIN code"
-            maxLength={6}
-            disabled={!formData.district || districtValidationStatus !== "valid"}
-            className={cn(
-              "h-12 rounded-xl border-2 text-base pr-12 font-mono tracking-wider transition-all",
-              touched.pin && errors.pin && "border-red-300",
-              pinValidationStatus === "valid" && "border-emerald-400 bg-emerald-50/50",
-              (!formData.district || districtValidationStatus !== "valid") && "bg-gray-50 cursor-not-allowed"
-            )}
-          />
-          <div className="absolute right-3 top-1/2 -translate-y-1/2">
-            {pinValidationStatus === "validating" && (
-              <Loader2 className="h-5 w-5 animate-spin text-gray-400" />
-            )}
-            {pinValidationStatus === "valid" && (
-              <motion.div
-                initial={{ scale: 0 }}
-                animate={{ scale: 1 }}
-                transition={{ type: "spring", stiffness: 300 }}
-              >
-                <CheckCircle className="h-5 w-5 text-emerald-500" />
-              </motion.div>
-            )}
-            {pinValidationStatus === "invalid" && (
-              <XCircle className="h-5 w-5 text-red-500" />
-            )}
           </div>
-        </div>
-        {!formData.district && (
-          <p className="text-xs text-amber-600 flex items-center gap-1">
-            <AlertCircle className="h-3 w-3" />
-            Please select a district first
-          </p>
-        )}
-        {pinValidationMessage && (
-          <motion.p
-            initial={{ opacity: 0, y: -10 }}
-            animate={{ opacity: 1, y: 0 }}
-            className={cn(
-              "text-sm flex items-center gap-1",
-              pinValidationStatus === "invalid" ? "text-red-600" : "text-gray-500"
-            )}
-          >
-            <AlertCircle className="h-4 w-4" />
-            {pinValidationMessage}
-          </motion.p>
-        )}
-        {touched.pin && errors.pin && !pinValidationMessage && (
-          <motion.p
-            initial={{ opacity: 0, y: -10 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="text-sm text-red-600 flex items-center gap-1"
-          >
-            <AlertCircle className="h-4 w-4" />
-            {errors.pin}
-          </motion.p>
-        )}
-      </motion.div>
 
-      {/* City (Auto-filled) */}
-      <motion.div className="space-y-2" variants={itemVariants}>
-        <Label htmlFor="city" className="text-sm font-semibold">
-          City <span className="text-red-500">*</span>
-        </Label>
-        <div className={cn(
-          "h-12 px-4 rounded-xl border-2 flex items-center transition-all",
-          formData.city
-            ? "bg-emerald-50/50 border-emerald-200 text-gray-900"
-            : "bg-gray-50 border-gray-200 text-gray-400"
-        )}>
-          {formData.city ? (
-            <div className="flex items-center gap-2">
-              <CheckCircle className="h-4 w-4 text-emerald-500" />
-              <span className="font-medium">{formData.city}</span>
-            </div>
-          ) : (
-            <span className="italic text-sm">Auto-filled from PIN code</span>
-          )}
-        </div>
-      </motion.div>
-
-      {/* Locality */}
-      <motion.div className="space-y-2 relative" variants={itemVariants}>
-        <Label
-          htmlFor="locality"
-          className={cn(
-            "text-sm font-semibold",
-            touched.locality && errors.locality && "text-red-600"
-          )}
-        >
-          Locality / Area <span className="text-red-500">*</span>
-        </Label>
-        <div className="relative">
-          <div className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">
-            <Navigation className="h-5 w-5" />
-          </div>
-          <Input
-            id="locality"
-            value={formData.locality}
-            onChange={handleLocalityChange}
-            onFocus={() => localityPredictions.length > 0 && setShowLocalityDropdown(true)}
-            onBlur={() => {
-              setFieldTouched("locality");
-              setTimeout(() => setShowLocalityDropdown(false), 200);
-            }}
-            placeholder="Start typing your locality name..."
-            className={cn(
-              "pl-11 pr-12 h-12 rounded-xl border-2 text-base transition-all",
-              touched.locality && errors.locality && "border-red-300",
-              (!formData.district || !formData.pin || pinValidationStatus !== "valid") && "bg-gray-50 cursor-not-allowed"
-            )}
-            disabled={!formData.district || !formData.pin || pinValidationStatus !== "valid"}
-          />
-          {isLoadingLocality && (
-            <div className="absolute right-3 top-1/2 -translate-y-1/2">
-              <Loader2 className="h-5 w-5 animate-spin text-gray-400" />
-            </div>
-          )}
-        </div>
-
-        {/* Locality Predictions Dropdown */}
-        <AnimatePresence>
-          {showLocalityDropdown && localityPredictions.length > 0 && (
-            <motion.div
-              initial={{ opacity: 0, y: -10, scale: 0.98 }}
-              animate={{ opacity: 1, y: 0, scale: 1 }}
-              exit={{ opacity: 0, y: -10, scale: 0.98 }}
-              className="absolute z-50 w-full mt-2 bg-white border-2 border-gray-200 rounded-2xl shadow-2xl max-h-52 overflow-auto"
-            >
-              {localityPredictions.map((prediction, index) => (
-                <motion.button
-                  key={prediction.place_id}
-                  type="button"
-                  onClick={() => handleLocalitySelect(prediction)}
-                  initial={{ opacity: 0, x: -10 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: index * 0.02 }}
-                  className="w-full px-4 py-3 text-left hover:bg-emerald-50 transition-colors"
-                >
-                  <p className="font-medium text-gray-900 truncate">
-                    {prediction.structured_formatting?.main_text || prediction.description}
-                  </p>
-                  {prediction.structured_formatting?.secondary_text && (
-                    <p className="text-xs text-gray-500 truncate">
-                      {prediction.structured_formatting.secondary_text}
-                    </p>
-                  )}
-                </motion.button>
-              ))}
-            </motion.div>
-          )}
-        </AnimatePresence>
-
-        {(!formData.district || !formData.pin || pinValidationStatus !== "valid") && (
-          <p className="text-xs text-amber-600 flex items-center gap-1">
-            <AlertCircle className="h-3 w-3" />
-            Please select district and enter valid PIN first
-          </p>
-        )}
-        {touched.locality && errors.locality && (
-          <motion.p
-            initial={{ opacity: 0, y: -10 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="text-sm text-red-600 flex items-center gap-1"
-          >
-            <AlertCircle className="h-4 w-4" />
-            {errors.locality}
-          </motion.p>
-        )}
-      </motion.div>
-
-      {/* Interactive Map for Location Selection */}
-      <motion.div variants={itemVariants}>
-        <div className="p-4 bg-gray-50 rounded-2xl border-2 border-gray-200">
-          <div className="flex items-center gap-2 mb-4">
-            <Map className="h-5 w-5 text-emerald-500" />
-            <span className="text-sm font-semibold text-gray-700">
-              Select Location on Map - If your location is disabled, please enable it to use this feature and refresh the page<span className="text-gray-400 font-normal">(Optional)</span>
-            </span>
-          </div>
-          <p className="text-xs text-gray-500 mb-4">
-            Click on the map, search for a location, or use your current location to set precise coordinates.
-          </p>
-          <GoogleMapPicker
-            latitude={formData.latitude}
-            longitude={formData.longitude}
-            onLocationSelect={(lat, lng) => {
-              updateField("latitude", lat);
-              updateField("longitude", lng);
-            }}
-            district={formData.district}
-            city={formData.city}
-            disabled={!formData.district || !formData.pin || pinValidationStatus !== "valid"}
-          />
-          {(!formData.district || !formData.pin || pinValidationStatus !== "valid") && (
-            <p className="text-xs text-amber-600 flex items-center gap-1 mt-3">
+          {!formData.district && (
+            <p className="text-xs text-amber-600 flex items-center gap-1 -mt-3">
               <AlertCircle className="h-3 w-3" />
-              Please select district and enter valid PIN first to enable map selection
+              Please select a district first
             </p>
           )}
+
+          {/* Locality */}
+          <motion.div className="space-y-2 relative" variants={itemVariants}>
+            <Label
+              htmlFor="locality"
+              className={cn(
+                "text-sm font-semibold",
+                touched.locality && errors.locality && "text-red-600"
+              )}
+            >
+              Locality / Area <span className="text-red-500">*</span>
+            </Label>
+            <div className="relative">
+              <div className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">
+                <Navigation className="h-4 w-4" />
+              </div>
+              <Input
+                id="locality"
+                value={formData.locality}
+                onChange={handleLocalityChange}
+                onFocus={() => localityPredictions.length > 0 && setShowLocalityDropdown(true)}
+                onBlur={() => {
+                  setFieldTouched("locality");
+                  setTimeout(() => setShowLocalityDropdown(false), 200);
+                }}
+                placeholder="Start typing your locality name..."
+                className={cn(
+                  "pl-10 pr-10 h-11 rounded-xl border-2 text-sm transition-all",
+                  touched.locality && errors.locality && "border-red-300",
+                  (!formData.district || !formData.pin || pinValidationStatus !== "valid") && "bg-gray-50 cursor-not-allowed"
+                )}
+                disabled={!formData.district || !formData.pin || pinValidationStatus !== "valid"}
+              />
+              {isLoadingLocality && (
+                <div className="absolute right-3 top-1/2 -translate-y-1/2">
+                  <Loader2 className="h-4 w-4 animate-spin text-gray-400" />
+                </div>
+              )}
+            </div>
+
+            {/* Locality Predictions Dropdown */}
+            <AnimatePresence>
+              {showLocalityDropdown && localityPredictions.length > 0 && (
+                <motion.div
+                  initial={{ opacity: 0, y: -10, scale: 0.98 }}
+                  animate={{ opacity: 1, y: 0, scale: 1 }}
+                  exit={{ opacity: 0, y: -10, scale: 0.98 }}
+                  className="absolute z-50 w-full mt-2 bg-white border-2 border-gray-200 rounded-xl shadow-2xl max-h-52 overflow-auto"
+                >
+                  {localityPredictions.map((prediction, index) => (
+                    <motion.button
+                      key={prediction.place_id}
+                      type="button"
+                      onClick={() => handleLocalitySelect(prediction)}
+                      initial={{ opacity: 0, x: -10 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      transition={{ delay: index * 0.02 }}
+                      className="w-full px-4 py-3 text-left hover:bg-[#630ed4]/5 transition-colors"
+                    >
+                      <p className="font-medium text-gray-900 text-sm truncate">
+                        {prediction.structured_formatting?.main_text || prediction.description}
+                      </p>
+                      {prediction.structured_formatting?.secondary_text && (
+                        <p className="text-xs text-gray-500 truncate">
+                          {prediction.structured_formatting.secondary_text}
+                        </p>
+                      )}
+                    </motion.button>
+                  ))}
+                </motion.div>
+              )}
+            </AnimatePresence>
+
+            {(!formData.district || !formData.pin || pinValidationStatus !== "valid") && (
+              <p className="text-xs text-amber-600 flex items-center gap-1">
+                <AlertCircle className="h-3 w-3" />
+                Please select district and enter valid PIN first
+              </p>
+            )}
+            {touched.locality && errors.locality && (
+              <motion.p
+                initial={{ opacity: 0, y: -10 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="text-sm text-red-600 flex items-center gap-1"
+              >
+                <AlertCircle className="h-4 w-4" />
+                {errors.locality}
+              </motion.p>
+            )}
+          </motion.div>
+
+          {/* Technical Authority Note */}
+          <motion.div
+            variants={itemVariants}
+            className="p-4 bg-blue-50 border border-blue-200 rounded-xl"
+          >
+            <div className="flex items-start gap-3">
+              <div className="p-1.5 bg-blue-100 rounded-lg shrink-0">
+                <Info className="h-4 w-4 text-blue-600" />
+              </div>
+              <div>
+                <p className="text-sm font-semibold text-blue-800">Technical Authority Note</p>
+                <p className="text-xs text-blue-700 mt-1 leading-relaxed">
+                  Accurate location data helps route your complaint to the correct jurisdictional authority and enables faster on-ground verification.
+                </p>
+              </div>
+            </div>
+          </motion.div>
         </div>
-      </motion.div>
+
+        {/* Right Column - Map */}
+        <div className="lg:col-span-6">
+          <motion.div
+            variants={itemVariants}
+            className="p-4 bg-gray-50 rounded-xl border border-gray-200 sticky top-4"
+          >
+            <div className="flex items-center gap-2 mb-3">
+              <Map className="h-5 w-5 text-[#630ed4]" />
+              <span className="text-sm font-semibold text-gray-700">
+                Select Location on Map
+              </span>
+            </div>
+            <p className="text-xs text-gray-500 mb-3">
+              Click on the map, search for a location, or use your current location to set precise coordinates. If your location is disabled, please enable it and refresh.
+            </p>
+            <GoogleMapPicker
+              latitude={formData.latitude}
+              longitude={formData.longitude}
+              onLocationSelect={(lat, lng) => {
+                updateField("latitude", lat);
+                updateField("longitude", lng);
+              }}
+              district={formData.district}
+              city={formData.city}
+              disabled={!formData.district || !formData.pin || pinValidationStatus !== "valid"}
+            />
+            {(!formData.district || !formData.pin || pinValidationStatus !== "valid") && (
+              <p className="text-xs text-amber-600 flex items-center gap-1 mt-3">
+                <AlertCircle className="h-3 w-3" />
+                Select district and enter valid PIN to enable map
+              </p>
+            )}
+          </motion.div>
+        </div>
+      </div>
     </motion.div>
   );
 }

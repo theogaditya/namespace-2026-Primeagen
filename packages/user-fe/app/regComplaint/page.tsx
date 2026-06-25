@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { motion, AnimatePresence, type Variants } from "framer-motion";
 import { Button } from "@/components/ui/button";
@@ -9,23 +9,20 @@ import {
   ArrowRight,
   Send,
   AlertCircle,
-  FileWarning,
-  Sparkles,
   Shield,
   ClipboardList,
   FileText,
   MapPin,
   Eye,
   CheckCircle,
-  Landmark,
-  Users,
-  HelpCircle,
-  MessageSquare,
   Brain,
   WifiOff,
   Loader2,
   Clock,
   XCircle,
+  Lock,
+  Square,
+  MapPinOff,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { SwarajAIChat } from "@/components/swaraj-ai-chat";
@@ -36,55 +33,20 @@ import {
   Step3Location,
   Step4Review,
   LoadingPopup,
+  LocationPermissionModal,
+  useAutoFillSequence,
   step1Schema,
   step2Schema,
   step3Schema,
   type ImageValidationStatus,
+  type AIResult,
+  type AutoFillPhase,
 } from "./customComps";
 import {
   Step1CategoryWithAutofill,
-  Step2DetailsAI,
-  type ImageAnalysisStatus,
 } from "./autofillpath";
 
 // Animation variants
-const containerVariants: Variants = {
-  hidden: { opacity: 0 },
-  visible: {
-    opacity: 1,
-    transition: {
-      staggerChildren: 0.1,
-      delayChildren: 0.2,
-    },
-  },
-};
-
-const itemVariants: Variants = {
-  hidden: { opacity: 0, y: 20 },
-  visible: {
-    opacity: 1,
-    y: 0,
-    transition: {
-      type: "spring",
-      stiffness: 100,
-      damping: 15,
-    },
-  },
-};
-
-const headerVariants: Variants = {
-  hidden: { opacity: 0, y: -30 },
-  visible: {
-    opacity: 1,
-    y: 0,
-    transition: {
-      type: "spring",
-      stiffness: 80,
-      damping: 20,
-    },
-  },
-};
-
 const stepContentVariants: Variants = {
   initial: { opacity: 0, x: 50 },
   animate: {
@@ -105,102 +67,24 @@ const stepContentVariants: Variants = {
   },
 };
 
-const floatingIconVariants: Variants = {
-  initial: { y: 0 },
-  animate: {
-    y: [-10, 10, -10],
-    transition: {
-      duration: 4,
-      repeat: Infinity,
-      ease: "easeInOut",
-    },
-  },
-};
-
-// Step configuration with enhanced icons - Standard path
+// Step configuration - Standard path
 const STEPS_STANDARD = [
-  {
-    id: 1,
-    label: "Category",
-    description: "Select department",
-    icon: <ClipboardList className="h-5 w-5" />,
-    gradient: "from-orange-500 to-amber-500",
-    bgGlow: "bg-orange-500/20",
-  },
-  {
-    id: 2,
-    label: "Details",
-    description: "Describe issue",
-    icon: <FileText className="h-5 w-5" />,
-    gradient: "from-blue-500 to-cyan-500",
-    bgGlow: "bg-blue-500/20",
-  },
-  {
-    id: 3,
-    label: "Location",
-    description: "Add address",
-    icon: <MapPin className="h-5 w-5" />,
-    gradient: "from-emerald-500 to-teal-500",
-    bgGlow: "bg-emerald-500/20",
-  },
-  {
-    id: 4,
-    label: "Review",
-    description: "Confirm & submit",
-    icon: <Eye className="h-5 w-5" />,
-    gradient: "from-purple-500 to-pink-500",
-    bgGlow: "bg-purple-500/20",
-  },
+  { id: 1, label: "CATEGORY" },
+  { id: 2, label: "DETAILS" },
+  { id: 3, label: "LOCATION" },
+  { id: 4, label: "REVIEW" },
 ];
 
-// Step configuration with enhanced icons - Autofill path
+// Step configuration - Autofill path (same labels — AI fills them automatically)
 const STEPS_AUTOFILL = [
-  {
-    id: 1,
-    label: "Category",
-    description: "Select department",
-    icon: <ClipboardList className="h-5 w-5" />,
-    gradient: "from-orange-500 to-amber-500",
-    bgGlow: "bg-orange-500/20",
-  },
-  {
-    id: 2,
-    label: "AI Auto-Fill",
-    description: "Upload & fill",
-    icon: <Brain className="h-5 w-5" />,
-    gradient: "from-purple-500 to-indigo-500",
-    bgGlow: "bg-purple-500/20",
-  },
-  {
-    id: 3,
-    label: "Location",
-    description: "Add address",
-    icon: <MapPin className="h-5 w-5" />,
-    gradient: "from-emerald-500 to-teal-500",
-    bgGlow: "bg-emerald-500/20",
-  },
-  {
-    id: 4,
-    label: "Review",
-    description: "Confirm & submit",
-    icon: <Eye className="h-5 w-5" />,
-    gradient: "from-purple-500 to-pink-500",
-    bgGlow: "bg-purple-500/20",
-  },
+  { id: 1, label: "CATEGORY" },
+  { id: 2, label: "DETAILS" },
+  { id: 3, label: "LOCATION" },
+  { id: 4, label: "REVIEW" },
 ];
 
-// Floating background icons
-const FLOATING_ICONS = [
-  { icon: <Landmark className="w-8 h-8" />, x: -350, y: -200, delay: 0, color: "text-orange-300" },
-  { icon: <Shield className="w-7 h-7" />, x: 350, y: -180, delay: 0.5, color: "text-blue-300" },
-  { icon: <Users className="w-6 h-6" />, x: -380, y: 100, delay: 1, color: "text-emerald-300" },
-  { icon: <HelpCircle className="w-7 h-7" />, x: 380, y: 120, delay: 1.5, color: "text-purple-300" },
-  { icon: <MessageSquare className="w-6 h-6" />, x: -300, y: -50, delay: 2, color: "text-amber-300" },
-  { icon: <Sparkles className="w-5 h-5" />, x: 300, y: -30, delay: 2.5, color: "text-pink-300" },
-];
-
-// Enhanced Step Progress Component
-function EnhancedStepProgress({
+// Step Progress Component - Purple themed with numbered circles
+function StepProgress({
   steps,
   currentStep,
 }: {
@@ -208,93 +92,56 @@ function EnhancedStepProgress({
   currentStep: number;
 }) {
   return (
-    <div className="w-full max-w-3xl mx-auto">
-      <div className="relative flex justify-between items-center">
-        {/* Background line */}
-        <div className="absolute top-6 left-0 right-0 h-1 bg-gray-200 rounded-full -z-10" />
-        
-        {/* Progress line */}
+    <div className="w-full max-w-2xl mx-auto">
+      <div className="relative flex items-center justify-between">
+        {/* Background connector line */}
+        <div className="absolute top-5 left-[10%] right-[10%] h-0.5 bg-gray-200" />
+        {/* Active connector line */}
         <motion.div
-          className="absolute top-6 left-0 h-1 bg-linear-to-r from-orange-500 via-blue-500 to-emerald-500 rounded-full -z-10"
+          className="absolute top-5 left-[10%] h-0.5 bg-[#630ed4]"
           initial={{ width: "0%" }}
-          animate={{ width: `${((currentStep - 1) / (steps.length - 1)) * 100}%` }}
-          transition={{ duration: 0.5, ease: "easeInOut" }}
+          animate={{
+            width: `${Math.min(((currentStep - 1) / (steps.length - 1)) * 80, 80)}%`,
+          }}
+          transition={{ duration: 0.4, ease: "easeInOut" }}
         />
 
-        {steps.map((step, index) => {
+        {steps.map((step) => {
           const isCompleted = step.id < currentStep;
           const isCurrent = step.id === currentStep;
-          const isUpcoming = step.id > currentStep;
 
           return (
-            <motion.div
-              key={step.id}
-              className="flex flex-col items-center relative z-10"
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: index * 0.1 }}
-            >
-              {/* Glow effect for current step */}
-              {isCurrent && (
-                <motion.div
-                  className={cn("absolute w-16 h-16 rounded-full blur-xl", step.bgGlow)}
-                  initial={{ scale: 0.8, opacity: 0 }}
-                  animate={{ scale: 1.2, opacity: 0.6 }}
-                  transition={{
-                    duration: 2,
-                    repeat: Infinity,
-                    repeatType: "reverse",
-                  }}
-                />
-              )}
-
-              {/* Step Circle */}
+            <div key={step.id} className="relative z-10 flex flex-col items-center">
+              {/* Circle */}
               <motion.div
                 className={cn(
-                  "relative w-12 h-12 rounded-full flex items-center justify-center text-sm font-semibold transition-all duration-300 shadow-lg",
-                  isCompleted && "bg-linear-to-br from-green-400 to-emerald-500 text-white",
-                  isCurrent &&
-                    `bg-linear-to-br ${step.gradient} text-white ring-4 ring-white shadow-xl`,
-                  isUpcoming && "bg-white text-gray-400 border-2 border-gray-200"
+                  "w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold transition-colors duration-300",
+                  isCompleted && "bg-emerald-500 text-white",
+                  isCurrent && "bg-[#630ed4] text-white ring-4 ring-[#630ed4]/20",
+                  !isCompleted && !isCurrent && "bg-gray-200 text-gray-400"
                 )}
-                whileHover={{ scale: 1.1 }}
-                whileTap={{ scale: 0.95 }}
+                initial={false}
+                animate={{ scale: isCurrent ? 1.05 : 1 }}
               >
                 {isCompleted ? (
-                  <motion.div
-                    initial={{ scale: 0 }}
-                    animate={{ scale: 1 }}
-                    transition={{ type: "spring", stiffness: 200 }}
-                  >
-                    <CheckCircle className="h-6 w-6" />
-                  </motion.div>
+                  <CheckCircle className="h-5 w-5" />
                 ) : (
-                  step.icon
+                  step.id
                 )}
               </motion.div>
 
-              {/* Step Label */}
-              <motion.div
-                className="mt-3 text-center"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ delay: 0.2 + index * 0.1 }}
+              {/* Label */}
+              <span
+                className={cn(
+                  "mt-2 text-[11px] font-semibold tracking-wide",
+                  isCompleted && "text-emerald-600",
+                  isCurrent && "text-[#630ed4]",
+                  !isCompleted && !isCurrent && "text-gray-400"
+                )}
               >
-                <p
-                  className={cn(
-                    "text-sm font-semibold transition-colors",
-                    isCompleted && "text-emerald-600",
-                    isCurrent && "text-gray-900",
-                    isUpcoming && "text-gray-400"
-                  )}
-                >
-                  {step.label}
-                </p>
-                <p className="text-xs text-gray-400 mt-0.5 hidden sm:block">
-                  {step.description}
-                </p>
-              </motion.div>
-            </motion.div>
+                {step.label}
+              </span>
+            </div>
           );
         })}
       </div>
@@ -325,12 +172,18 @@ export default function RegisterComplaintPage() {
   const [submitMessage, setSubmitMessage] = useState({ title: "", description: "" });
   const [showPopup, setShowPopup] = useState(false);
   const [complaintId, setComplaintId] = useState<string | null>(null);
-  const [mounted, setMounted] = useState(false);
   const [imageValidationStatus, setImageValidationStatus] = useState<ImageValidationStatus>("idle");
   
   // Autofill mode state
   const [useAutofill, setUseAutofill] = useState(false);
-  const [imageAnalysisStatus, setImageAnalysisStatus] = useState<ImageAnalysisStatus>("idle");
+  const [autoFillState, setAutoFillState] = useState<
+    "idle" | "location-permission" | "uploading" | "analyzing" | "filling" | "done"
+  >("idle");
+  const [aiResult, setAiResult] = useState<AIResult | null>(null);
+  const [userLocation, setUserLocation] = useState<{ lat: number; lng: number } | null>(null);
+  const [categories, setCategories] = useState<{ id: string; name: string; assignedDepartment: string }[]>([]);
+  const [operatingDistricts, setOperatingDistricts] = useState<{ id: string; name: string }[]>([]);
+  const [unserviceableLocation, setUnserviceableLocation] = useState<{ detectedDistrict: string; availableDistricts: string[] } | null>(null);
   
   // Network state from unified hook (works in both browser and Capacitor)
   const { isOnline } = useNetwork();
@@ -344,8 +197,34 @@ export default function RegisterComplaintPage() {
   // Get the appropriate steps based on autofill mode
   const STEPS = useAutofill ? STEPS_AUTOFILL : STEPS_STANDARD;
 
+  // Auto-fill sequence hook
+  const autoFill = useAutoFillSequence({
+    updateField: (field, value) => updateField(field as any, value as any),
+    setCurrentStep: goToStep,
+    goToStep,
+    categories,
+    operatingDistricts,
+  });
+
+  const isAutoFilling = autoFillState === "filling";
+
+  // Fetch categories + districts for auto-fill (needed for matching)
   useEffect(() => {
-    setMounted(true);
+    const fetchData = async () => {
+      try {
+        const [catRes, distRes] = await Promise.all([
+          fetch("/api/complaint/categories"),
+          fetch("/api/complaint/districts"),
+        ]);
+        const catData = await catRes.json();
+        const distData = await distRes.json();
+        if (catData.success && catData.data) setCategories(catData.data);
+        if (distData.success && distData.data) setOperatingDistricts(distData.data);
+      } catch (err) {
+        console.error("Error fetching auto-fill data:", err);
+      }
+    };
+    fetchData();
   }, []);
 
   // Check auth on mount
@@ -401,6 +280,53 @@ export default function RegisterComplaintPage() {
         return { schema: step1Schema, data: {} };
     }
   };
+
+  // --- AI Quick Fill Flow Handlers ---
+
+  // Called when user clicks the AI box → show location permission
+  const handleAutofillToggle = useCallback((value: boolean) => {
+    setUseAutofill(value);
+    if (value) {
+      setAutoFillState("location-permission");
+    }
+  }, []);
+
+  // Called when location permission is resolved
+  const handleLocationResult = useCallback((coords: { lat: number; lng: number } | null) => {
+    setUserLocation(coords);
+    setAutoFillState("uploading"); // Now waiting for image upload
+  }, []);
+
+  // Called when AI image upload starts
+  const handleAIUploadStart = useCallback(() => {
+    setAutoFillState("analyzing");
+  }, []);
+
+  // Called when AI analysis completes — start the auto-fill animation
+  const handleAIAnalysisComplete = useCallback(
+    (data: { category: string; subCategory: string; complaint: string; urgency: string }) => {
+      const result: AIResult = data;
+      setAiResult(result);
+      setAutoFillState("filling");
+      // Start the orchestrated auto-fill sequence
+      autoFill.run(result, userLocation).then(() => {
+        setAutoFillState("done");
+      });
+    },
+    [autoFill, userLocation]
+  );
+
+  // Called when AI analysis fails
+  const handleAIAnalysisError = useCallback(() => {
+    setAutoFillState("idle");
+    // User can select category manually
+  }, []);
+
+  // Stop auto-fill
+  const handleStopAutoFill = useCallback(() => {
+    autoFill.stop();
+    setAutoFillState("done");
+  }, [autoFill]);
 
   // Handle next step with validation
   const handleNext = () => {
@@ -624,30 +550,18 @@ export default function RegisterComplaintPage() {
             updateField={updateField}
             setFieldTouched={setFieldTouched}
             setErrors={setErrors}
+            setPhoto={setPhoto}
             useAutofill={useAutofill}
-            onAutofillToggle={setUseAutofill}
+            onAutofillToggle={handleAutofillToggle}
+            onAIUploadStart={handleAIUploadStart}
+            onAIAnalysisComplete={handleAIAnalysisComplete}
+            onAIAnalysisError={handleAIAnalysisError}
+            highlightedCategory={autoFill.highlightedCategory}
+            isAutoFilling={isAutoFilling}
+            autoFillPhase={autoFill.phase}
           />
         );
       case 2:
-        // Use AI autofill step if enabled, otherwise standard details
-        if (useAutofill) {
-          return (
-            <Step2DetailsAI
-              formData={formData}
-              touched={touched}
-              errors={errors}
-              updateField={updateField}
-              setFieldTouched={setFieldTouched}
-              setErrors={setErrors}
-              setPhoto={setPhoto}
-              onValidationStatusChange={setImageValidationStatus}
-              onAnalysisStatusChange={setImageAnalysisStatus}
-              onAnalysisComplete={(data) => {
-                console.log("AI Analysis complete:", data);
-              }}
-            />
-          );
-        }
         return (
           <Step2Details
             formData={formData}
@@ -669,6 +583,9 @@ export default function RegisterComplaintPage() {
             updateField={updateField}
             setFieldTouched={setFieldTouched}
             setErrors={setErrors}
+            onUnserviceableLocation={(detected, available) => {
+              setUnserviceableLocation({ detectedDistrict: detected, availableDistricts: available });
+            }}
           />
         );
       case 4:
@@ -680,138 +597,48 @@ export default function RegisterComplaintPage() {
 
   // Check if current step has errors
   const hasStepErrors = Object.keys(errors).filter((k) => errors[k]).length > 0;
-  const currentStepConfig = STEPS[currentStep - 1];
   
   // Check if Next button should be disabled
-  // For autofill path: disable while AI is analyzing
-  // For standard path: disable while image validation is in progress or invalid
-  const isNextDisabled = currentStep === 2 && (
-    useAutofill 
-      ? imageAnalysisStatus === "analyzing"
-      : (
-          imageValidationStatus === "validating" || 
-          imageValidationStatus === "invalid" ||
-          imageValidationStatus === "error"
-        )
-  );
+  // Disable during auto-fill or while image validation is in progress
+  const isNextDisabled = isAutoFilling || (currentStep === 2 && (
+    imageValidationStatus === "validating" || 
+    imageValidationStatus === "invalid" ||
+    imageValidationStatus === "error"
+  ));
+
+  // Get next step label for button text
+  const getNextStepLabel = () => {
+    if (currentStep >= 4) return "";
+    const next = STEPS[currentStep]; // currentStep is 1-indexed, so STEPS[currentStep] is the next
+    return next ? next.label.charAt(0) + next.label.slice(1).toLowerCase() : "Next";
+  };
 
   return (
-    <div className="min-h-screen relative overflow-hidden bg-linear-to-b from-slate-50 via-white to-slate-100 py-10">
-      {/* Animated Background Gradient */}
-      <div className="absolute inset-0 -z-10">
-        <div className="absolute top-0 left-1/4 w-96 h-96 bg-orange-200/30 rounded-full blur-3xl" />
-        <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-blue-200/30 rounded-full blur-3xl" />
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-linear-to-r from-orange-100/20 via-transparent to-blue-100/20 rounded-full blur-3xl" />
-      </div>
-
-      {/* Floating Background Icons */}
-      <div className="absolute inset-0 flex items-center justify-center pointer-events-none overflow-hidden">
-        {FLOATING_ICONS.map((item, index) => (
-          <motion.div
-            key={index}
-            className={cn(
-              "absolute opacity-20",
-              item.color,
-              mounted ? "opacity-20" : "opacity-0"
-            )}
-            style={{
-              transform: `translate(${item.x}px, ${item.y}px)`,
-            }}
-            variants={floatingIconVariants}
-            initial="initial"
-            animate="animate"
-            transition={{ delay: item.delay }}
-          >
-            {item.icon}
-          </motion.div>
-        ))}
-      </div>
-
-      <div className="relative z-10 py-8 sm:py-12 px-4">
+    <div className="min-h-screen bg-[#f9f9ff] py-10">
+      <div className="py-8 sm:py-12 px-4">
         <div className="max-w-4xl mx-auto">
           {/* Header */}
-          <motion.div
-            className="text-center mb-10"
-            initial="hidden"
-            animate="visible"
-            variants={headerVariants}
-          >
-            {/* Connection Status & Queue Indicator */}
-            <div className="flex justify-center gap-2 mb-4">
-              <motion.div
-                className={cn(
-                  "inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium",
-                  useAutofill 
-                    ? "bg-gradient-to-r from-purple-100 to-indigo-100 text-purple-700"
-                    : "bg-linear-to-r from-orange-100 to-amber-100 text-orange-700"
-                )}
-                whileHover={{ scale: 1.05 }}
-              >
-                {useAutofill ? <Brain className="w-4 h-4" /> : <Sparkles className="w-4 h-4" />}
-                {useAutofill ? "AI-Powered Auto-Fill Mode" : "AI-Powered Complaint System"}
-              </motion.div>
-            </div>
-            <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-gray-900 mb-3 tracking-tight">
+          <div className="text-center mb-8">
+            <h1 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-2 tracking-tight">
               Register a Complaint
             </h1>
-            <p className="text-gray-600 text-lg max-w-2xl mx-auto">
+            <p className="text-gray-500 text-base max-w-2xl mx-auto">
               Help us serve you better by providing accurate information about your concern
             </p>
-          </motion.div>
+          </div>
 
           {/* Progress Steps */}
-          <motion.div
-            className="mb-10"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.2 }}
-          >
-            <EnhancedStepProgress steps={STEPS} currentStep={currentStep} />
-          </motion.div>
+          <div className="mb-8">
+            <StepProgress steps={STEPS} currentStep={currentStep} />
+          </div>
 
           {/* Main Card */}
           <motion.div
-            className="bg-white/80 backdrop-blur-xl rounded-3xl shadow-2xl border border-white/50 overflow-hidden"
-            initial={{ opacity: 0, y: 40 }}
+            className="bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden"
+            initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.3, type: "spring", stiffness: 100 }}
+            transition={{ duration: 0.3 }}
           >
-            {/* Card Header */}
-            <div
-              className={cn(
-                "relative px-6 sm:px-8 py-6 bg-linear-to-r text-white overflow-hidden",
-                currentStepConfig.gradient
-              )}
-            >
-              {/* Animated background pattern */}
-              <div className="absolute inset-0 opacity-10">
-                <div className="absolute top-0 right-0 w-64 h-64 bg-white rounded-full -translate-y-1/2 translate-x-1/2" />
-                <div className="absolute bottom-0 left-0 w-48 h-48 bg-white rounded-full translate-y-1/2 -translate-x-1/2" />
-              </div>
-
-              <div className="relative z-10">
-                <motion.div
-                  className="flex items-center gap-3"
-                  key={currentStep}
-                  initial={{ opacity: 0, x: -20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ type: "spring", stiffness: 200 }}
-                >
-                  <div className="p-2 bg-white/20 rounded-xl backdrop-blur-sm">
-                    {currentStepConfig.icon}
-                  </div>
-                  <div>
-                    <h2 className="text-xl sm:text-2xl font-bold">
-                      Step {currentStep}: {currentStepConfig.label}
-                    </h2>
-                    <p className="text-white/80 text-sm mt-0.5">
-                      {currentStepConfig.description}
-                    </p>
-                  </div>
-                </motion.div>
-              </div>
-            </div>
-
             {/* Card Content */}
             <div className="p-6 sm:p-8">
               {/* Step Content with AnimatePresence */}
@@ -837,11 +664,9 @@ export default function RegisterComplaintPage() {
                     exit={{ opacity: 0, height: 0 }}
                     className="mt-6"
                   >
-                    <div className="p-4 bg-red-50 border border-red-200 rounded-2xl">
+                    <div className="p-4 bg-red-50 border border-red-200 rounded-xl">
                       <div className="flex items-start gap-3">
-                        <div className="p-1 bg-red-100 rounded-lg">
-                          <AlertCircle className="h-5 w-5 text-red-500" />
-                        </div>
+                        <AlertCircle className="h-5 w-5 text-red-500 shrink-0 mt-0.5" />
                         <div>
                           <p className="text-sm font-semibold text-red-800">
                             Please fix the following errors:
@@ -865,103 +690,66 @@ export default function RegisterComplaintPage() {
               </AnimatePresence>
 
               {/* Navigation Buttons */}
-              <motion.div
-                className="flex flex-col sm:flex-row justify-between items-center gap-4 mt-8 pt-6 border-t border-gray-100"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ delay: 0.4 }}
-              >
-                <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
-                  <Button
-                    variant="outline"
+              <div className={cn(
+                "flex justify-between items-center mt-8 pt-6 border-t border-gray-100",
+                isAutoFilling && "opacity-50 pointer-events-none"
+              )}>
+                {currentStep > 1 ? (
+                  <button
+                    type="button"
                     onClick={prevStep}
-                    disabled={currentStep === 1}
-                    className={cn(
-                      "flex items-center gap-2 px-6 py-5 rounded-xl border-2 transition-all",
-                      currentStep === 1 ? "invisible" : "hover:bg-gray-50 hover:border-gray-300"
-                    )}
+                    className="flex items-center gap-2 text-sm font-medium text-gray-600 hover:text-gray-900 transition-colors"
                   >
                     <ArrowLeft className="h-4 w-4" />
-                    Previous
-                  </Button>
-                </motion.div>
-
-                <div className="flex items-center gap-2 text-sm text-gray-500 order-first sm:order-0">
-                  <FileWarning className="h-4 w-4" />
-                  <span className="hidden sm:inline">All fields marked with * are required</span>
-                  <span className="sm:hidden">* Required fields</span>
-                </div>
+                    Previous Step
+                  </button>
+                ) : (
+                  <button
+                    type="button"
+                    onClick={() => router.push("/dashboard")}
+                    className="flex items-center gap-2 text-sm font-medium text-gray-600 hover:text-gray-900 transition-colors"
+                  >
+                    Cancel
+                  </button>
+                )}
 
                 {currentStep < 4 ? (
-                  <motion.div whileHover={{ scale: isNextDisabled ? 1 : 1.02 }} whileTap={{ scale: isNextDisabled ? 1 : 0.98 }}>
-                    <Button
-                      onClick={handleNext}
-                      disabled={isNextDisabled}
-                      className={cn(
-                        "flex items-center gap-2 px-8 py-5 rounded-xl text-white shadow-lg transition-all bg-linear-to-r",
-                        currentStepConfig.gradient,
-                        isNextDisabled 
-                          ? "opacity-50 cursor-not-allowed grayscale" 
-                          : "hover:shadow-xl hover:brightness-110"
-                      )}
-                    >
-                      {imageValidationStatus === "validating" 
-                        ? "Validating..." 
-                        : imageValidationStatus === "invalid" 
-                          ? "Invalid Image" 
-                          : "Next"}
-                      <ArrowRight className="h-4 w-4" />
-                    </Button>
-                  </motion.div>
-                ) : (
-                  <motion.div
-                    whileHover={{ scale: 1.02 }}
-                    whileTap={{ scale: 0.98 }}
-                    className="relative"
+                  <Button
+                    onClick={handleNext}
+                    disabled={isNextDisabled}
+                    className={cn(
+                      "flex items-center gap-2 px-6 py-2.5 rounded-full text-white transition-all",
+                      "bg-[#630ed4] hover:bg-[#5108b8]",
+                      isNextDisabled && "opacity-50 cursor-not-allowed"
+                    )}
                   >
-                    <Button
-                      onClick={handleSubmit}
-                      disabled={isSubmitting}
-                      className="flex items-center gap-2 px-8 py-5 rounded-xl bg-linear-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 text-white shadow-lg hover:shadow-xl transition-all"
-                    >
-                      <Send className="h-4 w-4" />
-                      Submit Complaint
-                    </Button>
-                    {/* Pulse animation for submit button */}
-                    <motion.div
-                      className="absolute inset-0 rounded-xl bg-linear-to-r from-green-500 to-emerald-500 -z-10"
-                      animate={{
-                        scale: [1, 1.05, 1],
-                        opacity: [0.5, 0, 0.5],
-                      }}
-                      transition={{
-                        duration: 2,
-                        repeat: Infinity,
-                        ease: "easeInOut",
-                      }}
-                    />
-                  </motion.div>
+                    {imageValidationStatus === "validating" 
+                      ? "Validating..." 
+                      : imageValidationStatus === "invalid" 
+                        ? "Invalid Image" 
+                        : `Next: ${getNextStepLabel()}`}
+                    <ArrowRight className="h-4 w-4" />
+                  </Button>
+                ) : (
+                  <Button
+                    onClick={handleSubmit}
+                    disabled={isSubmitting}
+                    className="flex items-center gap-2 px-6 py-2.5 rounded-full bg-emerald-600 hover:bg-emerald-700 text-white transition-all"
+                  >
+                    <Send className="h-4 w-4" />
+                    Submit Complaint
+                  </Button>
                 )}
-              </motion.div>
+              </div>
             </div>
-          </motion.div>
 
-          {/* Help Text */}
-          <motion.div
-            className="mt-8 text-center"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.5 }}
-          >
-            <p className="text-sm text-gray-500">
-              Need help? Contact our support team at{" "}
-              <a
-                href="mailto:support@swarajdesk.gov.in"
-                className="text-orange-600 hover:text-orange-700 font-medium hover:underline transition-colors"
-              >
-                support@swarajdesk.gov.in
-              </a>
-            </p>
+            {/* Security Footer */}
+            <div className="px-6 sm:px-8 py-4 bg-gray-50 border-t border-gray-100">
+              <div className="flex items-center justify-center gap-2 text-xs text-gray-400">
+                <Lock className="h-3.5 w-3.5" />
+                <span>Secure blockchain entry. Your privacy is our priority.</span>
+              </div>
+            </div>
           </motion.div>
         </div>
       </div>
@@ -974,6 +762,121 @@ export default function RegisterComplaintPage() {
         subMessage={submitMessage.description}
         onClose={handlePopupClose}
       />
+
+      {/* Location Permission Modal */}
+      <LocationPermissionModal
+        isOpen={autoFillState === "location-permission"}
+        onResult={handleLocationResult}
+      />
+
+      {/* Unserviceable Location Popup — shown for both auto-fill and manual fill */}
+      <AnimatePresence>
+        {(autoFill.unserviceableInfo || unserviceableLocation) && (() => {
+          const info = autoFill.unserviceableInfo || unserviceableLocation!;
+          return (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4"
+            >
+              <motion.div
+                initial={{ opacity: 0, scale: 0.9, y: 20 }}
+                animate={{ opacity: 1, scale: 1, y: 0 }}
+                exit={{ opacity: 0, scale: 0.9, y: -20 }}
+                transition={{ type: "spring", stiffness: 200, damping: 20 }}
+                className="bg-white rounded-2xl shadow-2xl border border-red-200 overflow-hidden max-w-md w-full"
+              >
+                {/* Header */}
+                <div className="bg-gradient-to-r from-red-500 to-orange-500 px-6 py-4 flex items-center gap-3">
+                  <MapPinOff className="h-6 w-6 text-white" />
+                  <h3 className="text-white font-bold text-lg">Location Not Serviceable</h3>
+                </div>
+
+                {/* Body */}
+                <div className="p-6 space-y-4">
+                  <p className="text-gray-700">
+                    Your detected location{" "}
+                    <span className="font-semibold text-red-600">
+                      &quot;{info.detectedDistrict}&quot;
+                    </span>{" "}
+                    is not in our list of operating districts.
+                  </p>
+
+                  <div className="bg-amber-50 border border-amber-200 rounded-xl p-4">
+                    <p className="text-sm font-semibold text-amber-800 mb-2">
+                      Please select one of our operating districts:
+                    </p>
+                    <div className="flex flex-wrap gap-1.5 max-h-40 overflow-auto">
+                      {info.availableDistricts.map((d) => (
+                        <span
+                          key={d}
+                          className="inline-block px-2.5 py-1 text-xs font-medium bg-white border border-amber-300 rounded-full text-amber-800"
+                        >
+                          {d}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+
+                  <Button
+                    onClick={() => {
+                      autoFill.dismissUnserviceable();
+                      setUnserviceableLocation(null);
+                      setAutoFillState("done");
+                      // Clear the invalid district so user can pick a valid one
+                      updateField("district" as any, "");
+                    }}
+                    className="w-full bg-[#630ed4] hover:bg-[#5108b8] text-white rounded-xl"
+                  >
+                    OK, I&apos;ll select a valid district
+                  </Button>
+                </div>
+              </motion.div>
+            </motion.div>
+          );
+        })()}
+      </AnimatePresence>
+
+      {/* Auto-Fill Overlay */}
+      <AnimatePresence>
+        {isAutoFilling && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50"
+          >
+            <motion.div
+              initial={{ y: 20, scale: 0.9 }}
+              animate={{ y: 0, scale: 1 }}
+              exit={{ y: 20, scale: 0.9 }}
+              className="flex items-center gap-3 px-5 py-3 rounded-full bg-[#630ed4] text-white shadow-2xl border border-[#630ed4]/50"
+            >
+              <motion.div
+                animate={{ rotate: 360 }}
+                transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+              >
+                <Brain className="h-5 w-5" />
+              </motion.div>
+              <span className="text-sm font-medium">
+                {autoFill.phase === "category" && "Selecting category..."}
+                {autoFill.phase === "details" && "Filling complaint details..."}
+                {autoFill.phase === "location" && (autoFill.locationStatus || "Filling location...")}
+                {autoFill.phase === "review" && "Almost done..."}
+              </span>
+              <button
+                type="button"
+                onClick={handleStopAutoFill}
+                className="p-1.5 rounded-full bg-white/20 hover:bg-white/30 transition-colors"
+                title="Stop auto-fill"
+              >
+                <Square className="h-3.5 w-3.5" />
+              </button>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* Offline Sync Modal */}
       <AnimatePresence>

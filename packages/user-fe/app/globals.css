@@ -120,6 +120,42 @@
   }
 }
 
+/* ─── Dashboard Design Tokens ─────────────────────────── */
+:root {
+  --dash-primary: #630ed4;
+  --dash-primary-container: #7c3aed;
+  --dash-secondary: #1960a3;
+  --dash-tertiary: #005b31;
+  --dash-tertiary-container: #007642;
+  --dash-surface: #f9f9ff;
+  --dash-surface-container: #e8eeff;
+  --dash-surface-container-low: #f1f3ff;
+  --dash-surface-container-high: #e3e8f9;
+  --dash-on-surface: #161c27;
+  --dash-on-primary: #ffffff;
+  --dash-on-secondary: #ffffff;
+  --dash-on-tertiary: #ffffff;
+  --dash-outline: #7b7487;
+  --dash-outline-variant: #ccc3d8;
+  --dash-error: #ba1a1a;
+  --dash-error-container: #ffdad6;
+}
+
+/* Pixel-art inspired badge styles (Habitica style) */
+.pixel-badge {
+  image-rendering: pixelated;
+  border: 3px solid #4a4455;
+  box-shadow: 4px 4px 0px rgba(0,0,0,0.1);
+  position: relative;
+}
+.pixel-badge::after {
+  content: '';
+  position: absolute;
+  top: -3px; left: -3px; right: -3px; bottom: -3px;
+  border: 1px solid rgba(255,255,255,0.3);
+  pointer-events: none;
+}
+
 /* Ensure Google Translate widget bar stays below our navbar */
 .goog-te-banner-frame,
 #goog-gt-tt,

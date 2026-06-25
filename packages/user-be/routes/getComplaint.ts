@@ -962,6 +962,7 @@ export function getComplaintRouter(db: PrismaClient) {
           { location: { district: { contains: query, mode: 'insensitive' as const } } },
           { location: { city: { contains: query, mode: 'insensitive' as const } } },
           { category: { name: { contains: query, mode: 'insensitive' as const } } },
+          { User: { name: { contains: query, mode: 'insensitive' as const } } },
         ],
       };
 

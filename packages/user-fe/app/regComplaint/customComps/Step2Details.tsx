@@ -26,12 +26,12 @@ import {
   X, 
   Globe,
   Lock,
-  Sparkles,
   Upload,
   Camera,
   Loader2,
   ShieldCheck,
   ShieldAlert,
+  Lightbulb,
 } from "lucide-react";
 
 const containerVariants: Variants = {
@@ -395,287 +395,305 @@ export function Step2Details({
       initial="hidden"
       animate="visible"
     >
-      <motion.div className="text-center mb-8" variants={headerVariants}>
-        <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-linear-to-r from-blue-100 to-cyan-100 text-blue-700 text-sm font-medium mb-4">
-          <Sparkles className="w-4 h-4" />
+      <motion.div className="text-center mb-6" variants={headerVariants}>
+        <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-[#630ed4]/10 text-[#630ed4] text-xs font-semibold uppercase tracking-wide mb-4">
           Step 2 of 4
         </div>
         <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-2">Complaint Details</h2>
         <p className="text-gray-500">
-          Describe your issue for{" "}
-          <span className="font-semibold text-blue-600 bg-blue-50 px-2 py-0.5 rounded-lg">
+          Provide specific details about your{" "}
+          <span className="font-semibold text-[#630ed4] bg-[#630ed4]/10 px-2 py-0.5 rounded-lg">
             {formData.categoryName}
-          </span>
+          </span>{" "}
+          complaint
         </p>
       </motion.div>
 
-      {/* Sub-category */}
-      <motion.div className="space-y-2" variants={itemVariants}>
-        <div className="flex items-center justify-between">
-          <Label htmlFor="subCategory" className={cn(
-            "text-sm font-semibold",
-            touched.subCategory && errors.subCategory && "text-red-600"
-          )}>
-            Sub-category <span className="text-red-500">*</span>
-          </Label>
-          <WordCounter current={subCategoryWords} max={MAX_SUBCATEGORY_WORDS} />
-        </div>
-        <div className="relative">
-          <Textarea
-            id="subCategory"
-            value={formData.subCategory}
-            onChange={handleSubCategoryChange}
-            onBlur={() => setFieldTouched("subCategory")}
-            placeholder="Briefly describe the type of issue (e.g., Pothole on main road)"
-            className={cn(
-              "min-h-20 resize-none rounded-xl border-2 transition-all focus:ring-2 focus:ring-blue-100",
-              touched.subCategory && errors.subCategory 
-                ? "border-red-300 focus:border-red-500" 
-                : "border-gray-200 focus:border-blue-500"
-            )}
-          />
-        </div>
-        {touched.subCategory && errors.subCategory && (
-          <motion.p
-            initial={{ opacity: 0, y: -10 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="text-sm text-red-600 flex items-center gap-1"
-          >
-            <AlertCircle className="h-4 w-4" />
-            {errors.subCategory}
-          </motion.p>
-        )}
-      </motion.div>
-
-      {/* Description */}
-      <motion.div className="space-y-2" variants={itemVariants}>
-        <div className="flex items-center justify-between">
-          <Label htmlFor="description" className={cn(
-            "text-sm font-semibold",
-            touched.description && errors.description && "text-red-600"
-          )}>
-            Description <span className="text-red-500">*</span>
-          </Label>
-          <WordCounter current={descriptionWords} max={MAX_DESCRIPTION_WORDS} />
-        </div>
-        <Textarea
-          id="description"
-          value={formData.description}
-          onChange={handleDescriptionChange}
-          onBlur={() => setFieldTouched("description")}
-          placeholder="Provide detailed information about your complaint. Include relevant details like when the issue started, how it affects you, etc."
-          className={cn(
-            "min-h-[150px] resize-none rounded-xl border-2 transition-all focus:ring-2 focus:ring-blue-100",
-            touched.description && errors.description 
-              ? "border-red-300 focus:border-red-500" 
-              : "border-gray-200 focus:border-blue-500"
-          )}
-        />
-        {touched.description && errors.description && (
-          <motion.p
-            initial={{ opacity: 0, y: -10 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="text-sm text-red-600 flex items-center gap-1"
-          >
-            <AlertCircle className="h-4 w-4" />
-            {errors.description}
-          </motion.p>
-        )}
-      </motion.div>
-
-      {/* Urgency */}
-      <motion.div className="space-y-3" variants={itemVariants}>
-        <Label className="text-sm font-semibold">
-          Urgency Level <span className="text-red-500">*</span>
-        </Label>
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-          {URGENCY_OPTIONS.map((option) => {
-            const isSelected = formData.urgency === option.value;
-            return (
-              <motion.button
-                key={option.value}
-                type="button"
-                onClick={() => {
-                  updateField("urgency", option.value);
-                  setFieldTouched("urgency");
-                }}
-                whileHover={{ scale: 1.02, y: -2 }}
-                whileTap={{ scale: 0.98 }}
+      {/* 2-Column Layout */}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+        {/* Left Column - Form Fields */}
+        <div className="lg:col-span-7 space-y-5">
+          {/* Sub-category */}
+          <motion.div className="space-y-2" variants={itemVariants}>
+            <div className="flex items-center justify-between">
+              <Label htmlFor="subCategory" className={cn(
+                "text-sm font-semibold",
+                touched.subCategory && errors.subCategory && "text-red-600"
+              )}>
+                Issue Sub-category <span className="text-red-500">*</span>
+              </Label>
+              <WordCounter current={subCategoryWords} max={MAX_SUBCATEGORY_WORDS} />
+            </div>
+            <div className="relative">
+              <Textarea
+                id="subCategory"
+                value={formData.subCategory}
+                onChange={handleSubCategoryChange}
+                onBlur={() => setFieldTouched("subCategory")}
+                placeholder="Briefly describe the type of issue (e.g., Pothole on main road)"
                 className={cn(
-                  "relative p-4 rounded-xl border-2 transition-all duration-200 text-left overflow-hidden",
-                  isSelected
-                    ? `${option.bgColor} border-current ${option.color} shadow-lg`
-                    : "border-gray-200 hover:border-gray-300 bg-white hover:bg-gray-50"
+                  "min-h-20 resize-none rounded-xl border-2 transition-all focus:ring-2 focus:ring-[#630ed4]/20",
+                  touched.subCategory && errors.subCategory 
+                    ? "border-red-300 focus:border-red-500" 
+                    : "border-gray-200 focus:border-[#630ed4]"
                 )}
-              >
-                {isSelected && (
-                  <motion.div
-                    initial={{ scale: 0 }}
-                    animate={{ scale: 1 }}
-                    className="absolute top-2 right-2"
-                  >
-                    <CheckCircle className="h-4 w-4" />
-                  </motion.div>
-                )}
-                <p className={cn("font-semibold text-sm", isSelected ? option.color : "text-gray-700")}>
-                  {option.label}
-                </p>
-                <p className="text-xs text-gray-500 mt-0.5 line-clamp-1">{option.description}</p>
-              </motion.button>
-            );
-          })}
-        </div>
-      </motion.div>
-
-      {/* Photo Upload */}
-      <motion.div className="space-y-3" variants={itemVariants}>
-        <Label className="text-sm font-semibold flex items-center gap-2">
-          <Camera className="h-4 w-4 text-gray-500" />
-          Attach Photo (Optional)
-        </Label>
-        <div className="space-y-2">
-          {formData.photoPreview ? (
-            <motion.div
-              initial={{ opacity: 0, scale: 0.9 }}
-              animate={{ opacity: 1, scale: 1 }}
-              className="relative inline-block"
-            >
-              <img
-                src={formData.photoPreview}
-                alt="Complaint attachment"
-                className="max-h-48 rounded-xl border-2 border-gray-200 object-cover shadow-lg"
               />
-              <motion.button
-                type="button"
-                onClick={handleRemovePhoto}
-                whileHover={{ scale: 1.1 }}
-                whileTap={{ scale: 0.9 }}
-                className="absolute -top-2 -right-2 p-1.5 bg-red-500 text-white rounded-full shadow-lg hover:bg-red-600 transition-colors z-10"
+            </div>
+            {touched.subCategory && errors.subCategory && (
+              <motion.p
+                initial={{ opacity: 0, y: -10 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="text-sm text-red-600 flex items-center gap-1"
               >
-                <X className="h-4 w-4" />
-              </motion.button>
-            </motion.div>
-          ) : (
-            <motion.div
-              onDragOver={(e) => { e.preventDefault(); setIsDragging(true); }}
-              onDragLeave={() => setIsDragging(false)}
-              onDrop={handleDrop}
-              onClick={() => fileInputRef.current?.click()}
-              whileHover={{ scale: 1.01 }}
-              whileTap={{ scale: 0.99 }}
+                <AlertCircle className="h-4 w-4" />
+                {errors.subCategory}
+              </motion.p>
+            )}
+          </motion.div>
+
+          {/* Description */}
+          <motion.div className="space-y-2" variants={itemVariants}>
+            <div className="flex items-center justify-between">
+              <Label htmlFor="description" className={cn(
+                "text-sm font-semibold",
+                touched.description && errors.description && "text-red-600"
+              )}>
+                Detailed Description <span className="text-red-500">*</span>
+              </Label>
+              <WordCounter current={descriptionWords} max={MAX_DESCRIPTION_WORDS} />
+            </div>
+            <Textarea
+              id="description"
+              value={formData.description}
+              onChange={handleDescriptionChange}
+              onBlur={() => setFieldTouched("description")}
+              placeholder="Provide detailed information about your complaint. Include relevant details like when the issue started, how it affects you, etc."
               className={cn(
-                "w-full p-8 border-2 border-dashed rounded-2xl transition-all duration-300 cursor-pointer",
-                "flex flex-col items-center justify-center gap-3",
-                isDragging
-                  ? "border-blue-500 bg-blue-50 scale-[1.02]"
-                  : photoError
-                  ? "border-red-300 bg-red-50"
-                  : "border-gray-300 hover:border-blue-400 hover:bg-blue-50/50"
+                "min-h-[150px] resize-none rounded-xl border-2 transition-all focus:ring-2 focus:ring-[#630ed4]/20",
+                touched.description && errors.description 
+                  ? "border-red-300 focus:border-red-500" 
+                  : "border-gray-200 focus:border-[#630ed4]"
               )}
-            >
-              <motion.div
-                animate={isDragging ? { y: -5, scale: 1.1 } : { y: 0, scale: 1 }}
-                className={cn(
-                  "p-3 rounded-xl",
-                  isDragging ? "bg-blue-100" : "bg-gray-100"
-                )}
+            />
+            {touched.description && errors.description && (
+              <motion.p
+                initial={{ opacity: 0, y: -10 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="text-sm text-red-600 flex items-center gap-1"
               >
-                <Upload className={cn(
-                  "h-8 w-8",
-                  isDragging ? "text-blue-600" : photoError ? "text-red-400" : "text-gray-400"
-                )} />
-              </motion.div>
-              <div className="text-center">
-                <span className={cn(
-                  "text-sm font-medium block",
-                  isDragging ? "text-blue-600" : photoError ? "text-red-600" : "text-gray-600"
-                )}>
-                  {isDragging ? "Drop your image here" : "Click to upload or drag and drop"}
-                </span>
-                <span className="text-xs text-gray-400 mt-1">PNG, JPG up to {MAX_PHOTO_SIZE_MB}MB</span>
-              </div>
-            </motion.div>
-          )}
-          <input
-            ref={fileInputRef}
-            type="file"
-            accept="image/*"
-            onChange={handlePhotoSelect}
-            className="hidden"
-          />
-          {photoError && (
-            <motion.p
-              initial={{ opacity: 0, y: -10 }}
-              animate={{ opacity: 1, y: 0 }}
-              className="text-sm text-red-600 flex items-center gap-1"
-            >
-              <AlertCircle className="h-4 w-4" />
-              {photoError}
-            </motion.p>
-          )}
-          
-          {/* Image Validation Badge */}
-          <AnimatePresence mode="wait">
-            {formData.photo && (
-              <ImageValidationBadge 
-                status={validationStatus} 
-                validationResult={validationResult} 
-              />
+                <AlertCircle className="h-4 w-4" />
+                {errors.description}
+              </motion.p>
             )}
-          </AnimatePresence>
-        </div>
-      </motion.div>
+          </motion.div>
 
-      {/* Public/Private Toggle */}
-      <motion.div
-        variants={itemVariants}
-        className={cn(
-          "p-5 rounded-2xl border-2 transition-all duration-300",
-          formData.isPublic
-            ? "bg-linear-to-r from-blue-50 to-cyan-50 border-blue-200"
-            : "bg-gray-50 border-gray-200"
-        )}
-      >
-        <div className="flex items-start gap-4">
-          <Checkbox
-            id="isPublic"
-            checked={formData.isPublic}
-            onCheckedChange={(checked) => {
-              updateField("isPublic", checked === true);
-              setFieldTouched("isPublic");
-            }}
-            className="mt-0.5 h-5 w-5"
-          />
-          <div className="flex-1">
-            <Label htmlFor="isPublic" className="text-sm font-semibold cursor-pointer flex items-center gap-2">
-              {formData.isPublic ? (
-                <>
-                  <motion.div
-                    initial={{ scale: 0 }}
-                    animate={{ scale: 1 }}
-                    className="p-1.5 bg-blue-100 rounded-lg"
-                  >
-                    <Globe className="h-4 w-4 text-blue-600" />
-                  </motion.div>
-                  <span className="text-blue-700">Make complaint public</span>
-                </>
-              ) : (
-                <>
-                  <div className="p-1.5 bg-gray-200 rounded-lg">
-                    <Lock className="h-4 w-4 text-gray-500" />
-                  </div>
-                  <span className="text-gray-700">Keep complaint private</span>
-                </>
-              )}
+          {/* Photo Upload */}
+          <motion.div className="space-y-3" variants={itemVariants}>
+            <Label className="text-sm font-semibold flex items-center gap-2">
+              <Camera className="h-4 w-4 text-gray-500" />
+              Attach Photo (Optional)
             </Label>
-            <p className="text-xs text-gray-500 mt-2 leading-relaxed">
-              {formData.isPublic
-                ? "Your complaint will be visible in the Community Feed. Other citizens can see and upvote it to increase priority."
-                : "Your complaint will only be visible to you and the assigned department officials."}
-            </p>
-          </div>
+            <div className="space-y-2">
+              {formData.photoPreview ? (
+                <motion.div
+                  initial={{ opacity: 0, scale: 0.9 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  className="relative inline-block"
+                >
+                  <img
+                    src={formData.photoPreview}
+                    alt="Complaint attachment"
+                    className="max-h-48 rounded-xl border-2 border-gray-200 object-cover shadow-lg"
+                  />
+                  <motion.button
+                    type="button"
+                    onClick={handleRemovePhoto}
+                    whileHover={{ scale: 1.1 }}
+                    whileTap={{ scale: 0.9 }}
+                    className="absolute -top-2 -right-2 p-1.5 bg-red-500 text-white rounded-full shadow-lg hover:bg-red-600 transition-colors z-10"
+                  >
+                    <X className="h-4 w-4" />
+                  </motion.button>
+                </motion.div>
+              ) : (
+                <motion.div
+                  onDragOver={(e) => { e.preventDefault(); setIsDragging(true); }}
+                  onDragLeave={() => setIsDragging(false)}
+                  onDrop={handleDrop}
+                  onClick={() => fileInputRef.current?.click()}
+                  whileHover={{ scale: 1.01 }}
+                  whileTap={{ scale: 0.99 }}
+                  className={cn(
+                    "w-full p-6 border-2 border-dashed rounded-xl transition-all duration-300 cursor-pointer",
+                    "flex flex-col items-center justify-center gap-2",
+                    isDragging
+                      ? "border-[#630ed4] bg-[#630ed4]/5"
+                      : photoError
+                      ? "border-red-300 bg-red-50"
+                      : "border-gray-300 hover:border-[#630ed4]/50 hover:bg-gray-50"
+                  )}
+                >
+                  <Upload className={cn(
+                    "h-6 w-6",
+                    isDragging ? "text-[#630ed4]" : photoError ? "text-red-400" : "text-gray-400"
+                  )} />
+                  <div className="text-center">
+                    <span className={cn(
+                      "text-sm font-medium block",
+                      isDragging ? "text-[#630ed4]" : photoError ? "text-red-600" : "text-gray-600"
+                    )}>
+                      {isDragging ? "Drop your image here" : "Click to upload or drag and drop"}
+                    </span>
+                    <span className="text-xs text-gray-400 mt-1">PNG, JPG up to {MAX_PHOTO_SIZE_MB}MB</span>
+                  </div>
+                </motion.div>
+              )}
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept="image/*"
+                onChange={handlePhotoSelect}
+                className="hidden"
+              />
+              {photoError && (
+                <motion.p
+                  initial={{ opacity: 0, y: -10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className="text-sm text-red-600 flex items-center gap-1"
+                >
+                  <AlertCircle className="h-4 w-4" />
+                  {photoError}
+                </motion.p>
+              )}
+              
+              {/* Image Validation Badge */}
+              <AnimatePresence mode="wait">
+                {formData.photo && (
+                  <ImageValidationBadge 
+                    status={validationStatus} 
+                    validationResult={validationResult} 
+                  />
+                )}
+              </AnimatePresence>
+            </div>
+          </motion.div>
+
+          {/* Public/Private Toggle */}
+          <motion.div
+            variants={itemVariants}
+            className={cn(
+              "p-4 rounded-xl border transition-all duration-200",
+              formData.isPublic
+                ? "bg-[#630ed4]/5 border-[#630ed4]/20"
+                : "bg-gray-50 border-gray-200"
+            )}
+          >
+            <div className="flex items-start gap-3">
+              <Checkbox
+                id="isPublic"
+                checked={formData.isPublic}
+                onCheckedChange={(checked) => {
+                  updateField("isPublic", checked === true);
+                  setFieldTouched("isPublic");
+                }}
+                className="mt-0.5 h-5 w-5"
+              />
+              <div className="flex-1">
+                <Label htmlFor="isPublic" className="text-sm font-semibold cursor-pointer flex items-center gap-2">
+                  {formData.isPublic ? (
+                    <>
+                      <Globe className="h-4 w-4 text-[#630ed4]" />
+                      <span className="text-[#630ed4]">Make complaint public</span>
+                    </>
+                  ) : (
+                    <>
+                      <Lock className="h-4 w-4 text-gray-500" />
+                      <span className="text-gray-700">Keep complaint private</span>
+                    </>
+                  )}
+                </Label>
+                <p className="text-xs text-gray-500 mt-1.5 leading-relaxed">
+                  {formData.isPublic
+                    ? "Visible in Community Feed. Others can upvote to increase priority."
+                    : "Only visible to you and the assigned department officials."}
+                </p>
+              </div>
+            </div>
+          </motion.div>
         </div>
-      </motion.div>
+
+        {/* Right Column - Urgency & Tip */}
+        <div className="lg:col-span-5 space-y-5">
+          {/* Urgency Level */}
+          <motion.div className="space-y-3" variants={itemVariants}>
+            <Label className="text-sm font-semibold">
+              Urgency Level <span className="text-red-500">*</span>
+            </Label>
+            <div className="space-y-2.5">
+              {URGENCY_OPTIONS.map((option) => {
+                const isSelected = formData.urgency === option.value;
+                return (
+                  <button
+                    key={option.value}
+                    type="button"
+                    onClick={() => {
+                      updateField("urgency", option.value);
+                      setFieldTouched("urgency");
+                    }}
+                    className={cn(
+                      "w-full flex items-start gap-3 p-3.5 rounded-xl border-2 transition-all duration-200 text-left",
+                      isSelected
+                        ? "border-[#630ed4] bg-[#630ed4]/5"
+                        : "border-gray-200 hover:border-gray-300 bg-white"
+                    )}
+                  >
+                    {/* Radio circle */}
+                    <div className={cn(
+                      "mt-0.5 w-4.5 h-4.5 rounded-full border-2 flex items-center justify-center shrink-0",
+                      isSelected ? "border-[#630ed4]" : "border-gray-300"
+                    )}>
+                      {isSelected && (
+                        <motion.div
+                          initial={{ scale: 0 }}
+                          animate={{ scale: 1 }}
+                          className="w-2 h-2 rounded-full bg-[#630ed4]"
+                        />
+                      )}
+                    </div>
+                    <div>
+                      <p className={cn(
+                        "font-semibold text-sm",
+                        isSelected ? "text-[#630ed4]" : "text-gray-700"
+                      )}>
+                        {option.label}
+                      </p>
+                      <p className="text-xs text-gray-500 mt-0.5">{option.description}</p>
+                    </div>
+                  </button>
+                );
+              })}
+            </div>
+          </motion.div>
+
+          {/* Architect's Tip */}
+          <motion.div
+            variants={itemVariants}
+            className="p-4 bg-amber-50 border border-amber-200 rounded-xl"
+          >
+            <div className="flex items-start gap-3">
+              <div className="p-1.5 bg-amber-100 rounded-lg shrink-0">
+                <Lightbulb className="h-4 w-4 text-amber-600" />
+              </div>
+              <div>
+                <p className="text-sm font-semibold text-amber-800">Architect&apos;s Tip</p>
+                <p className="text-xs text-amber-700 mt-1 leading-relaxed">
+                  Be as specific as possible in your description. Include dates, locations, and how the issue affects your daily life. This helps authorities prioritize and resolve your complaint faster.
+                </p>
+              </div>
+            </div>
+          </motion.div>
+        </div>
+      </div>
     </motion.div>
   );
 }

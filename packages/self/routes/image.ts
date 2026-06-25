@@ -103,6 +103,11 @@ Grounding rules:
 - If multiple categories fit, choose the one that best matches the main issue in the image.
 - If nothing clearly fits, choose the nearest category and keep the complaint cautious.
 
+Urgency assessment:
+- LOW: minor inconvenience, cosmetic issue, no safety risk
+- MEDIUM: moderate issue affecting daily life, routine maintenance needed
+- HIGH: serious issue posing safety risk, health hazard, or significant disruption
+
 Complaint style:
 - first person
 - natural and conversational
@@ -115,7 +120,8 @@ Return only:
 {
   "category": "...",
   "subCategory": "...",
-  "complaint": "..."
+  "complaint": "...",
+  "urgency": "LOW" | "MEDIUM" | "HIGH"
 }
         `,
 
@@ -179,8 +185,9 @@ Return only:
     res.status(200).json({
       success: true,
       category: parsedResponse.category || "Public Grievances",
-      subCategory: parsedResponse.category || "Public Grievances",
+      subCategory: parsedResponse.subCategory || parsedResponse.category || "Public Grievances",
       complaint: parsedResponse.complaint || response,
+      urgency: parsedResponse.urgency || "MEDIUM",
       model: completion.model,
     });
   } catch (error: any) {

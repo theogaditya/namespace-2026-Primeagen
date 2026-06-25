@@ -2,12 +2,15 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import Brands from "@/components/brands";
+import { motion } from "framer-motion";
 import Demo from "./home/demo";
-import Features from '@/components/Features';
-import { CTASection } from "@/components/cta";
-import { AIInputWithSuggestionsDemo } from "@/components/chat";
-import { Footer7 } from "@/components/footer";
+import TrustedBy from "@/components/landing/TrustedBy";
+import HeroCTA from "@/components/landing/HeroCTA";
+import FlowSection from "@/components/landing/FlowSection";
+import FeatureVault from "@/components/landing/FeatureVault";
+import ComparisonSection from "@/components/landing/ComparisonSection";
+import LandingCTA from "@/components/landing/LandingCTA";
+import LandingFooter from "@/components/landing/LandingFooter";
 
 export default function Home() {
   const router = useRouter();
@@ -29,14 +32,21 @@ export default function Home() {
   }
 
   return (
-    <div>
+    <div className="overflow-x-hidden scroll-smooth">
       <Demo />
-      <Brands />
-      <br></br><br></br>
-      <Features />
-      <AIInputWithSuggestionsDemo />
-      <CTASection />
-      {/* <Footer7/> */}
+      <HeroCTA />
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 0.4, delay: 0.2 }}
+      >
+        <TrustedBy />
+      </motion.div>
+      <FlowSection />
+      <ComparisonSection />
+      <FeatureVault />
+      <LandingCTA />
+      <LandingFooter />
     </div>
   );
 }
