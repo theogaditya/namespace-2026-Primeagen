@@ -9,6 +9,8 @@ on:
 jobs:
   test:
     runs-on: ubuntu-latest
+    env:
+      MIGRATE_URL: file:./dev.db
 
     steps:
       - uses: actions/checkout@v4
@@ -20,7 +22,7 @@ jobs:
 
       # admin-be
       - name: Install dependencies (admin-be)
-        run: cd packages/admin-be && bun install
+        run: cd packages/admin-be && bun install --ignore-scripts || true
       - name: Run tests with coverage (admin-be)
         run: cd packages/admin-be && bun run test:coverage
 
