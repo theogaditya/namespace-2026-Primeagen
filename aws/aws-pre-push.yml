@@ -10,6 +10,7 @@
   hosts: local
   become: false
   gather_facts: false
+  
   vars:
     project_root: "/home/abhas/node/Projects/iit-test"
     packages:
