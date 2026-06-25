@@ -5,12 +5,13 @@ import type { CheckResult } from '../types';
 export async function runS3Checks(): Promise<CheckResult[]> {
   const results: CheckResult[] = [];
   const s3 = new S3Client({
-    region: config.aws.region,
+    region: config.s3.region,
     credentials: {
-      accessKeyId: config.aws.accessKeyId,
-      secretAccessKey: config.aws.secretAccessKey,
+      accessKeyId: config.s3.accessKeyId,
+      secretAccessKey: config.s3.secretAccessKey,
     },
   });
+  const bucket = config.s3.bucket;
 
   const testKey = `_monitor/healthcheck-${Date.now()}.txt`;
   const testBody = `monitor-health-check-${Date.now()}`;
@@ -19,7 +20,7 @@ export async function runS3Checks(): Promise<CheckResult[]> {
   const writeStart = Date.now();
   try {
     await s3.send(new PutObjectCommand({
-      Bucket: config.aws.s3Bucket,
+      Bucket: bucket,
       Key: testKey,
       Body: testBody,
       ContentType: 'text/plain',
@@ -43,7 +44,7 @@ export async function runS3Checks(): Promise<CheckResult[]> {
   const readStart = Date.now();
   try {
     const resp = await s3.send(new GetObjectCommand({
-      Bucket: config.aws.s3Bucket,
+      Bucket: bucket,
       Key: testKey,
     }));
     const bodyStr = await resp.Body?.transformToString();
@@ -67,7 +68,7 @@ export async function runS3Checks(): Promise<CheckResult[]> {
   const delStart = Date.now();
   try {
     await s3.send(new DeleteObjectCommand({
-      Bucket: config.aws.s3Bucket,
+      Bucket: bucket,
       Key: testKey,
     }));
     results.push({

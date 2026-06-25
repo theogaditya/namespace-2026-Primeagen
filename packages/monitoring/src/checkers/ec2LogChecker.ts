@@ -5,10 +5,11 @@ import type { CheckResult } from '../types';
 
 // Services we want logs from on the EC2 instance
 const EC2_SERVICES = [
-  { name: 'user-be', logCmd: 'sudo journalctl -u user-be --no-pager -n 100 2>/dev/null || echo "No logs found for user-be"' },
-  { name: 'admin-be', logCmd: 'sudo journalctl -u admin-be --no-pager -n 100 2>/dev/null || echo "No logs found for admin-be"' },
-  { name: 'comp-queue', logCmd: 'sudo journalctl -u comp-queue --no-pager -n 100 2>/dev/null || echo "No logs found for comp-queue"' },
-  { name: 'system', logCmd: 'top -b -n 1 | head -n 50' },
+  { name: 'user-be',    logCmd: 'sudo journalctl -u user-be.service    --no-pager -n 100 2>/dev/null || echo "No logs found for user-be.service"' },
+  { name: 'admin-be',   logCmd: 'sudo journalctl -u admin-be.service   --no-pager -n 100 2>/dev/null || echo "No logs found for admin-be.service"' },
+  { name: 'comp-queue', logCmd: 'sudo journalctl -u comp-queue.service --no-pager -n 100 2>/dev/null || echo "No logs found for comp-queue.service"' },
+  { name: 'self',       logCmd: 'sudo journalctl -u self.service       --no-pager -n 100 2>/dev/null || echo "No logs found for self.service"' },
+  { name: 'system',     logCmd: 'top -b -n 1 | head -n 50' },
 ];
 
 // Cache of last fetched logs

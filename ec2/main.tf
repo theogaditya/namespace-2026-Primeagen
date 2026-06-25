@@ -8,7 +8,7 @@ terraform {
 }
 
 provider "aws" {
-  region = "ap-south-2"
+  region = "ap-south-1"
 }
 
 data "aws_vpc" "default" {
@@ -114,7 +114,7 @@ resource "aws_key_pair" "deployer" {
 
 resource "aws_instance" "web" {
   ami           = data.aws_ami.ubuntu.id
-  instance_type = "t3.large"
+  instance_type = "m7i-flex.large"
 
   key_name               = "ec2-iit-pair"
   vpc_security_group_ids = [local.web_sg_id]
