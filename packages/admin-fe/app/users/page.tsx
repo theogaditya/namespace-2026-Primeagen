@@ -1,5 +1,5 @@
 // REVAMPED: This page now redirects to the new Tactical Intel design.
-// Old implementation commented out below — see app/(pages)/agent-revamped/my-complaints/page.tsx for the revamped version.
+// Old implementation commented out below — see app/(pages)/Agent/my-complaints/page.tsx for the revamped version.
 //
 // "use client"
 // import { AdminLayout } from "@/components/admin-layout"
@@ -18,5 +18,5 @@
 import { redirect } from 'next/navigation'
 
 export default function UsersPage() {
-  redirect('/agent-revamped/my-complaints')
+  redirect('/Agent/my-complaints')
 }

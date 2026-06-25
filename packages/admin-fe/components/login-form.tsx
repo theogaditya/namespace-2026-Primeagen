@@ -9,20 +9,20 @@ import { Label } from "@/components/ui/label"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 
-type AdminType = "SUPER_ADMIN" | "STATE_ADMIN" | "MUNICIPAL_ADMIN" | "AGENT"
+type AdminType = "STATE_ADMIN" | "MUNICIPAL_ADMIN" | "AGENT" | "CIVIC_PARTNER"
 
 const adminTypeLabels: Record<AdminType, string> = {
-  SUPER_ADMIN: "Super Admin",
   STATE_ADMIN: "State Admin",
   MUNICIPAL_ADMIN: "Municipal Admin",
   AGENT: "Agent",
+  CIVIC_PARTNER: "Civic Partner",
 }
 
 const adminTypeRoutes: Record<AdminType, string> = {
-  SUPER_ADMIN: "/Super",
   STATE_ADMIN: "/State",
   MUNICIPAL_ADMIN: "/Municipal",
   AGENT: "/Agent",
+  CIVIC_PARTNER: "/CivicPartner",
 }
 
 type LoginFormProps = {
@@ -52,16 +52,23 @@ export function LoginForm({ adminType: controlledAdminType, onAdminTypeChange }:
     setIsLoading(true)
 
     try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000"}/api/auth/login`, {
+      // Civic Partner uses a separate auth endpoint
+      const isCivicPartner = adminType === "CIVIC_PARTNER"
+      const loginUrl = isCivicPartner
+        ? `${process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000"}/api/civic-partner/auth/login`
+        : `${process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000"}/api/auth/login`
+
+      const response = await fetch(loginUrl, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({
-          officialEmail: email,
-          password,
-          adminType,
-        }),
+        credentials: "include",
+        body: JSON.stringify(
+          isCivicPartner
+            ? { officialEmail: email, password }
+            : { officialEmail: email, password, adminType }
+        ),
       })
 
       const data = await response.json()
@@ -70,7 +77,13 @@ export function LoginForm({ adminType: controlledAdminType, onAdminTypeChange }:
         throw new Error(data.message || "Login failed")
       }
 
-      if (data.success && data.token) {
+      if (isCivicPartner && data.success) {
+        // Civic partner auth uses httpOnly cookies set by backend.
+        // Store partner info for the frontend.
+        localStorage.setItem("civicPartner", JSON.stringify(data.partner))
+        localStorage.setItem("adminType", "CIVIC_PARTNER")
+        router.push(adminTypeRoutes.CIVIC_PARTNER)
+      } else if (data.success && data.token) {
         localStorage.setItem("token", data.token)
         localStorage.setItem("adminType", data.adminType)
         localStorage.setItem("admin", JSON.stringify(data.admin))

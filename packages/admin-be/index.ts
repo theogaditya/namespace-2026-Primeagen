@@ -5,13 +5,17 @@ import type { Express } from 'express';
 import { PrismaClient } from './prisma/generated/client/client';
 import agentRoutes from './routes/agent';
 import authRoutes from './routes/auth';
-import complaintRoutes from './routes/complaint';
 import municipalAdminRoutes from './routes/municipalAdminRoutes';
 import stateAdminRoutes from './routes/stateAdminRoutes';
 import superAdminRoutes from './routes/superAdminRoutes';
 import chatRoutes from './routes/chat';
-import { complaintProcessingRouter, startComplaintPolling } from './routes/complaintProcessing';
-import { userComplaintsRouter } from './routes/userComplaints';
+import civicPartnerAuthRoutes from './routes/civicPartnerAuth';
+import civicPartnerSurveyRoutes from './routes/civicPartnerSurveys';
+import civicPartnerAnalyticsRoutes from './routes/civicPartnerAnalytics';
+import publicSurveyRoutes from './routes/publicSurveyRoutes';
+import complaintRoutes from './routes/complaint';
+// import { complaintProcessingRouter, startComplaintPolling } from './routes/complaintProcessing';
+// import { userComplaintsRouter } from './routes/userComplaints';
 import { healthPoint } from './routes/health';
 import autoAssignRouter, { startAutoAssignPolling } from './routes/autoAssign';
 
@@ -45,12 +49,20 @@ export class Server {
     this.app.use('/api/auth', authRoutes(this.db));
     this.app.use('/api/super-admin', superAdminRoutes(this.db));
     this.app.use('/api/state-admin', stateAdminRoutes(this.db));
+
+    // CivicPartner feature
+    this.app.use('/api/civic-partner/auth', civicPartnerAuthRoutes(this.db));
+    this.app.use('/api/civic-partner/surveys', civicPartnerSurveyRoutes(this.db));
+    this.app.use('/api/civic-partner/analytics', civicPartnerAnalyticsRoutes(this.db));
+    // Public survey endpoints consumed by user-fe (no auth required)
+    this.app.use('/api/surveys', publicSurveyRoutes(this.db));
     this.app.use('/api/municipal-admin', municipalAdminRoutes(this.db));
     this.app.use('/api/agent', agentRoutes(this.db));
-    this.app.use('/api/complaints', complaintRoutes(this.db));
     this.app.use('/api/chat', chatRoutes(this.db));
-    this.app.use('/api/complaint', complaintProcessingRouter(this.db));
-    this.app.use('/api/users', userComplaintsRouter(this.db));
+    // Complaint endpoints (re-enabled) — required by admin-fe
+    this.app.use('/api/complaints', complaintRoutes(this.db));
+    // this.app.use('/api/complaint', complaintProcessingRouter(this.db));
+    // this.app.use('/api/users', userComplaintsRouter(this.db));
     this.app.use('/api/auto-assign', autoAssignRouter);
 
     this.app.use('/api', healthPoint(this.db));

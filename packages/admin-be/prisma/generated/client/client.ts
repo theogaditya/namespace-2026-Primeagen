@@ -90,6 +90,11 @@ export type Category = Prisma.CategoryModel
  */
 export type Complaint = Prisma.ComplaintModel
 /**
+ * Model BlockchainSyncEvent
+ * 
+ */
+export type BlockchainSyncEvent = Prisma.BlockchainSyncEventModel
+/**
  * Model ComplaintLocation
  * 
  */
@@ -139,3 +144,28 @@ export type Badge = Prisma.BadgeModel
  * 
  */
 export type UserBadge = Prisma.UserBadgeModel
+/**
+ * Model CivicPartner
+ * 
+ */
+export type CivicPartner = Prisma.CivicPartnerModel
+/**
+ * Model Survey
+ * 
+ */
+export type Survey = Prisma.SurveyModel
+/**
+ * Model SurveyQuestion
+ * 
+ */
+export type SurveyQuestion = Prisma.SurveyQuestionModel
+/**
+ * Model SurveyResponse
+ * 
+ */
+export type SurveyResponse = Prisma.SurveyResponseModel
+/**
+ * Model SurveyAnswer
+ * 
+ */
+export type SurveyAnswer = Prisma.SurveyAnswerModel

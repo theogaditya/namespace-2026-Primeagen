@@ -1,5 +1,13 @@
+import dotenv from 'dotenv';
+import path from 'path';
+import { fileURLToPath } from 'url';
 import { PrismaClient } from "../prisma/generated/client/client";
 import { PrismaPg } from "@prisma/adapter-pg";
+
+// Load the package `.env` explicitly (so seeds work regardless of cwd)
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+dotenv.config({ path: path.resolve(__dirname, '..', '.env') });
 
 class PrismaSingleton {
   private static instance: PrismaClient;

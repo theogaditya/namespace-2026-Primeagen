@@ -10,19 +10,19 @@ The following files were modified to comment out their old implementation:
 
 - **`app/(pages)/Agent/page.tsx`**
   - **Commented out**: `<AvailableComplaints />` wrapped in `<AuthGuard>` and `<AdminLayout>`.
-  - **Replaced with**: `redirect('/agent-revamped')`
+  - **Replaced with**: `redirect('/Agent')`
 
 - **`app/users/page.tsx`**
   - **Commented out**: `<MyComplaints />` wrapped in `<AuthGuard>` and `<AdminLayout>`.
-  - **Replaced with**: `redirect('/agent-revamped/my-complaints')`
+  - **Replaced with**: `redirect('/Agent/my-complaints')`
 
 - **`app/reports/page.tsx`**
   - **Commented out**: `<Analytics />` wrapped in `<AuthGuard>` and `<AdminLayout>`.
-  - **Replaced with**: `redirect('/agent-revamped/reports')`
+  - **Replaced with**: `redirect('/Agent/reports')`
 
 ## 2. What was Created
 
-All new code resides purely in `app/(pages)/agent-revamped/` so as not to mutate the underlying `/components/` library unless necessary.
+All new code resides purely in `app/(pages)/Agent/` so as not to mutate the underlying `/components/` library unless necessary.
 
 1. **`_layout.tsx`**
    - Implements `AgentRevampedLayout`. A custom layout that strips out the original `AdminLayout` and offers the Tactical Intel dark-blue sidebar and topnav interface.

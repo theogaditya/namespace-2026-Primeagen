@@ -3,7 +3,7 @@
 import * as React from "react"
 import { LoginForm } from "./login-form"
 
-type RoleKey = "SUPER_ADMIN" | "STATE_ADMIN" | "MUNICIPAL_ADMIN" | "AGENT"
+type RoleKey = "STATE_ADMIN" | "MUNICIPAL_ADMIN" | "AGENT" | "CIVIC_PARTNER"
 
 const ROLE_INFO: Record<
   RoleKey,
@@ -60,19 +60,21 @@ const ROLE_INFO: Record<
     bg: "bg-violet-50",
     border: "border-violet-300",
   },
-  SUPER_ADMIN: {
-    title: "Super Admin",
-    subtitle: "Platform administrator",
+  CIVIC_PARTNER: {
+    title: "Civic Partner",
+    subtitle: "NGOs & Government bodies",
     bullets: [
-      "Platform & user administration: Create Super/State/Municipal admins, manage roles, permissions and account status.",
-      "System-wide complaint oversight: View or remove complaints, handle escalations that reach the top level.",
-      "Audit, exports & maintenance: Access audit logs, run system-wide exports and maintenance tasks.",
-      "Configure integrations & global settings: Configure external integrations and global platform settings.",
+      "Create & launch surveys: Design surveys with multiple question types (MCQ, Rating, Yes/No, Text) and publish them to citizens.",
+      "Monitor response analytics: Track total responses, completion rates, and response velocity in real-time.",
+      "Question-level insights: View per-question breakdowns — option distribution for MCQs, average ratings, and text sentiment.",
+      "Export survey data: Download survey responses in CSV or JSON format for offline analysis and reporting.",
+      "Manage survey lifecycle: Draft, publish, close, and archive surveys through a streamlined workflow.",
     ],
-    color: "text-red-700",
-    bg: "bg-red-50",
-    border: "border-red-500",
+    color: "text-teal-700",
+    bg: "bg-teal-50",
+    border: "border-teal-300",
   },
+
 }
 
 export default function LoginPage() {
@@ -129,7 +131,7 @@ export default function LoginPage() {
             <LoginForm
               adminType={selected as any}
               onAdminTypeChange={(t) => {
-                if ((["AGENT", "MUNICIPAL_ADMIN", "STATE_ADMIN", "SUPER_ADMIN"] as unknown as RoleKey[]).includes(t as RoleKey)) {
+                if ((["AGENT", "MUNICIPAL_ADMIN", "STATE_ADMIN", "CIVIC_PARTNER"] as unknown as RoleKey[]).includes(t as RoleKey)) {
                   setSelected(t as RoleKey)
                 }
               }}

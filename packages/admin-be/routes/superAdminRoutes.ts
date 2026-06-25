@@ -99,7 +99,7 @@ router.post('/logout', (req, res: any) => {
     sameSite: 'strict',
     path: '/'
   });
-  
+
   return res.json({ success: true, message: 'Logged out successfully' });
 });
 
@@ -323,9 +323,9 @@ router.post('/create/super-municipal-admins', authenticateSuperAdminOnly, async 
   const { fullName, officialEmail, phoneNumber, password, municipality } = req.body;
 
   if (!fullName || !officialEmail || !password || !municipality) {
-    return res.status(400).json({ 
-      success: false, 
-      message: 'Missing required fields: fullName, officialEmail, password, municipality' 
+    return res.status(400).json({
+      success: false,
+      message: 'Missing required fields: fullName, officialEmail, password, municipality'
     });
   }
 
@@ -382,9 +382,9 @@ router.post('/create/super-state-admins', authenticateSuperAdminOnly, async (req
   const { fullName, officialEmail, phoneNumber, password, state } = req.body;
 
   if (!fullName || !officialEmail || !password || !state) {
-    return res.status(400).json({ 
-      success: false, 
-      message: 'Missing required fields: fullName, officialEmail, password, state' 
+    return res.status(400).json({
+      success: false,
+      message: 'Missing required fields: fullName, officialEmail, password, state'
     });
   }
 
@@ -436,7 +436,7 @@ router.post('/create/super-state-admins', authenticateSuperAdminOnly, async (req
   }
 });
 
-// ----- 9. Get All Admins -----  
+// ----- 9. Get All Admins -----
 router.get('/admins', async (req, res) => {
   try {
     const stateAdmins = await prisma.departmentStateAdmin.findMany();
@@ -458,7 +458,7 @@ router.get('/admins', async (req, res) => {
   }
 });
 
-// ----- 8. Update Admins Status -----  
+// ----- 8. Update Admins Status -----
 router.patch('/admins/:id/status', async (req, res:any) => {
   const { id } = req.params;
   const { status } = req.body;
@@ -529,7 +529,7 @@ router.patch('/delete/:id', async (req, res:any) => {
 
     const updatedComplaint = await prisma.complaint.update({
       where: { id },
-      data: { 
+      data: {
         status: 'DELETED',
       }
     });
@@ -545,7 +545,7 @@ router.patch('/delete/:id', async (req, res:any) => {
   }
 });
 
-// ----- 11. Escalate A Complaint ----- 
+// ----- 11. Escalate A Complaint -----
 
 // ----- 12. Get My Complaints (Escalated to Super Admin) -----
 router.get('/my-complaints', authenticateSuperAdminOnly, async (req: any, res: any) => {
@@ -586,8 +586,8 @@ router.get('/my-complaints', authenticateSuperAdminOnly, async (req: any, res: a
     return res.json({ success: true, complaints });
   } catch (error: any) {
     console.error('Error fetching super admin complaints:', error);
-    return res.status(500).json({ 
-      success: false, 
+    return res.status(500).json({
+      success: false,
       message: 'Failed to fetch complaints',
       error: process.env.NODE_ENV === 'development' ? error.message : undefined
     });
@@ -612,8 +612,8 @@ router.put('/complaints/:id/status', authenticateSuperAdminOnly, async (req: any
     ];
 
     if (!status || !validStatuses.includes(status)) {
-      return res.status(400).json({ 
-        success: false, 
+      return res.status(400).json({
+        success: false,
         message: 'Invalid status. Valid statuses are: ' + validStatuses.join(', ')
       });
     }
@@ -623,15 +623,15 @@ router.put('/complaints/:id/status', authenticateSuperAdminOnly, async (req: any
     });
 
     if (!existingComplaint) {
-      return res.status(404).json({ 
-        success: false, 
-        message: 'Complaint not found' 
+      return res.status(404).json({
+        success: false,
+        message: 'Complaint not found'
       });
     }
 
     const updatedComplaintRaw = await prisma.complaint.update({
       where: { id },
-      data: { 
+      data: {
         status,
         ...(status === 'COMPLETED' && { dateOfResolution: new Date() })
       },
@@ -677,16 +677,16 @@ router.put('/complaints/:id/status', authenticateSuperAdminOnly, async (req: any
     const { User, ...complaintRest } = updatedComplaintRaw as any;
     const updatedComplaint = { ...complaintRest, complainant: User || null };
 
-    return res.json({ 
-      success: true, 
+    return res.json({
+      success: true,
       message: 'Complaint status updated successfully',
-      complaint: updatedComplaint 
+      complaint: updatedComplaint
     });
 
   } catch (error: any) {
     console.error('Error updating complaint status:', error);
-    return res.status(500).json({ 
-      success: false, 
+    return res.status(500).json({
+      success: false,
       message: 'Failed to update complaint status',
       error: process.env.NODE_ENV === 'development' ? error.message : undefined
     });
@@ -700,9 +700,9 @@ router.patch('/state-admins/:id/status', authenticateSuperAdminOnly, async (req:
     const { status } = req.body;
 
     if (!status || !['ACTIVE', 'INACTIVE'].includes(status)) {
-      return res.status(400).json({ 
-        success: false, 
-        message: 'Invalid status. Must be ACTIVE or INACTIVE' 
+      return res.status(400).json({
+        success: false,
+        message: 'Invalid status. Must be ACTIVE or INACTIVE'
       });
     }
 
@@ -711,9 +711,9 @@ router.patch('/state-admins/:id/status', authenticateSuperAdminOnly, async (req:
     });
 
     if (!stateAdmin) {
-      return res.status(404).json({ 
-        success: false, 
-        message: 'State admin not found' 
+      return res.status(404).json({
+        success: false,
+        message: 'State admin not found'
       });
     }
 
@@ -728,15 +728,15 @@ router.patch('/state-admins/:id/status', authenticateSuperAdminOnly, async (req:
       }
     });
 
-    return res.json({ 
-      success: true, 
+    return res.json({
+      success: true,
       message: `State admin ${status === 'ACTIVE' ? 'activated' : 'deactivated'} successfully`,
-      data: updatedAdmin 
+      data: updatedAdmin
     });
   } catch (error: any) {
     console.error('Error updating state admin status:', error);
-    return res.status(500).json({ 
-      success: false, 
+    return res.status(500).json({
+      success: false,
       message: 'Failed to update state admin status',
       error: process.env.NODE_ENV === 'development' ? error.message : undefined
     });
@@ -750,9 +750,9 @@ router.patch('/municipal-admins/:id/status', authenticateSuperAdminOnly, async (
     const { status } = req.body;
 
     if (!status || !['ACTIVE', 'INACTIVE'].includes(status)) {
-      return res.status(400).json({ 
-        success: false, 
-        message: 'Invalid status. Must be ACTIVE or INACTIVE' 
+      return res.status(400).json({
+        success: false,
+        message: 'Invalid status. Must be ACTIVE or INACTIVE'
       });
     }
 
@@ -761,9 +761,9 @@ router.patch('/municipal-admins/:id/status', authenticateSuperAdminOnly, async (
     });
 
     if (!municipalAdmin) {
-      return res.status(404).json({ 
-        success: false, 
-        message: 'Municipal admin not found' 
+      return res.status(404).json({
+        success: false,
+        message: 'Municipal admin not found'
       });
     }
 
@@ -778,20 +778,206 @@ router.patch('/municipal-admins/:id/status', authenticateSuperAdminOnly, async (
       }
     });
 
-    return res.json({ 
-      success: true, 
+    return res.json({
+      success: true,
       message: `Municipal admin ${status === 'ACTIVE' ? 'activated' : 'deactivated'} successfully`,
-      data: updatedAdmin 
+      data: updatedAdmin
     });
   } catch (error: any) {
     console.error('Error updating municipal admin status:', error);
-    return res.status(500).json({ 
-      success: false, 
+    return res.status(500).json({
+      success: false,
       message: 'Failed to update municipal admin status',
       error: process.env.NODE_ENV === 'development' ? error.message : undefined
     });
   }
 });
+
+
+  // ─────────────────────────────────────────────────────────────────────────
+  // CIVIC PARTNER MANAGEMENT  (SuperAdmin only)
+  // ─────────────────────────────────────────────────────────────────────────
+
+  // GET /api/super-admin/civic-partners
+  // List all CivicPartners. Optional query: ?verified=true|false&status=ACTIVE|INACTIVE
+  router.get('/civic-partners', authenticateSuperAdminOnly, async (req, res: any) => {
+    const { verified, status } = req.query as { verified?: string; status?: string };
+
+    try {
+      const partners = await prisma.civicPartner.findMany({
+        where: {
+          ...(verified !== undefined ? { isVerified: verified === 'true' } : {}),
+          ...(status ? { status: status as any } : {}),
+        },
+        select: {
+          id: true,
+          orgId: true,
+          orgName: true,
+          officialEmail: true,
+          phoneNumber: true,
+          orgType: true,
+          registrationNo: true,
+          state: true,
+          district: true,
+          website: true,
+          status: true,
+          isVerified: true,
+          verifiedAt: true,
+          dateOfCreation: true,
+          lastLogin: true,
+          _count: { select: { surveys: true } },
+        },
+        orderBy: { dateOfCreation: 'desc' },
+      });
+
+      return res.json({ success: true, total: partners.length, partners });
+    } catch (err) {
+      console.error('[superAdmin.civicPartners.list]', err);
+      return res.status(500).json({ success: false, message: 'Server error' });
+    }
+  });
+
+  // GET /api/super-admin/civic-partners/pending
+  // Approval queue: only unverified partners
+  router.get('/civic-partners/pending', authenticateSuperAdminOnly, async (req, res: any) => {
+    try {
+      const partners = await prisma.civicPartner.findMany({
+        where: { isVerified: false, status: 'ACTIVE' },
+        select: {
+          id: true,
+          orgName: true,
+          officialEmail: true,
+          orgType: true,
+          registrationNo: true,
+          state: true,
+          district: true,
+          website: true,
+          dateOfCreation: true,
+        },
+        orderBy: { dateOfCreation: 'asc' },
+      });
+
+      return res.json({ success: true, pendingCount: partners.length, partners });
+    } catch (err) {
+      console.error('[superAdmin.civicPartners.pending]', err);
+      return res.status(500).json({ success: false, message: 'Server error' });
+    }
+  });
+
+  // PATCH /api/super-admin/civic-partners/:partnerId/verify
+  // Approve a pending registration
+  router.patch('/civic-partners/:partnerId/verify', authenticateSuperAdminOnly, async (req, res: any) => {
+    const { partnerId } = req.params;
+
+    try {
+      const existing = await prisma.civicPartner.findUnique({ where: { id: partnerId } });
+      if (!existing) return res.status(404).json({ success: false, message: 'CivicPartner not found' });
+      if (existing.isVerified) {
+        return res.status(400).json({ success: false, message: 'This organisation is already verified' });
+      }
+
+      const partner = await prisma.civicPartner.update({
+        where: { id: partnerId },
+        data: { isVerified: true, verifiedAt: new Date() },
+        select: { id: true, orgName: true, officialEmail: true, isVerified: true, verifiedAt: true },
+      });
+
+      return res.json({ success: true, message: 'Organisation verified successfully', partner });
+    } catch (err) {
+      console.error('[superAdmin.civicPartners.verify]', err);
+      return res.status(500).json({ success: false, message: 'Server error' });
+    }
+  });
+
+  // PATCH /api/super-admin/civic-partners/:partnerId/reject
+  // Reject (hard-delete) a pending unverified registration
+  router.patch('/civic-partners/:partnerId/reject', authenticateSuperAdminOnly, async (req, res: any) => {
+    const { partnerId } = req.params;
+
+    try {
+      const existing = await prisma.civicPartner.findUnique({ where: { id: partnerId } });
+      if (!existing) return res.status(404).json({ success: false, message: 'CivicPartner not found' });
+      if (existing.isVerified) {
+        return res.status(400).json({
+          success: false,
+          message: 'Cannot reject an already-verified organisation. Use the suspend endpoint instead.',
+        });
+      }
+
+      await prisma.civicPartner.delete({ where: { id: partnerId } });
+      return res.json({ success: true, message: 'Registration rejected and removed' });
+    } catch (err) {
+      console.error('[superAdmin.civicPartners.reject]', err);
+      return res.status(500).json({ success: false, message: 'Server error' });
+    }
+  });
+
+  // PATCH /api/super-admin/civic-partners/:partnerId/status
+  // Suspend or reactivate a verified CivicPartner
+  // Body: { status: 'ACTIVE' | 'INACTIVE' }
+  router.patch('/civic-partners/:partnerId/status', authenticateSuperAdminOnly, async (req, res: any) => {
+    const { partnerId } = req.params;
+    const { status } = req.body as { status: 'ACTIVE' | 'INACTIVE' };
+
+    if (!['ACTIVE', 'INACTIVE'].includes(status)) {
+      return res.status(400).json({ success: false, message: 'status must be ACTIVE or INACTIVE' });
+    }
+
+    try {
+      const existing = await prisma.civicPartner.findUnique({ where: { id: partnerId } });
+      if (!existing) return res.status(404).json({ success: false, message: 'CivicPartner not found' });
+
+      const partner = await prisma.civicPartner.update({
+        where: { id: partnerId },
+        data: { status },
+        select: { id: true, orgName: true, status: true },
+      });
+
+      return res.json({
+        success: true,
+        message: `Organisation ${status === 'ACTIVE' ? 'reactivated' : 'suspended'} successfully`,
+        partner,
+      });
+    } catch (err) {
+      console.error('[superAdmin.civicPartners.status]', err);
+      return res.status(500).json({ success: false, message: 'Server error' });
+    }
+  });
+
+  // GET /api/super-admin/civic-partners/:partnerId
+  // Full detail of a single CivicPartner including survey stats
+  router.get('/civic-partners/:partnerId', authenticateSuperAdminOnly, async (req, res: any) => {
+    const { partnerId } = req.params;
+
+    try {
+      const partner = await prisma.civicPartner.findUnique({
+        where: { id: partnerId },
+        include: {
+          surveys: {
+            select: {
+              id: true,
+              title: true,
+              status: true,
+              category: true,
+              createdAt: true,
+              isPublic: true,
+              _count: { select: { responses: true } },
+            },
+            orderBy: { createdAt: 'desc' },
+          },
+        },
+      });
+
+      if (!partner) return res.status(404).json({ success: false, message: 'CivicPartner not found' });
+
+      // Redact password
+      const { password: _, ...safe } = partner as any;
+      return res.json({ success: true, partner: safe });
+    } catch (err) {
+      console.error('[superAdmin.civicPartners.detail]', err);
+      return res.status(500).json({ success: false, message: 'Server error' });
+    }
+  });
 
   return router;
 }

@@ -236,6 +236,12 @@ model Complaint {
   managedBySuperAdminId          String?
   moderatedByMunicipalAdminId    String?
   seq                            Int                       @unique @default(autoincrement())
+  blockchainHash                 String?                   @db.VarChar(66)
+  blockchainBlock                BigInt?
+  ipfsHash                       String?
+  isOnChain                      Boolean                   @default(false)
+  blockchainStatus               BlockchainStatus          @default(PENDING)
+  blockchainUpdatedAt            DateTime?
   sla                            String?
   AIabusedFlag                   Boolean?
   AIimageVarificationStatus      Boolean?
@@ -256,6 +262,26 @@ model Complaint {
   location                       ComplaintLocation?
   upvotes                        Upvote[]
   coAssignedAgents               Agent[]                   @relation("CoAssignedAgentComplaints")
+
+  @@index([blockchainHash])
+}
+
+model BlockchainSyncEvent {
+  id              String          @id @default(uuid())
+  entityType      String
+  entityId        String
+  keyPrefix       String
+  blockchainHash  String          @db.VarChar(66)
+  blockchainBlock BigInt?
+  ipfsHash        String?
+  isOnChain       Boolean         @default(true)
+  payload         Json
+  status          SyncEventStatus @default(PROCESSED)
+  processedAt     DateTime        @default(now())
+
+  @@unique([keyPrefix, blockchainHash])
+  @@index([entityType, entityId])
+  @@map("blockchain_sync_events")
 }
 
 model ComplaintLocation {
@@ -415,6 +441,7 @@ enum AccessLevel {
   DEPT_MUNICIPAL_ADMIN
   DEPT_STATE_ADMIN
   AGENT
+  CIVIC_PARTNER
 }
 
 enum Department {
@@ -470,4 +497,133 @@ enum BadgeRarity {
   RARE
   EPIC
   LEGENDARY
+}
+
+enum BlockchainStatus {
+  PENDING
+  CONFIRMED
+  FAILED
+}
+
+enum SyncEventStatus {
+  PROCESSED
+  DUPLICATE
+  FAILED
+}
+
+// ─── CivicPartner Feature ────────────────────────────────────────────────────
+
+enum CivicPartnerType {
+  NGO
+  GOVERNMENT_BODY
+}
+
+enum SurveySourceType {
+  NGO
+  SURVEY
+}
+
+enum SurveyStatus {
+  DRAFT
+  PUBLISHED
+  CLOSED
+  ARCHIVED
+}
+
+enum QuestionType {
+  TEXT
+  MCQ
+  CHECKBOX
+  RATING
+  YES_NO
+}
+
+model CivicPartner {
+  id             String           @id @default(uuid())
+  orgName        String
+  orgId          String           @unique @default(uuid())
+  officialEmail  String           @unique
+  password       String
+  phoneNumber    String?
+  orgType        CivicPartnerType
+  registrationNo String           @unique
+  state          String
+  district       String?
+  website        String?
+  accessLevel    AccessLevel      @default(CIVIC_PARTNER)
+  status         Status           @default(ACTIVE)
+  isVerified     Boolean          @default(false)
+  verifiedAt     DateTime?
+  dateOfCreation DateTime         @default(now())
+  lastUpdated    DateTime         @updatedAt
+  lastLogin      DateTime?
+  surveys        Survey[]
+
+  @@map("civic_partners")
+}
+
+model Survey {
+  id             String           @id @default(uuid())
+  civicPartnerId String
+  title          String
+  description    String
+  sourceType     SurveySourceType @default(SURVEY)
+  category       String
+  content        String
+  sourceUrl      String?
+  status         SurveyStatus     @default(DRAFT)
+  isPublic       Boolean          @default(false)
+  startsAt       DateTime?
+  endsAt         DateTime?
+  createdAt      DateTime         @default(now())
+  lastUpdated    DateTime         @updatedAt
+  civicPartner   CivicPartner     @relation(fields: [civicPartnerId], references: [id])
+  questions      SurveyQuestion[]
+  responses      SurveyResponse[]
+
+  @@index([category])
+  @@index([status])
+  @@index([civicPartnerId])
+  @@map("surveys")
+}
+
+model SurveyQuestion {
+  id           String        @id @default(uuid())
+  surveyId     String
+  questionText String
+  questionType QuestionType
+  options      String[]
+  isRequired   Boolean       @default(true)
+  order        Int
+  survey       Survey        @relation(fields: [surveyId], references: [id], onDelete: Cascade)
+  answers      SurveyAnswer[]
+
+  @@map("survey_questions")
+}
+
+model SurveyResponse {
+  id          String         @id @default(uuid())
+  surveyId    String
+  userId      String?
+  startedAt   DateTime?
+  submittedAt DateTime       @default(now())
+  isComplete  Boolean        @default(true)
+  survey      Survey         @relation(fields: [surveyId], references: [id], onDelete: Cascade)
+  answers     SurveyAnswer[]
+
+  @@index([surveyId])
+  @@map("survey_responses")
+}
+
+model SurveyAnswer {
+  id           String         @id @default(uuid())
+  responseId   String
+  questionId   String
+  answerText   String?
+  selectedOpts String[]
+  ratingValue  Int?
+  response     SurveyResponse @relation(fields: [responseId], references: [id], onDelete: Cascade)
+  question     SurveyQuestion @relation(fields: [questionId], references: [id])
+
+  @@map("survey_answers")
 }

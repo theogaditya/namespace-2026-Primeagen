@@ -1,5 +1,5 @@
 // REVAMPED: This page now redirects to the new Tactical Intel design.
-// Old implementation commented out below — see app/(pages)/agent-revamped/reports/page.tsx for the revamped version.
+// Old implementation commented out below — see app/(pages)/Agent/reports/page.tsx for the revamped version.
 //
 // "use client"
 // import { AdminLayout } from "@/components/admin-layout"
@@ -18,5 +18,5 @@
 import { redirect } from 'next/navigation'
 
 export default function ReportsPage() {
-  redirect('/agent-revamped/reports')
+  redirect('/Agent/reports')
 }

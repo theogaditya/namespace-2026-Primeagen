@@ -39,8 +39,6 @@ const getDashboardPath = (adminType: string | null): string => {
       return '/Municipal'
     case 'STATE_ADMIN':
       return '/State'
-    case 'SUPER_ADMIN':
-      return '/Super'
     default:
       return '/Agent'
   }
@@ -61,9 +59,9 @@ export function AdminLayout({ children }: AdminLayoutProps) {
       const raw = typeof window !== 'undefined' ? localStorage.getItem('admin') : null
       if (raw) {
         const parsed = JSON.parse(raw)
-        setAdminData({ 
-          fullName: parsed.fullName || parsed.name, 
-          officialEmail: parsed.officialEmail || parsed.email, 
+        setAdminData({
+          fullName: parsed.fullName || parsed.name,
+          officialEmail: parsed.officialEmail || parsed.email,
           id: parsed.id,
           adminType: parsed.adminType || localStorage.getItem('adminType')
         })
@@ -133,7 +131,7 @@ export function AdminLayout({ children }: AdminLayoutProps) {
                           ? "bg-blue-50 border-r-2 border-blue-600 text-blue-700"
                           : "text-gray-600 hover:bg-gray-50 hover:text-gray-900",
                         "group flex items-center px-2 py-2 text-sm font-medium rounded-md",
-                      )} 
+                      )}
                     >
                       <item.icon
                         className={cn(
@@ -350,11 +348,7 @@ export function AdminLayout({ children }: AdminLayoutProps) {
                         const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null
                         const adminType = typeof window !== 'undefined' ? localStorage.getItem('adminType') : null
 
-                        if (adminType === 'SUPER_ADMIN') {
-                          // super-admin logout endpoint clears cookie
-                          await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000'}/api/super-admin/logout`, { method: 'POST', credentials: 'include' })
-                        } else if (token) {
-                          // try to invalidate token on server if endpoint exists
+                        if (token) {
                           try {
                             await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000'}/api/users/logout`, {
                               method: 'POST',

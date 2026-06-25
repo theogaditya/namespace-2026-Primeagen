@@ -1,7 +1,8 @@
 import { Server } from "./index";
 import dotenv from "dotenv";
 import { getPrisma } from "./lib/prisma";
-import { initializeGCP } from "./lib/gcp/gcp";
+// GCP initialization disabled to avoid unnecessary external init during local runs
+// import { initializeGCP } from "./lib/gcp/gcp";
 import { redisClient, RedisClientforComplaintQueue } from './lib/redis/redisClient';
 import { blockchainQueueService } from './lib/redis/blockchainQueueService';
 import { retrieveAndInjectSecrets } from './middleware/retriveSecrets';
@@ -29,10 +30,10 @@ async function bootstrap() {
       console.warn('Failed to initialize Redis clients:', redisInitErr);
     }
 
-    // Initialize GCP Vertex AI client
-    const gcpConfig = await initializeGCP();
-    console.log('GCP Vertex AI client initialized');
-    console.log(`  Endpoint: ${gcpConfig.endpointId}`);
+    // GCP initialization disabled (not needed in this environment)
+    // const gcpConfig = await initializeGCP();
+    // console.log('GCP Vertex AI client initialized');
+    // console.log(`  Endpoint: ${gcpConfig.endpointId}`);
 
     // Now that secrets are loaded, initialize server
     const server = new Server(prisma);

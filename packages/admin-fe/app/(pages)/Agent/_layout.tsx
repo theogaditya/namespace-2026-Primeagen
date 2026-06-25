@@ -65,9 +65,9 @@ export function AgentRevampedLayout({ children }: AgentRevampedLayoutProps) {
   }
 
   const navItems = [
-    { href: "/agent-revamped", icon: "analytics", label: "Intelligence" },
-    { href: "/agent-revamped/my-complaints", icon: "tactic", label: "Operations" },
-    { href: "/agent-revamped/reports", icon: "settings", label: "Management" },
+    { href: "/Agent", icon: "analytics", label: "Intelligence" },
+    { href: "/Agent/my-complaints", icon: "tactic", label: "Operations" },
+    { href: "/Agent/reports", icon: "settings", label: "Management" },
   ]
 
   const isActive = (href: string) => pathname === href
@@ -252,9 +252,9 @@ export function AgentRevampedLayout({ children }: AgentRevampedLayoutProps) {
                 <span className="text-slate-400">DASHBOARD</span>
                 <span className="text-slate-300">/</span>
                 <span className="text-[#0047cc] border-b-2 border-[#0047cc] pb-0.5">
-                  {pathname === "/agent-revamped"
+                  {pathname === "/Agent"
                     ? "INTELLIGENCE"
-                    : pathname === "/agent-revamped/my-complaints"
+                    : pathname === "/Agent/my-complaints"
                     ? "OPERATIONS"
                     : "MANAGEMENT"}
                 </span>
