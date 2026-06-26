@@ -101,6 +101,7 @@ model DepartmentMunicipalAdmin {
   managedByStateAdmin       DepartmentStateAdmin? @relation("StateAdminToMunicipalAdmin", fields: [managedByStateAdminId], references: [id])
   managedBySuperMunicipal   SuperMunicipalAdmin?  @relation("SuperMunicipalToDepAdmin", fields: [managedBySuperMunicipalId], references: [id])
   newsUpdates               NewsUpdate[]
+  announcements             Announcement[]
 
   @@map("department_municipal_admins")
 }
@@ -320,6 +321,23 @@ model NewsUpdate {
   createdBy   DepartmentMunicipalAdmin @relation(fields: [createdById], references: [id])
 
   @@map("news_updates")
+}
+
+model Announcement {
+  id           String                   @id @default(uuid())
+  title        String
+  content      String
+  municipality String
+  isActive     Boolean                  @default(true)
+  priority     Int                      @default(0)
+  startsAt     DateTime                 @default(now())
+  expiresAt    DateTime?
+  createdAt    DateTime                 @default(now())
+  updatedAt    DateTime                 @updatedAt
+  createdById  String
+  createdBy    DepartmentMunicipalAdmin @relation(fields: [createdById], references: [id])
+
+  @@map("announcements")
 }
 
 model AuditLog {

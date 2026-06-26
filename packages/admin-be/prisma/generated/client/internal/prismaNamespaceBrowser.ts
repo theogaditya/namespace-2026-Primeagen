@@ -65,6 +65,7 @@ export const ModelName = {
   ComplaintLocation: 'ComplaintLocation',
   Upvote: 'Upvote',
   NewsUpdate: 'NewsUpdate',
+  Announcement: 'Announcement',
   AuditLog: 'AuditLog',
   RegionalWorkflow: 'RegionalWorkflow',
   Chat: 'Chat',
@@ -372,6 +373,23 @@ export const NewsUpdateScalarFieldEnum = {
 } as const
 
 export type NewsUpdateScalarFieldEnum = (typeof NewsUpdateScalarFieldEnum)[keyof typeof NewsUpdateScalarFieldEnum]
+
+
+export const AnnouncementScalarFieldEnum = {
+  id: 'id',
+  title: 'title',
+  content: 'content',
+  municipality: 'municipality',
+  isActive: 'isActive',
+  priority: 'priority',
+  startsAt: 'startsAt',
+  expiresAt: 'expiresAt',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt',
+  createdById: 'createdById'
+} as const
+
+export type AnnouncementScalarFieldEnum = (typeof AnnouncementScalarFieldEnum)[keyof typeof AnnouncementScalarFieldEnum]
 
 
 export const AuditLogScalarFieldEnum = {

@@ -8,7 +8,7 @@ import { getBadgeService } from '../lib/badges/badgeService';
 
 export default function(prisma: PrismaClient) {
   const router = express.Router();
-  
+
 
 // Login
 router.post('/login', async (req, res: any) => {
@@ -68,9 +68,9 @@ router.post('/login', async (req, res: any) => {
 router.post('/create/agent', authenticateMunicipalAdminOnly, async (req, res: any) => {
   const parse = agentSchema.safeParse(req.body);
   if (!parse.success) {
-    return res.status(400).json({ 
-      message: 'Invalid input', 
-      errors: parse.error.errors 
+    return res.status(400).json({
+      message: 'Invalid input',
+      errors: parse.error.errors
     });
   }
 
@@ -94,8 +94,8 @@ router.post('/create/agent', authenticateMunicipalAdminOnly, async (req, res: an
     });
 
     if (existingAgent) {
-      return res.status(409).json({ 
-        message: 'Agent with this email or official email already exists' 
+      return res.status(409).json({
+        message: 'Agent with this email or official email already exists'
       });
     }
 
@@ -144,21 +144,21 @@ router.post('/create/agent', authenticateMunicipalAdminOnly, async (req, res: an
       }
     });
 
-    res.status(201).json({ 
+    res.status(201).json({
       success: true,
-      message: 'Agent created successfully', 
-      agent 
+      message: 'Agent created successfully',
+      agent
     });
   } catch (err: any) {
     console.error('Agent creation error:', err);
-    
+
     if (err.code === 'P2002') {
-      return res.status(409).json({ 
-        message: 'Agent with this email or official email already exists' 
+      return res.status(409).json({
+        message: 'Agent with this email or official email already exists'
       });
     }
-    
-    res.status(500).json({ 
+
+    res.status(500).json({
       message: 'Agent registration failed',
       error: process.env.NODE_ENV === 'development' ? err.message : undefined
     });
@@ -262,8 +262,8 @@ router.put('/complaints/:id/status', authenticateMunicipalAdminOnly, async (req:
 
     const validStatuses = ['REGISTERED', 'UNDER_PROCESSING', 'FORWARDED', 'ON_HOLD', 'COMPLETED', 'REJECTED'];
     if (!status || !validStatuses.includes(status)) {
-      return res.status(400).json({ 
-        success: false, 
+      return res.status(400).json({
+        success: false,
         message: 'Invalid status. Valid statuses are: ' + validStatuses.join(', ')
       });
     }
@@ -273,15 +273,15 @@ router.put('/complaints/:id/status', authenticateMunicipalAdminOnly, async (req:
     });
 
     if (!existingComplaint) {
-      return res.status(404).json({ 
-        success: false, 
-        message: 'Complaint not found' 
+      return res.status(404).json({
+        success: false,
+        message: 'Complaint not found'
       });
     }
 
     const updatedComplaint = await prisma.complaint.update({
       where: { id },
-      data: { 
+      data: {
         status,
         ...(status === 'COMPLETED' && { dateOfResolution: new Date() })
       },
@@ -327,16 +327,16 @@ router.put('/complaints/:id/status', authenticateMunicipalAdminOnly, async (req:
     const { User, ...complaintRest } = updatedComplaint as any;
     const complaintForResponse = { ...complaintRest, complainant: User || null };
 
-    return res.json({ 
-      success: true, 
+    return res.json({
+      success: true,
       message: 'Complaint status updated successfully',
-      complaint: complaintForResponse 
+      complaint: complaintForResponse
     });
 
   } catch (error: any) {
     console.error('Error updating complaint status:', error);
-    return res.status(500).json({ 
-      success: false, 
+    return res.status(500).json({
+      success: false,
       message: 'Failed to update complaint status',
       error: process.env.NODE_ENV === 'development' ? error.message : undefined
     });
@@ -463,19 +463,19 @@ router.get('/all', async (req, res) => {
     const agents = await prisma.agent.findMany({
       select: {
         id: true,
-        fullName: true,  
+        fullName: true,
         email: true,
         department: true,
         accessLevel: true,
         status: true,
       }
     });
-      
-    res.status(200).json({ 
-      success: true, 
+
+    res.status(200).json({
+      success: true,
       agents: agents.map((agent: any) => ({
         ...agent,
-        name: agent.fullName, 
+        name: agent.fullName,
         status: agent.status || 'INACTIVE'
       }))
     });
@@ -492,9 +492,9 @@ router.patch('/:id/status', async (req, res:any) => {
 
   // Validate input
   if (!status || !['ACTIVE', 'INACTIVE'].includes(status)) {
-    return res.status(400).json({ 
-      success: false, 
-      message: 'Invalid status. Must be either "ACTIVE" or "INACTIVE"' 
+    return res.status(400).json({
+      success: false,
+      message: 'Invalid status. Must be either "ACTIVE" or "INACTIVE"'
     });
   }
 
@@ -517,31 +517,169 @@ router.patch('/:id/status', async (req, res:any) => {
     const formattedAgent = {
       ...updatedAgent,
       name: updatedAgent.fullName,
-      status: updatedAgent.status.charAt(0).toUpperCase() + 
+      status: updatedAgent.status.charAt(0).toUpperCase() +
              updatedAgent.status.slice(1).toLowerCase()
     };
 
-    res.status(200).json({ 
+    res.status(200).json({
       success: true,
       agent: formattedAgent
     });
 
   } catch (error:any) {
     console.error('Error updating agent status:', error);
-    
+
     if (error.code === 'P2025') {
-      return res.status(404).json({ 
-        success: false, 
-        message: 'Agent not found' 
+      return res.status(404).json({
+        success: false,
+        message: 'Agent not found'
       });
     }
-    
-    res.status(500).json({ 
-      success: false, 
-      message: 'Failed to update agent status' 
+
+    res.status(500).json({
+      success: false,
+      message: 'Failed to update agent status'
     });
   }
 });
+
+  // ─── Announcement CRUD ─────────────────────────────────────────────
+
+  // Create announcement
+  router.post('/announcements', authenticateMunicipalAdminOnly, async (req: any, res: any) => {
+    try {
+      const admin = await prisma.departmentMunicipalAdmin.findUnique({
+        where: { id: req.admin.id },
+        select: { municipality: true },
+      });
+      if (!admin) return res.status(404).json({ success: false, message: 'Admin not found' });
+
+      const { title, content, priority, startsAt, expiresAt } = req.body;
+      if (!title || !content) {
+        return res.status(400).json({ success: false, message: 'title and content are required' });
+      }
+      if (content.length > 280) {
+        return res.status(400).json({ success: false, message: 'content must be 280 characters or fewer' });
+      }
+
+      const announcement = await prisma.announcement.create({
+        data: {
+          title,
+          content,
+          municipality: admin.municipality,
+          priority: priority ?? 0,
+          startsAt: startsAt ? new Date(startsAt) : undefined,
+          expiresAt: expiresAt ? new Date(expiresAt) : null,
+          createdById: req.admin.id,
+        },
+      });
+
+      return res.status(201).json({ success: true, data: announcement });
+    } catch (error: any) {
+      console.error('Error creating announcement:', error);
+      return res.status(500).json({ success: false, message: 'Failed to create announcement' });
+    }
+  });
+
+  // List announcements (own municipality)
+  router.get('/announcements', authenticateMunicipalAdminOnly, async (req: any, res: any) => {
+    try {
+      const admin = await prisma.departmentMunicipalAdmin.findUnique({
+        where: { id: req.admin.id },
+        select: { municipality: true },
+      });
+      if (!admin) return res.status(404).json({ success: false, message: 'Admin not found' });
+
+      const page = parseInt(req.query.page as string) || 1;
+      const limit = parseInt(req.query.limit as string) || 20;
+      const skip = (page - 1) * limit;
+
+      const isActiveFilter = req.query.isActive;
+      const where: any = { municipality: admin.municipality };
+      if (isActiveFilter === 'true') where.isActive = true;
+      else if (isActiveFilter === 'false') where.isActive = false;
+
+      const [data, total] = await Promise.all([
+        prisma.announcement.findMany({
+          where,
+          orderBy: [{ priority: 'desc' }, { createdAt: 'desc' }],
+          skip,
+          take: limit,
+        }),
+        prisma.announcement.count({ where }),
+      ]);
+
+      return res.json({ success: true, data, total, page });
+    } catch (error: any) {
+      console.error('Error listing announcements:', error);
+      return res.status(500).json({ success: false, message: 'Failed to list announcements' });
+    }
+  });
+
+  // Update announcement
+  router.patch('/announcements/:id', authenticateMunicipalAdminOnly, async (req: any, res: any) => {
+    try {
+      const admin = await prisma.departmentMunicipalAdmin.findUnique({
+        where: { id: req.admin.id },
+        select: { municipality: true },
+      });
+      if (!admin) return res.status(404).json({ success: false, message: 'Admin not found' });
+
+      const existing = await prisma.announcement.findUnique({ where: { id: req.params.id } });
+      if (!existing) return res.status(404).json({ success: false, message: 'Announcement not found' });
+      if (existing.municipality !== admin.municipality) {
+        return res.status(403).json({ success: false, message: 'Not authorised' });
+      }
+
+      const { title, content, priority, isActive, startsAt, expiresAt } = req.body;
+      if (content && content.length > 280) {
+        return res.status(400).json({ success: false, message: 'content must be 280 characters or fewer' });
+      }
+
+      const updated = await prisma.announcement.update({
+        where: { id: req.params.id },
+        data: {
+          ...(title !== undefined && { title }),
+          ...(content !== undefined && { content }),
+          ...(priority !== undefined && { priority }),
+          ...(isActive !== undefined && { isActive }),
+          ...(startsAt !== undefined && { startsAt: new Date(startsAt) }),
+          ...(expiresAt !== undefined && { expiresAt: expiresAt ? new Date(expiresAt) : null }),
+        },
+      });
+
+      return res.json({ success: true, data: updated });
+    } catch (error: any) {
+      console.error('Error updating announcement:', error);
+      if (error.code === 'P2025') {
+        return res.status(404).json({ success: false, message: 'Announcement not found' });
+      }
+      return res.status(500).json({ success: false, message: 'Failed to update announcement' });
+    }
+  });
+
+  // Delete announcement
+  router.delete('/announcements/:id', authenticateMunicipalAdminOnly, async (req: any, res: any) => {
+    try {
+      const admin = await prisma.departmentMunicipalAdmin.findUnique({
+        where: { id: req.admin.id },
+        select: { municipality: true },
+      });
+      if (!admin) return res.status(404).json({ success: false, message: 'Admin not found' });
+
+      const existing = await prisma.announcement.findUnique({ where: { id: req.params.id } });
+      if (!existing) return res.status(404).json({ success: false, message: 'Announcement not found' });
+      if (existing.municipality !== admin.municipality) {
+        return res.status(403).json({ success: false, message: 'Not authorised' });
+      }
+
+      await prisma.announcement.delete({ where: { id: req.params.id } });
+      return res.status(204).send();
+    } catch (error: any) {
+      console.error('Error deleting announcement:', error);
+      return res.status(500).json({ success: false, message: 'Failed to delete announcement' });
+    }
+  });
 
   return router;
 }

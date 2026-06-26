@@ -7,8 +7,8 @@ import { cn } from "@/lib/utils"
 
 interface RevampedLayoutProps {
   children: React.ReactNode
-  activeTab?: 'dashboard' | 'my-complaints' | 'reports' | 'agent-management'
-  onTabChange?: (tab: 'dashboard' | 'my-complaints' | 'reports' | 'agent-management') => void
+  activeTab?: 'dashboard' | 'my-complaints' | 'reports' | 'agent-management' | 'announcements'
+  onTabChange?: (tab: 'dashboard' | 'my-complaints' | 'reports' | 'agent-management' | 'announcements') => void
 }
 
 const NAV_ITEMS = [
@@ -16,6 +16,7 @@ const NAV_ITEMS = [
   { name: "My Complaints", icon: "assignment", tabKey: 'my-complaints' as const },
   { name: "Analytics", icon: "analytics", tabKey: 'reports' as const },
   { name: "Agent Management", icon: "group", tabKey: 'agent-management' as const },
+  { name: "Announcements", icon: "campaign", tabKey: 'announcements' as const },
 ]
 
 export function RevampedLayout({ children, activeTab = 'dashboard', onTabChange }: RevampedLayoutProps) {

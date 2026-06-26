@@ -18,6 +18,7 @@ import complaintRoutes from './routes/complaint';
 // import { userComplaintsRouter } from './routes/userComplaints';
 import { healthPoint } from './routes/health';
 import autoAssignRouter, { startAutoAssignPolling } from './routes/autoAssign';
+import publicAnnouncementRoutes from './routes/publicAnnouncementRoutes';
 
 export class Server {
   private app: Express;
@@ -56,6 +57,8 @@ export class Server {
     this.app.use('/api/civic-partner/analytics', civicPartnerAnalyticsRoutes(this.db));
     // Public survey endpoints consumed by user-fe (no auth required)
     this.app.use('/api/surveys', publicSurveyRoutes(this.db));
+    // Public announcements consumed by user-fe (no auth required)
+    this.app.use('/api/public', publicAnnouncementRoutes(this.db));
     this.app.use('/api/municipal-admin', municipalAdminRoutes(this.db));
     this.app.use('/api/agent', agentRoutes(this.db));
     this.app.use('/api/chat', chatRoutes(this.db));

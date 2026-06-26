@@ -88,6 +88,11 @@ export type Upvote = Prisma.UpvoteModel
  */
 export type NewsUpdate = Prisma.NewsUpdateModel
 /**
+ * Model Announcement
+ * 
+ */
+export type Announcement = Prisma.AnnouncementModel
+/**
  * Model AuditLog
  * 
  */
