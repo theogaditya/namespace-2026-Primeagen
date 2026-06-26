@@ -10,13 +10,12 @@ import {
   Complaint,
   UserData,
 } from "./customComps";
-import { SwarajAIChat } from "@/components/swaraj-ai-chat";
 import { LikeProvider } from "@/contexts/LikeContext";
 import { NewBadgeNotification } from "@/components/badges/NewBadgeNotification";
 import LandingFooter from "@/components/landing/LandingFooter";
 import DashboardSidebar, { type DashboardView } from "@/components/dashboard/DashboardSidebar";
 import DashboardTopBar from "@/components/dashboard/DashboardTopBar";
-import DashboardHeroBanner from "@/components/dashboard/DashboardHeroBanner";
+import DashboardAIChatHub from "@/components/dashboard/DashboardAIChatHub";
 import CivicStandingSection from "@/components/dashboard/CivicStandingSection";
 import ActiveReportsGrid from "@/components/dashboard/ActiveReportsGrid";
 import LiveAreaMapWidget from "@/components/dashboard/LiveAreaMapWidget";
@@ -273,7 +272,9 @@ export default function DashboardPage() {
           <main className="flex-1 overflow-auto">
             {activeView === "dashboard" && (
               <div className="pt-8 px-4 lg:px-8 pb-12 max-w-7xl mx-auto w-full">
-                <DashboardHeroBanner user={user} resolvedCount={stats?.resolvedComplaints ?? 0} />
+                <DashboardAIChatHub
+                  user={user}
+                />
 
                 <CivicStandingSection
                   stats={stats}
@@ -373,7 +374,6 @@ export default function DashboardPage() {
           hideAssignmentTimeline={isCommunityComplaint}
         />
 
-        <SwarajAIChat />
         <NewBadgeNotification />
 
         <AllBadgesModal

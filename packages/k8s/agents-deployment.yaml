@@ -1,0 +1,81 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: agents-deployment
+  namespace: default
+  labels:
+    app: agents
+  annotations:
+    kubernetes.io/change-cause: "Initial deployment"
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: agents
+  template:
+    metadata:
+      labels:
+        app: agents
+      annotations:
+        rollme: "initial"
+    spec:
+      containers:
+        - name: agents
+          image: ogadityahota/sih-swarajdesk-agents:latest
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 3040
+              name: http
+          envFrom:
+            - secretRef:
+                name: sih-swaraj-agents-secret
+          env:
+            - name: NODE_ENV
+              value: "production"
+            - name: AGENTS_PORT
+              value: "3040"
+            - name: REDIS_URL
+              value: "redis://default:X95Voc7K22sc6e3G0sIBcJczdeuadzxi@redis-11469.c305.ap-south-1-1.ec2.cloud.redislabs.com:11469"
+          resources:
+            requests:
+              memory: "256Mi"
+              cpu: "250m"
+            limits:
+              memory: "512Mi"
+              cpu: "500m"
+          startupProbe:
+            httpGet:
+              path: /api/health
+              port: 3040
+            failureThreshold: 30
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /api/health
+              port: 3040
+            periodSeconds: 10
+            failureThreshold: 3
+          readinessProbe:
+            httpGet:
+              path: /api/health
+              port: 3040
+            periodSeconds: 5
+            failureThreshold: 3
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: agents-service
+  namespace: default
+  labels:
+    app: agents
+spec:
+  selector:
+    app: agents
+  ports:
+    - name: http
+      port: 3040
+      targetPort: 3040
+      protocol: TCP
+  type: ClusterIP

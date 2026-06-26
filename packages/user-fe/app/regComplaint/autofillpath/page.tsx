@@ -13,7 +13,6 @@ import {
   Lock,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { SwarajAIChat } from "@/components/swaraj-ai-chat";
 import {
   useComplaintForm,
   Step3Location,
@@ -546,9 +545,6 @@ export default function RegisterComplaintWithAutofillPage() {
         subMessage={submitMessage.description}
         onClose={handlePopupClose}
       />
-
-      {/* AI Chatbot */}
-      <SwarajAIChat />
     </div>
   );
 }

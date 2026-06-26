@@ -25,7 +25,6 @@ import {
   MapPinOff,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { SwarajAIChat } from "@/components/swaraj-ai-chat";
 import { useNetwork } from "@/hooks/useNetwork";
 import {
   useComplaintForm,
@@ -41,6 +40,7 @@ import {
   type ImageValidationStatus,
   type AIResult,
   type AutoFillPhase,
+  type DraftLocation,
 } from "./customComps";
 import {
   Step1CategoryWithAutofill,
@@ -181,6 +181,7 @@ export default function RegisterComplaintPage() {
   >("idle");
   const [aiResult, setAiResult] = useState<AIResult | null>(null);
   const [userLocation, setUserLocation] = useState<{ lat: number; lng: number } | null>(null);
+  const [pendingDraft, setPendingDraft] = useState<{ aiResult: AIResult; draftLoc: DraftLocation } | null>(null);
   const [categories, setCategories] = useState<{ id: string; name: string; assignedDepartment: string }[]>([]);
   const [operatingDistricts, setOperatingDistricts] = useState<{ id: string; name: string }[]>([]);
   const [unserviceableLocation, setUnserviceableLocation] = useState<{ detectedDistrict: string; availableDistricts: string[] } | null>(null);
@@ -234,6 +235,40 @@ export default function RegisterComplaintPage() {
       router.push("/loginUser?redirect=/regComplaint");
     }
   }, [router]);
+
+  // Auto-fill from AI complaint draft (stored by DashboardAIChatHub)
+  useEffect(() => {
+    if (categories.length === 0 || operatingDistricts.length === 0) return;
+
+    const draftStr = localStorage.getItem("complaintDraft");
+    if (!draftStr) return;
+
+    try {
+      const draft = JSON.parse(draftStr);
+      localStorage.removeItem("complaintDraft");
+
+      const aiResult: AIResult = {
+        category: draft.category || "",
+        subCategory: draft.subCategory || "",
+        complaint: draft.description || "",
+        urgency: draft.urgency || "MEDIUM",
+      };
+
+      const draftLoc: DraftLocation = {
+        district: draft.district,
+        city: draft.city,
+        pin: draft.pin,
+        locality: draft.locality,
+      };
+
+      setPendingDraft({ aiResult, draftLoc });
+      setUseAutofill(true);
+      setAutoFillState("location-permission");
+    } catch (err) {
+      console.error("[regComplaint] Failed to parse complaint draft:", err);
+      localStorage.removeItem("complaintDraft");
+    }
+  }, [categories, operatingDistricts]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Auto-submit when connection is restored
   useEffect(() => {
@@ -294,8 +329,18 @@ export default function RegisterComplaintPage() {
   // Called when location permission is resolved
   const handleLocationResult = useCallback((coords: { lat: number; lng: number } | null) => {
     setUserLocation(coords);
-    setAutoFillState("uploading"); // Now waiting for image upload
-  }, []);
+    if (pendingDraft) {
+      // Neural Core flow: we already have the AI draft, skip image upload and start filling
+      setAutoFillState("filling");
+      autoFill.run(pendingDraft.aiResult, coords, pendingDraft.draftLoc).then(() => {
+        setAutoFillState("done");
+      });
+      setPendingDraft(null);
+    } else {
+      // Quick Fill flow: now waiting for image upload
+      setAutoFillState("uploading");
+    }
+  }, [pendingDraft, autoFill]);
 
   // Called when AI image upload starts
   const handleAIUploadStart = useCallback(() => {
@@ -788,7 +833,7 @@ export default function RegisterComplaintPage() {
                 className="bg-white rounded-2xl shadow-2xl border border-red-200 overflow-hidden max-w-md w-full"
               >
                 {/* Header */}
-                <div className="bg-gradient-to-r from-red-500 to-orange-500 px-6 py-4 flex items-center gap-3">
+                <div className="bg-linear-to-r from-red-500 to-orange-500 px-6 py-4 flex items-center gap-3">
                   <MapPinOff className="h-6 w-6 text-white" />
                   <h3 className="text-white font-bold text-lg">Location Not Serviceable</h3>
                 </div>
@@ -895,7 +940,7 @@ export default function RegisterComplaintPage() {
               className="bg-white rounded-2xl shadow-2xl border-2 border-slate-200 overflow-hidden max-w-md w-full"
             >
               {/* Header */}
-              <div className="bg-gradient-to-r from-blue-500 to-indigo-500 px-6 py-4">
+              <div className="bg-linear-to-r from-blue-500 to-indigo-500 px-6 py-4">
                 <h3 className="text-white font-bold text-xl">Complaint Submission</h3>
               </div>
 
@@ -1036,9 +1081,6 @@ export default function RegisterComplaintPage() {
           </motion.div>
         )}
       </AnimatePresence>
-
-      {/* AI Chatbot */}
-      <SwarajAIChat />
     </div>
   );
 }

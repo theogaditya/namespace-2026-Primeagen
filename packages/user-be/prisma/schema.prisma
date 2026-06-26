@@ -242,6 +242,11 @@ model Complaint {
   AIstandardizedSubCategory      String?
   lastUpdated                    DateTime                  @updatedAt
   isDuplicate                    Boolean?
+  qualityScore                   Int?                      @default(0)
+  qualityBreakdown               Json?
+  hasSimilarComplaints           Boolean?                  @default(false)
+  similarComplaintIds            String[]                  @default([])
+  abuseMetadata                  Json?
   assignedAgent                  Agent?                    @relation("AssignedAgentComplaints", fields: [assignedAgentId], references: [id])
   category                       Category                  @relation(fields: [categoryId], references: [id])
   User                           User?                     @relation(fields: [complainantId], references: [id])

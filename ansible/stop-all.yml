@@ -24,6 +24,9 @@
       - name: compQueue
         ports:
           - 3005
+      - name: agents
+        ports:
+          - 3040
       - name: self
         ports:
           - 3030
@@ -99,6 +102,7 @@
           • 3003 (user-fe)
           • 3004 (admin-fe)
           • 3005 (compQueue)
+          • 3040 (agents)
           • 3030 (self)
           
           Log files have been cleaned up.

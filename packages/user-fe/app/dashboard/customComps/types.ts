@@ -104,6 +104,17 @@ export interface Complaint {
   isDuplicate: boolean | null;
   managedByMunicipalAdminId: string | null;
   escalatedToStateAdminId: string | null;
+  // AI-enriched fields
+  qualityScore: number | null;
+  qualityBreakdown: { clarity: number; evidence: number; location: number; completeness: number } | null;
+  hasSimilarComplaints: boolean | null;
+  similarComplaintIds: string[];
+  abuseMetadata: {
+    severity?: string;
+    flagged_phrases?: string[];
+    explanation_en?: string;
+    explanation_hi?: string;
+  } | null;
   location: ComplaintLocation | null;
   User: ComplaintUser | null;
   category: ComplaintCategory;

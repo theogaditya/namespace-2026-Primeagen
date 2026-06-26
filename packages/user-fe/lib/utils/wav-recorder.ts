@@ -3,40 +3,50 @@
  * Captures PCM audio and encodes to WAV format
  */
 export class WavRecorder {
-  private audioContext: AudioContext | null = null;
+  private _audioContext: AudioContext | null = null;
   private processor: ScriptProcessorNode | null = null;
-  private source: MediaStreamAudioSourceNode | null = null;
+  private _source: MediaStreamAudioSourceNode | null = null;
   private stream: MediaStream | null = null;
   private buffers: Float32Array[] = [];
   private sampleRate = 44100;
+
+  /** Expose audioContext for external AnalyserNode (e.g. silence detection) */
+  get audioContext(): AudioContext | null {
+    return this._audioContext;
+  }
+
+  /** Expose source node for connecting an AnalyserNode */
+  get source(): MediaStreamAudioSourceNode | null {
+    return this._source;
+  }
 
   async start(): Promise<void> {
     this.buffers = [];
     this.stream = await navigator.mediaDevices.getUserMedia({ audio: true });
     
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    this.audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
-    this.sampleRate = this.audioContext.sampleRate || 44100;
-    this.source = this.audioContext.createMediaStreamSource(this.stream);
+    this._audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
+    this.sampleRate = this._audioContext.sampleRate || 44100;
+    this._source = this._audioContext.createMediaStreamSource(this.stream);
     
     // ScriptProcessorNode is deprecated but still widely supported; buffer size 4096
-    this.processor = this.audioContext.createScriptProcessor(4096, 1, 1);
+    this.processor = this._audioContext.createScriptProcessor(4096, 1, 1);
     this.processor.onaudioprocess = (e: AudioProcessingEvent) => {
       const input = e.inputBuffer.getChannelData(0);
       this.buffers.push(new Float32Array(input));
     };
     
-    this.source.connect(this.processor);
-    this.processor.connect(this.audioContext.destination);
+    this._source.connect(this.processor);
+    this.processor.connect(this._audioContext.destination);
   }
 
   async stop(): Promise<Blob> {
-    if (!this.audioContext) throw new Error("Not recording");
+    if (!this._audioContext) throw new Error("Not recording");
     
     // Disconnect nodes
     try {
       this.processor?.disconnect();
-      this.source?.disconnect();
+      this._source?.disconnect();
     } catch (e) {
       console.warn("Error disconnecting audio nodes:", e);
     }
@@ -49,10 +59,10 @@ export class WavRecorder {
     const blob = new Blob([new Uint8Array(wavBuffer.buffer as ArrayBuffer)], { type: "audio/wav" });
 
     // Close audio context
-    await this.audioContext.close();
-    this.audioContext = null;
+    await this._audioContext.close();
+    this._audioContext = null;
     this.processor = null;
-    this.source = null;
+    this._source = null;
     this.stream = null;
     this.buffers = [];
 

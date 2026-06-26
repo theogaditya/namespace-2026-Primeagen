@@ -18,8 +18,11 @@ import {
   Send,
   Clock,
   Shield,
+  BarChart3,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { DedupResultsCard } from "@/components/dedup-results-card";
+import { QualityScoreBadge, QualityBreakdownBar } from "@/components/quality-score-badge";
 
 interface Step4Props {
   formData: ComplaintFormState;
@@ -292,6 +295,43 @@ export function Step4Review({ formData, goToStep }: Step4Props) {
           </div>
         </div>
       </motion.div>
+
+      {/* AI Duplicate Check */}
+      <motion.div variants={itemVariants}>
+        <DedupResultsCard
+          description={formData.description}
+          categoryName={formData.categoryName}
+          district={formData.district}
+          onUpvoteInstead={(id) => {
+            window.open(`/dashboard?highlight=${id}`, "_blank");
+          }}
+        />
+      </motion.div>
+
+      {/* Quality Score Preview */}
+      {formData.description && formData.description.length >= 20 && (
+        <motion.div
+          variants={itemVariants}
+          className="bg-white border-2 border-gray-100 rounded-2xl overflow-hidden shadow-sm hover:shadow-md transition-shadow"
+        >
+          <div className="flex items-center justify-between px-5 py-4 bg-linear-to-r from-violet-50 to-purple-50 border-b border-gray-100">
+            <div className="flex items-center gap-3">
+              <div className="p-2 bg-violet-100 rounded-xl">
+                <BarChart3 className="h-5 w-5 text-violet-600" />
+              </div>
+              <span className="font-semibold text-gray-800">AI Quality Preview</span>
+            </div>
+          </div>
+          <div className="p-5">
+            <p className="text-xs text-gray-400 mb-3">
+              Quality is scored after submission based on clarity, evidence, location details, and completeness.
+            </p>
+            <div className="flex items-center gap-3">
+              <div className="text-sm text-gray-600">Estimated score will appear on your complaint card.</div>
+            </div>
+          </div>
+        </motion.div>
+      )}
 
       {/* Confirmation Notice */}
       <motion.div

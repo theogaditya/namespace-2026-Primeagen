@@ -1,0 +1,40 @@
+version: '3.8'
+
+services:
+  agents:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        DATABASE_URL: ${DATABASE_URL:-postgresql://dummy:dummy@localhost:5432/dummy}
+    image: mistaholmes/swarajdesk-agents:latest
+    container_name: agents
+    ports:
+      - "${AGENTS_PORT:-3040}:3040"
+    environment:
+      NODE_ENV: ${NODE_ENV:-development}
+      AGENTS_PORT: ${AGENTS_PORT:-3040}
+
+      # Database (read-only access)
+      DATABASE_URL: ${DATABASE_URL}
+
+      # Redis
+      REDIS_URL: ${REDIS_URL}
+
+      # Auth
+      JWT_SECRET: ${JWT_SECRET}
+
+      # AI Model Provider
+      MODEL_PROVIDER: ${MODEL_PROVIDER:-openai}
+      OPENAI_API_KEY: ${OPENAI_API_KEY}
+      GOOGLE_API_KEY: ${GOOGLE_API_KEY:-}
+
+      # Support email (for escalation)
+      SUPPORT_EMAIL: ${SUPPORT_EMAIL:-support@swarajdesk.in}
+    restart: unless-stopped
+    networks:
+      - agents-network
+
+networks:
+  agents-network:
+    driver: bridge

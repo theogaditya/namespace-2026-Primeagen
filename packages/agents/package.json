@@ -1,0 +1,47 @@
+{
+  "name": "agents",
+  "version": "1.0.0",
+  "description": "AI Agents Service - LangChain.js powered (Sentient AI, Help AI, Dedup AI, Abuse AI)",
+  "type": "module",
+  "scripts": {
+    "dev": "bun --watch bin.ts",
+    "start": "bun bin.ts",
+    "test:unit": "vitest test --run",
+    "test:coverage": "vitest test --run --coverage"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@types/cors": "^2.8.19",
+    "@types/express": "^5.0.5",
+    "@types/jsonwebtoken": "^9.0.9",
+    "@types/node": "^24.10.1",
+    "@types/nodemailer": "^6.4.17",
+    "@types/uuid": "^10.0.0",
+    "@vitest/coverage-v8": "^2.1.4",
+    "prisma": "^7.0.1",
+    "typescript": "^5.9.3",
+    "vitest": "^2.1.4"
+  },
+  "dependencies": {
+    "@langchain/core": "^0.3.0",
+    "@langchain/langgraph": "^0.2.0",
+    "@langchain/openai": "^0.3.0",
+    "@langchain/google-genai": "^0.1.0",
+    "@prisma/adapter-pg": "^7.0.1",
+    "@prisma/client": "^7.0.1",
+    "@redis/client": "^5.10.0",
+    "axios": "^1.13.2",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.7",
+    "express": "^5.1.0",
+    "helmet": "^8.1.0",
+    "jsonwebtoken": "^9.0.2",
+    "nodemailer": "^6.10.1",
+    "openai": "^4.77.0",
+    "pg": "^8.16.3",
+    "uuid": "^11.1.0",
+    "zod": "^3.25.67"
+  }
+}

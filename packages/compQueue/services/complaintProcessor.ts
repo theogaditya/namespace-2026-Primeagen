@@ -80,6 +80,7 @@ export async function processNextComplaint(db: PrismaClient): Promise<{ processe
 
     // Call moderation service to sanitize abusive text. If moderation service returns clean_text,
     let AIabusedFlag: boolean | null = null;
+    let abuseMetadata: Record<string, any> | null = null;
     try {
       console.log("Testing Out The Abusive Route");
 
@@ -88,6 +89,14 @@ export async function processNextComplaint(db: PrismaClient): Promise<{ processe
         if (mod.has_abuse) {
           AIabusedFlag = true;
         }
+        // Store full moderation metadata for frontend display
+        abuseMetadata = {
+          severity: mod.severity,
+          flagged_spans: mod.flagged_spans,
+          explanation_en: mod.explanation_en || null,
+          explanation_hi: mod.explanation_hi || null,
+          flagged_phrases: mod.flagged_phrases || [],
+        };
         // Use cleaned text if provided
         if (mod.clean_text && typeof mod.clean_text === 'string' && mod.clean_text.trim().length > 0) {
           complaintData.description = mod.clean_text;
@@ -101,6 +110,14 @@ export async function processNextComplaint(db: PrismaClient): Promise<{ processe
     // Testing Abuse Route Stub 
     // const AIabusedFlag: boolean = false;
 
+    // Extract AI-enriched fields from complaint data (set by frontend during dedup/quality checks)
+    const qualityScore = typeof complaintData.qualityScore === 'number' ? complaintData.qualityScore : null;
+    const qualityBreakdown = complaintData.qualityBreakdown || null;
+    const hasSimilarComplaints = complaintData.hasSimilarComplaints === true;
+    const similarComplaintIds: string[] = Array.isArray(complaintData.similarComplaintIds)
+      ? complaintData.similarComplaintIds
+      : [];
+
     const result = await db.$transaction(async (tx) => {
       const complaint = await tx.complaint.create({
         data: {
@@ -111,6 +128,11 @@ export async function processNextComplaint(db: PrismaClient): Promise<{ processe
           description: complaintData.description,
           isDuplicate: isDuplicate || false,
           AIabusedFlag: AIabusedFlag,
+          abuseMetadata: abuseMetadata || undefined,
+          qualityScore: qualityScore,
+          qualityBreakdown: qualityBreakdown || undefined,
+          hasSimilarComplaints: hasSimilarComplaints,
+          similarComplaintIds: similarComplaintIds,
           // AIimageVarificationStatus: false, // Placeholder for future AI image verification
           urgency: complaintData.urgency || "LOW",
           attachmentUrl: complaintData.attachmentUrl || null,
@@ -130,6 +152,29 @@ export async function processNextComplaint(db: PrismaClient): Promise<{ processe
           },
         },
       });
+
+      // Bidirectional dedup linking: update referenced complaints to include this new complaint
+      if (similarComplaintIds.length > 0) {
+        for (const similarId of similarComplaintIds) {
+          try {
+            const existing = await tx.complaint.findUnique({
+              where: { id: similarId },
+              select: { similarComplaintIds: true },
+            });
+            if (existing && !existing.similarComplaintIds.includes(complaint.id)) {
+              await tx.complaint.update({
+                where: { id: similarId },
+                data: {
+                  hasSimilarComplaints: true,
+                  similarComplaintIds: [...existing.similarComplaintIds, complaint.id],
+                },
+              });
+            }
+          } catch (linkErr) {
+            console.warn(`[ComplaintProcessing] Failed to link similar complaint ${similarId}:`, linkErr);
+          }
+        }
+      }
 
       return complaint;
     });

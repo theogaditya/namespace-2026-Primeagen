@@ -20,6 +20,13 @@ export interface AIResult {
   urgency: string;
 }
 
+export interface DraftLocation {
+  district?: string;
+  city?: string;
+  pin?: string;
+  locality?: string;
+}
+
 interface AutoFillSequenceOptions {
   updateField: (field: string, value: string | boolean) => void;
   setCurrentStep: (step: number) => void;
@@ -28,7 +35,7 @@ interface AutoFillSequenceOptions {
   operatingDistricts: { id: string; name: string }[];
 }
 
-const AUTO_FILL_SLOWDOWN_FACTOR = 2.0;
+const AUTO_FILL_SLOWDOWN_FACTOR = 3.5;
 
 export function useAutoFillSequence(options: AutoFillSequenceOptions) {
   const { updateField, setCurrentStep, goToStep, categories, operatingDistricts } = options;
@@ -85,7 +92,8 @@ export function useAutoFillSequence(options: AutoFillSequenceOptions) {
   const run = useCallback(
     async (
       aiResult: AIResult,
-      userLocation: { lat: number; lng: number } | null
+      userLocation: { lat: number; lng: number } | null,
+      draftLocation?: DraftLocation
     ) => {
       cancelledRef.current = false;
 
@@ -163,7 +171,117 @@ export function useAutoFillSequence(options: AutoFillSequenceOptions) {
       await delay(500);
 
       // --- Phase 3: Location ---
-      if (userLocation) {
+      if (draftLocation && (draftLocation.district || draftLocation.city)) {
+        // Use draft for district, but prefer GPS for pin/city/locality when available
+        setLocationStatus("Filling location from AI draft...");
+
+        let matchedDistrict: string | null = null;
+
+        if (draftLocation.district) {
+          matchedDistrict = matchDistrict(draftLocation.district, operatingDistricts);
+          if (matchedDistrict) {
+            updateField("district", matchedDistrict);
+            await delay(400);
+          } else {
+            // District not in operating list
+            setLocationStatus("Location not serviceable.");
+            setUnserviceableInfo({
+              detectedDistrict: draftLocation.district,
+              availableDistricts: operatingDistricts.map((d) => d.name),
+            });
+            setPhase("stopped");
+            return;
+          }
+        }
+
+        if (userLocation) {
+          // GPS available — use precise reverse geocoded data for pin/city/locality (same as Quick Fill)
+          setLocationStatus("Reverse geocoding your location...");
+          const geo = await reverseGeocode(userLocation.lat, userLocation.lng);
+          if (cancelledRef.current) { setPhase("stopped"); return; }
+
+          if (geo.pin) {
+            setLocationStatus("Validating PIN...");
+            updateField("pin", geo.pin);
+            await delay(600);
+
+            if (matchedDistrict) {
+              try {
+                const pinRes = await fetch(
+                  `/api/complaint/validate-pin?pin=${geo.pin}&district=${encodeURIComponent(matchedDistrict)}`
+                );
+                const pinData = await pinRes.json();
+                if (pinData.success && pinData.data?.valid && pinData.data.matchesSelectedDistrict) {
+                  updateField("city", pinData.data.city || geo.city);
+                } else {
+                  updateField("city", geo.city);
+                }
+              } catch {
+                updateField("city", geo.city);
+              }
+              await delay(300);
+            }
+          } else if (geo.city) {
+            updateField("city", geo.city);
+            await delay(300);
+          }
+
+          if (geo.locality) {
+            setLocationStatus("Filling locality...");
+            updateField("locality", geo.locality);
+            await delay(300);
+          }
+
+          // Set map coordinates — enables the map and places the marker
+          updateField("latitude", String(userLocation.lat));
+          updateField("longitude", String(userLocation.lng));
+          setLocationStatus("Location filled from AI draft + GPS \u2713");
+          await delay(800);
+        } else {
+          // No GPS — fall back to draft-only data for pin/city/locality
+          if (draftLocation.pin && /^\d{6}$/.test(draftLocation.pin)) {
+            setLocationStatus("Filling PIN code...");
+            updateField("pin", draftLocation.pin);
+            await delay(500);
+
+            if (matchedDistrict) {
+              try {
+                const pinRes = await fetch(
+                  `/api/complaint/validate-pin?pin=${draftLocation.pin}&district=${encodeURIComponent(matchedDistrict)}`
+                );
+                const pinData = await pinRes.json();
+                if (pinData.success && pinData.data?.valid && pinData.data.matchesSelectedDistrict) {
+                  if (pinData.data.city) {
+                    updateField("city", pinData.data.city);
+                  } else if (draftLocation.city) {
+                    updateField("city", draftLocation.city);
+                  }
+                } else if (draftLocation.city) {
+                  updateField("city", draftLocation.city);
+                }
+              } catch {
+                if (draftLocation.city) {
+                  updateField("city", draftLocation.city);
+                }
+              }
+              await delay(300);
+            }
+          } else if (draftLocation.city) {
+            setLocationStatus("Filling city...");
+            updateField("city", draftLocation.city);
+            await delay(300);
+          }
+
+          if (draftLocation.locality) {
+            setLocationStatus("Filling locality...");
+            updateField("locality", draftLocation.locality);
+            await delay(300);
+          }
+
+          setLocationStatus("Location filled from AI draft \u2713");
+          await delay(800);
+        }
+      } else if (userLocation) {
         setLocationStatus("Reverse geocoding your location...");
         const geo = await reverseGeocode(userLocation.lat, userLocation.lng);
 

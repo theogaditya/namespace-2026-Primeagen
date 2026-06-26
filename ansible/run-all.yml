@@ -31,6 +31,11 @@
         ports:
           - 3005
         has_prisma: true
+      - name: agents
+        path: "{{ project_root }}/packages/agents"
+        ports:
+          - 3040
+        has_prisma: true
       - name: self
         path: "{{ project_root }}/packages/self"
         ports:
@@ -62,9 +67,10 @@
           1. user-be    (HTTP: 3000, WS: 3001)
           2. admin-be   (HTTP: 3002)
           3. compQueue  (HTTP: 3005)
-          4. self       (HTTP: 3030)
-          5. user-fe    (HTTP: 3003)
-          6. admin-fe   (HTTP: 3004)
+          4. agents     (HTTP: 3040)
+          5. self       (HTTP: 3030)
+          6. user-fe    (HTTP: 3003)
+          7. admin-fe   (HTTP: 3004)
           ========================================
 
     # ============================================
@@ -174,8 +180,21 @@
       pause:
         seconds: 2
 
-    # 4. self (HTTP: 3030)
-    - name: "🟢 4/6 Starting self (HTTP: 3030)"
+    # 4. agents (HTTP: 3040)
+    - name: "🟢 4/7 Starting agents (HTTP: 3040)"
+      shell: "nohup bun run dev > /tmp/agents.log 2>&1 &"
+      args:
+        chdir: "{{ project_root }}/packages/agents"
+      async: 10
+      poll: 0
+      register: agents_job
+
+    - name: Wait for agents to initialize
+      pause:
+        seconds: 3
+
+    # 5. self (HTTP: 3030)
+    - name: "🟢 5/7 Starting self (HTTP: 3030)"
       shell: "nohup bun run dev > /tmp/self.log 2>&1 &"
       args:
         chdir: "{{ project_root }}/packages/self"
@@ -187,8 +206,8 @@
       pause:
         seconds: 2
 
-    # 5. user-fe (HTTP: 3003)
-    - name: "🟢 5/6 Starting user-fe (HTTP: 3003)"
+    # 6. user-fe (HTTP: 3003)
+    - name: "🟢 6/7 Starting user-fe (HTTP: 3003)"
       shell: "nohup bun run dev -p 3003 > /tmp/user-fe.log 2>&1 &"
       args:
         chdir: "{{ project_root }}/packages/user-fe"
@@ -200,8 +219,8 @@
       pause:
         seconds: 4
 
-    # 6. admin-fe (HTTP: 3004)
-    - name: "🟢 6/6 Starting admin-fe (HTTP: 3004)"
+    # 7. admin-fe (HTTP: 3004)
+    - name: "🟢 7/7 Starting admin-fe (HTTP: 3004)"
       shell: "nohup bun run dev -p 3004 > /tmp/admin-fe.log 2>&1 &"
       args:
         chdir: "{{ project_root }}/packages/admin-fe"
@@ -246,6 +265,7 @@
           🔵 user-be WS → ws://localhost:3001
           🔵 admin-be   → http://localhost:3002
           🔵 compQueue  → http://localhost:3005
+          🤖 agents     → http://localhost:3040
           🔵 self       → http://localhost:3030
           🟢 user-fe    → http://localhost:3003
           🟢 admin-fe   → http://localhost:3004
@@ -255,6 +275,7 @@
           • user-be:    /tmp/user-be.log
           • admin-be:   /tmp/admin-be.log
           • compQueue:  /tmp/compQueue.log
+          • agents:     /tmp/agents.log
           • self:       /tmp/self.log
           • user-fe:    /tmp/user-fe.log
           • admin-fe:   /tmp/admin-fe.log

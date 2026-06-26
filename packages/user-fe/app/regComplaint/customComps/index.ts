@@ -11,7 +11,7 @@ export { LocationPermissionModal } from "./LocationPermissionModal";
 
 // Hooks
 export { useComplaintForm } from "./useComplaintForm";
-export { useAutoFillSequence, type AutoFillPhase, type AIResult } from "./useAutoFillSequence";
+export { useAutoFillSequence, type AutoFillPhase, type AIResult, type DraftLocation } from "./useAutoFillSequence";
 
 // Types
 export * from "./types";

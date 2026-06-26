@@ -21,6 +21,9 @@ import {
   ThumbsUp,
   Clock,
 } from "lucide-react";
+import { QualityScoreBadge } from "@/components/quality-score-badge";
+import { AbuseFlagBanner } from "@/components/abuse-flag-banner";
+import { SimilarComplaintsBadge } from "@/components/similar-complaints-card";
 
 interface ComplaintCardProps {
   complaint: Complaint;
@@ -58,6 +61,13 @@ export function ComplaintCard({ complaint, onClick, index = 0 }: ComplaintCardPr
         )}
       />
 
+      {/* Abuse moderation banner */}
+      {complaint.AIabusedFlag && (
+        <div className="mb-2 ml-3 mr-2">
+          <AbuseFlagBanner abuseMetadata={complaint.abuseMetadata} compact />
+        </div>
+      )}
+
       <div className="flex flex-col sm:flex-row sm:items-start gap-4">
         {/* Left section - Main content */}
         <div className="flex-1 min-w-0 pl-2">
@@ -87,6 +97,16 @@ export function ComplaintCard({ complaint, onClick, index = 0 }: ComplaintCardPr
             >
               {urgencyConfig.icon} {urgencyConfig.label}
             </span>
+
+            {/* Quality Score Badge */}
+            {complaint.qualityScore != null && complaint.qualityScore > 0 && (
+              <QualityScoreBadge score={complaint.qualityScore} />
+            )}
+
+            {/* Similar Complaints Badge */}
+            {complaint.hasSimilarComplaints && complaint.similarComplaintIds?.length > 0 && (
+              <SimilarComplaintsBadge count={complaint.similarComplaintIds.length} />
+            )}
 
             {/* Public/Private indicator */}
             <span

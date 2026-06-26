@@ -38,6 +38,38 @@ export interface ChatAPIResponse {
   error?: string;
 }
 
+// Agents service response types
+export interface AgentsChatResponse {
+  reply: string;
+  agent: string;
+  sessionId: string;
+}
+
+export interface DedupMatch {
+  id: string;
+  seq: number;
+  description: string;
+  similarity: number;
+  status: string;
+  upvoteCount: number;
+}
+
+export interface DedupResponse {
+  hasSimilar: boolean;
+  matches: DedupMatch[];
+}
+
+export interface QualityScoreResponse {
+  score: number;
+  breakdown: {
+    clarity: number;
+    evidence: number;
+    location: number;
+    completeness: number;
+  };
+  suggestions: string[];
+}
+
 // Voice chat API types
 export interface VoiceChatResponse {
   audio_url: string;
