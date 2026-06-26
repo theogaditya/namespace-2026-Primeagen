@@ -1,297 +1,302 @@
 "use client"
 
-import { useState, useEffect, useCallback } from "react"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table"
-import { Users, UserPlus, RefreshCw, Building2, Shield, Loader2 } from "lucide-react"
-import { Switch } from "@/components/ui/switch"
+import { useState, useEffect, useMemo } from "react"
 import { AddMunicipalAdminForm } from "./AddMunicipalAdminForm"
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3002"
 
 interface MunicipalAdmin {
   id: string
-  adminId?: string
+  name: string
   fullName: string
-  officialEmail: string
-  phoneNumber?: string
-  department?: string
-  municipality?: string
-  accessLevel?: string
-  status?: string
-  workloadLimit?: number
-  currentWorkload?: number
-  dateOfCreation?: string
+  email: string
+  department: string
+  accessLevel: string
+  status: string
 }
 
+const formatDepartment = (dept: string) =>
+  dept.split("_").map((w) => w.charAt(0) + w.slice(1).toLowerCase()).join(" ")
+
+/* ── Avatar colour palette (deterministic by index) ── */
+const AVATAR_COLORS = [
+  { bg: "#d7e2ff", text: "#041627" },
+  { bg: "#e1c29b", text: "#211200" },
+  { bg: "#ffdad6", text: "#ba1a1a" },
+  { bg: "#acc7ff", text: "#041627" },
+  { bg: "#d2e4fb", text: "#041627" },
+  { bg: "#feddb5", text: "#38260b" },
+]
+
+const getInitials = (name: string) =>
+  name.split(" ").map((w) => w[0]).slice(0, 2).join("").toUpperCase()
+
 export function MunicipalAdminManagement() {
-  const [admins, setAdmins] = useState<MunicipalAdmin[]>([])
+  const [municipalAdmins, setMunicipalAdmins] = useState<MunicipalAdmin[]>([])
   const [loading, setLoading] = useState(true)
   const [showForm, setShowForm] = useState(false)
-  const [refreshing, setRefreshing] = useState(false)
   const [updatingStatus, setUpdatingStatus] = useState<string | null>(null)
+  const [statusFilter, setStatusFilter] = useState<"ALL" | "ACTIVE" | "INACTIVE">("ALL")
 
-  const fetchMunicipalAdmins = useCallback(async () => {
-    try {
-      const token = localStorage.getItem("token")
-      if (!token) {
-        console.error("No token found")
-        setLoading(false)
-        return
-      }
-
-      const response = await fetch(`${API_URL}/api/state-admin/municipal-admins`, {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-      })
-
-      const data = await response.json()
-
-      if (data.success && data.data) {
-        setAdmins(data.data)
-      }
-    } catch (err) {
-      console.error("Error fetching municipal admins:", err)
-    } finally {
-      setLoading(false)
-      setRefreshing(false)
-    }
-  }, [])
-
-  useEffect(() => {
-    fetchMunicipalAdmins()
-  }, [fetchMunicipalAdmins])
-
-  const handleRefresh = () => {
-    setRefreshing(true)
-    fetchMunicipalAdmins()
-  }
-
-  const handleFormSuccess = () => {
-    setShowForm(false)
-    fetchMunicipalAdmins() // Real-time refresh after creating
-  }
-
-  const handleToggleStatus = async (adminId: string, currentStatus: string) => {
-    setUpdatingStatus(adminId)
+  const fetchMunicipalAdmins = async () => {
+    setLoading(true)
     try {
       const token = localStorage.getItem("token")
       if (!token) return
-
-      const newStatus = currentStatus === "ACTIVE" ? "INACTIVE" : "ACTIVE"
-
-      const response = await fetch(`${API_URL}/api/state-admin/municipal-admins/${adminId}/status`, {
-        method: "PATCH",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({ status: newStatus }),
+      const res = await fetch(`${API_URL}/api/state-admin/all`, {
+        headers: { Authorization: `Bearer ${token}` },
       })
-
-      if (response.ok) {
-        setAdmins(admins.map(admin =>
-          admin.id === adminId ? { ...admin, status: newStatus } : admin
-        ))
+      if (res.ok) {
+        const data = await res.json()
+        setMunicipalAdmins(data.municipalAdmins || data.agents || [])
       }
     } catch (err) {
-      console.error("Error updating admin status:", err)
+      console.error("Error fetching municipalAdmins:", err)
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  useEffect(() => { fetchMunicipalAdmins() }, [])
+
+  const handleMunicipalAdminCreated = () => {
+    fetchMunicipalAdmins()
+    setShowForm(false)
+  }
+
+  const handleToggleStatus = async (municipalAdminId: string, currentStatus: string) => {
+    setUpdatingStatus(municipalAdminId)
+    try {
+      const token = localStorage.getItem("token")
+      if (!token) return
+      const newStatus = currentStatus === "ACTIVE" ? "INACTIVE" : "ACTIVE"
+      const res = await fetch(`${API_URL}/api/state-admin/${municipalAdminId}/status`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+        body: JSON.stringify({ status: newStatus }),
+      })
+      if (res.ok) {
+        setMunicipalAdmins(municipalAdmins.map((a) => (a.id === municipalAdminId ? { ...a, status: newStatus } : a)))
+      }
+    } catch (err) {
+      console.error("Error updating municipal admin status:", err)
     } finally {
       setUpdatingStatus(null)
     }
   }
 
-  const formatDepartment = (dept?: string) => {
-    if (!dept) return "—"
-    return dept.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase())
-  }
+  const activeCount = municipalAdmins.filter((a) => a.status === "ACTIVE").length
+  const inactiveCount = municipalAdmins.filter((a) => a.status === "INACTIVE").length
 
-  const activeCount = admins.filter((a) => a.status === "ACTIVE").length
-  const inactiveCount = admins.filter((a) => a.status === "INACTIVE").length
+  const filteredMunicipalAdmins = useMemo(() => {
+    if (statusFilter === "ALL") return municipalAdmins
+    return municipalAdmins.filter((a) => a.status === statusFilter)
+  }, [municipalAdmins, statusFilter])
 
-  if (loading) {
-    return (
-      <div className="flex items-center justify-center min-h-[400px]">
-        <Loader2 className="h-8 w-8 animate-spin text-purple-600" />
-      </div>
-    )
-  }
-
+  // ─── Render ─────────────────────────────────────────────────────
   return (
-    <div className="p-6 space-y-6">
+    <div className="p-6 md:p-8 flex flex-col gap-8">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+      <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Municipal Admin Management</h1>
-          <p className="text-gray-500 mt-1">Create and manage Municipal Admins under your jurisdiction</p>
+          <h2 className="text-3xl font-black text-[#041627] tracking-tight">Municipal Admin Management</h2>
+          <p className="text-[#44474c] text-sm font-medium mt-1">Configure and manage municipal admins across your jurisdiction.</p>
         </div>
-        <div className="flex gap-3">
-          <Button
-            variant="outline"
-            onClick={handleRefresh}
-            disabled={refreshing}
-            className="border-gray-300"
-          >
-            <RefreshCw className={`h-4 w-4 mr-2 ${refreshing ? "animate-spin" : ""}`} />
-            Refresh
-          </Button>
-          <Button
-            onClick={() => setShowForm(!showForm)}
-            className="bg-purple-600 hover:bg-purple-700 text-white"
-          >
-            <UserPlus className="h-4 w-4 mr-2" />
-            {showForm ? "View Admins" : "Add New Admin"}
-          </Button>
-        </div>
+        <button
+          onClick={() => setShowForm(!showForm)}
+          className={`flex items-center gap-2 px-6 py-2.5 text-sm font-bold rounded-xl transition-all active:scale-95 duration-150 ${
+            showForm
+              ? "bg-[#e1e3e4] text-[#041627] hover:bg-[#d9dadb]"
+              : "bg-gradient-to-br from-[#041627] to-[#1a2b3c] text-white shadow-lg shadow-[#041627]/10 hover:shadow-[#041627]/20"
+          }`}
+        >
+          <span className="material-symbols-outlined text-xl">{showForm ? "group" : "person_add"}</span>
+          {showForm ? "View Municipal Admins" : "Create New Municipal Admin"}
+        </button>
       </div>
 
-      {/* Stats Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-        <Card className="bg-white border border-gray-200">
-          <CardContent className="p-4">
-            <div className="flex items-center gap-3">
-              <div className="p-2 bg-purple-100 rounded-lg">
-                <Users className="h-5 w-5 text-purple-600" />
-              </div>
-              <div>
-                <p className="text-sm text-gray-500">Total Admins</p>
-                <p className="text-2xl font-bold text-gray-900">{admins.length}</p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-        <Card className="bg-white border border-gray-200">
-          <CardContent className="p-4">
-            <div className="flex items-center gap-3">
-              <div className="p-2 bg-green-100 rounded-lg">
-                <Shield className="h-5 w-5 text-green-600" />
-              </div>
-              <div>
-                <p className="text-sm text-gray-500">Active</p>
-                <p className="text-2xl font-bold text-green-600">{activeCount}</p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-        <Card className="bg-white border border-gray-200">
-          <CardContent className="p-4">
-            <div className="flex items-center gap-3">
-              <div className="p-2 bg-red-100 rounded-lg">
-                <Building2 className="h-5 w-5 text-red-600" />
-              </div>
-              <div>
-                <p className="text-sm text-gray-500">Inactive</p>
-                <p className="text-2xl font-bold text-red-600">{inactiveCount}</p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
-
-      {/* Content */}
+      {/* Toggle: Form or MunicipalAdmin List */}
       {showForm ? (
-        <AddMunicipalAdminForm
-          onSuccess={handleFormSuccess}
-          onCancel={() => setShowForm(false)}
-        />
+        <AddMunicipalAdminForm onSuccess={handleMunicipalAdminCreated} onCancel={() => setShowForm(false)} />
       ) : (
-        <Card className="bg-white border border-gray-200">
-          <CardHeader>
-            <CardTitle className="text-lg text-gray-900">Municipal Admins List</CardTitle>
-            <CardDescription>All registered Municipal Admins in your state</CardDescription>
-          </CardHeader>
-          <CardContent>
-            {admins.length === 0 ? (
-              <div className="text-center py-12">
-                <Users className="h-12 w-12 text-gray-300 mx-auto mb-3" />
-                <p className="text-gray-500">No Municipal Admins found</p>
-                <Button
-                  onClick={() => setShowForm(true)}
-                  className="mt-4 bg-purple-600 hover:bg-purple-700 text-white"
-                >
-                  <UserPlus className="h-4 w-4 mr-2" />
-                  Create First Admin
-                </Button>
+        <>
+          {/* ── KPI Cards ── */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div className="bg-white p-6 rounded-xl border-t-2 border-[#041627]">
+              <div className="flex items-center gap-3 mb-4">
+                <div className="p-2 bg-[#edeeef] rounded-lg"><span className="material-symbols-outlined text-[#041627]">group</span></div>
+              </div>
+              <p className="text-[10px] font-bold uppercase tracking-widest text-[#44474c]">Total Admins</p>
+              <p className="text-4xl font-black text-[#041627] mt-1 tracking-tighter">{municipalAdmins.length}</p>
+            </div>
+            <div className="bg-white p-6 rounded-xl border-t-2 border-emerald-400">
+              <div className="flex items-center gap-3 mb-4">
+                <div className="p-2 bg-[#edeeef] rounded-lg"><span className="material-symbols-outlined text-emerald-600">person_check</span></div>
+              </div>
+              <p className="text-[10px] font-bold uppercase tracking-widest text-[#44474c]">Active</p>
+              <p className="text-4xl font-black text-emerald-600 mt-1 tracking-tighter">{activeCount}</p>
+            </div>
+            <div className="bg-white p-6 rounded-xl border-t-2 border-[#74777d]">
+              <div className="flex items-center gap-3 mb-4">
+                <div className="p-2 bg-[#edeeef] rounded-lg"><span className="material-symbols-outlined text-[#74777d]">person_off</span></div>
+              </div>
+              <p className="text-[10px] font-bold uppercase tracking-widest text-[#44474c]">Inactive</p>
+              <p className="text-4xl font-black text-[#74777d] mt-1 tracking-tighter">{inactiveCount}</p>
+            </div>
+          </div>
+
+          {/* ── MunicipalAdmins Table ── */}
+          <div className="bg-white rounded-2xl overflow-hidden">
+            {/* ── Filter Bar ── */}
+            <div className="px-6 py-5 bg-[#f3f4f5] flex flex-wrap items-center justify-between gap-4">
+              <div className="flex items-center gap-6 flex-wrap">
+                {/* Status segmented buttons */}
+                <div className="flex items-center gap-2">
+                  <span className="text-xs font-bold text-[#44474c] uppercase tracking-widest">Status:</span>
+                  <div className="flex bg-[#e1e3e4]/30 p-1 rounded-lg">
+                    {(["ALL", "ACTIVE", "INACTIVE"] as const).map((s) => (
+                      <button
+                        key={s}
+                        onClick={() => setStatusFilter(s)}
+                        className={`px-3 py-1 text-xs font-bold rounded-md transition-all ${
+                          statusFilter === s
+                            ? "bg-white shadow-sm text-[#041627]"
+                            : "text-[#44474c] hover:text-[#041627]"
+                        }`}
+                      >
+                        {s === "ALL" ? "All" : s === "ACTIVE" ? "Active" : "Inactive"}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              </div>
+              <button
+                onClick={fetchMunicipalAdmins}
+                disabled={loading}
+                className="flex items-center gap-1 text-[#041627] font-bold text-xs uppercase tracking-widest hover:opacity-70 transition-opacity disabled:opacity-50"
+              >
+                <span className={`material-symbols-outlined text-sm ${loading ? "animate-spin" : ""}`}>refresh</span>
+                Refresh
+              </button>
+            </div>
+
+            {loading ? (
+              <div className="flex items-center justify-center py-16">
+                <span className="material-symbols-outlined text-3xl text-[#115cb9] animate-spin">progress_activity</span>
+              </div>
+            ) : filteredMunicipalAdmins.length === 0 ? (
+              <div className="text-center py-16 px-6">
+                <span className="material-symbols-outlined text-5xl text-[#c4c6cd] mb-4">group</span>
+                <p className="text-[#44474c] font-medium">
+                  {municipalAdmins.length === 0 ? "No admins found." : `No ${statusFilter.toLowerCase()} admins.`}
+                </p>
+                {municipalAdmins.length === 0 && (
+                  <p className="text-sm text-[#74777d] mt-1">Click &quot;Create New Municipal Admin&quot; to add.</p>
+                )}
               </div>
             ) : (
               <div className="overflow-x-auto">
-                <Table>
-                  <TableHeader>
-                    <TableRow className="bg-gray-50">
-                      <TableHead className="font-semibold text-gray-700">Name</TableHead>
-                      <TableHead className="font-semibold text-gray-700">Email</TableHead>
-                      <TableHead className="font-semibold text-gray-700">Municipality</TableHead>
-                      <TableHead className="font-semibold text-gray-700">Department</TableHead>
-                      <TableHead className="font-semibold text-gray-700">Status</TableHead>
-                      <TableHead className="font-semibold text-gray-700">Workload</TableHead>
-                      <TableHead className="font-semibold text-gray-700">Actions</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {admins.map((admin) => (
-                      <TableRow key={admin.id} className="hover:bg-gray-50">
-                        <TableCell className="font-medium text-gray-900">
-                          {admin.fullName}
-                        </TableCell>
-                        <TableCell className="text-gray-600">{admin.officialEmail}</TableCell>
-                        <TableCell className="text-gray-600">{admin.municipality || "—"}</TableCell>
-                        <TableCell className="text-gray-600">
-                          <span className="text-xs bg-purple-100 text-purple-700 px-2 py-1 rounded-full">
-                            {formatDepartment(admin.department)}
-                          </span>
-                        </TableCell>
-                        <TableCell>
-                          <Badge
-                            variant={admin.status === "ACTIVE" ? "default" : "secondary"}
-                            className={
-                              admin.status === "ACTIVE"
-                                ? "bg-green-100 text-green-700 hover:bg-green-100"
-                                : "bg-red-100 text-red-700 hover:bg-red-100"
-                            }
-                          >
-                            {admin.status || "UNKNOWN"}
-                          </Badge>
-                        </TableCell>
-                        <TableCell className="text-gray-600">
-                          {admin.currentWorkload ?? 0} / {admin.workloadLimit ?? 10}
-                        </TableCell>
-                        <TableCell>
-                          <div className="flex items-center gap-3">
-                            <div className="w-5 h-5 flex items-center justify-center">
-                              {updatingStatus === admin.id && (
-                                <Loader2 className="h-4 w-4 animate-spin text-purple-600" />
+                <table className="w-full text-left border-collapse">
+                  <thead className="bg-[#f3f4f5]/50">
+                    <tr>
+                      <th className="px-6 py-4 text-[10px] font-black text-[#44474c] uppercase tracking-widest">Administrator</th>
+                      <th className="px-6 py-4 text-[10px] font-black text-[#44474c] uppercase tracking-widest hidden lg:table-cell">Role</th>
+                      <th className="px-6 py-4 text-[10px] font-black text-[#44474c] uppercase tracking-widest hidden md:table-cell">Department</th>
+                      <th className="px-6 py-4 text-[10px] font-black text-[#44474c] uppercase tracking-widest">Status</th>
+                      <th className="px-6 py-4 text-[10px] font-black text-[#44474c] uppercase tracking-widest text-right">Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-[#edeeef]">
+                    {filteredMunicipalAdmins.map((municipalAdmin, idx) => {
+                      const color = AVATAR_COLORS[idx % AVATAR_COLORS.length]
+                      const displayName = municipalAdmin.name || municipalAdmin.fullName
+                      return (
+                        <tr key={municipalAdmin.id} className="hover:bg-[#f3f4f5] transition-colors group">
+                          {/* Administrator — avatar + name + email */}
+                          <td className="px-6 py-5">
+                            <div className="flex items-center gap-3">
+                              <div
+                                className="w-10 h-10 rounded-full flex items-center justify-center font-black text-xs shrink-0"
+                                style={{ backgroundColor: color.bg, color: color.text }}
+                              >
+                                {getInitials(displayName)}
+                              </div>
+                              <div className="min-w-0">
+                                <p className="text-sm font-bold text-[#041627] truncate">{displayName}</p>
+                                <p className="text-xs text-[#44474c] truncate">{municipalAdmin.email}</p>
+                              </div>
+                            </div>
+                          </td>
+                          {/* Role badge */}
+                          <td className="px-6 py-5 hidden lg:table-cell">
+                            <span className="px-2.5 py-1 rounded-md bg-[#d2e4fb] text-[#041627] text-[10px] font-black tracking-wider uppercase">
+                              MUNICIPAL ADMIN
+                            </span>
+                          </td>
+                          {/* Department */}
+                          <td className="px-6 py-5 hidden md:table-cell">
+                            <p className="text-sm font-semibold text-[#041627]">{formatDepartment(municipalAdmin.department)}</p>
+                          </td>
+                          {/* Status dot + label */}
+                          <td className="px-6 py-5">
+                            <div className="flex items-center gap-2">
+                              {updatingStatus === municipalAdmin.id ? (
+                                <span className="material-symbols-outlined text-base text-[#115cb9] animate-spin">progress_activity</span>
+                              ) : (
+                                <div
+                                  className={`w-1.5 h-1.5 rounded-full ${
+                                    municipalAdmin.status === "ACTIVE"
+                                      ? "bg-[#115cb9]"
+                                      : "bg-[#c4c6cd]"
+                                  }`}
+                                  style={municipalAdmin.status === "ACTIVE" ? { boxShadow: "0 0 8px rgba(17,92,185,0.6)" } : undefined}
+                                />
+                              )}
+                              <span className={`text-xs font-bold ${municipalAdmin.status === "ACTIVE" ? "text-[#041627]" : "text-[#74777d]"}`}>
+                                {municipalAdmin.status === "ACTIVE" ? "Active" : "Inactive"}
+                              </span>
+                            </div>
+                          </td>
+                          {/* Hover-reveal actions */}
+                          <td className="px-6 py-5 text-right">
+                            <div className="flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                              {municipalAdmin.status === "ACTIVE" ? (
+                                <button
+                                  onClick={() => handleToggleStatus(municipalAdmin.id, municipalAdmin.status)}
+                                  disabled={updatingStatus === municipalAdmin.id}
+                                  className="p-2 text-[#44474c] hover:text-[#ba1a1a] transition-colors disabled:opacity-50"
+                                  title="Deactivate municipalAdmin"
+                                >
+                                  <span className="material-symbols-outlined text-lg">block</span>
+                                </button>
+                              ) : (
+                                <button
+                                  onClick={() => handleToggleStatus(municipalAdmin.id, municipalAdmin.status)}
+                                  disabled={updatingStatus === municipalAdmin.id}
+                                  className="p-2 text-[#115cb9] hover:text-[#041627] transition-colors disabled:opacity-50"
+                                  title="Activate municipalAdmin"
+                                >
+                                  <span className="material-symbols-outlined text-lg" style={{ fontVariationSettings: "'FILL' 1" }}>check_circle</span>
+                                </button>
                               )}
                             </div>
-                            <Switch
-                              checked={admin.status === "ACTIVE"}
-                              onCheckedChange={() => handleToggleStatus(admin.id, admin.status || "INACTIVE")}
-                              disabled={updatingStatus === admin.id}
-                            />
-                            <span className="text-sm text-gray-500 w-16">
-                              {admin.status === "ACTIVE" ? "Active" : "Inactive"}
-                            </span>
-                          </div>
-                        </TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
+                          </td>
+                        </tr>
+                      )
+                    })}
+                  </tbody>
+                </table>
               </div>
             )}
-          </CardContent>
-        </Card>
+
+            {/* Footer count */}
+            {!loading && filteredMunicipalAdmins.length > 0 && (
+              <div className="px-6 py-4 flex items-center justify-between bg-[#f3f4f5]/30">
+                <span className="text-xs font-semibold text-[#44474c]">Showing {filteredMunicipalAdmins.length} of {municipalAdmins.length} Admins</span>
+              </div>
+            )}
+          </div>
+        </>
       )}
     </div>
   )

@@ -1,18 +1,6 @@
 "use client"
 
 import { useState } from "react"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { UserPlus, Eye, EyeOff, Loader2 } from "lucide-react"
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3002"
 
@@ -30,7 +18,18 @@ const DEPARTMENTS = [
   { value: "HOUSING_URBAN_DEVELOPMENT", label: "Housing & Urban Development" },
   { value: "SOCIAL_WELFARE", label: "Social Welfare" },
   { value: "PUBLIC_GRIEVANCES", label: "Public Grievances" },
-]
+] as const
+
+interface MunicipalAdminFormData {
+  fullName: string
+  email: string
+  officialEmail: string
+  phoneNumber: string
+  password: string
+  confirmPassword: string
+  municipality: string
+  department: string
+}
 
 interface AddMunicipalAdminFormProps {
   onSuccess?: () => void
@@ -38,290 +37,245 @@ interface AddMunicipalAdminFormProps {
 }
 
 export function AddMunicipalAdminForm({ onSuccess, onCancel }: AddMunicipalAdminFormProps) {
-  const [formData, setFormData] = useState({
-    fullName: "",
-    officialEmail: "",
-    phoneNumber: "",
-    municipality: "",
-    department: "",
-    password: "",
-    confirmPassword: "",
+  const [formData, setFormData] = useState<MunicipalAdminFormData>({
+    fullName: "", email: "", officialEmail: "", phoneNumber: "", password: "", confirmPassword: "", municipality: "", department: "",
   })
   const [showPassword, setShowPassword] = useState(false)
   const [showConfirmPassword, setShowConfirmPassword] = useState(false)
-  const [loading, setLoading] = useState(false)
+  const [isSubmitting, setIsSubmitting] = useState(false)
   const [error, setError] = useState("")
-  const [success, setSuccess] = useState("")
+  const [success, setSuccess] = useState(false)
 
-  const handleInputChange = (field: string, value: string) => {
+  const handleChange = (field: keyof MunicipalAdminFormData, value: string) => {
     setFormData((prev) => ({ ...prev, [field]: value }))
     setError("")
-    setSuccess("")
   }
 
-  const validateForm = () => {
-    if (!formData.fullName || formData.fullName.length < 2) {
-      setError("Full name must be at least 2 characters")
-      return false
-    }
-    if (!formData.officialEmail || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.officialEmail)) {
-      setError("Please enter a valid official email")
-      return false
-    }
-    if (!formData.phoneNumber || formData.phoneNumber.length < 10) {
-      setError("Phone number must be at least 10 digits")
-      return false
-    }
-    if (!formData.municipality || formData.municipality.length < 2) {
-      setError("Municipality is required")
-      return false
-    }
-    if (!formData.department) {
-      setError("Please select a department")
-      return false
-    }
-    if (!formData.password || formData.password.length < 8) {
-      setError("Password must be at least 8 characters")
-      return false
-    }
-    if (formData.password !== formData.confirmPassword) {
-      setError("Passwords do not match")
-      return false
-    }
-    return true
+  const validateForm = (): string | null => {
+    if (!formData.fullName.trim()) return "Full name is required"
+    if (!formData.email.trim()) return "Email is required"
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) return "Invalid email format"
+    if (!formData.officialEmail.trim()) return "Official email is required"
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.officialEmail)) return "Invalid official email format"
+    if (!formData.phoneNumber.trim()) return "Phone number is required"
+    if (formData.password.length < 6) return "Password must be at least 6 characters"
+    if (formData.password !== formData.confirmPassword) return "Passwords do not match"
+    if (!formData.municipality.trim()) return "Municipality is required"
+    if (!formData.department) return "Department is required"
+    return null
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-
-    if (!validateForm()) return
-
-    setLoading(true)
     setError("")
-    setSuccess("")
+    const validationError = validateForm()
+    if (validationError) { setError(validationError); return }
 
+    setIsSubmitting(true)
     try {
       const token = localStorage.getItem("token")
-      if (!token) {
-        setError("Not authenticated. Please login again.")
-        setLoading(false)
-        return
-      }
+      if (!token) { setError("Not authenticated. Please login again."); return }
 
-      const response = await fetch(`${API_URL}/api/state-admin/municipal-admins`, {
+      const res = await fetch(`${API_URL}/api/state-admin/create/municipal-admin`, {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
+        headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
         body: JSON.stringify({
-          fullName: formData.fullName,
-          officialEmail: formData.officialEmail,
-          phoneNumber: formData.phoneNumber,
-          municipality: formData.municipality,
-          department: formData.department,
+          fullName: formData.fullName.trim(),
+          email: formData.email.trim(),
+          officialEmail: formData.officialEmail.trim(),
+          phoneNumber: formData.phoneNumber.trim(),
           password: formData.password,
+          municipality: formData.municipality.trim(),
+          department: formData.department,
         }),
       })
 
-      const data = await response.json()
+      const data = await res.json()
+      if (!res.ok) throw new Error(data.message || "Failed to create municipal admin")
 
-      if (data.success) {
-        setSuccess("Municipal Admin created successfully!")
-        setFormData({
-          fullName: "",
-          officialEmail: "",
-          phoneNumber: "",
-          municipality: "",
-          department: "",
-          password: "",
-          confirmPassword: "",
-        })
-        onSuccess?.()
-      } else {
-        setError(data.message || "Failed to create Municipal Admin")
-      }
+      setSuccess(true)
+      setFormData({ fullName: "", email: "", officialEmail: "", phoneNumber: "", password: "", confirmPassword: "", municipality: "", department: "" })
+
+      setTimeout(() => { setSuccess(false); onSuccess?.() }, 2000)
     } catch (err) {
-      console.error("Error creating municipal admin:", err)
-      setError("Network error. Please try again.")
+      setError(err instanceof Error ? err.message : "Something went wrong")
     } finally {
-      setLoading(false)
+      setIsSubmitting(false)
     }
   }
 
-  return (
-    <Card className="w-full max-w-2xl mx-auto bg-white border border-gray-200 shadow-sm">
-      <CardHeader className="bg-gradient-to-r from-purple-600 to-indigo-600 text-white rounded-t-lg">
-        <div className="flex items-center gap-2">
-          <UserPlus className="h-6 w-6" />
-          <div>
-            <CardTitle className="text-xl">Create New Municipal Admin</CardTitle>
-            <CardDescription className="text-purple-100">
-              Fill in the required details
-            </CardDescription>
-          </div>
+  const resetForm = () => {
+    setFormData({ fullName: "", email: "", officialEmail: "", phoneNumber: "", password: "", confirmPassword: "", municipality: "", department: "" })
+    setError("")
+    setSuccess(false)
+  }
+
+  // ─── Success State ─────────────────────────────────────────────
+  if (success) {
+    return (
+      <div className="bg-white rounded-xl max-w-2xl mx-auto p-10 flex flex-col items-center justify-center text-center">
+        <div className="w-16 h-16 bg-emerald-100 rounded-full flex items-center justify-center mb-4">
+          <span className="material-symbols-outlined text-3xl text-emerald-600">check_circle</span>
         </div>
-      </CardHeader>
-      <CardContent className="p-6">
-        <form onSubmit={handleSubmit} className="space-y-6">
-          {error && (
-            <div className="p-3 text-sm text-red-600 bg-red-50 border border-red-200 rounded-md">
-              {error}
-            </div>
-          )}
-          {success && (
-            <div className="p-3 text-sm text-green-600 bg-green-50 border border-green-200 rounded-md">
-              {success}
-            </div>
-          )}
+        <h3 className="text-xl font-black text-[#041627] tracking-tight mb-2">Municipal Admin Created Successfully!</h3>
+        <p className="text-[#44474c] text-sm">The new admin has been added to the system.</p>
+      </div>
+    )
+  }
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {/* Full Name */}
-            <div className="space-y-2">
-              <Label htmlFor="fullName" className="text-gray-700">Full Name</Label>
-              <Input
-                id="fullName"
-                type="text"
-                placeholder="Enter full name"
-                value={formData.fullName}
-                onChange={(e) => handleInputChange("fullName", e.target.value)}
-                className="border-gray-300 focus:border-purple-500 focus:ring-purple-500"
-              />
-            </div>
+  // ─── Form ──────────────────────────────────────────────────────
+  return (
+    <div className="bg-white rounded-xl max-w-2xl mx-auto overflow-hidden">
+      {/* Header */}
+      <div className="px-6 py-5 bg-[#f3f4f5]/50 flex items-center gap-3">
+        <div className="w-10 h-10 bg-[#d2e4fb] rounded-lg flex items-center justify-center">
+          <span className="material-symbols-outlined text-[#115cb9]">person_add</span>
+        </div>
+        <div>
+          <h3 className="text-lg font-bold text-[#041627] leading-tight">Create New Municipal Admin</h3>
+          <p className="text-sm text-[#44474c] font-medium">Fill out the form to onboard a new municipal-level admin.</p>
+        </div>
+      </div>
 
-            {/* Official Email */}
-            <div className="space-y-2">
-              <Label htmlFor="officialEmail" className="text-gray-700">Official Email</Label>
-              <Input
-                id="officialEmail"
-                type="email"
-                placeholder="admin@gov.in"
-                value={formData.officialEmail}
-                onChange={(e) => handleInputChange("officialEmail", e.target.value)}
-                className="border-gray-300 focus:border-purple-500 focus:ring-purple-500"
-              />
-            </div>
-
-            {/* Phone Number */}
-            <div className="space-y-2">
-              <Label htmlFor="phoneNumber" className="text-gray-700">Phone Number</Label>
-              <Input
-                id="phoneNumber"
-                type="tel"
-                placeholder="Enter phone number"
-                value={formData.phoneNumber}
-                onChange={(e) => handleInputChange("phoneNumber", e.target.value)}
-                className="border-gray-300 focus:border-purple-500 focus:ring-purple-500"
-              />
-            </div>
-
-            {/* Department */}
-            <div className="space-y-2">
-              <Label htmlFor="department" className="text-gray-700">Department</Label>
-              <Select
-                value={formData.department}
-                onValueChange={(value) => handleInputChange("department", value)}
-              >
-                <SelectTrigger className="border-gray-300 focus:border-purple-500 focus:ring-purple-500">
-                  <SelectValue placeholder="Select department" />
-                </SelectTrigger>
-                <SelectContent>
-                  {DEPARTMENTS.map((dept) => (
-                    <SelectItem key={dept.value} value={dept.value}>
-                      {dept.label}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-
-            {/* Municipality */}
-            <div className="space-y-2">
-              <Label htmlFor="municipality" className="text-gray-700">Municipality</Label>
-              <Input
-                id="municipality"
-                type="text"
-                placeholder="Enter municipality name"
-                value={formData.municipality}
-                onChange={(e) => handleInputChange("municipality", e.target.value)}
-                className="border-gray-300 focus:border-purple-500 focus:ring-purple-500"
-              />
-            </div>
-
-            {/* Password */}
-            <div className="space-y-2">
-              <Label htmlFor="password" className="text-gray-700">Password</Label>
-              <div className="relative">
-                <Input
-                  id="password"
-                  type={showPassword ? "text" : "password"}
-                  placeholder="Min 8 characters"
-                  value={formData.password}
-                  onChange={(e) => handleInputChange("password", e.target.value)}
-                  className="border-gray-300 focus:border-purple-500 focus:ring-purple-500 pr-10"
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700"
-                >
-                  {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-                </button>
-              </div>
-            </div>
-
-            {/* Confirm Password */}
-            <div className="space-y-2 md:col-span-2 md:w-1/2">
-              <Label htmlFor="confirmPassword" className="text-gray-700">Confirm Password</Label>
-              <div className="relative">
-                <Input
-                  id="confirmPassword"
-                  type={showConfirmPassword ? "text" : "password"}
-                  placeholder="Confirm password"
-                  value={formData.confirmPassword}
-                  onChange={(e) => handleInputChange("confirmPassword", e.target.value)}
-                  className="border-gray-300 focus:border-purple-500 focus:ring-purple-500 pr-10"
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700"
-                >
-                  {showConfirmPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-                </button>
-              </div>
-            </div>
+      <form onSubmit={handleSubmit} className="p-6 space-y-6">
+        {/* Error */}
+        {error && (
+          <div className="flex items-center gap-2 bg-[#ffdad6] text-[#ba1a1a] px-4 py-3 rounded-lg text-sm font-medium">
+            <span className="material-symbols-outlined text-lg">error</span>
+            {error}
           </div>
+        )}
 
-          {/* Action Buttons */}
-          <div className="flex justify-end gap-3 pt-4 border-t border-gray-200">
-            {onCancel && (
-              <Button
-                type="button"
-                variant="outline"
-                onClick={onCancel}
-                className="border-gray-300 text-gray-700 hover:bg-gray-50"
-              >
-                Cancel
-              </Button>
-            )}
-            <Button
-              type="submit"
-              disabled={loading}
-              className="bg-purple-600 hover:bg-purple-700 text-white"
+        {/* Row 1: Name & Email */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+          <FormField label="Full Name" required>
+            <input
+              type="text" placeholder="Enter full name" value={formData.fullName}
+              onChange={(e) => handleChange("fullName", e.target.value)}
+              className="w-full h-11 px-4 rounded-lg bg-[#f3f4f5] text-[#191c1d] text-sm font-medium placeholder:text-[#74777d] outline-none focus:ring-2 focus:ring-[#115cb9]/30 transition-all"
+            />
+          </FormField>
+          <FormField label="Email" required>
+            <input
+              type="email" placeholder="Personal email address" value={formData.email}
+              onChange={(e) => handleChange("email", e.target.value)}
+              className="w-full h-11 px-4 rounded-lg bg-[#f3f4f5] text-[#191c1d] text-sm font-medium placeholder:text-[#74777d] outline-none focus:ring-2 focus:ring-[#115cb9]/30 transition-all"
+            />
+          </FormField>
+        </div>
+
+        {/* Row 2: Official Email & Phone */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+          <FormField label="Official Email" required>
+            <input
+              type="email" placeholder="official@gov.in" value={formData.officialEmail}
+              onChange={(e) => handleChange("officialEmail", e.target.value)}
+              className="w-full h-11 px-4 rounded-lg bg-[#f3f4f5] text-[#191c1d] text-sm font-medium placeholder:text-[#74777d] outline-none focus:ring-2 focus:ring-[#115cb9]/30 transition-all"
+            />
+          </FormField>
+          <FormField label="Phone Number" required>
+            <input
+              type="tel" placeholder="Enter phone number" value={formData.phoneNumber}
+              onChange={(e) => handleChange("phoneNumber", e.target.value)}
+              className="w-full h-11 px-4 rounded-lg bg-[#f3f4f5] text-[#191c1d] text-sm font-medium placeholder:text-[#74777d] outline-none focus:ring-2 focus:ring-[#115cb9]/30 transition-all"
+            />
+          </FormField>
+        </div>
+
+        {/* Row 3: Password & Confirm */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+          <FormField label="Password" required>
+            <div className="relative">
+              <input
+                type={showPassword ? "text" : "password"} placeholder="Minimum 6 characters" value={formData.password}
+                onChange={(e) => handleChange("password", e.target.value)}
+                className="w-full h-11 px-4 pr-11 rounded-lg bg-[#f3f4f5] text-[#191c1d] text-sm font-medium placeholder:text-[#74777d] outline-none focus:ring-2 focus:ring-[#115cb9]/30 transition-all"
+              />
+              <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute inset-y-0 right-0 px-3 flex items-center text-[#74777d] hover:text-[#44474c]">
+                <span className="material-symbols-outlined text-lg">{showPassword ? "visibility_off" : "visibility"}</span>
+              </button>
+            </div>
+          </FormField>
+          <FormField label="Confirm Password" required>
+            <div className="relative">
+              <input
+                type={showConfirmPassword ? "text" : "password"} placeholder="Confirm password" value={formData.confirmPassword}
+                onChange={(e) => handleChange("confirmPassword", e.target.value)}
+                className="w-full h-11 px-4 pr-11 rounded-lg bg-[#f3f4f5] text-[#191c1d] text-sm font-medium placeholder:text-[#74777d] outline-none focus:ring-2 focus:ring-[#115cb9]/30 transition-all"
+              />
+              <button type="button" onClick={() => setShowConfirmPassword(!showConfirmPassword)} className="absolute inset-y-0 right-0 px-3 flex items-center text-[#74777d] hover:text-[#44474c]">
+                <span className="material-symbols-outlined text-lg">{showConfirmPassword ? "visibility_off" : "visibility"}</span>
+              </button>
+            </div>
+          </FormField>
+        </div>
+
+        {/* Row 4: Municipality & Department */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+          <FormField label="Municipality" required>
+            <input
+              type="text" placeholder="Enter municipality name" value={formData.municipality}
+              onChange={(e) => handleChange("municipality", e.target.value)}
+              className="w-full h-11 px-4 rounded-lg bg-[#f3f4f5] text-[#191c1d] text-sm font-medium placeholder:text-[#74777d] outline-none focus:ring-2 focus:ring-[#115cb9]/30 transition-all"
+            />
+          </FormField>
+          <FormField label="Department" required>
+            <select
+              value={formData.department}
+              onChange={(e) => handleChange("department", e.target.value)}
+              className="w-full h-11 px-4 rounded-lg bg-[#f3f4f5] text-[#191c1d] text-sm font-medium outline-none focus:ring-2 focus:ring-[#115cb9]/30 transition-all appearance-none cursor-pointer"
             >
-              {loading ? (
-                <>
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  Creating...
-                </>
-              ) : (
-                "Create Admin"
-              )}
-            </Button>
-          </div>
-        </form>
-      </CardContent>
-    </Card>
+              <option value="" className="text-[#74777d]">Select department</option>
+              {DEPARTMENTS.map((d) => (
+                <option key={d.value} value={d.value}>{d.label}</option>
+              ))}
+            </select>
+          </FormField>
+        </div>
+
+        {/* Actions */}
+        <div className="flex items-center justify-end gap-3 pt-4">
+          {onCancel && (
+            <button
+              type="button"
+              onClick={() => { resetForm(); onCancel() }}
+              disabled={isSubmitting}
+              className="px-5 py-2.5 text-sm font-bold text-[#041627] bg-[#e1e3e4] rounded-lg hover:bg-[#d9dadb] transition-all disabled:opacity-50"
+            >
+              Cancel
+            </button>
+          )}
+          <button
+            type="submit"
+            disabled={isSubmitting}
+            className="flex items-center gap-2 px-5 py-2.5 text-sm font-bold text-white bg-[#041627] rounded-lg hover:bg-[#0a2844] transition-all disabled:opacity-50 active:scale-95"
+          >
+            {isSubmitting ? (
+              <>
+                <span className="material-symbols-outlined text-lg animate-spin">progress_activity</span>
+                Creating...
+              </>
+            ) : (
+              <>
+                <span className="material-symbols-outlined text-lg">person_add</span>
+                Create Admin
+              </>
+            )}
+          </button>
+        </div>
+      </form>
+    </div>
+  )
+}
+
+// ─── Helper ──────────────────────────────────────────────────────
+function FormField({ label, required, children }: { label: string; required?: boolean; children: React.ReactNode }) {
+  return (
+    <div className="space-y-1.5">
+      <label className="text-[10px] font-bold uppercase tracking-[0.05em] text-[#44474c]">
+        {label} {required && <span className="text-[#ba1a1a]">*</span>}
+      </label>
+      {children}
+    </div>
   )
 }
