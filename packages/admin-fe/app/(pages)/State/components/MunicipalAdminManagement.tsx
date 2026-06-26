@@ -16,7 +16,7 @@ import { Users, UserPlus, RefreshCw, Building2, Shield, Loader2 } from "lucide-r
 import { Switch } from "@/components/ui/switch"
 import { AddMunicipalAdminForm } from "./AddMunicipalAdminForm"
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000"
+const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3002"
 
 interface MunicipalAdmin {
   id: string
@@ -91,7 +91,7 @@ export function MunicipalAdminManagement() {
       if (!token) return
 
       const newStatus = currentStatus === "ACTIVE" ? "INACTIVE" : "ACTIVE"
-      
+
       const response = await fetch(`${API_URL}/api/state-admin/municipal-admins/${adminId}/status`, {
         method: "PATCH",
         headers: {
@@ -102,7 +102,7 @@ export function MunicipalAdminManagement() {
       })
 
       if (response.ok) {
-        setAdmins(admins.map(admin => 
+        setAdmins(admins.map(admin =>
           admin.id === adminId ? { ...admin, status: newStatus } : admin
         ))
       }

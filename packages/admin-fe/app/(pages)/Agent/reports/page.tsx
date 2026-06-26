@@ -33,7 +33,7 @@ interface ResolvedCase {
   confidence: number
 }
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000"
+const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3002"
 
 const DAYS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"]
 const DAY_HEIGHTS = [40, 65, 55, 85, 92, 30, 25] // % heights for bar chart

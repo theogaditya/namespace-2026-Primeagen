@@ -14,7 +14,7 @@ import {
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { UserPlus, Eye, EyeOff, Loader2 } from "lucide-react"
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000"
+const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3002"
 
 const DEPARTMENTS = [
   { value: "INFRASTRUCTURE", label: "Infrastructure" },
@@ -93,7 +93,7 @@ export function AddMunicipalAdminForm({ onSuccess, onCancel }: AddMunicipalAdmin
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    
+
     if (!validateForm()) return
 
     setLoading(true)

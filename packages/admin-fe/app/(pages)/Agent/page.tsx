@@ -61,7 +61,7 @@ interface OverviewStats {
   assigned: number
 }
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000"
+const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3002"
 
 // Priority badge config
 const PRIORITY_CONFIG: Record<string, { label: string; bg: string; text: string }> = {

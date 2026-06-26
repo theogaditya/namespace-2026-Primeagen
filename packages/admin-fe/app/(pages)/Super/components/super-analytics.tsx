@@ -47,7 +47,7 @@ const Hotmap = dynamic(() => import("@/components/Hotmap"), {
   ),
 })
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000"
+const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3002"
 
 interface Complaint {
   id: string
@@ -189,8 +189,8 @@ export function SuperAnalytics() {
 
       const total = complaints.length
       const solved = complaints.filter((c) => c.status === "COMPLETED").length
-      const escalated = complaints.filter((c) => 
-        c.status === "ESCALATED_TO_STATE_LEVEL" || 
+      const escalated = complaints.filter((c) =>
+        c.status === "ESCALATED_TO_STATE_LEVEL" ||
         c.status === "ESCALATED_TO_MUNICIPAL_LEVEL"
       ).length
 

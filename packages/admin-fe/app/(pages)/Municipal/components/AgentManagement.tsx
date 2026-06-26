@@ -9,7 +9,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Users, RefreshCw, Loader2, UserPlus } from "lucide-react"
 import { AddAgentForm } from "./AddAgentForm"
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000"
+const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3002"
 
 interface Agent {
   id: string
@@ -67,7 +67,7 @@ export function AgentManagement() {
       if (!token) return
 
       const newStatus = currentStatus === "ACTIVE" ? "INACTIVE" : "ACTIVE"
-      
+
       const response = await fetch(`${API_URL}/api/municipal-admin/${agentId}/status`, {
         method: "PATCH",
         headers: {
@@ -78,7 +78,7 @@ export function AgentManagement() {
       })
 
       if (response.ok) {
-        setAgents(agents.map(agent => 
+        setAgents(agents.map(agent =>
           agent.id === agentId ? { ...agent, status: newStatus } : agent
         ))
       }
@@ -115,8 +115,8 @@ export function AgentManagement() {
           <h1 className="text-2xl font-bold text-gray-900">Agent Management</h1>
           <p className="text-gray-600 mt-1">Create and manage agents under your jurisdiction</p>
         </div>
-        <Button 
-          onClick={() => setShowForm(!showForm)} 
+        <Button
+          onClick={() => setShowForm(!showForm)}
           className="bg-blue-600 hover:bg-blue-700"
         >
           <UserPlus className="w-4 h-4 mr-2" />
@@ -126,9 +126,9 @@ export function AgentManagement() {
 
       {/* Show Form or Agent List */}
       {showForm ? (
-        <AddAgentForm 
-          onSuccess={handleAgentCreated} 
-          onCancel={() => setShowForm(false)} 
+        <AddAgentForm
+          onSuccess={handleAgentCreated}
+          onCancel={() => setShowForm(false)}
         />
       ) : (
         <>

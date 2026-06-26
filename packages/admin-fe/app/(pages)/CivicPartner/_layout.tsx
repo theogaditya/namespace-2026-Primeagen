@@ -12,7 +12,6 @@ interface CivicPartnerLayoutProps {
 const NAV_ITEMS = [
   { label: "Dashboard", icon: "dashboard", href: "/CivicPartner" },
   { label: "Surveys", icon: "poll", href: "/CivicPartner/surveys" },
-  { label: "Analytics", icon: "insert_chart", href: "/CivicPartner/analytics" },
   { label: "Settings", icon: "settings", href: "/CivicPartner/settings" },
 ]
 
@@ -22,18 +21,9 @@ export function CivicPartnerLayout({ children }: CivicPartnerLayoutProps) {
   const router = useRouter()
   const [searchQuery, setSearchQuery] = useState("")
 
-  if (isLoading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-[#f3faff]">
-        <div className="flex flex-col items-center gap-4">
-          <div className="w-8 h-8 border-4 border-[#003358] border-t-transparent rounded-full animate-spin" />
-          <p className="text-[#071e27]/70 font-medium">Loading portal...</p>
-        </div>
-      </div>
-    )
-  }
-
-  if (!isAuthenticated || !partner) return null
+  // Always render the layout shell so route-level `loading.tsx` components
+  // can display uninterrupted. Use safe fallbacks for `partner` fields
+  // while auth is resolving.
 
   const isActive = (href: string) => {
     if (href === "/CivicPartner") return pathname === "/CivicPartner"
@@ -53,7 +43,10 @@ export function CivicPartnerLayout({ children }: CivicPartnerLayoutProps) {
       />
 
       {/* ── Sidebar ── */}
-      <aside className="h-screen w-64 fixed left-0 bg-[#f3faff] flex flex-col py-6 z-20">
+      <aside
+        className="h-screen w-64 fixed left-0 bg-[#f3faff] flex flex-col py-6 z-20"
+        style={{ borderRight: "1px solid rgba(7,30,39,0.12)" }}
+      >
         <div className="px-8 mb-10">
           <h1
             className="text-2xl font-extrabold tracking-tighter text-[#003358]"
@@ -62,7 +55,7 @@ export function CivicPartnerLayout({ children }: CivicPartnerLayoutProps) {
             CivicPartner
           </h1>
           <p className="text-xs font-medium text-[#071e27]/70 uppercase tracking-widest mt-1">
-            Government Portal
+            Survey & Engagement Portal
           </p>
         </div>
 
@@ -100,16 +93,29 @@ export function CivicPartnerLayout({ children }: CivicPartnerLayoutProps) {
       </aside>
 
       {/* ── Main Area ── */}
-      <main className="flex-1 ml-64 flex flex-col h-screen overflow-y-auto">
+      <main className="flex-1 ml-64 flex flex-col h-screen overflow-y-auto pt-4">
         {/* TopBar */}
         <header className="flex justify-between items-center px-8 h-16 w-full bg-[#f3faff] sticky top-0 z-10">
           <div className="flex items-center gap-4 bg-[#e6f6ff] px-4 py-2 rounded-full w-96">
-            <span className="material-symbols-outlined text-[#727780]">search</span>
+            <span
+              role="button"
+              onClick={() => {
+                if (searchQuery.trim()) router.push(`/CivicPartner/surveys?search=${encodeURIComponent(searchQuery.trim())}`)
+              }}
+              className="material-symbols-outlined text-[#727780] cursor-pointer"
+            >
+              search
+            </span>
             <input
               className="bg-transparent border-none focus:outline-none focus:ring-0 text-sm w-full"
-              placeholder="Search surveys, respondents, or reports..."
+              placeholder="Search surveys, questions, or reports..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === "Enter" && searchQuery.trim()) {
+                  router.push(`/CivicPartner/surveys?search=${encodeURIComponent(searchQuery.trim())}`)
+                }
+              }}
               style={{ fontFamily: "'Inter', sans-serif" }}
             />
           </div>
@@ -119,14 +125,14 @@ export function CivicPartnerLayout({ children }: CivicPartnerLayoutProps) {
               <span className="absolute top-2 right-2 w-2 h-2 bg-[#ba1a1a] rounded-full" />
             </button>
             <div className="flex items-center gap-3 pl-4" style={{ borderLeft: "1px solid rgba(193,199,208,0.2)" }}>
-              <div className="text-right">
-                <p className="text-sm font-bold text-[#003358]">{partner.orgName}</p>
+                <div className="text-right">
+                <p className="text-sm font-bold text-[#003358]">{partner?.orgName || "CivicPartner"}</p>
                 <p className="text-[10px] text-[#727780] font-medium">
-                  {partner.orgType?.replace(/_/g, " ")} · {partner.state}
+                  {partner?.orgType?.replace(/_/g, " ") || ""} {partner?.state ? `· ${partner.state}` : ""}
                 </p>
               </div>
               <div className="w-10 h-10 rounded-full bg-[#004a7c] flex items-center justify-center text-white font-bold text-sm">
-                {partner.orgName?.charAt(0)?.toUpperCase() || "C"}
+                {(partner?.orgName?.charAt(0) || "C").toUpperCase()}
               </div>
             </div>
             <button

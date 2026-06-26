@@ -43,12 +43,12 @@ export function AgentRevampedLayout({ children }: AgentRevampedLayoutProps) {
       const adminType = typeof window !== "undefined" ? localStorage.getItem("adminType") : null
       if (adminType === "SUPER_ADMIN") {
         await fetch(
-          `${process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000"}/api/super-admin/logout`,
+          `${process.env.NEXT_PUBLIC_API_URL || "http://localhost:3002"}/api/super-admin/logout`,
           { method: "POST", credentials: "include" }
         )
       } else if (token) {
         try {
-          await fetch(`${process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000"}/api/users/logout`, {
+          await fetch(`${process.env.NEXT_PUBLIC_API_URL || "http://localhost:3002"}/api/users/logout`, {
             method: "POST",
             headers: { Authorization: `Bearer ${token}` },
           })

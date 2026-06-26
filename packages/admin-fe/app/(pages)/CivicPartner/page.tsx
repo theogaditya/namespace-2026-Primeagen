@@ -4,7 +4,7 @@ import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import { CivicPartnerLayout } from "./_layout"
 
-const API = process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000"
+const API = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3002"
 
 interface Survey {
   id: string
@@ -29,6 +29,26 @@ export default function CivicPartnerDashboard() {
   const [surveys, setSurveys] = useState<Survey[]>([])
   const [portfolio, setPortfolio] = useState<PortfolioStats | null>(null)
   const [loading, setLoading] = useState(true)
+  const [insightDismissed, setInsightDismissed] = useState(false)
+
+  // Persist whether the weekly insight has been dismissed so it stays closed
+  useEffect(() => {
+    try {
+      const stored = localStorage.getItem("civicPartner_insightDismissed")
+      if (stored === "true") setInsightDismissed(true)
+    } catch (err) {
+      // ignore localStorage errors (e.g., SSR or disabled)
+    }
+  }, [])
+
+  const dismissInsight = () => {
+    try {
+      localStorage.setItem("civicPartner_insightDismissed", "true")
+    } catch (err) {
+      // ignore
+    }
+    setInsightDismissed(true)
+  }
 
   useEffect(() => {
     const fetchData = async () => {
@@ -69,25 +89,25 @@ export default function CivicPartnerDashboard() {
     switch (status) {
       case "PUBLISHED":
         return (
-          <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-[#94f0df] text-[#006f62]">
+          <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-[#e6fffb] text-[#0b6b59]">
             Published
           </span>
         )
       case "DRAFT":
         return (
-          <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-[#663f00] text-[#2a1700]">
+          <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-[#fff8e1] text-[#6b4a00]">
             Draft
           </span>
         )
       case "CLOSED":
         return (
-          <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-[#c7dde9] text-[#727780]">
+          <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-[#eef6ff] text-[#5b6670]">
             Closed
           </span>
         )
       default:
         return (
-          <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-[#c7dde9] text-[#727780]">
+          <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-[#eef6ff] text-[#5b6670]">
             {status}
           </span>
         )
@@ -97,22 +117,20 @@ export default function CivicPartnerDashboard() {
   const actionLabel = (status: string) => {
     switch (status) {
       case "PUBLISHED":
-        return "View Analytics"
+        return "Manage Survey"
       case "DRAFT":
-        return "Edit Survey"
+        return "Edit Draft"
       case "CLOSED":
-        return "View Report"
+        return "View Details"
+      case "ARCHIVED":
+        return "View Archive"
       default:
         return "View"
     }
   }
 
   const handleAction = (survey: Survey) => {
-    if (survey.status === "DRAFT") {
-      router.push(`/CivicPartner/surveys/${survey.id}/edit`)
-    } else {
-      router.push(`/CivicPartner/analytics/${survey.id}`)
-    }
+    router.push(`/CivicPartner/surveys/${survey.id}`)
   }
 
   const timeAgo = (dateStr: string) => {
@@ -219,13 +237,13 @@ export default function CivicPartnerDashboard() {
                 >
                   Recent Surveys
                 </h3>
-                <p className="text-sm text-[#727780]">Real-time status of your active and past campaigns</p>
+                <p className="text-sm text-[#727780]">Real-time overview of your survey campaigns</p>
               </div>
               <button
                 onClick={() => router.push("/CivicPartner/surveys")}
                 className="text-sm font-bold text-[#006b5e] hover:underline flex items-center gap-1"
               >
-                View Archive
+                View All Surveys
                 <span className="material-symbols-outlined text-sm">arrow_forward</span>
               </button>
             </div>
@@ -235,11 +253,23 @@ export default function CivicPartnerDashboard() {
               style={{ boxShadow: "0 12px 32px -4px rgba(7, 30, 39, 0.06)" }}
             >
               {loading ? (
-                <div className="p-12 text-center text-[#727780]">Loading surveys...</div>
+                <div className="p-4 space-y-3">
+                  {[1, 2, 3].map((i) => (
+                    <div key={i} className="flex items-center gap-4 px-6 py-5">
+                      <div className="flex-1 space-y-2">
+                        <div className="h-4 w-48 bg-[#e6f6ff] rounded-lg animate-pulse" />
+                        <div className="h-3 w-24 bg-[#e6f6ff] rounded animate-pulse" />
+                      </div>
+                      <div className="h-6 w-16 bg-[#e6f6ff] rounded-full animate-pulse" />
+                      <div className="h-4 w-12 bg-[#e6f6ff] rounded animate-pulse" />
+                      <div className="h-8 w-24 bg-[#e6f6ff] rounded-lg animate-pulse" />
+                    </div>
+                  ))}
+                </div>
               ) : recentSurveys.length === 0 ? (
                 <div className="p-12 text-center">
                   <span className="material-symbols-outlined text-5xl text-[#c1c7d0] mb-4 block">poll</span>
-                  <p className="text-[#727780] font-medium">No surveys yet. Launch your first survey!</p>
+                  <p className="text-[#727780] font-medium">No surveys yet. Create your first one to start collecting community feedback!</p>
                   <button
                     onClick={() => router.push("/CivicPartner/surveys/new")}
                     className="mt-4 px-6 py-3 rounded-xl bg-gradient-to-br from-[#003358] to-[#004a7c] text-white font-bold text-sm"
@@ -254,10 +284,10 @@ export default function CivicPartnerDashboard() {
                       <th className="text-left px-6 py-4 text-[10px] font-bold text-[#727780] uppercase tracking-widest">
                         Survey Title
                       </th>
-                      <th className="text-left px-6 py-4 text-[10px] font-bold text-[#727780] uppercase tracking-widest">
+                      <th className="text-center px-6 py-4 text-[10px] font-bold text-[#727780] uppercase tracking-widest">
                         Status
                       </th>
-                      <th className="text-left px-6 py-4 text-[10px] font-bold text-[#727780] uppercase tracking-widest">
+                      <th className="text-center px-6 py-4 text-[10px] font-bold text-[#727780] uppercase tracking-widest">
                         Responses
                       </th>
                       <th className="text-right px-6 py-4 text-[10px] font-bold text-[#727780] uppercase tracking-widest">
@@ -276,9 +306,9 @@ export default function CivicPartnerDashboard() {
                           <p className="text-sm font-bold text-[#003358]">{sv.title}</p>
                           <p className="text-[11px] text-[#727780]">Last updated {timeAgo(sv.lastUpdated)}</p>
                         </td>
-                        <td className="px-6 py-5">{statusBadge(sv.status)}</td>
+                        <td className="px-6 py-5 text-center">{statusBadge(sv.status)}</td>
                         <td
-                          className="px-6 py-5 font-bold text-[#003358]"
+                          className="px-6 py-5 font-bold text-[#003358] text-center"
                           style={{ fontFamily: "'Manrope', sans-serif" }}
                         >
                           {sv.status === "DRAFT" ? "—" : (sv._count?.responses ?? 0).toLocaleString()}
@@ -306,17 +336,25 @@ export default function CivicPartnerDashboard() {
             </h3>
             <div className="space-y-4">
               {loading ? (
-                <div className="p-8 text-center text-[#727780]">Loading...</div>
+                <div className="space-y-4">
+                  {[1, 2].map((i) => (
+                    <div key={i} className="bg-[#e6f6ff]/40 p-5 rounded-xl animate-pulse">
+                      <div className="h-4 w-32 bg-[#dbf1fe] rounded mb-3" />
+                      <div className="h-2 w-full bg-[#dbf1fe] rounded-full mb-2" />
+                      <div className="h-3 w-20 bg-[#dbf1fe] rounded" />
+                    </div>
+                  ))}
+                </div>
               ) : drafts.length === 0 ? (
                 <div className="bg-[#d5ecf8]/40 p-8 rounded-xl text-center">
-                  <p className="text-[#727780] text-sm">No drafts at the moment</p>
+                  <p className="text-[#727780] text-sm">No drafts in progress</p>
                 </div>
               ) : (
                 drafts.map((d) => (
                   <div
                     key={d.id}
                     className="bg-[#d5ecf8]/40 p-5 rounded-xl border-l-4 border-[#ffb95f] hover:bg-[#d5ecf8] transition-all cursor-pointer"
-                    onClick={() => router.push(`/CivicPartner/surveys/${d.id}/edit`)}
+                    onClick={() => router.push(`/CivicPartner/surveys/${d.id}`)}
                   >
                     <div className="flex justify-between items-start mb-2">
                       <h4 className="text-sm font-bold text-[#003358]">{d.title}</h4>
@@ -355,13 +393,21 @@ export default function CivicPartnerDashboard() {
             </div>
 
             {/* Weekly Insight */}
+            {!insightDismissed && (
             <div
-              className="p-6 rounded-xl text-white"
+              className="p-6 rounded-xl text-white relative"
               style={{
                 background: "linear-gradient(135deg, #006b5e 0%, #005047 100%)",
                 boxShadow: "0 12px 32px -4px rgba(7, 30, 39, 0.06)",
               }}
             >
+              <button
+                onClick={dismissInsight}
+                className="absolute top-3 right-3 p-1 hover:bg-white/20 rounded-lg transition-colors"
+                title="Dismiss"
+              >
+                <span className="material-symbols-outlined text-white/70 text-sm">close</span>
+              </button>
               <div className="flex items-center gap-3 mb-4">
                 <span className="material-symbols-outlined text-[#ffddb8]">insights</span>
                 <p className="text-xs font-bold uppercase tracking-wider">Weekly Insight</p>
@@ -378,6 +424,7 @@ export default function CivicPartnerDashboard() {
                 Launch Survey
               </button>
             </div>
+            )}
           </div>
         </section>
       </div>

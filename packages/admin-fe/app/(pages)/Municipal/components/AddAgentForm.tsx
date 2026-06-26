@@ -8,7 +8,7 @@ import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Eye, EyeOff, UserPlus, Loader2, CheckCircle } from "lucide-react"
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000"
+const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3002"
 
 // Department enum matching backend schema
 const DEPARTMENTS = [
@@ -125,7 +125,7 @@ export function AddAgentForm({ onSuccess, onCancel }: AddAgentFormProps) {
       }
 
       setSuccess(true)
-      
+
       // Reset form
       setFormData({
         fullName: "",

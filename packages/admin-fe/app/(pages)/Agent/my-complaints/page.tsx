@@ -31,7 +31,7 @@ interface Complaint {
   escalationLevel?: string | null
 }
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000"
+const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3002"
 
 const PRIORITY_CONFIG: Record<string, { label: string; bg: string; text: string }> = {
   CRITICAL: { label: "CRITICAL HIGH", bg: "bg-[#ffdad6]", text: "text-[#93000a]" },

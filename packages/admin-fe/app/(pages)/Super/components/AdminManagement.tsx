@@ -23,7 +23,7 @@ import { Users, UserPlus, RefreshCw, Shield, Building2, MapPin, Loader2, Filter 
 import { Switch } from "@/components/ui/switch"
 import { AddAdminForm } from "./AddAdminForm"
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000"
+const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3002"
 
 type FilterType = "ALL" | "STATE_ADMIN" | "MUNICIPAL_ADMIN"
 
@@ -97,10 +97,10 @@ export function AdminManagement() {
       if (!token) return
 
       const newStatus = currentStatus === "ACTIVE" ? "INACTIVE" : "ACTIVE"
-      const endpoint = accessLevel === "DEPT_STATE_ADMIN" 
+      const endpoint = accessLevel === "DEPT_STATE_ADMIN"
         ? `${API_URL}/api/super-admin/state-admins/${adminId}/status`
         : `${API_URL}/api/super-admin/municipal-admins/${adminId}/status`
-      
+
       const response = await fetch(endpoint, {
         method: "PATCH",
         headers: {
@@ -111,7 +111,7 @@ export function AdminManagement() {
       })
 
       if (response.ok) {
-        setAdmins(admins.map(admin => 
+        setAdmins(admins.map(admin =>
           admin.id === adminId ? { ...admin, status: newStatus } : admin
         ))
       }
@@ -146,10 +146,10 @@ export function AdminManagement() {
   const activeCount = admins.filter((a) => a.status === "ACTIVE").length
 
   // Filter admins based on selected filter
-  const filteredAdmins = filter === "ALL" 
-    ? admins 
-    : filter === "STATE_ADMIN" 
-      ? stateAdmins 
+  const filteredAdmins = filter === "ALL"
+    ? admins
+    : filter === "STATE_ADMIN"
+      ? stateAdmins
       : municipalAdmins
 
   const getFilterLabel = () => {
@@ -267,8 +267,8 @@ export function AdminManagement() {
             <div>
               <CardTitle className="text-lg text-gray-900">{getFilterLabel()}</CardTitle>
               <CardDescription>
-                {filter === "ALL" 
-                  ? "State and Municipal Admins across the system" 
+                {filter === "ALL"
+                  ? "State and Municipal Admins across the system"
                   : filter === "STATE_ADMIN"
                     ? "All State level administrators"
                     : "All Municipal level administrators"
@@ -309,8 +309,8 @@ export function AdminManagement() {
               <div className="text-center py-12">
                 <Users className="h-12 w-12 text-gray-300 mx-auto mb-3" />
                 <p className="text-gray-500">
-                  {filter === "ALL" 
-                    ? "No admins found" 
+                  {filter === "ALL"
+                    ? "No admins found"
                     : `No ${filter === "STATE_ADMIN" ? "State" : "Municipal"} Admins found`
                   }
                 </p>

@@ -350,7 +350,7 @@ export function AdminLayout({ children }: AdminLayoutProps) {
 
                         if (token) {
                           try {
-                            await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000'}/api/users/logout`, {
+                            await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3002'}/api/users/logout`, {
                               method: 'POST',
                               headers: { Authorization: `Bearer ${token}` },
                             })

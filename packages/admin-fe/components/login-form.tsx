@@ -55,8 +55,8 @@ export function LoginForm({ adminType: controlledAdminType, onAdminTypeChange }:
       // Civic Partner uses a separate auth endpoint
       const isCivicPartner = adminType === "CIVIC_PARTNER"
       const loginUrl = isCivicPartner
-        ? `${process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000"}/api/civic-partner/auth/login`
-        : `${process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000"}/api/auth/login`
+        ? `${process.env.NEXT_PUBLIC_API_URL || "http://localhost:3002"}/api/civic-partner/auth/login`
+        : `${process.env.NEXT_PUBLIC_API_URL || "http://localhost:3002"}/api/auth/login`
 
       const response = await fetch(loginUrl, {
         method: "POST",

@@ -4,7 +4,7 @@ import { useState, useEffect, use } from "react"
 import { useRouter } from "next/navigation"
 import { CivicPartnerLayout } from "../../_layout"
 
-const API = process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000"
+const API = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3002"
 
 interface Overview {
   totalResponses: number
@@ -318,9 +318,10 @@ export default function SurveyAnalyticsPage({ params }: { params: Promise<{ surv
             )}
 
             {/* Per-Question Breakdowns */}
-            {questions.map((q) => {
+            {questions.map((q, qi) => {
               const detail = questionDetails[q.questionId]
               if (!detail) return null
+              const displayOrder = q.order ?? qi + 1
 
               return (
                 <div
@@ -329,7 +330,7 @@ export default function SurveyAnalyticsPage({ params }: { params: Promise<{ surv
                   style={{ boxShadow: "0 12px 32px -4px rgba(7,30,39,0.06)" }}
                 >
                   <h4 className="text-lg font-bold text-[#003358] mb-6">
-                    {q.order + 1}. {q.questionText}
+                    {displayOrder}. {q.questionText}
                   </h4>
 
                   {/* MCQ / CHECKBOX */}
@@ -467,16 +468,18 @@ export default function SurveyAnalyticsPage({ params }: { params: Promise<{ surv
                 Questions Overview
               </h3>
               <div className="space-y-4">
-                {questions.map((q) => (
-                  <div key={q.questionId} className="flex items-center justify-between">
-                    <div className="flex-1 min-w-0">
-                      <p className="text-sm font-medium text-[#003358] truncate">
-                        Q{q.order + 1}. {q.questionText}
-                      </p>
-                      <p className="text-[10px] text-[#727780]">
-                        {q.totalAnswers} answers · {q.responseRate}% response rate
-                      </p>
-                    </div>
+                {questions.map((q, qi) => {
+                  const displayOrder = q.order ?? qi + 1
+                  return (
+                    <div key={q.questionId} className="flex items-center justify-between">
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm font-medium text-[#003358] truncate">
+                          Q{displayOrder}. {q.questionText}
+                        </p>
+                        <p className="text-[10px] text-[#727780]">
+                          {q.totalAnswers} answers · {q.responseRate}% response rate
+                        </p>
+                      </div>
                     <span className="material-symbols-outlined text-sm text-[#727780] ml-2">
                       {q.questionType === "MCQ" || q.questionType === "CHECKBOX"
                         ? "bar_chart"

@@ -4,7 +4,7 @@ import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import { CivicPartnerLayout } from "../_layout"
 
-const API = process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000"
+const API = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3002"
 
 interface Survey {
   id: string
@@ -73,7 +73,7 @@ export default function SurveysListPage() {
             >
               Surveys
             </h2>
-            <p className="text-[#727780] mt-1">Manage all your community engagement surveys</p>
+            <p className="text-[#727780] mt-1">Create, manage, and track all your community engagement surveys</p>
           </div>
           <button
             onClick={() => router.push("/CivicPartner/surveys/new")}
@@ -104,7 +104,30 @@ export default function SurveysListPage() {
 
         {/* Survey Cards */}
         {loading ? (
-          <div className="text-center py-20 text-[#727780]">Loading...</div>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {[1, 2, 3, 4, 5, 6].map((i) => (
+              <div
+                key={i}
+                className="bg-white p-6 rounded-xl animate-pulse"
+                style={{ boxShadow: "0 4px 16px rgba(0,0,0,0.04)", border: "1px solid rgba(193,199,208,0.1)" }}
+              >
+                <div className="flex justify-between mb-4">
+                  <div className="h-5 w-16 bg-[#e6f6ff] rounded-full" />
+                  <div className="h-3 w-20 bg-[#e6f6ff] rounded" />
+                </div>
+                <div className="h-5 w-40 bg-[#e6f6ff] rounded-lg mb-2" />
+                <div className="h-3 w-full bg-[#e6f6ff] rounded mb-1" />
+                <div className="h-3 w-2/3 bg-[#e6f6ff] rounded mb-4" />
+                <div className="pt-3 flex justify-between" style={{ borderTop: "1px solid rgba(193,199,208,0.15)" }}>
+                  <div className="flex gap-4">
+                    <div className="h-4 w-12 bg-[#e6f6ff] rounded" />
+                    <div className="h-4 w-12 bg-[#e6f6ff] rounded" />
+                  </div>
+                  <div className="h-4 w-4 bg-[#e6f6ff] rounded" />
+                </div>
+              </div>
+            ))}
+          </div>
         ) : surveys.length === 0 ? (
           <div className="text-center py-20">
             <span className="material-symbols-outlined text-6xl text-[#c1c7d0] mb-4 block">poll</span>
@@ -119,11 +142,7 @@ export default function SurveysListPage() {
                 key={sv.id}
                 className="bg-white p-6 rounded-xl cursor-pointer hover:translate-y-[-2px] transition-all"
                 style={{ boxShadow: "0 12px 32px -4px rgba(7, 30, 39, 0.06)", border: "1px solid rgba(193,199,208,0.1)" }}
-                onClick={() =>
-                  sv.status === "DRAFT"
-                    ? router.push(`/CivicPartner/surveys/${sv.id}/edit`)
-                    : router.push(`/CivicPartner/analytics/${sv.id}`)
-                }
+                onClick={() => router.push(`/CivicPartner/surveys/${sv.id}`)}
               >
                 <div className="flex justify-between items-start mb-3">
                   {statusBadge(sv.status)}

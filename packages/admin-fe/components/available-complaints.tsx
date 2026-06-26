@@ -80,7 +80,7 @@ interface Complaint {
 }
 
 // Use NEXT_PUBLIC_API_URL when provided, otherwise fallback to admin-be default port 4000
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000'
+const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3002'
 
 export function AvailableComplaints() {
   const [complaints, setComplaints] = useState<Complaint[]>([])

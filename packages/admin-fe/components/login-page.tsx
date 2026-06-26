@@ -70,9 +70,9 @@ const ROLE_INFO: Record<
       "Export survey data: Download survey responses in CSV or JSON format for offline analysis and reporting.",
       "Manage survey lifecycle: Draft, publish, close, and archive surveys through a streamlined workflow.",
     ],
-    color: "text-teal-700",
-    bg: "bg-teal-50",
-    border: "border-teal-300",
+    color: "text-amber-700",
+    bg: "bg-amber-50",
+    border: "border-amber-300",
   },
 
 }

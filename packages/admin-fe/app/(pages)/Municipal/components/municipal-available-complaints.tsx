@@ -78,7 +78,7 @@ interface Complaint {
 }
 
 // Use NEXT_PUBLIC_API_URL when provided, otherwise fallback to admin-be default port 4000
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000'
+const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3002'
 
 export function MunicipalAvailableComplaints() {
   const [complaints, setComplaints] = useState<Complaint[]>([])
@@ -197,7 +197,7 @@ export function MunicipalAvailableComplaints() {
   useEffect(() => {
     // Skip the initial render - the pagination.page effect handles the first load
     if (!initialLoadDone) return
-    
+
     const debounce = setTimeout(() => {
       if (pagination.page === 1) {
         // Don't show loading skeleton for search - just update data silently
@@ -367,9 +367,9 @@ export function MunicipalAvailableComplaints() {
     },
     {
       title: "ESCALATED",
-      value: complaints.filter((c) => 
-        c.status?.includes('ESCALATED') || 
-        !!c.managedByMunicipalAdmin?.id || 
+      value: complaints.filter((c) =>
+        c.status?.includes('ESCALATED') ||
+        !!c.managedByMunicipalAdmin?.id ||
         !!c.escalationLevel
       ).length.toString(),
       subtitle: "⚠ Awaiting Review",
@@ -382,7 +382,7 @@ export function MunicipalAvailableComplaints() {
   const displayedComplaints = complaints.filter((complaint) => {
     // Urgency filter
     if (urgencyFilter !== 'all' && complaint.urgency !== urgencyFilter) return false
-    
+
     // Assignment filter
     if (assignmentFilter === 'all') return true
     if (assignmentFilter === 'assigned') return !!complaint.assignedAgent?.id || !!complaint.managedByMunicipalAdmin?.id
@@ -454,7 +454,7 @@ export function MunicipalAvailableComplaints() {
             <div key={i} className="bg-gray-200 rounded-2xl p-6 shadow-lg relative overflow-hidden animate-pulse">
               <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -translate-y-1/2 translate-x-1/2" />
               <div className="absolute bottom-0 left-0 w-24 h-24 bg-white/10 rounded-full translate-y-1/2 -translate-x-1/2" />
-              
+
               <div className="relative flex items-start justify-between">
                 <div className="space-y-3">
                   <div className="h-3 bg-gray-300 rounded w-24"></div>
@@ -471,7 +471,7 @@ export function MunicipalAvailableComplaints() {
               {/* Background decoration */}
               <div className="absolute top-0 right-0 w-32 h-32 bg-white/5 rounded-full -translate-y-1/2 translate-x-1/2" />
               <div className="absolute bottom-0 left-0 w-24 h-24 bg-white/5 rounded-full translate-y-1/2 -translate-x-1/2" />
-              
+
               <div className="relative flex items-start justify-between">
                 <div className="space-y-1">
                   <p className="text-xs font-semibold tracking-wider text-white/80 uppercase">{stat.title}</p>

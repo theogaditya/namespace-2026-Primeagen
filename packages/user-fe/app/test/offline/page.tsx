@@ -102,7 +102,7 @@ export default function Page() {
   const [showStored, setShowStored] = useState(false);
   const [showOnline, setShowOnline] = useState(false);
   const [queuedCount, setQueuedCount] = useState<number>(0);
-  const base = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:4000';
+  const base = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:3002';
   const initialOnlineRef = useRef(true);
 
   // Ensure any previously-selected coordinate is cleared on page load

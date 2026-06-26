@@ -41,7 +41,7 @@ const Hotmap = dynamic(() => import("@/components/Hotmap"), {
   ),
 })
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000"
+const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3002"
 
 interface Complaint {
   id: string
@@ -182,7 +182,7 @@ interface InteractivePieChartProps {
 
 function InteractivePieChart({ data, width, height }: InteractivePieChartProps) {
   const [selectedStatus, setSelectedStatus] = useState<string | null>(null)
-  
+
   if (width < 10 || data.length === 0) return null
 
   const margin = { top: 20, right: 20, bottom: 20, left: 20 }
@@ -193,11 +193,11 @@ function InteractivePieChart({ data, width, height }: InteractivePieChartProps) 
   const centerX = innerWidth / 2
   const donutThickness = 45
 
-  const filteredData = selectedStatus 
+  const filteredData = selectedStatus
     ? data.filter((d) => d.name === selectedStatus)
     : data
 
-  const selectedData = selectedStatus 
+  const selectedData = selectedStatus
     ? data.find((d) => d.name === selectedStatus)
     : null
 
@@ -229,7 +229,7 @@ function InteractivePieChart({ data, width, height }: InteractivePieChartProps) 
               />
             )}
           </Pie>
-          
+
           {/* Center text when selected */}
           {selectedData && (
             <g>
@@ -260,7 +260,7 @@ function InteractivePieChart({ data, width, height }: InteractivePieChartProps) 
               </text>
             </g>
           )}
-          
+
           {/* Default center text */}
           {!selectedData && (
             <g>
@@ -285,7 +285,7 @@ function InteractivePieChart({ data, width, height }: InteractivePieChartProps) 
           )}
         </Group>
       </svg>
-      
+
       {/* Legend */}
       <div className="mt-4 flex flex-wrap justify-center gap-3">
         {data.map((item) => (
@@ -295,18 +295,18 @@ function InteractivePieChart({ data, width, height }: InteractivePieChartProps) 
               selectedStatus === item.name ? null : item.name
             )}
             className={`flex items-center gap-2 px-2 py-1 rounded text-xs transition-all ${
-              selectedStatus === item.name 
-                ? "bg-gray-100 ring-2 ring-offset-1" 
+              selectedStatus === item.name
+                ? "bg-gray-100 ring-2 ring-offset-1"
                 : "hover:bg-gray-50"
             }`}
-            style={{ 
-              ...(selectedStatus === item.name && { 
-                boxShadow: `0 0 0 2px ${item.color}` 
+            style={{
+              ...(selectedStatus === item.name && {
+                boxShadow: `0 0 0 2px ${item.color}`
               })
             }}
           >
-            <span 
-              className="w-3 h-3 rounded-full" 
+            <span
+              className="w-3 h-3 rounded-full"
               style={{ backgroundColor: item.color }}
             />
             <span className="text-gray-700">{item.name}</span>
@@ -314,7 +314,7 @@ function InteractivePieChart({ data, width, height }: InteractivePieChartProps) 
           </button>
         ))}
       </div>
-      
+
       {/* Instruction text */}
       <p className="text-center text-xs text-gray-400 mt-2">
         Click on segments to view details
@@ -424,8 +424,8 @@ export function Analytics() {
         d.setDate(d.getDate() - i)
         const dateStr = d.toLocaleDateString("en-US", { month: "short", day: "numeric" })
         const dataIndex = 6 - i
-        last7Days.push({ 
-          date: dateStr, 
+        last7Days.push({
+          date: dateStr,
           registered: dummyData[dataIndex].registered,
           resolved: dummyData[dataIndex].resolved
         })
@@ -534,37 +534,37 @@ export function Analytics() {
           <title>Complaint Report</title>
           <style>
             * { margin: 0; padding: 0; box-sizing: border-box; }
-            body { 
-              font-family: Arial, sans-serif; 
+            body {
+              font-family: Arial, sans-serif;
               padding: 40px;
               line-height: 1.6;
               color: #333;
             }
-            .header { 
-              text-align: center; 
+            .header {
+              text-align: center;
               margin-bottom: 30px;
               border-bottom: 2px solid #333;
               padding-bottom: 20px;
             }
-            h1 { 
-              font-size: 24px; 
+            h1 {
+              font-size: 24px;
               margin-bottom: 10px;
             }
-            .section { 
+            .section {
               margin-bottom: 20px;
             }
-            .field { 
+            .field {
               margin-bottom: 12px;
               display: flex;
               border-bottom: 1px solid #eee;
               padding: 8px 0;
             }
-            .label { 
-              font-weight: bold; 
+            .label {
+              font-weight: bold;
               width: 200px;
               flex-shrink: 0;
             }
-            .value { 
+            .value {
               flex: 1;
               word-break: break-word;
             }
@@ -717,12 +717,12 @@ export function Analytics() {
         <Card>
           <CardHeader className="flex flex-row items-center justify-between pb-2">
             <CardTitle className="text-sm font-medium text-gray-600">Total Complaints</CardTitle>
-            <FileText 
+            <FileText
               className={`h-5 w-5 transition-all duration-300 ${
-                animateIcons 
-                  ? "text-yellow-500 drop-shadow-[0_0_8px_rgba(234,179,8,0.8)] animate-[pulse_2s_ease-in-out_infinite]" 
+                animateIcons
+                  ? "text-yellow-500 drop-shadow-[0_0_8px_rgba(234,179,8,0.8)] animate-[pulse_2s_ease-in-out_infinite]"
                   : "text-gray-400"
-              }`} 
+              }`}
             />
           </CardHeader>
           <CardContent>
@@ -735,12 +735,12 @@ export function Analytics() {
         <Card>
           <CardHeader className="flex flex-row items-center justify-between pb-2">
             <CardTitle className="text-sm font-medium text-gray-600">Solved Issues</CardTitle>
-            <CheckCircle 
+            <CheckCircle
               className={`h-5 w-5 transition-all duration-300 ${
-                animateIcons 
-                  ? "text-green-500 drop-shadow-[0_0_8px_rgba(34,197,94,0.8)] animate-[pulse_2s_ease-in-out_infinite]" 
+                animateIcons
+                  ? "text-green-500 drop-shadow-[0_0_8px_rgba(34,197,94,0.8)] animate-[pulse_2s_ease-in-out_infinite]"
                   : "text-gray-400"
-              }`} 
+              }`}
             />
           </CardHeader>
           <CardContent>
@@ -760,10 +760,10 @@ export function Analytics() {
         >
           <CardHeader className="flex flex-row items-center justify-between pb-2">
             <CardTitle className="text-sm font-medium text-gray-600">Most Liked Complaint</CardTitle>
-            <ThumbsUp 
+            <ThumbsUp
               className={`h-5 w-5 transition-all ${
-                animateIcons 
-                  ? "text-purple-500 drop-shadow-[0_0_8px_rgba(168,85,247,0.8)] animate-[thumbsUpJump_1.6s_ease-out_forwards]" 
+                animateIcons
+                  ? "text-purple-500 drop-shadow-[0_0_8px_rgba(168,85,247,0.8)] animate-[thumbsUpJump_1.6s_ease-out_forwards]"
                   : "text-gray-400"
               }`}
               style={{
@@ -800,17 +800,17 @@ export function Analytics() {
           <CardHeader className="flex flex-row items-center justify-between pb-2">
             <CardTitle className="text-sm font-medium text-gray-600">Queue Status</CardTitle>
             <div className="relative h-5 w-5">
-              <Activity 
+              <Activity
                 className="h-5 w-5 text-gray-400"
               />
               {animateIcons && (
-                <svg 
-                  className="absolute inset-0 h-5 w-5" 
-                  viewBox="0 0 24 24" 
-                  fill="none" 
-                  stroke="currentColor" 
-                  strokeWidth="2" 
-                  strokeLinecap="round" 
+                <svg
+                  className="absolute inset-0 h-5 w-5"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
                   strokeLinejoin="round"
                 >
                   <defs>
@@ -827,8 +827,8 @@ export function Analytics() {
                     </linearGradient>
                   </defs>
                   {/* EKG path matching the Activity icon */}
-                  <path 
-                    d="M22 12h-4l-3 9L9 3l-3 9H2" 
+                  <path
+                    d="M22 12h-4l-3 9L9 3l-3 9H2"
                     stroke="url(#ekgGradient)"
                     strokeWidth="2.5"
                     fill="none"
@@ -967,7 +967,7 @@ export function Analytics() {
                 <X className="h-5 w-5" />
               </Button>
             </div>
-            
+
             {analyticsData.mostLikedComplaints.length === 1 ? (
               /* Single complaint - detailed view */
               <div className="p-6 space-y-4 overflow-y-auto">

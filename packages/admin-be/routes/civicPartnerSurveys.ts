@@ -224,6 +224,31 @@ export default function (prisma: PrismaClient) {
     }
   });
 
+  // ─── POST /api/civic-partner/surveys/:surveyId/reopen ──────────────────
+  // Reopen a CLOSED survey back to PUBLISHED state.
+  router.post('/:surveyId/reopen', async (req, res: any) => {
+    const { id: civicPartnerId } = getCivicPartner(req);
+    const { surveyId } = req.params;
+
+    try {
+      const existing = await prisma.survey.findFirst({ where: { id: surveyId, civicPartnerId } });
+      if (!existing) return res.status(404).json({ success: false, message: 'Survey not found' });
+      if (existing.status !== 'CLOSED') {
+        return res.status(400).json({ success: false, message: 'Only CLOSED surveys can be reopened' });
+      }
+
+      const survey = await prisma.survey.update({
+        where: { id: surveyId },
+        data: { status: 'PUBLISHED', isPublic: true },
+      });
+
+      return res.json({ success: true, message: 'Survey reopened', survey });
+    } catch (err) {
+      console.error('[surveys.reopen]', err);
+      return res.status(500).json({ success: false, message: 'Server error' });
+    }
+  });
+
   // ─── DELETE /api/civic-partner/surveys/:surveyId ─────────────────────────
   // Soft-delete: moves survey to ARCHIVED status.
   router.delete('/:surveyId', async (req, res: any) => {

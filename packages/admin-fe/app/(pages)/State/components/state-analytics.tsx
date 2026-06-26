@@ -42,7 +42,7 @@ const Hotmap = dynamic(() => import("@/components/Hotmap"), {
   ),
 })
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000"
+const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3002"
 
 interface Complaint {
   id: string
@@ -160,7 +160,7 @@ interface InteractivePieChartProps {
 
 function InteractivePieChart({ data, width, height }: InteractivePieChartProps) {
   const [selectedStatus, setSelectedStatus] = useState<string | null>(null)
-  
+
   if (width < 10 || data.length === 0) return null
 
   const margin = { top: 20, right: 20, bottom: 20, left: 20 }
@@ -199,7 +199,7 @@ function InteractivePieChart({ data, width, height }: InteractivePieChartProps) 
               />
             )}
           </Pie>
-          
+
           {selectedData && (
             <g>
               <text textAnchor="middle" y={-10} fontSize={24} fontWeight={700} fill={selectedData.color}>
@@ -213,7 +213,7 @@ function InteractivePieChart({ data, width, height }: InteractivePieChartProps) 
               </text>
             </g>
           )}
-          
+
           {!selectedData && (
             <g>
               <text textAnchor="middle" y={-5} fontSize={20} fontWeight={700} fill="#374151">
@@ -226,7 +226,7 @@ function InteractivePieChart({ data, width, height }: InteractivePieChartProps) 
           )}
         </Group>
       </svg>
-      
+
       <div className="mt-4 flex flex-wrap justify-center gap-3">
         {data.map((item) => (
           <button
@@ -243,7 +243,7 @@ function InteractivePieChart({ data, width, height }: InteractivePieChartProps) 
           </button>
         ))}
       </div>
-      
+
       <p className="text-center text-xs text-gray-400 mt-2">Click on segments to view details</p>
     </div>
   )
