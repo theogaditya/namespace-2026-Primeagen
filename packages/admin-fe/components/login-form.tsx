@@ -156,11 +156,16 @@ export function LoginForm({ adminType: controlledAdminType, onAdminTypeChange }:
                   <SelectValue placeholder="Select admin type" />
                 </SelectTrigger>
                 <SelectContent>
-                  {(Object.keys(adminTypeLabels) as AdminType[]).map((type) => (
-                    <SelectItem key={type} value={type}>
-                      {adminTypeLabels[type]}
-                    </SelectItem>
-                  ))}
+                  {(
+                    (Object.keys(adminTypeLabels) as AdminType[])
+                      .slice()
+                      .sort((a, b) => adminTypeLabels[a].localeCompare(adminTypeLabels[b]))
+                      .map((type) => (
+                        <SelectItem key={type} value={type}>
+                          {adminTypeLabels[type]}
+                        </SelectItem>
+                      ))
+                  )}
                 </SelectContent>
               </Select>
             </div>

@@ -3,7 +3,7 @@
 import * as React from "react"
 import { LoginForm } from "./login-form"
 
-type RoleKey = "STATE_ADMIN" | "MUNICIPAL_ADMIN" | "AGENT" | "CIVIC_PARTNER"
+type RoleKey = "CIVIC_PARTNER" | "STATE_ADMIN" | "MUNICIPAL_ADMIN" | "AGENT"
 
 const ROLE_INFO: Record<
   RoleKey,
@@ -70,9 +70,9 @@ const ROLE_INFO: Record<
       "Export survey data: Download survey responses in CSV or JSON format for offline analysis and reporting.",
       "Manage survey lifecycle: Draft, publish, close, and archive surveys through a streamlined workflow.",
     ],
-    color: "text-amber-700",
-    bg: "bg-amber-50",
-    border: "border-amber-300",
+    color: "text-red-700",
+    bg: "bg-red-50",
+    border: "border-red-300",
   },
 
 }
