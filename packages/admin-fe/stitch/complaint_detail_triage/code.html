@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Complaint Detail - SwarajDesk</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "surface": "#f8f9fa",
+                        "on-primary-fixed-variant": "#38485a",
+                        "on-tertiary-fixed-variant": "#584326",
+                        "surface-container": "#edeeef",
+                        "on-secondary": "#ffffff",
+                        "surface-bright": "#f8f9fa",
+                        "outline": "#74777d",
+                        "on-secondary-container": "#003370",
+                        "on-error": "#ffffff",
+                        "on-primary-fixed": "#0b1d2d",
+                        "tertiary": "#211200",
+                        "background": "#f8f9fa",
+                        "surface-container-low": "#f3f4f5",
+                        "primary-container": "#1a2b3c",
+                        "surface-container-high": "#e7e8e9",
+                        "primary": "#041627",
+                        "error-container": "#ffdad6",
+                        "inverse-on-surface": "#f0f1f2",
+                        "on-secondary-fixed-variant": "#004491",
+                        "inverse-primary": "#b7c8de",
+                        "primary-fixed": "#d2e4fb",
+                        "surface-variant": "#e1e3e4",
+                        "on-tertiary": "#ffffff",
+                        "outline-variant": "#c4c6cd",
+                        "on-surface-variant": "#44474c",
+                        "on-secondary-fixed": "#001a40",
+                        "on-tertiary-fixed": "#281802",
+                        "on-error-container": "#93000a",
+                        "tertiary-fixed-dim": "#e1c29b",
+                        "secondary-fixed-dim": "#acc7ff",
+                        "on-primary": "#ffffff",
+                        "secondary": "#115cb9",
+                        "surface-container-lowest": "#ffffff",
+                        "on-tertiary-container": "#a88c69",
+                        "primary-fixed-dim": "#b7c8de",
+                        "surface-tint": "#4f6073",
+                        "surface-dim": "#d9dadb",
+                        "tertiary-fixed": "#feddb5",
+                        "tertiary-container": "#38260b",
+                        "error": "#ba1a1a",
+                        "on-primary-container": "#8192a7",
+                        "on-background": "#191c1d",
+                        "secondary-fixed": "#d7e2ff",
+                        "on-surface": "#191c1d",
+                        "inverse-surface": "#2e3132",
+                        "secondary-container": "#659dfe",
+                        "surface-container-highest": "#e1e3e4"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.125rem",
+                        "lg": "0.25rem",
+                        "xl": "0.5rem",
+                        "full": "0.75rem"
+                    },
+                    "fontFamily": {
+                        "headline": ["Inter"],
+                        "body": ["Inter"],
+                        "label": ["Inter"]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        body { font-family: 'Inter', sans-serif; }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            vertical-align: middle;
+        }
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(24px);
+            -webkit-backdrop-filter: blur(24px);
+        }
+    </style>
+</head>
+<body class="bg-surface text-on-surface selection:bg-primary-fixed">
+<!-- SideNavBar (Authority: JSON) -->
+<aside class="h-screen w-64 fixed left-0 top-0 z-40 bg-surface_container_low dark:bg-slate-950 flex flex-col p-4 gap-2 no-border tonal-layering">
+<div class="flex items-center gap-3 px-2 mb-8">
+<div class="w-8 h-8 rounded bg-primary flex items-center justify-center text-white">
+<span class="material-symbols-outlined text-sm">dashboard</span>
+</div>
+<div>
+<h1 class="text-lg font-bold text-slate-900 dark:text-white tracking-tight">SwarajDesk</h1>
+<p class="text-[10px] font-semibold uppercase tracking-widest text-slate-500">Admin Portal</p>
+</div>
+</div>
+<nav class="flex-1 space-y-1">
+<a class="flex items-center gap-3 px-3 py-2 text-slate-500 dark:text-slate-400 hover:bg-slate-200/50 dark:hover:bg-slate-800/50 transition-all ease-in-out duration-200 font-inter text-sm font-semibold tracking-wide" href="#">
+<span class="material-symbols-outlined" data-icon="dashboard">dashboard</span> Dashboard
+            </a>
+<a class="flex items-center gap-3 px-3 py-2 bg-surface_container_highest dark:bg-slate-800 text-slate-900 dark:text-white rounded-lg transition-all ease-in-out duration-200 font-inter text-sm font-semibold tracking-wide" href="#">
+<span class="material-symbols-outlined" data-icon="forum">forum</span> Complaints
+            </a>
+<a class="flex items-center gap-3 px-3 py-2 text-slate-500 dark:text-slate-400 hover:bg-slate-200/50 dark:hover:bg-slate-800/50 transition-all ease-in-out duration-200 font-inter text-sm font-semibold tracking-wide" href="#">
+<span class="material-symbols-outlined" data-icon="group">group</span> Users
+            </a>
+<a class="flex items-center gap-3 px-3 py-2 text-slate-500 dark:text-slate-400 hover:bg-slate-200/50 dark:hover:bg-slate-800/50 transition-all ease-in-out duration-200 font-inter text-sm font-semibold tracking-wide" href="#">
+<span class="material-symbols-outlined" data-icon="analytics">analytics</span> Analytics
+            </a>
+<a class="flex items-center gap-3 px-3 py-2 text-slate-500 dark:text-slate-400 hover:bg-slate-200/50 dark:hover:bg-slate-800/50 transition-all ease-in-out duration-200 font-inter text-sm font-semibold tracking-wide" href="#">
+<span class="material-symbols-outlined" data-icon="settings">settings</span> Settings
+            </a>
+<a class="flex items-center gap-3 px-3 py-2 text-slate-500 dark:text-slate-400 hover:bg-slate-200/50 dark:hover:bg-slate-800/50 transition-all ease-in-out duration-200 font-inter text-sm font-semibold tracking-wide" href="#">
+<span class="material-symbols-outlined" data-icon="priority_high">priority_high</span> Escalations
+            </a>
+</nav>
+<div class="mt-auto space-y-1">
+<a class="flex items-center gap-3 px-3 py-2 text-slate-500 dark:text-slate-400 hover:bg-slate-200/50 dark:hover:bg-slate-800/50 transition-all ease-in-out duration-200 font-inter text-sm font-semibold tracking-wide" href="#">
+<span class="material-symbols-outlined" data-icon="help">help</span> Help
+            </a>
+<a class="flex items-center gap-3 px-3 py-2 text-slate-500 dark:text-slate-400 hover:bg-slate-200/50 dark:hover:bg-slate-800/50 transition-all ease-in-out duration-200 font-inter text-sm font-semibold tracking-wide" href="#">
+<span class="material-symbols-outlined" data-icon="logout">logout</span> Logout
+            </a>
+</div>
+</aside>
+<!-- Main Canvas -->
+<main class="ml-64 min-h-screen flex flex-col">
+<!-- TopAppBar (Authority: JSON) -->
+<header class="sticky top-0 z-50 bg-surface/80 backdrop-blur-xl flex items-center justify-between px-6 py-3 w-full shadow-sm">
+<div class="flex items-center gap-4">
+<button class="material-symbols-outlined text-on-surface hover:bg-slate-100 p-2 rounded-full transition-colors">arrow_back</button>
+<div class="flex flex-col">
+<span class="text-[10px] font-bold uppercase tracking-widest text-on-surface-variant">Complaint #SD-88219</span>
+<h2 class="text-xl font-black text-slate-900 tracking-tighter">Broken Water Main - Sector 4</h2>
+</div>
+</div>
+<div class="flex items-center gap-3">
+<span class="px-3 py-1 bg-surface-container-high text-on-surface-variant rounded-full text-xs font-bold uppercase tracking-tighter">Admin Role</span>
+<button class="p-2 text-slate-500 hover:bg-slate-100 transition-colors rounded-full">
+<span class="material-symbols-outlined" data-icon="notifications">notifications</span>
+</button>
+<div class="w-8 h-8 rounded-full bg-slate-200 overflow-hidden ring-2 ring-surface">
+<img alt="User Profile Avatar" data-alt="professional portrait of a municipal administrator in a suit against a neutral background" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDk9iiODSypsxM4YDSsAonId6LFqGM09-XoxQdb9Dh5gCRSKOtK2osLYQlwDVGDUp61H7fWtn_vihg40OYfGSmMDyWzIF01l-i4-ZXdkbMvF0TRY7c8Pw0rYGuE7DfFtFGAgrrYa6o7pWMReh-JOZZIu81RsA4JSsXpeQJ7bdxYF1h9nXFSd1kLF7rZo9Eu8Y2qAV2gPs9jHBdrLFZ5kFO31rMb3HHIbUuUdXhQtP4zn1DOdLO46IUNkdKo8Rgn62M-o5k9ULSoqqpp"/>
+</div>
+</div>
+</header>
+<!-- Contextual Action Bar -->
+<div class="px-8 py-4 bg-surface-container-low flex items-center justify-between">
+<div class="flex gap-2">
+<button class="px-4 py-2 bg-surface-container-lowest text-on-surface text-sm font-semibold rounded-lg hover:bg-white transition-colors active:scale-95 flex items-center gap-2">
+<span class="material-symbols-outlined text-sm">person_add</span> Assign/Reassign
+                </button>
+<button class="px-4 py-2 bg-surface-container-lowest text-on-surface text-sm font-semibold rounded-lg hover:bg-white transition-colors active:scale-95 flex items-center gap-2">
+<span class="material-symbols-outlined text-sm">sticky_note_2</span> Add Note
+                </button>
+<button class="px-4 py-2 bg-secondary text-white text-sm font-semibold rounded-lg hover:bg-opacity-90 transition-colors active:scale-95 flex items-center gap-2 shadow-sm">
+<span class="material-symbols-outlined text-sm">check_circle</span> Approve Resolution
+                </button>
+</div>
+<button class="px-6 py-2 bg-gradient-to-br from-primary to-primary-container text-white text-sm font-bold rounded-lg hover:shadow-lg transition-all active:scale-95 flex items-center gap-2">
+<span class="material-symbols-outlined text-sm" style="font-variation-settings: 'FILL' 1;">priority_high</span> Escalate to State
+            </button>
+</div>
+<!-- Content Grid -->
+<div class="p-8 grid grid-cols-12 gap-6">
+<!-- Left Column: Evidence & History -->
+<div class="col-span-8 space-y-6">
+<!-- Status History Bento Card -->
+<section class="bg-surface-container-lowest p-6 rounded-xl space-y-6">
+<div class="flex items-center justify-between border-b border-surface-variant pb-4">
+<h3 class="text-sm font-black uppercase tracking-widest text-on-surface-variant flex items-center gap-2">
+<span class="material-symbols-outlined text-secondary">history</span> Detailed timeline of activity
+                        </h3>
+<span class="text-xs text-on-surface-variant font-medium">Last updated: 12 mins ago</span>
+</div>
+<div class="relative space-y-8 before:content-[''] before:absolute before:left-[11px] before:top-2 before:bottom-2 before:w-[2px] before:bg-surface-variant">
+<!-- Timeline Entry 1 -->
+<div class="relative pl-10">
+<div class="absolute left-0 top-1 w-6 h-6 rounded-full bg-secondary flex items-center justify-center text-white z-10">
+<span class="material-symbols-outlined text-xs" style="font-variation-settings: 'FILL' 1;">assignment_turned_in</span>
+</div>
+<div class="bg-surface-container-low p-4 rounded-lg">
+<div class="flex justify-between items-start mb-1">
+<h4 class="text-sm font-bold text-on-surface">Investigation Completed</h4>
+<time class="text-[10px] font-bold text-on-surface-variant uppercase tracking-widest">Today, 10:45 AM</time>
+</div>
+<p class="text-sm text-on-surface-variant leading-relaxed">Field officer Rajat Singh verified the leakage. Technical team dispatched for repair. Pipe diameter confirmed as 12 inches.</p>
+<div class="mt-3 flex gap-2">
+<span class="px-2 py-1 bg-surface-container text-[10px] font-bold rounded uppercase tracking-tighter">verified</span>
+<span class="px-2 py-1 bg-surface-container text-[10px] font-bold rounded uppercase tracking-tighter">field_report_v2.pdf</span>
+</div>
+</div>
+</div>
+<!-- Timeline Entry 2 -->
+<div class="relative pl-10">
+<div class="absolute left-0 top-1 w-6 h-6 rounded-full bg-surface-container flex items-center justify-center text-on-surface-variant z-10">
+<span class="material-symbols-outlined text-xs">chat_bubble</span>
+</div>
+<div class="p-4 border-l-2 border-surface-container-high">
+<div class="flex justify-between items-start mb-1">
+<h4 class="text-sm font-bold text-on-surface">Internal Note Added</h4>
+<time class="text-[10px] font-bold text-on-surface-variant uppercase tracking-widest">Today, 09:12 AM</time>
+</div>
+<p class="text-sm italic text-on-surface-variant">"Requires heavy machinery for excavation. Notifying the traffic department for partial road closure." — <span class="font-bold">Anita Sharma (Ops)</span></p>
+</div>
+</div>
+<!-- Timeline Entry 3 -->
+<div class="relative pl-10">
+<div class="absolute left-0 top-1 w-6 h-6 rounded-full bg-primary flex items-center justify-center text-white z-10">
+<span class="material-symbols-outlined text-xs">new_releases</span>
+</div>
+<div class="bg-surface-container-low p-4 rounded-lg opacity-80">
+<div class="flex justify-between items-start mb-1">
+<h4 class="text-sm font-bold text-on-surface">Complaint Filed</h4>
+<time class="text-[10px] font-bold text-on-surface-variant uppercase tracking-widest">Yesterday, 04:30 PM</time>
+</div>
+<p class="text-sm text-on-surface-variant">Initial report filed via Mobile App. Categorized as "Critical Utility Failure".</p>
+</div>
+</div>
+</div>
+</section>
+<!-- Audit Log -->
+<section class="bg-surface-container-lowest p-6 rounded-xl">
+<h3 class="text-sm font-black uppercase tracking-widest text-on-surface-variant mb-4 flex items-center gap-2">
+<span class="material-symbols-outlined text-outline">verified_user</span> Audit Log
+                    </h3>
+<div class="overflow-x-auto">
+<table class="w-full text-left">
+<thead>
+<tr class="text-[10px] font-bold uppercase tracking-widest text-on-surface-variant border-b border-surface-variant">
+<th class="py-3 px-2">Action</th>
+<th class="py-3 px-2">User</th>
+<th class="py-3 px-2">IP Address</th>
+<th class="py-3 px-2">Timestamp</th>
+</tr>
+</thead>
+<tbody class="text-sm">
+<tr class="hover:bg-surface-container-low transition-colors">
+<td class="py-3 px-2 font-medium">Status Change: Pending → Investigation</td>
+<td class="py-3 px-2">System Automator</td>
+<td class="py-3 px-2 text-on-surface-variant font-mono text-xs">172.16.0.42</td>
+<td class="py-3 px-2 text-on-surface-variant">Oct 24, 09:00:12</td>
+</tr>
+<tr class="hover:bg-surface-container-low transition-colors">
+<td class="py-3 px-2 font-medium">Document Upload</td>
+<td class="py-3 px-2">Rajat Singh (ID: 442)</td>
+<td class="py-3 px-2 text-on-surface-variant font-mono text-xs">106.22.19.112</td>
+<td class="py-3 px-2 text-on-surface-variant">Oct 24, 10:44:55</td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+</div>
+<!-- Right Column: Sidebar Meta -->
+<aside class="col-span-4 space-y-6">
+<!-- SLA Timer -->
+<div class="bg-primary text-white p-6 rounded-xl relative overflow-hidden group">
+<div class="absolute top-0 right-0 p-4 opacity-10">
+<span class="material-symbols-outlined text-6xl">timer</span>
+</div>
+<h4 class="text-[10px] font-bold uppercase tracking-widest mb-1 text-primary-fixed">SLA Progress</h4>
+<div class="flex items-end gap-2 mb-4">
+<span class="text-4xl font-black tracking-tighter">04:19:58</span>
+<span class="text-xs font-bold text-primary-fixed mb-2">Remaining</span>
+</div>
+<div class="w-full h-1.5 bg-white/20 rounded-full overflow-hidden">
+<div class="w-[72%] h-full bg-error shadow-[0_0_8px_#ba1a1a]"></div>
+</div>
+<p class="text-[10px] mt-4 font-bold uppercase tracking-widest text-primary-fixed flex items-center gap-1">
+<span class="material-symbols-outlined text-xs">report</span> SLA expires in 4h 20m
+                    </p>
+</div>
+<!-- Complainant Info -->
+<section class="bg-surface-container-lowest p-6 rounded-xl">
+<h3 class="text-sm font-black uppercase tracking-widest text-on-surface-variant mb-4 flex items-center gap-2">
+<span class="material-symbols-outlined text-secondary">person</span> Complainant Info
+                    </h3>
+<div class="flex items-center gap-4 mb-6">
+<div class="w-12 h-12 rounded-full bg-secondary-fixed flex items-center justify-center text-on-secondary-fixed">
+<span class="material-symbols-outlined">person</span>
+</div>
+<div>
+<p class="font-bold text-on-surface">Harish Vardhan</p>
+<p class="text-xs text-on-surface-variant">+91 98765 43210</p>
+</div>
+</div>
+<div class="space-y-4">
+<div class="p-3 bg-surface-container-low rounded-lg">
+<p class="text-[10px] font-bold uppercase tracking-widest text-on-surface-variant mb-1">Reported Via</p>
+<div class="flex items-center gap-2 text-sm font-semibold">
+<span class="material-symbols-outlined text-sm">smartphone</span> Mobile Application (v4.2)
+                            </div>
+</div>
+<div class="p-3 bg-surface-container-low rounded-lg">
+<p class="text-[10px] font-bold uppercase tracking-widest text-on-surface-variant mb-1">User Trust Score</p>
+<div class="flex items-center gap-1">
+<span class="material-symbols-outlined text-sm text-amber-500" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined text-sm text-amber-500" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined text-sm text-amber-500" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined text-sm text-amber-500" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined text-sm text-on-surface-variant">star</span>
+<span class="ml-auto text-xs font-bold text-on-surface-variant">4.2/5</span>
+</div>
+</div>
+</div>
+</section>
+<!-- Location Map -->
+<section class="bg-surface-container-lowest p-6 rounded-xl overflow-hidden">
+<h3 class="text-sm font-black uppercase tracking-widest text-on-surface-variant mb-4 flex items-center gap-2">
+<span class="material-symbols-outlined text-error">location_on</span> Location Map
+                    </h3>
+<div class="w-full h-40 rounded-lg bg-surface-variant relative group cursor-pointer">
+<img class="w-full h-full object-cover rounded-lg group-hover:scale-105 transition-transform duration-700" data-alt="detailed birds eye view map of an urban residential district with street markers and a red pin on a crossroad" data-location="New Delhi" src="https://lh3.googleusercontent.com/aida-public/AB6AXuASv4CPy09Xai4wtAoeNoVdoFEVYK0Xwklej5IClrSbEmi87fIu6DSXTlUi8sb3oJZWZ7BiupS0EVL-Btvn7e_20qx_vc7uFnfCSEVSXXOriPtZLrw4v2FW-W_Ex-pCqDbGXky_umpE7tpvf1DW5QeSp8WtIVhS43us-ErzxLUiGylDS6d1aRa7dvpy57DZ2udlRBhsmu9V6tjovy3IPQulTEc_6v4Ytf-B6Feszf5iSV2eb_cLRFxXrFEozDpOsMF_CgzBoDh4FpIw"/>
+<div class="absolute inset-0 flex items-center justify-center bg-black/10">
+<span class="material-symbols-outlined text-error text-4xl" style="font-variation-settings: 'FILL' 1;">location_on</span>
+</div>
+<div class="absolute bottom-2 left-2 bg-white/90 backdrop-blur px-2 py-1 rounded text-[10px] font-bold uppercase tracking-widest">Sector 4, Rohini</div>
+</div>
+</section>
+<!-- Attachments -->
+<section class="bg-surface-container-lowest p-6 rounded-xl">
+<h3 class="text-sm font-black uppercase tracking-widest text-on-surface-variant mb-4 flex items-center gap-2">
+<span class="material-symbols-outlined text-outline">attach_file</span> Attachments (3)
+                    </h3>
+<div class="space-y-3">
+<div class="flex items-center gap-3 p-2 bg-surface hover:bg-surface-container transition-colors rounded-lg group">
+<div class="w-10 h-10 rounded bg-error-container flex items-center justify-center text-error">
+<span class="material-symbols-outlined">image</span>
+</div>
+<div class="flex-1 min-w-0">
+<p class="text-xs font-bold text-on-surface truncate">leakage_photo_01.jpg</p>
+<p class="text-[10px] text-on-surface-variant">2.4 MB • 2 hours ago</p>
+</div>
+<button class="material-symbols-outlined text-on-surface-variant opacity-0 group-hover:opacity-100 transition-opacity">download</button>
+</div>
+<div class="flex items-center gap-3 p-2 bg-surface hover:bg-surface-container transition-colors rounded-lg group">
+<div class="w-10 h-10 rounded bg-primary-fixed flex items-center justify-center text-primary">
+<span class="material-symbols-outlined">description</span>
+</div>
+<div class="flex-1 min-w-0">
+<p class="text-xs font-bold text-on-surface truncate">site_inspection_report.pdf</p>
+<p class="text-[10px] text-on-surface-variant">452 KB • 1 hour ago</p>
+</div>
+<button class="material-symbols-outlined text-on-surface-variant opacity-0 group-hover:opacity-100 transition-opacity">download</button>
+</div>
+<button class="w-full py-3 border-2 border-dashed border-outline-variant rounded-lg text-xs font-bold text-on-surface-variant hover:bg-surface transition-colors uppercase tracking-widest">
+                            + Upload New File
+                        </button>
+</div>
+</section>
+</aside>
+</div>
+<!-- Footer (Authority: JSON) -->
+<footer class="w-full py-6 mt-auto bg-surface flex flex-col items-center justify-center gap-2 px-8 border-t border-slate-100 font-inter label-sm uppercase tracking-widest text-slate-500">
+<div class="flex gap-6 mb-2">
+<a class="text-slate-400 hover:text-slate-700 transition-colors opacity-80 hover:opacity-100" href="#">Support</a>
+<a class="text-slate-400 hover:text-slate-700 transition-colors opacity-80 hover:opacity-100" href="#">Data Retention Policy</a>
+<a class="text-slate-400 hover:text-slate-700 transition-colors opacity-80 hover:opacity-100" href="#">Terms</a>
+</div>
+<p class="text-[10px] font-medium opacity-60">v2.4.0 • SwarajDesk Admin</p>
+</footer>
+</main>
+</body></html>

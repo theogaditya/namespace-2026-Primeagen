@@ -20,6 +20,29 @@ export function CivicPartnerLayout({ children }: CivicPartnerLayoutProps) {
   const pathname = usePathname()
   const router = useRouter()
   const [searchQuery, setSearchQuery] = useState("")
+  const [cachedPartner, setCachedPartner] = useState<CivicPartner | null>(() => {
+    try {
+      const raw = typeof window !== "undefined" ? localStorage.getItem("civicPartner") : null
+      return raw ? (JSON.parse(raw) as CivicPartner) : null
+    } catch {
+      return null
+    }
+  })
+
+  // Keep a cached copy of the partner for instant UI while auth verifies.
+  // Also update cache when a fresh partner object arrives from the auth hook.
+  useEffect(() => {
+    if (partner) {
+      setCachedPartner(partner)
+      try {
+        localStorage.setItem("civicPartner", JSON.stringify(partner))
+      } catch {
+        // ignore storage errors
+      }
+    }
+  }, [partner])
+
+  const displayPartner = partner ?? cachedPartner
 
   // Always render the layout shell so route-level `loading.tsx` components
   // can display uninterrupted. Use safe fallbacks for `partner` fields
@@ -125,14 +148,34 @@ export function CivicPartnerLayout({ children }: CivicPartnerLayoutProps) {
               <span className="absolute top-2 right-2 w-2 h-2 bg-[#ba1a1a] rounded-full" />
             </button>
             <div className="flex items-center gap-3 pl-4" style={{ borderLeft: "1px solid rgba(193,199,208,0.2)" }}>
-                <div className="text-right">
-                <p className="text-sm font-bold text-[#003358]">{partner?.orgName || "CivicPartner"}</p>
-                <p className="text-[10px] text-[#727780] font-medium">
-                  {partner?.orgType?.replace(/_/g, " ") || ""} {partner?.state ? `· ${partner.state}` : ""}
-                </p>
+              <div className="text-right">
+                {displayPartner ? (
+                  <>
+                    <p className="text-sm font-bold text-[#003358]">{displayPartner.orgName}</p>
+                    <p className="text-[10px] text-[#727780] font-medium">
+                      {displayPartner.orgType?.replace(/_/g, " ") || ""}{displayPartner.state ? ` · ${displayPartner.state}` : ""}
+                    </p>
+                  </>
+                ) : isLoading ? (
+                  <div className="space-y-1 animate-pulse">
+                    <div className="h-4 bg-[#e6eef5] rounded w-32" />
+                    <div className="h-3 bg-[#e6eef5] rounded w-24" />
+                  </div>
+                ) : (
+                  <>
+                    <p className="text-sm font-bold text-[#003358]">CivicPartner</p>
+                    <p className="text-[10px] text-[#727780] font-medium"> </p>
+                  </>
+                )}
               </div>
-              <div className="w-10 h-10 rounded-full bg-[#004a7c] flex items-center justify-center text-white font-bold text-sm">
-                {(partner?.orgName?.charAt(0) || "C").toUpperCase()}
+              <div className="w-10 h-10 rounded-full flex items-center justify-center text-white font-bold text-sm">
+                {displayPartner ? (
+                  (displayPartner.orgName?.charAt(0) || "C").toUpperCase()
+                ) : isLoading ? (
+                  <div className="w-8 h-8 rounded-full bg-[#e6eef5] animate-pulse" />
+                ) : (
+                  <div className="w-8 h-8 rounded-full bg-[#004a7c] flex items-center justify-center text-white font-bold">C</div>
+                )}
               </div>
             </div>
             <button

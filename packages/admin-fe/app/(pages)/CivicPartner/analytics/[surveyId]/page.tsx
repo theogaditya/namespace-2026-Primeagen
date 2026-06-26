@@ -490,7 +490,7 @@ export default function SurveyAnalyticsPage({ params }: { params: Promise<{ surv
                             : "text_fields"}
                     </span>
                   </div>
-                ))}
+                ); })}
               </div>
             </div>
 

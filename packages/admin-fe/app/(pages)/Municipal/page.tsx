@@ -2,31 +2,25 @@
 
 import { useState } from 'react'
 import dynamic from 'next/dynamic'
-import { MunicipalAdminLayout } from "./components/municipal-admin-layout"
+import { RevampedLayout } from "./components/layout"
 import { AuthGuard } from "@/components/auth-guard"
 
-// Load the heavy, browser-only components only on the client (named exports)
-const MunicipalAvailableComplaints = dynamic(() => import('./components/municipal-available-complaints').then(m => m.MunicipalAvailableComplaints), { ssr: false })
-const MunicipalMyComplaints = dynamic(() => import('./components/municipal-my-complaints').then(m => m.MunicipalMyComplaints), { ssr: false })
-const MunicipalAnalytics = dynamic(() => import('./components/municipal-analytics').then(m => m.MunicipalAnalytics), { ssr: false })
-const AgentManagement = dynamic(() => import('./components/AgentManagement').then(m => m.AgentManagement), { ssr: false })
+const Dashboard = dynamic(() => import('./components/dashboard').then(m => m.MunicipalDashboard), { ssr: false })
+const MyComplaints = dynamic(() => import('./components/my-complaints').then(m => m.MunicipalMyComplaints), { ssr: false })
+const Analytics = dynamic(() => import('./components/analytics').then(m => m.MunicipalAnalytics), { ssr: false })
+const AgentManagement = dynamic(() => import('./components/agent-management').then(m => m.AgentManagement), { ssr: false })
 
-export default function MunicipalPage() {
+export default function MunicipalRevampedPage() {
   const [activeTab, setActiveTab] = useState<'dashboard' | 'my-complaints' | 'reports' | 'agent-management'>('dashboard')
 
   return (
     <AuthGuard requiredAdminType="MUNICIPAL_ADMIN">
-      <MunicipalAdminLayout activeTab={activeTab} onTabChange={setActiveTab}>
-        {activeTab === 'dashboard' && <MunicipalAvailableComplaints />}
-        {activeTab === 'my-complaints' && <MunicipalMyComplaints />}
-        {activeTab === 'reports' && <MunicipalAnalytics />}
+      <RevampedLayout activeTab={activeTab} onTabChange={setActiveTab}>
+        {activeTab === 'dashboard' && <Dashboard />}
+        {activeTab === 'my-complaints' && <MyComplaints />}
+        {activeTab === 'reports' && <Analytics />}
         {activeTab === 'agent-management' && <AgentManagement />}
-        {activeTab === 'agent-management' && (
-          <div className="p-6">
-            <div className="text-gray-600">Agent management</div>
-          </div>
-        )}
-      </MunicipalAdminLayout>
+      </RevampedLayout>
     </AuthGuard>
   )
 }

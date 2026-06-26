@@ -108,6 +108,16 @@ export function LoginForm({ adminType: controlledAdminType, onAdminTypeChange }:
                 src="https://upload.wikimedia.org/wikipedia/commons/5/55/Emblem_of_India.svg"
                 alt="National Emblem of India"
                 className="w-full h-full object-contain"
+                loading="eager"
+                fetchPriority="high"
+                onError={(e) => {
+                  const img = e.currentTarget as HTMLImageElement
+                  if (!img.dataset.retry) {
+                    img.dataset.retry = "1"
+                    // reassign src to trigger a reload attempt
+                    img.src = img.src
+                  }
+                }}
               />
             </div>
           </div>
@@ -144,30 +154,27 @@ export function LoginForm({ adminType: controlledAdminType, onAdminTypeChange }:
               <Label htmlFor="adminType" className="text-gray-700 font-medium">
                 Admin Type
               </Label>
-              <Select
-                value={adminType}
-                onValueChange={(value) => {
-                  const v = value as AdminType
-                  setAdminType(v)
-                  if (onAdminTypeChange) onAdminTypeChange(v)
-                }}
-              >
-                <SelectTrigger className="h-10 sm:h-12 bg-white border-gray-300 focus:border-blue-500 focus:ring-blue-500 rounded-xl text-sm sm:text-base">
-                  <SelectValue placeholder="Select admin type" />
-                </SelectTrigger>
-                <SelectContent>
-                  {(
-                    (Object.keys(adminTypeLabels) as AdminType[])
-                      .slice()
-                      .sort((a, b) => adminTypeLabels[a].localeCompare(adminTypeLabels[b]))
-                      .map((type) => (
-                        <SelectItem key={type} value={type}>
-                          {adminTypeLabels[type]}
-                        </SelectItem>
-                      ))
-                  )}
-                </SelectContent>
-              </Select>
+              <div>
+                <select
+                  id="adminType"
+                  value={adminType}
+                  onChange={(e) => {
+                    const v = e.target.value as AdminType
+                    setAdminType(v)
+                    if (onAdminTypeChange) onAdminTypeChange(v)
+                  }}
+                  className="h-10 sm:h-12 w-full bg-white border border-gray-300 rounded-xl px-3 pr-4 text-sm sm:text-base focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                >
+                  {(Object.keys(adminTypeLabels) as AdminType[])
+                    .slice()
+                    .sort((a, b) => adminTypeLabels[a].localeCompare(adminTypeLabels[b]))
+                    .map((type) => (
+                      <option key={type} value={type}>
+                        {adminTypeLabels[type]}
+                      </option>
+                    ))}
+                </select>
+              </div>
             </div>
 
             <div className="space-y-2">

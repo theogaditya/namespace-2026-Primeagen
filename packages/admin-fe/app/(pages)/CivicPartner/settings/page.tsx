@@ -20,7 +20,7 @@ interface Survey {
 
 export default function CivicPartnerSettingsPage() {
   const router = useRouter()
-  const { partner, logout } = useCivicPartnerAuth()
+  const { partner, isLoading, logout } = useCivicPartnerAuth()
   const [surveys, setSurveys] = useState<Survey[]>([])
   const [loading, setLoading] = useState(true)
   const [selectedSurvey, setSelectedSurvey] = useState<Survey | null>(null)
@@ -82,7 +82,70 @@ export default function CivicPartnerSettingsPage() {
     }
   }
 
-  if (!partner) return null
+  if (!partner) {
+    if (isLoading) {
+      return (
+        <CivicPartnerLayout>
+          <div className="p-8 space-y-8">
+            <div>
+              <h2 className="text-3xl font-extrabold text-[#003358] tracking-tight" style={{ fontFamily: "'Manrope', sans-serif" }}>
+                Settings
+              </h2>
+              <p className="text-[#727780] mt-1">Manage your organization profile and survey configurations</p>
+            </div>
+
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+              <div className="lg:col-span-5 space-y-6">
+                <section className="bg-white p-8 rounded-xl" style={{ boxShadow: "0 4px 16px rgba(0,0,0,0.04)", border: "1px solid rgba(193,199,208,0.1)" }}>
+                  <div className="flex items-center gap-4 mb-8">
+                    <div className="w-14 h-14 rounded-2xl bg-[#e6eef5] animate-pulse" />
+                    <div className="space-y-2 w-full">
+                      <div className="h-4 bg-[#e6eef5] rounded w-48 animate-pulse" />
+                      <div className="h-3 bg-[#e6eef5] rounded w-32 animate-pulse" />
+                    </div>
+                  </div>
+                  <div className="grid grid-cols-2 gap-6">
+                    {Array.from({ length: 6 }).map((_, i) => (
+                      <div key={i}>
+                        <div className="h-3 bg-[#eef6fb] rounded w-28 mb-2 animate-pulse" />
+                        <div className="h-4 bg-[#e6eef5] rounded w-full animate-pulse" />
+                      </div>
+                    ))}
+                  </div>
+                </section>
+
+                <section className="bg-white p-8 rounded-xl" style={{ boxShadow: "0 4px 16px rgba(0,0,0,0.04)", border: "1px solid rgba(193,199,208,0.1)" }}>
+                  <h3 className="text-lg font-bold text-[#003358] mb-4" style={{ fontFamily: "'Manrope', sans-serif" }}>Session</h3>
+                  <div className="h-3 bg-[#e6eef5] rounded w-40 mb-4 animate-pulse" />
+                  <div className="h-10 w-40 bg-[#e6eef5] rounded-lg animate-pulse" />
+                </section>
+              </div>
+
+              <div className="lg:col-span-7">
+                <section className="bg-white rounded-xl overflow-hidden" style={{ boxShadow: "0 4px 16px rgba(0,0,0,0.04)", border: "1px solid rgba(193,199,208,0.1)" }}>
+                  <div className="p-6 flex items-center justify-between border-b border-[#e6f6ff]">
+                    <div>
+                      <h3 className="text-lg font-bold text-[#003358]" style={{ fontFamily: "'Manrope', sans-serif" }}>Survey Management</h3>
+                      <p className="text-xs text-[#727780] mt-1">&nbsp;</p>
+                    </div>
+                    <div className="h-8 w-20 bg-[#e6eef5] rounded-lg animate-pulse" />
+                  </div>
+
+                  <div className="p-6 space-y-3">
+                    {[1, 2, 3, 4].map((i) => (
+                      <div key={i} className="h-14 bg-[#f3faff] rounded-lg animate-pulse" />
+                    ))}
+                  </div>
+                </section>
+              </div>
+            </div>
+          </div>
+        </CivicPartnerLayout>
+      )
+    }
+
+    return null
+  }
 
   const statusConfig: Record<string, { bg: string; text: string; label: string }> = {
     PUBLISHED: { bg: "bg-emerald-100", text: "text-emerald-700", label: "Active" },

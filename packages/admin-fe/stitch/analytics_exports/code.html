@@ -1,0 +1,458 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Governance Intelligence | SwarajDesk Admin</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<style>
+        body { font-family: 'Inter', sans-serif; }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #c4c6cd; border-radius: 10px; }
+    </style>
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "surface": "#f8f9fa",
+                      "on-primary-fixed-variant": "#38485a",
+                      "on-tertiary-fixed-variant": "#584326",
+                      "surface-container": "#edeeef",
+                      "on-secondary": "#ffffff",
+                      "surface-bright": "#f8f9fa",
+                      "outline": "#74777d",
+                      "on-secondary-container": "#003370",
+                      "on-error": "#ffffff",
+                      "on-primary-fixed": "#0b1d2d",
+                      "tertiary": "#211200",
+                      "background": "#f8f9fa",
+                      "surface-container-low": "#f3f4f5",
+                      "primary-container": "#1a2b3c",
+                      "surface-container-high": "#e7e8e9",
+                      "primary": "#041627",
+                      "error-container": "#ffdad6",
+                      "inverse-on-surface": "#f0f1f2",
+                      "on-secondary-fixed-variant": "#004491",
+                      "inverse-primary": "#b7c8de",
+                      "primary-fixed": "#d2e4fb",
+                      "surface-variant": "#e1e3e4",
+                      "on-tertiary": "#ffffff",
+                      "outline-variant": "#c4c6cd",
+                      "on-surface-variant": "#44474c",
+                      "on-secondary-fixed": "#001a40",
+                      "on-tertiary-fixed": "#281802",
+                      "on-error-container": "#93000a",
+                      "tertiary-fixed-dim": "#e1c29b",
+                      "secondary-fixed-dim": "#acc7ff",
+                      "on-primary": "#ffffff",
+                      "secondary": "#115cb9",
+                      "surface-container-lowest": "#ffffff",
+                      "on-tertiary-container": "#a88c69",
+                      "primary-fixed-dim": "#b7c8de",
+                      "surface-tint": "#4f6073",
+                      "surface-dim": "#d9dadb",
+                      "tertiary-fixed": "#feddb5",
+                      "tertiary-container": "#38260b",
+                      "error": "#ba1a1a",
+                      "on-primary-container": "#8192a7",
+                      "on-background": "#191c1d",
+                      "secondary-fixed": "#d7e2ff",
+                      "on-surface": "#191c1d",
+                      "inverse-surface": "#2e3132",
+                      "secondary-container": "#659dfe",
+                      "surface-container-highest": "#e1e3e4"
+              },
+              "borderRadius": {
+                      "DEFAULT": "0.125rem",
+                      "lg": "0.25rem",
+                      "xl": "0.5rem",
+                      "full": "0.75rem"
+              }
+            },
+          }
+        }
+      </script>
+</head>
+<body class="bg-surface text-on-surface selection:bg-primary-fixed">
+<!-- SideNavBar -->
+<aside class="h-screen w-64 fixed left-0 top-0 z-40 bg-surface_container_low dark:bg-slate-950 flex flex-col p-4 gap-2 transition-all ease-in-out duration-200">
+<div class="px-2 py-6 mb-4">
+<h1 class="text-lg font-bold text-slate-900 dark:text-white">SwarajDesk</h1>
+<p class="font-inter text-xs font-semibold tracking-wide text-slate-500 uppercase">Admin Portal</p>
+</div>
+<nav class="flex-1 flex flex-col gap-1">
+<a class="flex items-center gap-3 px-3 py-2 text-slate-500 dark:text-slate-400 hover:bg-slate-200/50 dark:hover:bg-slate-800/50 transition-all font-inter text-sm font-semibold tracking-wide" href="#">
+<span class="material-symbols-outlined">dashboard</span> Dashboard
+            </a>
+<a class="flex items-center gap-3 px-3 py-2 text-slate-500 dark:text-slate-400 hover:bg-slate-200/50 dark:hover:bg-slate-800/50 transition-all font-inter text-sm font-semibold tracking-wide" href="#">
+<span class="material-symbols-outlined">forum</span> Complaints
+            </a>
+<a class="flex items-center gap-3 px-3 py-2 text-slate-500 dark:text-slate-400 hover:bg-slate-200/50 dark:hover:bg-slate-800/50 transition-all font-inter text-sm font-semibold tracking-wide" href="#">
+<span class="material-symbols-outlined">group</span> Users
+            </a>
+<a class="flex items-center gap-3 px-3 py-2 bg-surface_container_highest dark:bg-slate-800 text-slate-900 dark:text-white rounded-lg transition-all font-inter text-sm font-semibold tracking-wide" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">analytics</span> Analytics
+            </a>
+<a class="flex items-center gap-3 px-3 py-2 text-slate-500 dark:text-slate-400 hover:bg-slate-200/50 dark:hover:bg-slate-800/50 transition-all font-inter text-sm font-semibold tracking-wide" href="#">
+<span class="material-symbols-outlined">settings</span> Settings
+            </a>
+<a class="flex items-center gap-3 px-3 py-2 text-slate-500 dark:text-slate-400 hover:bg-slate-200/50 dark:hover:bg-slate-800/50 transition-all font-inter text-sm font-semibold tracking-wide" href="#">
+<span class="material-symbols-outlined">priority_high</span> Escalations
+            </a>
+</nav>
+<div class="mt-auto border-t border-outline-variant/10 pt-4 flex flex-col gap-1">
+<a class="flex items-center gap-3 px-3 py-2 text-slate-500 dark:text-slate-400 hover:bg-slate-200/50 transition-all font-inter text-sm font-semibold tracking-wide" href="#">
+<span class="material-symbols-outlined">help</span> Help
+            </a>
+<a class="flex items-center gap-3 px-3 py-2 text-slate-500 dark:text-slate-400 hover:bg-slate-200/50 transition-all font-inter text-sm font-semibold tracking-wide text-error" href="#">
+<span class="material-symbols-outlined">logout</span> Logout
+            </a>
+</div>
+</aside>
+<main class="ml-64 min-h-screen flex flex-col">
+<!-- TopAppBar -->
+<header class="bg-surface/80 dark:bg-slate-900/80 backdrop-blur-xl flex items-center justify-between px-6 py-3 w-full sticky top-0 z-30 shadow-sm">
+<div class="flex items-center gap-8">
+<span class="text-xl font-black text-slate-900 dark:text-white tracking-tighter uppercase">Governance Analytics</span>
+<div class="relative group">
+<span class="absolute left-3 top-1/2 -translate-y-1/2 material-symbols-outlined text-outline text-sm">search</span>
+<input class="pl-10 pr-4 py-1.5 bg-surface-container-low border-none rounded-lg text-sm focus:ring-1 focus:ring-primary-container w-64 transition-all" placeholder="Search insights..." type="text"/>
+</div>
+</div>
+<div class="flex items-center gap-4">
+<button class="p-2 text-slate-500 hover:bg-slate-100 rounded-full transition-colors relative">
+<span class="material-symbols-outlined">notifications</span>
+<span class="absolute top-2 right-2 w-2 h-2 bg-error rounded-full"></span>
+</button>
+<div class="h-8 w-[1px] bg-outline-variant/30 mx-2"></div>
+<div class="flex items-center gap-3">
+<div class="text-right">
+<p class="text-xs font-bold text-slate-900">Admin Role</p>
+<p class="text-[10px] text-slate-500 leading-none">System Oversight</p>
+</div>
+<img alt="User Profile Avatar" class="w-9 h-9 rounded-full object-cover ring-2 ring-surface-container-high" src="https://lh3.googleusercontent.com/aida-public/AB6AXuD9i2oDWCWhtmdPAg_cspPuQ7g7L8PO3KcjoMaVvXsHv_z7So57xDSz5DAgEUBHP-ywDSdz1aRuPHMbGC-2ogbLW3vtY818K_V8nB_-R1WBwcPAnP-eyHf9CehPHcmXhDakgHsVcSve_5e_bJYpXq4iRHkUYUkATkqW90ZXxnGu2VEO11yO2nUqTFtrADwO3l7Ru6d0oJRcsaNpC4MMHGzj_bmtIDqbTFAfVqmh3SC7z9YFNjYYNUSDoOUiXo2I7YJIqDq2-RJ2Ny0o"/>
+</div>
+</div>
+</header>
+<!-- Content Area -->
+<div class="p-8 flex flex-col gap-8">
+<!-- Section 1: Executive Summary KPIs -->
+<section class="grid grid-cols-1 md:grid-cols-3 gap-6">
+<!-- Citizen Satisfaction (CSAT) -->
+<div class="bg-surface-container-lowest p-6 rounded-xl shadow-sm border border-outline-variant/10">
+<div class="flex justify-between items-start mb-4">
+<div>
+<p class="text-xs font-bold text-on-surface-variant uppercase tracking-widest">Citizen Satisfaction</p>
+<h3 class="text-3xl font-black mt-1">4.2<span class="text-lg text-outline">/5</span></h3>
+</div>
+<span class="material-symbols-outlined text-secondary bg-secondary/10 p-2 rounded-lg">sentiment_satisfied</span>
+</div>
+<!-- Mini Trend Line Visualization -->
+<div class="h-12 w-full flex items-end gap-1 px-1">
+<div class="flex-1 bg-secondary/20 h-[60%] rounded-t-sm"></div>
+<div class="flex-1 bg-secondary/20 h-[65%] rounded-t-sm"></div>
+<div class="flex-1 bg-secondary/40 h-[75%] rounded-t-sm"></div>
+<div class="flex-1 bg-secondary/60 h-[70%] rounded-t-sm"></div>
+<div class="flex-1 bg-secondary/80 h-[85%] rounded-t-sm"></div>
+<div class="flex-1 bg-secondary h-[90%] rounded-t-sm"></div>
+</div>
+<div class="flex justify-between mt-2 text-[10px] font-bold text-outline-variant">
+<span>JAN</span><span>JUN</span>
+</div>
+</div>
+<!-- First Response Time (FRT) -->
+<div class="bg-surface-container-lowest p-6 rounded-xl shadow-sm border border-outline-variant/10">
+<div class="flex justify-between items-start mb-4">
+<div>
+<p class="text-xs font-bold text-on-surface-variant uppercase tracking-widest">Avg. First Response</p>
+<h3 class="text-3xl font-black mt-1">2.4<span class="text-lg text-outline">h</span></h3>
+</div>
+<span class="material-symbols-outlined text-primary bg-primary/10 p-2 rounded-lg">bolt</span>
+</div>
+<div class="flex items-center gap-2 text-secondary font-bold text-xs">
+<span class="material-symbols-outlined text-sm">trending_down</span>
+<span>-18% from last month</span>
+</div>
+<p class="text-[10px] text-on-surface-variant mt-4 leading-relaxed">System-wide efficiency improved due to automated triage deployment in Pune and Mumbai.</p>
+</div>
+<!-- Backlog Health -->
+<div class="bg-surface-container-lowest p-6 rounded-xl shadow-sm border border-outline-variant/10">
+<div class="flex justify-between items-start mb-4">
+<div>
+<p class="text-xs font-bold text-on-surface-variant uppercase tracking-widest">Backlog Health</p>
+<h3 class="text-3xl font-black mt-1">112%</h3>
+</div>
+<span class="material-symbols-outlined text-tertiary bg-tertiary/10 p-2 rounded-lg">balance</span>
+</div>
+<div class="w-full bg-surface-container-high h-2 rounded-full overflow-hidden mt-2">
+<div class="bg-primary h-full w-[85%]"></div>
+</div>
+<div class="flex justify-between mt-3 text-[10px] font-bold">
+<span class="text-on-surface-variant">RESOLUTIONS (4.2k)</span>
+<span class="text-primary">NEW (3.8k)</span>
+</div>
+</div>
+</section>
+<!-- Section 2: Comparative Analysis & Root Cause -->
+<section class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+<!-- Comparative Departmental Analysis -->
+<div class="lg:col-span-8 bg-surface-container-lowest p-6 rounded-xl shadow-sm border border-outline-variant/10">
+<div class="flex justify-between items-center mb-8">
+<div>
+<h3 class="font-bold text-lg">Departmental Resolution Efficiency</h3>
+<p class="text-xs text-on-surface-variant">Performance benchmarks by municipal service sector</p>
+</div>
+<button class="text-xs font-bold text-primary flex items-center gap-1">
+<span class="material-symbols-outlined text-sm">filter_alt</span> Compare All
+                        </button>
+</div>
+<div class="space-y-6">
+<!-- Department Row -->
+<div>
+<div class="flex justify-between text-xs font-bold mb-2">
+<span>Water Supply</span>
+<span class="text-on-surface-variant">Avg. 1.2 Days | 96% SLA Compliance</span>
+</div>
+<div class="w-full bg-surface-container-high h-4 rounded-sm flex">
+<div class="bg-primary h-full w-[96%]" title="Compliant"></div>
+<div class="bg-error h-full w-[4%]" title="Breached"></div>
+</div>
+</div>
+<div>
+<div class="flex justify-between text-xs font-bold mb-2">
+<span>Sanitation &amp; Waste</span>
+<span class="text-on-surface-variant">Avg. 2.5 Days | 82% SLA Compliance</span>
+</div>
+<div class="w-full bg-surface-container-high h-4 rounded-sm flex">
+<div class="bg-primary h-full w-[82%]" title="Compliant"></div>
+<div class="bg-error h-full w-[18%]" title="Breached"></div>
+</div>
+</div>
+<div>
+<div class="flex justify-between text-xs font-bold mb-2">
+<span>Power &amp; Streetlights</span>
+<span class="text-on-surface-variant">Avg. 0.8 Days | 99% SLA Compliance</span>
+</div>
+<div class="w-full bg-surface-container-high h-4 rounded-sm flex">
+<div class="bg-primary h-full w-[99%]" title="Compliant"></div>
+<div class="bg-error h-full w-[1%]" title="Breached"></div>
+</div>
+</div>
+<div>
+<div class="flex justify-between text-xs font-bold mb-2">
+<span>Roads &amp; Potholes</span>
+<span class="text-on-surface-variant">Avg. 8.4 Days | 64% SLA Compliance</span>
+</div>
+<div class="w-full bg-surface-container-high h-4 rounded-sm flex">
+<div class="bg-primary h-full w-[64%]" title="Compliant"></div>
+<div class="bg-error h-full w-[36%]" title="Breached"></div>
+</div>
+</div>
+</div>
+</div>
+<!-- SLA Breach Root Cause Analysis -->
+<div class="lg:col-span-4 bg-surface-container-lowest p-6 rounded-xl shadow-sm border border-outline-variant/10">
+<h3 class="font-bold text-lg mb-6">SLA Breach Root Causes</h3>
+<div class="space-y-4">
+<div class="flex items-center gap-4">
+<div class="w-3 h-3 rounded-full bg-primary"></div>
+<div class="flex-1">
+<p class="text-xs font-bold">Field Team Capacity</p>
+<div class="w-full bg-surface-container-high h-1.5 rounded-full mt-1">
+<div class="bg-primary h-full w-[45%]"></div>
+</div>
+</div>
+<span class="text-xs font-bold">45%</span>
+</div>
+<div class="flex items-center gap-4">
+<div class="w-3 h-3 rounded-full bg-secondary"></div>
+<div class="flex-1">
+<p class="text-xs font-bold">Inter-departmental Delay</p>
+<div class="w-full bg-surface-container-high h-1.5 rounded-full mt-1">
+<div class="bg-secondary h-full w-[28%]"></div>
+</div>
+</div>
+<span class="text-xs font-bold">28%</span>
+</div>
+<div class="flex items-center gap-4">
+<div class="w-3 h-3 rounded-full bg-tertiary-container"></div>
+<div class="flex-1">
+<p class="text-xs font-bold">Complex Repair/Tech</p>
+<div class="w-full bg-surface-container-high h-1.5 rounded-full mt-1">
+<div class="bg-tertiary-container h-full w-[15%]"></div>
+</div>
+</div>
+<span class="text-xs font-bold">15%</span>
+</div>
+<div class="flex items-center gap-4">
+<div class="w-3 h-3 rounded-full bg-outline"></div>
+<div class="flex-1">
+<p class="text-xs font-bold">Resource Shortage</p>
+<div class="w-full bg-surface-container-high h-1.5 rounded-full mt-1">
+<div class="bg-outline h-full w-[12%]"></div>
+</div>
+</div>
+<span class="text-xs font-bold">12%</span>
+</div>
+</div>
+<div class="mt-8 pt-6 border-t border-outline-variant/10">
+<p class="text-[10px] text-on-surface-variant font-bold uppercase tracking-widest mb-2">Recommendation</p>
+<p class="text-xs leading-relaxed italic text-on-surface-variant">"Increase field personnel in Zone 4 (Roads) to mitigate the 45% capacity bottleneck."</p>
+</div>
+</div>
+</section>
+<!-- Section 3: Geospatial Hotspots -->
+<section class="bg-surface-container-lowest rounded-xl shadow-sm border border-outline-variant/10 overflow-hidden">
+<div class="px-6 py-4 border-b border-outline-variant/10 flex justify-between items-center bg-surface-container-low/50">
+<h3 class="font-bold text-base">Geospatial Hotspots: Unresolved Critical Complaints</h3>
+<div class="flex gap-2">
+<span class="px-2 py-1 bg-error/10 text-error text-[10px] font-black rounded uppercase">Critical Density: High</span>
+</div>
+</div>
+<div class="grid grid-cols-1 lg:grid-cols-3">
+<!-- Map Placeholder -->
+<div class="lg:col-span-2 bg-slate-200 relative min-h-[300px] flex items-center justify-center overflow-hidden">
+<div class="absolute inset-0 opacity-20 grayscale">
+<img alt="Abstract map pattern" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCHjg-MnUvtAqn_cx9dmfMWH5r6N06x50_JYnlPYvyk-BUQW8-ca7FWnJeISxzM5GYmO93e-h_O4KAMjYQunMFosdLedbsXVuKp_g_UJI5l5K7rk4FDj3OU7GjJCpvDhvffEUlfskdsBJRaQHrQX3b0jn2oZuygrNj8lDohcnTYKqcwmdoC-rG37dFgLa9ogTacXSJaE3fg_y_7u1opqxqD0pCSJkk-A8PqkTene3Kcz0KbpHo0R7TxDMvhFs-oZ0reAY16gAdgJXJi"/>
+</div>
+<!-- Hotspot Indicators -->
+<div class="absolute top-1/4 left-1/3 w-12 h-12 bg-error/30 rounded-full animate-pulse flex items-center justify-center">
+<div class="w-4 h-4 bg-error rounded-full"></div>
+</div>
+<div class="absolute bottom-1/3 right-1/4 w-8 h-8 bg-error/30 rounded-full animate-pulse flex items-center justify-center">
+<div class="w-3 h-3 bg-error rounded-full"></div>
+</div>
+<div class="z-10 bg-white/90 backdrop-blur p-3 rounded-lg shadow-xl border border-outline-variant/20 text-xs font-bold">
+<p class="text-error mb-1 flex items-center gap-1"><span class="material-symbols-outlined text-sm">location_on</span> Mumbai Ward-H East</p>
+<p class="text-on-surface-variant font-medium">84 Unresolved Criticals</p>
+</div>
+</div>
+<!-- Table Summary -->
+<div class="p-0 border-l border-outline-variant/10 overflow-y-auto max-h-[300px]">
+<table class="w-full text-left text-xs">
+<thead class="sticky top-0 bg-surface-container-high z-10">
+<tr>
+<th class="p-4 font-bold uppercase tracking-widest text-on-surface-variant">Ward/District</th>
+<th class="p-4 font-bold uppercase tracking-widest text-on-surface-variant">Density</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-outline-variant/5">
+<tr class="hover:bg-surface-container-low cursor-pointer">
+<td class="p-4 font-medium">Ward-H East (Mumbai)</td>
+<td class="p-4"><span class="font-bold text-error">High (84)</span></td>
+</tr>
+<tr class="hover:bg-surface-container-low cursor-pointer">
+<td class="p-4 font-medium">Shivajinagar (Pune)</td>
+<td class="p-4"><span class="font-bold text-secondary">Medium (42)</span></td>
+</tr>
+<tr class="hover:bg-surface-container-low cursor-pointer">
+<td class="p-4 font-medium">Sitabuldi (Nagpur)</td>
+<td class="p-4"><span class="font-bold text-secondary">Medium (38)</span></td>
+</tr>
+<tr class="hover:bg-surface-container-low cursor-pointer">
+<td class="p-4 font-medium">Ward-K West (Mumbai)</td>
+<td class="p-4"><span class="font-bold text-on-surface-variant">Low (12)</span></td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</section>
+<!-- Section 4: Report Generation Hub -->
+<section class="grid grid-cols-1 lg:grid-cols-12 gap-6 mb-12">
+<!-- Granular Filters (Report Builder Upgrade) -->
+<div class="lg:col-span-4 bg-surface-container-lowest p-6 rounded-xl shadow-sm border border-outline-variant/10">
+<h3 class="font-bold text-lg mb-6">Intelligence Hub</h3>
+<div class="space-y-4">
+<div>
+<label class="text-[10px] font-black uppercase tracking-widest text-on-surface-variant mb-2 block">Financial Year</label>
+<select class="w-full bg-surface-container-low border-none rounded-lg py-2.5 text-sm font-medium">
+<option>FY 2024-25 (Current)</option>
+<option>FY 2023-24</option>
+<option>FY 2022-23</option>
+</select>
+</div>
+<div>
+<label class="text-[10px] font-black uppercase tracking-widest text-on-surface-variant mb-2 block">Department Segment</label>
+<select class="w-full bg-surface-container-low border-none rounded-lg py-2.5 text-sm font-medium">
+<option>All Departments</option>
+<option>Water &amp; Sanitation</option>
+<option>Public Works (PWD)</option>
+<option>Healthcare Services</option>
+</select>
+</div>
+<div>
+<label class="text-[10px] font-black uppercase tracking-widest text-on-surface-variant mb-2 block">SLA Compliance Status</label>
+<div class="grid grid-cols-2 gap-2">
+<label class="flex items-center gap-2 bg-surface-container-low p-2 rounded-lg cursor-pointer">
+<input checked="" class="rounded text-primary focus:ring-primary border-none" type="checkbox"/>
+<span class="text-xs font-bold">Compliant</span>
+</label>
+<label class="flex items-center gap-2 bg-surface-container-low p-2 rounded-lg cursor-pointer">
+<input checked="" class="rounded text-error focus:ring-error border-none" type="checkbox"/>
+<span class="text-xs font-bold">Breached</span>
+</label>
+</div>
+</div>
+<button class="w-full bg-primary text-white py-3 rounded-lg font-bold text-sm mt-4 hover:bg-primary-container transition-colors shadow-lg shadow-primary/10">
+                            Apply Intelligence Filters
+                        </button>
+</div>
+</div>
+<!-- Export Protocol -->
+<div class="lg:col-span-8 bg-surface-container-low p-8 rounded-xl relative overflow-hidden">
+<div class="relative z-10 h-full flex flex-col justify-between">
+<div>
+<h2 class="font-black text-2xl tracking-tighter mb-2">Export Protocol</h2>
+<p class="text-sm text-on-surface-variant max-w-lg mb-8">Securely retrieve administrative governance data in structured formats for ministerial auditing or archiving.</p>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+<button class="bg-surface-container-lowest p-6 rounded-xl flex items-center justify-between group hover:shadow-md transition-all border border-transparent hover:border-outline-variant/20">
+<div class="flex items-center gap-4">
+<div class="p-3 bg-secondary/5 text-secondary rounded-lg">
+<span class="material-symbols-outlined">table_view</span>
+</div>
+<div class="text-left">
+<p class="text-sm font-bold">Download CSV</p>
+<p class="text-[10px] text-on-surface-variant">Compatible with Excel/Sheets</p>
+</div>
+</div>
+<span class="material-symbols-outlined text-outline group-hover:text-primary transition-colors">download</span>
+</button>
+<button class="bg-surface-container-lowest p-6 rounded-xl flex items-center justify-between group hover:shadow-md transition-all border border-transparent hover:border-outline-variant/20">
+<div class="flex items-center gap-4">
+<div class="p-3 bg-primary/5 text-primary rounded-lg">
+<span class="material-symbols-outlined">data_object</span>
+</div>
+<div class="text-left">
+<p class="text-sm font-bold">Download JSON</p>
+<p class="text-[10px] text-on-surface-variant">Optimized for API ingest</p>
+</div>
+</div>
+<span class="material-symbols-outlined text-outline group-hover:text-primary transition-colors">download</span>
+</button>
+</div>
+</div>
+<div class="absolute -right-20 -bottom-20 w-64 h-64 bg-primary/5 rounded-full blur-3xl"></div>
+</div>
+</section>
+</div>
+<!-- Footer -->
+<footer class="bg-surface dark:bg-slate-900 border-t border-slate-100 dark:border-slate-800 w-full py-6 mt-auto flex flex-col items-center justify-center gap-2 px-8">
+<p class="font-inter label-sm uppercase tracking-widest text-slate-500 dark:text-slate-400">v2.4.0 • SwarajDesk Admin • Governance Intelligence Panel</p>
+<div class="flex gap-6">
+<a class="text-slate-400 dark:text-slate-500 hover:text-slate-700 dark:hover:text-slate-200 transition-colors opacity-80 hover:opacity-100 font-inter label-sm uppercase tracking-widest text-[10px]" href="#">Support</a>
+<a class="text-slate-400 dark:text-slate-500 hover:text-slate-700 dark:hover:text-slate-200 transition-colors opacity-80 hover:opacity-100 font-inter label-sm uppercase tracking-widest text-[10px]" href="#">Data Retention Policy</a>
+<a class="text-slate-400 dark:text-slate-500 hover:text-slate-700 dark:hover:text-slate-200 transition-colors opacity-80 hover:opacity-100 font-inter label-sm uppercase tracking-widest text-[10px]" href="#">Terms</a>
+</div>
+</footer>
+</main>
+</body></html>
