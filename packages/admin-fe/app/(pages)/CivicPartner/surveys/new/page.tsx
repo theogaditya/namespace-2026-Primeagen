@@ -290,6 +290,7 @@ export default function NewSurveyPage() {
                       placeholder="e.g. 2024 Urban Mobility Feedback"
                       value={title}
                       onChange={(e) => setTitle(e.target.value)}
+                      suppressHydrationWarning
                     />
                   </div>
                   <div className="grid grid-cols-2 gap-6">
@@ -312,6 +313,7 @@ export default function NewSurveyPage() {
                         placeholder="Planning & Dev"
                         value={content}
                         onChange={(e) => setContent(e.target.value)}
+                        suppressHydrationWarning
                       />
                     </div>
                   </div>
@@ -323,6 +325,7 @@ export default function NewSurveyPage() {
                       rows={4}
                       value={description}
                       onChange={(e) => setDescription(e.target.value)}
+                      suppressHydrationWarning
                     />
                   </div>
                 </div>

@@ -1,432 +1,278 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useRef } from "react"
 import { useRouter } from "next/navigation"
 import { CivicPartnerLayout } from "./_layout"
-
+import { 
+  BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, 
+  AreaChart, Area, PieChart, Pie, Cell 
+} from 'recharts'
+import { cn } from "@/lib/utils"
 const API = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3002"
+const GOOGLE_API_KEY = process.env.NEXT_PUBLIC_GOOGLE_API_KEY || ""
 
-interface Survey {
-  id: string
-  title: string
-  status: "DRAFT" | "PUBLISHED" | "CLOSED" | "ARCHIVED"
-  createdAt: string
-  lastUpdated: string
-  _count?: { responses: number; questions: number }
-}
+const interactionStats = [
+  { name: 'Jan', value: 400 }, { name: 'Feb', value: 121 }, { name: 'Mar', value: 650 }, 
+  { name: 'Apr', value: 180 }, { name: 'May', value: 920 }, { name: 'Jun', value: 340 }
+];
 
-interface PortfolioStats {
-  totalSurveys: number
-  totalResponses: number
-  published: number
-  draft: number
-  closed: number
-  avgCompletionRate: number | null
-}
+const targetData = [
+  { name: 'Reached', value: 75.5, color: '#465FFF' }, { name: 'Remaining', value: 24.5, color: '#F3F4F6' }
+];
 
 export default function CivicPartnerDashboard() {
   const router = useRouter()
-  const [surveys, setSurveys] = useState<Survey[]>([])
-  const [portfolio, setPortfolio] = useState<PortfolioStats | null>(null)
+  const mapRef = useRef<HTMLDivElement>(null)
   const [loading, setLoading] = useState(true)
-  const [insightDismissed, setInsightDismissed] = useState(false)
-
-  // Persist whether the weekly insight has been dismissed so it stays closed
-  useEffect(() => {
-    try {
-      const stored = localStorage.getItem("civicPartner_insightDismissed")
-      if (stored === "true") setInsightDismissed(true)
-    } catch (err) {
-      // ignore localStorage errors (e.g., SSR or disabled)
-    }
-  }, [])
-
-  const dismissInsight = () => {
-    try {
-      localStorage.setItem("civicPartner_insightDismissed", "true")
-    } catch (err) {
-      // ignore
-    }
-    setInsightDismissed(true)
-  }
+  const [stats, setStats] = useState({ responses: 0, surveys: 0, drafts: 0 })
 
   useEffect(() => {
-    const fetchData = async () => {
+    const load = async () => {
       try {
-        const [surveyRes, portfolioRes] = await Promise.all([
-          fetch(`${API}/api/civic-partner/surveys`, { credentials: "include" }),
-          fetch(`${API}/api/civic-partner/analytics/portfolio`, { credentials: "include" }),
-        ])
-
-        if (surveyRes.ok) {
-          const sd = await surveyRes.json()
-          setSurveys(sd.surveys ?? sd.data ?? [])
+        const res = await fetch(`${API}/api/civic-partner/surveys`, { credentials: "include" })
+        if (res.ok) {
+          const data = await res.json()
+          const all = data.surveys ?? []
+          setStats({
+            responses: all.reduce((acc: number, s: any) => acc + (s._count?.responses || 0), 0),
+            surveys: all.filter((s: any) => s.status === 'PUBLISHED').length,
+            drafts: all.filter((s: any) => s.status === 'DRAFT').length
+          })
         }
-
-        if (portfolioRes.ok) {
-          const pd = await portfolioRes.json()
-          setPortfolio(pd.portfolio ?? pd)
-        }
-      } catch (err) {
-        console.error("Failed to load dashboard:", err)
-      } finally {
-        setLoading(false)
-      }
+      } catch (err) { console.error(err) } finally { setLoading(false) }
     }
-    fetchData()
+    load()
   }, [])
 
-  const totalResponses = portfolio?.totalResponses ?? surveys.reduce((s, sv) => s + (sv._count?.responses ?? 0), 0)
-  const activeSurveys = portfolio?.published ?? surveys.filter((s) => s.status === "PUBLISHED").length
-  const draftSurveys = portfolio?.draft ?? surveys.filter((s) => s.status === "DRAFT").length
-  const closedSurveys = portfolio?.closed ?? surveys.filter((s) => s.status === "CLOSED").length
-  const completionRate = portfolio?.avgCompletionRate
+  useEffect(() => {
+    if (!loading && mapRef.current) {
+      const initMap = () => {
+        if (mapRef.current && window.google?.maps) {
+          const map = new google.maps.Map(mapRef.current, {
+            center: { lat: 20.5937, lng: 78.9629 }, zoom: 4,
+            styles: [ { "featureType": "water", "elementType": "all", "stylers": [{"color": "#465FFF"}, {"opacity": 0.05}] } ]
+          });
+          const heatmapPoints = [ new google.maps.LatLng(19.0760, 72.8777), new google.maps.LatLng(28.6139, 77.2090) ];
+          new google.maps.visualization.HeatmapLayer({ data: heatmapPoints, map: map, radius: 40 });
+        }
+      }
 
-  const recentSurveys = [...surveys].sort((a, b) => new Date(b.lastUpdated).getTime() - new Date(a.lastUpdated).getTime()).slice(0, 5)
-  const drafts = surveys.filter((s) => s.status === "DRAFT").slice(0, 3)
+      // If Google Maps is already loaded, just init the map
+      if (window.google?.maps) {
+        initMap()
+        return
+      }
 
-  const statusBadge = (status: string) => {
-    switch (status) {
-      case "PUBLISHED":
-        return (
-          <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-[#e6fffb] text-[#0b6b59]">
-            Published
-          </span>
-        )
-      case "DRAFT":
-        return (
-          <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-[#fff8e1] text-[#6b4a00]">
-            Draft
-          </span>
-        )
-      case "CLOSED":
-        return (
-          <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-[#eef6ff] text-[#5b6670]">
-            Closed
-          </span>
-        )
-      default:
-        return (
-          <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-[#eef6ff] text-[#5b6670]">
-            {status}
-          </span>
-        )
+      // Check if script already exists in DOM
+      const existing = document.querySelector(`script[src*="maps.googleapis.com"]`)
+      if (existing) {
+        existing.addEventListener('load', initMap)
+        return
+      }
+
+      const script = document.createElement('script')
+      script.src = `https://maps.googleapis.com/maps/api/js?key=${GOOGLE_API_KEY}&libraries=visualization`
+      script.async = true
+      script.onload = initMap
+      document.head.appendChild(script)
     }
-  }
-
-  const actionLabel = (status: string) => {
-    switch (status) {
-      case "PUBLISHED":
-        return "Manage Survey"
-      case "DRAFT":
-        return "Edit Draft"
-      case "CLOSED":
-        return "View Details"
-      case "ARCHIVED":
-        return "View Archive"
-      default:
-        return "View"
-    }
-  }
-
-  const handleAction = (survey: Survey) => {
-    router.push(`/CivicPartner/surveys/${survey.id}`)
-  }
-
-  const timeAgo = (dateStr: string) => {
-    const now = Date.now()
-    const d = new Date(dateStr).getTime()
-    const diff = now - d
-    const mins = Math.floor(diff / 60000)
-    if (mins < 60) return `${mins}m ago`
-    const hours = Math.floor(mins / 60)
-    if (hours < 24) return `${hours}h ago`
-    const days = Math.floor(hours / 24)
-    if (days < 7) return `${days}d ago`
-    return new Date(dateStr).toLocaleDateString()
-  }
+  }, [loading])
 
   return (
     <CivicPartnerLayout>
-      <div className="p-8 space-y-10">
-        {/* ── Hero Metrics ── */}
-        <section className="grid grid-cols-12 gap-6">
-          {/* Total Responses */}
-          <div
-            className="col-span-12 md:col-span-5 p-8 rounded-xl text-white flex flex-col justify-between min-h-[220px]"
-            style={{
-              background: "linear-gradient(135deg, #003358 0%, #004a7c 100%)",
-              boxShadow: "0 12px 32px -4px rgba(7, 30, 39, 0.06)",
-            }}
-          >
-            <div>
-              <p className="text-[#87baf3] font-medium tracking-wide uppercase text-[10px]">
-                Total Responses
-              </p>
-              <h2
-                className="text-5xl font-extrabold mt-2"
-                style={{ fontFamily: "'Manrope', sans-serif" }}
-              >
-                {loading ? "—" : totalResponses.toLocaleString()}
-              </h2>
-            </div>
-            <div className="flex items-center gap-2 text-[#97f3e2]">
-              <span className="material-symbols-outlined text-sm">trending_up</span>
-              <span className="text-xs font-semibold">
-                Across {portfolio?.totalSurveys ?? surveys.length} survey{(portfolio?.totalSurveys ?? surveys.length) !== 1 ? "s" : ""}
-              </span>
-            </div>
-          </div>
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-8 gap-4">
+         <div>
+            <h2 className="text-3xl font-black text-black tracking-tight">Dashboard Overview</h2>
+            <p className="text-sm text-gray-400 font-medium">Welcome back to your civic command center.</p>
+         </div>
+         <button 
+           onClick={() => router.push("/CivicPartner/surveys/new")}
+           className="h-11 px-8 bg-[#465FFF] text-white rounded-xl text-xs font-black shadow-lg shadow-[#465FFF]/20 hover:bg-[#3451D1] transition-all flex items-center gap-2 uppercase tracking-tighter"
+         >
+            <span className="material-symbols-outlined text-sm font-bold">add</span> New Campaign
+         </button>
+      </div>
 
-          {/* Active Surveys */}
-          <div
-            className="col-span-12 md:col-span-3 bg-white p-8 rounded-xl"
-            style={{ boxShadow: "0 12px 32px -4px rgba(7, 30, 39, 0.06)", border: "1px solid rgba(193,199,208,0.1)" }}
-          >
-            <p className="text-[#727780] font-medium tracking-wide uppercase text-[10px]">Active Surveys</p>
-            <h2
-              className="text-4xl font-extrabold mt-2 text-[#003358]"
-              style={{ fontFamily: "'Manrope', sans-serif" }}
-            >
-              {loading ? "—" : activeSurveys}
-            </h2>
-            <div className="mt-6 flex flex-col gap-2">
-              <div className="h-1.5 w-full bg-[#dbf1fe] rounded-full overflow-hidden">
-                <div
-                  className="h-full bg-[#006b5e] rounded-full transition-all"
-                  style={{ width: `${Math.min(100, (activeSurveys / Math.max(1, activeSurveys + draftSurveys + closedSurveys)) * 100)}%` }}
-                />
-              </div>
-              <p className="text-[11px] text-[#727780]">
-                {draftSurveys} drafts · {closedSurveys} closed
-              </p>
-            </div>
-          </div>
-
-          {/* Completion Rate */}
-          <div
-            className="col-span-12 md:col-span-4 bg-white p-8 rounded-xl"
-            style={{ boxShadow: "0 12px 32px -4px rgba(7, 30, 39, 0.06)", border: "1px solid rgba(193,199,208,0.1)" }}
-          >
-            <p className="text-[#727780] font-medium tracking-wide uppercase text-[10px]">
-              Avg. Completion Rate
-            </p>
-            <h2
-              className="text-4xl font-extrabold mt-2 text-[#003358]"
-              style={{ fontFamily: "'Manrope', sans-serif" }}
-            >
-              {loading ? "—" : completionRate != null ? `${completionRate.toFixed(1)}%` : "N/A"}
-            </h2>
-            <div className="mt-4 flex items-center gap-4">
-              <p className="text-xs text-[#727780] font-medium">
-                Based on responses marked complete
-              </p>
-            </div>
-          </div>
-        </section>
-
-        {/* ── Main Content Grid ── */}
-        <section className="grid grid-cols-12 gap-8">
-          {/* Recent Surveys Table */}
-          <div className="col-span-12 lg:col-span-8 space-y-6">
-            <div className="flex justify-between items-end">
-              <div>
-                <h3
-                  className="text-xl font-extrabold text-[#003358]"
-                  style={{ fontFamily: "'Manrope', sans-serif" }}
-                >
-                  Recent Surveys
-                </h3>
-                <p className="text-sm text-[#727780]">Real-time overview of your survey campaigns</p>
-              </div>
-              <button
-                onClick={() => router.push("/CivicPartner/surveys")}
-                className="text-sm font-bold text-[#006b5e] hover:underline flex items-center gap-1"
-              >
-                View All Surveys
-                <span className="material-symbols-outlined text-sm">arrow_forward</span>
-              </button>
-            </div>
-
-            <div
-              className="bg-white rounded-xl overflow-hidden"
-              style={{ boxShadow: "0 12px 32px -4px rgba(7, 30, 39, 0.06)" }}
-            >
-              {loading ? (
-                <div className="p-4 space-y-3">
-                  {[1, 2, 3].map((i) => (
-                    <div key={i} className="flex items-center gap-4 px-6 py-5">
-                      <div className="flex-1 space-y-2">
-                        <div className="h-4 w-48 bg-[#e6f6ff] rounded-lg animate-pulse" />
-                        <div className="h-3 w-24 bg-[#e6f6ff] rounded animate-pulse" />
-                      </div>
-                      <div className="h-6 w-16 bg-[#e6f6ff] rounded-full animate-pulse" />
-                      <div className="h-4 w-12 bg-[#e6f6ff] rounded animate-pulse" />
-                      <div className="h-8 w-24 bg-[#e6f6ff] rounded-lg animate-pulse" />
-                    </div>
-                  ))}
+      <div className="grid grid-cols-12 gap-4 md:gap-6 pb-20">
+        
+        {/* Metric Cards - Official Pixel Sync */}
+        <div className="col-span-12 xl:col-span-7 grid grid-cols-1 sm:grid-cols-2 gap-4 md:gap-6">
+           {[
+             { label: "Community", value: stats.responses.toLocaleString(), trend: "11.01%", up: true, icon: "groups" },
+             { label: "Campaigns", value: stats.surveys.toString(), trend: "4.35%", up: true, icon: "campaign" },
+             { label: "Success Rate", value: "84.2%", trend: "2.59%", up: true, icon: "fact_check" },
+             { label: "Public Drafts", value: stats.drafts.toString(), trend: "0.95%", up: false, icon: "edit_document" }
+           ].map((kpi, i) => (
+             <div key={i} className="rounded-2xl border border-gray-200 bg-white p-5 md:p-6 shadow-xs">
+                <div className="flex items-center justify-center w-12 h-12 bg-gray-100 rounded-xl">
+                   <span className="material-symbols-outlined text-gray-800 text-xl font-medium">{kpi.icon}</span>
                 </div>
-              ) : recentSurveys.length === 0 ? (
-                <div className="p-12 text-center">
-                  <span className="material-symbols-outlined text-5xl text-[#c1c7d0] mb-4 block">poll</span>
-                  <p className="text-[#727780] font-medium">No surveys yet. Create your first one to start collecting community feedback!</p>
-                  <button
-                    onClick={() => router.push("/CivicPartner/surveys/new")}
-                    className="mt-4 px-6 py-3 rounded-xl bg-gradient-to-br from-[#003358] to-[#004a7c] text-white font-bold text-sm"
-                  >
-                    Create Survey
-                  </button>
+                <div className="flex items-end justify-between mt-5">
+                   <div>
+                      <span className="text-xs font-medium text-gray-500 uppercase tracking-tight">{kpi.label}</span>
+                      <h4 className="mt-2 font-black text-gray-800 text-2xl tracking-tighter">{kpi.value}</h4>
+                   </div>
+                   <div className={cn("px-2 py-1 rounded-lg text-[10px] font-black flex items-center gap-1", kpi.up ? "bg-emerald-50 text-emerald-600" : "bg-red-50 text-red-600")}>
+                      <span className="material-symbols-outlined text-xs">{kpi.up ? 'arrow_upward' : 'arrow_downward'}</span> {kpi.trend}
+                   </div>
                 </div>
-              ) : (
-                <table className="w-full border-collapse">
-                  <thead>
-                    <tr className="bg-[#e6f6ff]/50">
-                      <th className="text-left px-6 py-4 text-[10px] font-bold text-[#727780] uppercase tracking-widest">
-                        Survey Title
-                      </th>
-                      <th className="text-center px-6 py-4 text-[10px] font-bold text-[#727780] uppercase tracking-widest">
-                        Status
-                      </th>
-                      <th className="text-center px-6 py-4 text-[10px] font-bold text-[#727780] uppercase tracking-widest">
-                        Responses
-                      </th>
-                      <th className="text-right px-6 py-4 text-[10px] font-bold text-[#727780] uppercase tracking-widest">
-                        Action
-                      </th>
+             </div>
+           ))}
+        </div>
+
+        {/* Campaign Metrics Hub - Pie Chart with Legend Sync */}
+        <div className="col-span-12 xl:col-span-5 bg-white rounded-2xl border border-gray-200 p-8 shadow-xs flex flex-col justify-between">
+           <div>
+              <div className="flex justify-between items-center mb-6">
+                 <div><h3 className="text-lg font-bold text-gray-800">Campaign Categories</h3><p className="text-[10px] text-gray-400 font-bold uppercase tracking-widest mt-1">Distribution across sectors</p></div>
+                 <span className="material-symbols-outlined text-gray-300">pie_chart</span>
+              </div>
+              <div className="h-[240px] w-full">
+                 <ResponsiveContainer width="100%" height="100%">
+                    <PieChart>
+                       <Pie 
+                         data={[
+                           { name: "Infrastructure", val: 400, fill: "#465FFF" },
+                           { name: "Public Safety", val: 300, fill: "#10B981" },
+                           { name: "Health", val: 240, fill: "#F59E0B" },
+                           { name: "Education", val: 180, fill: "#EF4444" },
+                           { name: "Others", val: 100, fill: "#6366F1" }
+                         ]} 
+                         dataKey="val" 
+                         innerRadius={50} 
+                         outerRadius={80} 
+                         paddingAngle={4}
+                       />
+                       <Tooltip contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 10px 15px -3px rgba(0,0,0,0.1)' }} />
+                    </PieChart>
+                 </ResponsiveContainer>
+              </div>
+           </div>
+           
+           {/* Custom Legend - Sync with User Component */}
+           <div className="mt-4 flex flex-wrap gap-x-4 gap-y-2 justify-center border-t border-gray-50 pt-6">
+              {[
+                { name: "Infrastructure", c: "#465FFF" }, { name: "Safety", c: "#10B981" },
+                { name: "Health", c: "#F59E0B" }, { name: "Edu", c: "#EF4444" }, { name: "Other", c: "#6366F1" }
+              ].map((l, i) => (
+                <div key={i} className="flex items-center gap-1.5">
+                   <div className="h-2 w-2 rounded-full" style={{ backgroundColor: l.c }} />
+                   <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest">{l.name}</span>
+                </div>
+              ))}
+           </div>
+        </div>
+
+        {/* Interactions Chart - Official Area Sync */}
+        <div className="col-span-12 bg-white rounded-2xl border border-gray-200 p-8 shadow-xs">
+           <div className="flex justify-between items-center mb-10">
+              <div><h3 className="text-lg font-bold text-gray-800">Engagement Demographics</h3><p className="text-xs text-gray-400 mt-1 uppercase font-black">Regional citizen interaction pulse</p></div>
+              <div className="flex gap-2">
+                 <button className="px-4 py-1.5 bg-gray-50 text-[10px] font-black uppercase text-gray-400 rounded-lg hover:bg-gray-100 transition-colors">7D</button>
+                 <button className="px-4 py-1.5 bg-brand-50 text-[10px] font-black uppercase text-brand-500 rounded-lg">30D</button>
+              </div>
+           </div>
+           <div className="h-[280px] w-full">
+              <ResponsiveContainer width="100%" height="100%">
+                 <AreaChart data={interactionStats} margin={{ top: 0, right: 0, left: -20, bottom: 0 }}>
+                    <defs><linearGradient id="areaGrad" x1="0" y1="0" x2="0" y2="1"><stop offset="5%" stopColor="#465FFF" stopOpacity={0.1}/><stop offset="95%" stopColor="#465FFF" stopOpacity={0}/></linearGradient></defs>
+                    <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{fill: '#94A3B8', fontSize: 10, fontWeight: 700}} />
+                    <Tooltip contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 10px 15px -3px rgba(0,0,0,0.1)' }} />
+                    <Area type="monotone" dataKey="value" stroke="#465FFF" strokeWidth={3} fill="url(#areaGrad)" />
+                 </AreaChart>
+              </ResponsiveContainer>
+           </div>
+        </div>
+
+        {/* Participation Source Hub - Multiple Bar Chart Sync */}
+        <div className="col-span-12 xl:col-span-5 bg-white rounded-2xl border border-gray-200 p-8 shadow-xs flex flex-col justify-between">
+           <div>
+              <div className="flex justify-between items-center mb-10">
+                 <div><h3 className="text-lg font-bold text-gray-800">Participation Source</h3><p className="text-xs text-gray-400 mt-1 uppercase font-black font-outfit">Direct vs. Mobile participation</p></div>
+                 <span className="material-symbols-outlined text-gray-300">bar_chart</span>
+              </div>
+              <div className="h-[200px] w-full">
+                 <ResponsiveContainer width="100%" height="100%">
+                    <BarChart data={interactionStats} margin={{ top: 0, right: 0, left: -25, bottom: 0 }}>
+                       <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{fill: '#94A3B8', fontSize: 10, fontWeight: 700}} tickMargin={10} tickFormatter={(value) => value.slice(0, 3)} />
+                       <Tooltip cursor={{fill: '#F1F4FF'}} contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 10px 15px -3px rgba(0,0,0,0.1)' }} />
+                       <Bar dataKey="value" name="Direct" fill="#465FFF" radius={4} barSize={12} />
+                       <Bar dataKey="target" name="Mobile" fill="#C7D2FE" radius={4} barSize={12} />
+                    </BarChart>
+                 </ResponsiveContainer>
+              </div>
+           </div>
+           <div className="mt-8 pt-8 border-t border-gray-50 flex flex-col gap-2">
+              <div className="flex items-center gap-2 text-sm font-black text-gray-800">
+                 Trending up by 5.2% this month <span className="material-symbols-outlined text-emerald-500 text-sm font-bold">trending_up</span>
+              </div>
+              <p className="text-xs text-gray-400 font-medium">Showing total visitors for the last 6 months</p>
+           </div>
+        </div>
+
+        {/* Live Interactions Table - Sync with Recent Orders */}
+        <div className="col-span-12 xl:col-span-7 bg-white rounded-2xl border border-gray-200 shadow-xs overflow-hidden">
+           <div className="p-8 border-b border-gray-50 flex justify-between items-center">
+              <h3 className="text-lg font-bold text-gray-800">Recent Participation</h3>
+              <div className="flex gap-2">
+                 <button className="px-4 py-2 border border-gray-100 rounded-xl text-[10px] font-black text-gray-400 hover:bg-gray-50 transition-all uppercase tracking-widest">Filter</button>
+                 <button className="px-4 py-2 border border-gray-100 rounded-xl text-[10px] font-black text-gray-400 hover:bg-gray-50 transition-all uppercase tracking-widest">See All</button>
+              </div>
+           </div>
+           <div className="overflow-x-auto">
+              <table className="w-full text-left font-outfit">
+                 <thead>
+                    <tr className="bg-gray-50/50 border-y border-gray-100 uppercase tracking-widest text-[10px] text-gray-400 font-black">
+                       <th className="px-8 py-4">Citizen Identity</th>
+                       <th className="px-8 py-4">District</th>
+                       <th className="px-8 py-4">Security</th>
+                       <th className="px-8 py-4 text-right">Status</th>
                     </tr>
-                  </thead>
-                  <tbody className="divide-y divide-[#e6f6ff]">
-                    {recentSurveys.map((sv) => (
-                      <tr
-                        key={sv.id}
-                        className="hover:bg-[#e6f6ff]/30 transition-colors cursor-pointer"
-                        onClick={() => handleAction(sv)}
-                      >
-                        <td className="px-6 py-5">
-                          <p className="text-sm font-bold text-[#003358]">{sv.title}</p>
-                          <p className="text-[11px] text-[#727780]">Last updated {timeAgo(sv.lastUpdated)}</p>
-                        </td>
-                        <td className="px-6 py-5 text-center">{statusBadge(sv.status)}</td>
-                        <td
-                          className="px-6 py-5 font-bold text-[#003358] text-center"
-                          style={{ fontFamily: "'Manrope', sans-serif" }}
-                        >
-                          {sv.status === "DRAFT" ? "—" : (sv._count?.responses ?? 0).toLocaleString()}
-                        </td>
-                        <td className="px-6 py-5 text-right">
-                          <button className="px-4 py-2 rounded-lg text-[11px] font-bold bg-[#d5ecf8] text-[#003358] hover:bg-[#003358] hover:text-white transition-all">
-                            {actionLabel(sv.status)}
-                          </button>
-                        </td>
+                 </thead>
+                 <tbody className="divide-y divide-gray-50 uppercase tracking-tight">
+                    {[
+                      { name: "Rahul S.", district: "Maharashtra", stat: "Verified", time: "2m ago" },
+                      { name: "Anita K.", district: "Delhi NCR", stat: "Pending", time: "5m ago" },
+                      { name: "Vikram P.", district: "West Bengal", stat: "Verified", time: "12m ago" },
+                      { name: "Priya M.", district: "Karnataka", stat: "Verified", time: "18m ago" },
+                    ].map((row, i) => (
+                      <tr key={i} className="hover:bg-gray-50/20 transition-all cursor-pointer">
+                         <td className="px-8 py-4"><div className="flex items-center gap-3"><div className="h-10 w-10 bg-[#F1F4FF] text-[#465FFF] flex items-center justify-center rounded-xl font-black text-xs shadow-sm">{row.name.charAt(0)}</div><div><p className="text-sm font-black text-gray-800 leading-tight">{row.name}</p><p className="text-[10px] font-bold text-gray-400 mt-1">{row.time}</p></div></div></td>
+                         <td className="px-8 py-4 text-xs font-bold text-gray-500">{row.district}</td>
+                         <td className="px-8 py-4 text-xs font-bold text-gray-500">{row.stat}</td>
+                         <td className="px-8 py-4 text-right"><span className={cn("px-2 py-1 rounded-lg text-[10px] font-black uppercase tracking-tighter shadow-sm", row.stat === 'Verified' ? "bg-emerald-50 text-emerald-500" : "bg-amber-50 text-amber-500")}>{row.stat}</span></td>
                       </tr>
                     ))}
-                  </tbody>
-                </table>
-              )}
-            </div>
-          </div>
+                 </tbody>
+              </table>
+           </div>
+        </div>
 
-          {/* Drafts Sidebar */}
-          <div className="col-span-12 lg:col-span-4 space-y-6">
-            <h3
-              className="text-xl font-extrabold text-[#003358]"
-              style={{ fontFamily: "'Manrope', sans-serif" }}
-            >
-              Drafts in Progress
-            </h3>
-            <div className="space-y-4">
-              {loading ? (
-                <div className="space-y-4">
-                  {[1, 2].map((i) => (
-                    <div key={i} className="bg-[#e6f6ff]/40 p-5 rounded-xl animate-pulse">
-                      <div className="h-4 w-32 bg-[#dbf1fe] rounded mb-3" />
-                      <div className="h-2 w-full bg-[#dbf1fe] rounded-full mb-2" />
-                      <div className="h-3 w-20 bg-[#dbf1fe] rounded" />
-                    </div>
-                  ))}
-                </div>
-              ) : drafts.length === 0 ? (
-                <div className="bg-[#d5ecf8]/40 p-8 rounded-xl text-center">
-                  <p className="text-[#727780] text-sm">No drafts in progress</p>
-                </div>
-              ) : (
-                drafts.map((d) => (
-                  <div
-                    key={d.id}
-                    className="bg-[#d5ecf8]/40 p-5 rounded-xl border-l-4 border-[#ffb95f] hover:bg-[#d5ecf8] transition-all cursor-pointer"
-                    onClick={() => router.push(`/CivicPartner/surveys/${d.id}`)}
-                  >
-                    <div className="flex justify-between items-start mb-2">
-                      <h4 className="text-sm font-bold text-[#003358]">{d.title}</h4>
-                      <span className="material-symbols-outlined text-[#727780] text-lg">more_horiz</span>
-                    </div>
-                    <div className="flex items-center gap-3">
-                      <div className="w-10 h-1 bg-[#cfe6f2] rounded-full flex-1 overflow-hidden">
-                        <div
-                          className="bg-[#ffb95f] h-full"
-                          style={{
-                            width: `${Math.min(100, ((d._count?.questions ?? 0) / Math.max(1, d._count?.questions ?? 1)) * 100)}%`,
-                          }}
-                        />
-                      </div>
-                      <span className="text-[10px] font-bold text-[#727780]">
-                        {d._count?.questions ?? 0} questions
-                      </span>
-                    </div>
-                    <p className="mt-3 text-[11px] text-[#727780]">
-                      Created {timeAgo(d.createdAt)}
-                    </p>
-                  </div>
-                ))
-              )}
-
-              {/* Add new placeholder */}
-              <div
-                className="border-2 border-dashed border-[#c1c7d0]/30 p-8 rounded-xl flex flex-col items-center justify-center gap-3 text-center opacity-60 hover:opacity-100 transition-opacity cursor-pointer"
-                onClick={() => router.push("/CivicPartner/surveys/new")}
-              >
-                <div className="w-10 h-10 rounded-full bg-[#dbf1fe] flex items-center justify-center">
-                  <span className="material-symbols-outlined text-[#003358]">add</span>
-                </div>
-                <p className="text-xs font-bold text-[#003358]">Create New Survey</p>
+        {/* Global Hotspots Hub - Restored India Map */}
+        <div className="col-span-12 bg-white rounded-2xl border border-gray-200 p-8 shadow-xs">
+           <div className="flex justify-between items-center mb-10">
+              <div><h3 className="text-lg font-bold text-gray-800">District Intelligence Hub</h3><p className="text-xs text-gray-400 mt-1 uppercase font-black">Real-time heatmaps for Indian civic turnout</p></div>
+              <span className="material-symbols-outlined text-brand-500 text-2xl">public</span>
+           </div>
+           <div className="grid grid-cols-12 gap-10">
+              <div className="col-span-12 lg:col-span-8">
+                 <div ref={mapRef} className="h-[400px] w-full bg-gray-50 rounded-2xl border border-gray-100 overflow-hidden shadow-inner" />
               </div>
-            </div>
-
-            {/* Weekly Insight */}
-            {!insightDismissed && (
-            <div
-              className="p-6 rounded-xl text-white relative"
-              style={{
-                background: "linear-gradient(135deg, #006b5e 0%, #005047 100%)",
-                boxShadow: "0 12px 32px -4px rgba(7, 30, 39, 0.06)",
-              }}
-            >
-              <button
-                onClick={dismissInsight}
-                className="absolute top-3 right-3 p-1 hover:bg-white/20 rounded-lg transition-colors"
-                title="Dismiss"
-              >
-                <span className="material-symbols-outlined text-white/70 text-sm">close</span>
-              </button>
-              <div className="flex items-center gap-3 mb-4">
-                <span className="material-symbols-outlined text-[#ffddb8]">insights</span>
-                <p className="text-xs font-bold uppercase tracking-wider">Weekly Insight</p>
+              <div className="col-span-12 lg:col-span-4 flex flex-col justify-center space-y-8">
+                 {[ 
+                   { name: "Maharashtra", val: "79%", w: "79%", c: "bg-[#465FFF]" }, 
+                   { name: "Delhi NCR", val: "54%", w: "54%", c: "bg-emerald-500" },
+                   { name: "Karnataka", val: "23%", w: "23%", c: "bg-amber-500" },
+                   { name: "West Bengal", val: "12%", w: "12%", c: "bg-red-500" } 
+                 ].map((d, i) => (
+                    <div key={i}>
+                       <div className="flex items-center justify-between mb-3"><p className="text-sm font-black text-gray-800">{d.name}</p><p className="text-xs font-black text-gray-900">{d.val}</p></div>
+                       <div className="h-2 w-full bg-gray-50 rounded-full overflow-hidden border border-gray-100"><div className={cn("h-full rounded-full transition-all duration-1000", d.c)} style={{ width: d.w }} /></div>
+                    </div>
+                 ))}
               </div>
-              <p className="text-sm font-medium leading-relaxed">
-                {totalResponses > 0
-                  ? `You have collected ${totalResponses.toLocaleString()} responses across ${(portfolio?.totalSurveys ?? surveys.length)} surveys. ${activeSurveys > 0 ? `${activeSurveys} survey${activeSurveys > 1 ? "s" : ""} currently accepting responses.` : "Launch a new survey to start collecting feedback."}`
-                  : "Launch your first survey to begin collecting citizen feedback and unlock analytics insights."}
-              </p>
-              <button
-                onClick={() => router.push("/CivicPartner/surveys/new")}
-                className="mt-4 text-xs font-bold border-b border-white/40 pb-1 hover:border-white transition-all"
-              >
-                Launch Survey
-              </button>
-            </div>
-            )}
-          </div>
-        </section>
+           </div>
+        </div>
       </div>
     </CivicPartnerLayout>
   )
