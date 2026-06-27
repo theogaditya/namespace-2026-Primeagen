@@ -360,12 +360,18 @@ export function AdminLayout({ children }: AdminLayoutProps) {
                         }
                       } catch (err) {
                         console.warn('Logout error', err)
-                      } finally {
+                        } finally {
                         // Clear client-side auth
                         try { localStorage.removeItem('token'); localStorage.removeItem('admin'); localStorage.removeItem('adminType'); } catch {}
                         // notify other tabs
                         try { window.dispatchEvent(new Event('authChange')) } catch {}
-                        router.push('/')
+                        // Force a full reload to the login page so Turnstile and global scripts reinitialize
+                        try {
+                          window.location.replace('/')
+                        } catch (e) {
+                          // fallback to SPA navigation
+                          router.push('/')
+                        }
                       }
                     }}>
                       <LogOut className="mr-2 h-4 w-4" />

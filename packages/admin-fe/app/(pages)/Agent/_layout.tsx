@@ -61,7 +61,11 @@ export function AgentRevampedLayout({ children }: AgentRevampedLayoutProps) {
       localStorage.removeItem("adminType")
     } catch {}
     try { window.dispatchEvent(new Event("authChange")) } catch {}
-    router.push("/")
+    try {
+      window.location.replace('/')
+    } catch (e) {
+      router.push('/')
+    }
   }
 
   const navItems = [

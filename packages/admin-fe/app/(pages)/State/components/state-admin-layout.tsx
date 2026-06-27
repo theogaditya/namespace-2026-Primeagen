@@ -56,7 +56,11 @@ export function StateAdminLayout({ children, activeTab = 'dashboard', onTabChang
       localStorage.removeItem('adminType')
     } catch {}
     try { window.dispatchEvent(new Event('authChange')) } catch {}
-    router.push('/')
+    try {
+      window.location.replace('/')
+    } catch (e) {
+      router.push('/')
+    }
   }
 
   const initials = adminData?.fullName

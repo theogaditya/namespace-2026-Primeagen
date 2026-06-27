@@ -40,6 +40,10 @@ export function LoginForm({ adminType: controlledAdminType, onAdminTypeChange }:
   const [isLoading, setIsLoading] = React.useState(false)
   const [showPassword, setShowPassword] = React.useState(false)
   const [cfToken, setCfToken] = React.useState<string | null>(null)
+  const turnstileRef = React.useRef<HTMLDivElement | null>(null)
+  const widgetIdRef = React.useRef<number | null>(null)
+
+  const isFirstRender = React.useRef(true)
 
   React.useEffect(() => {
     if (controlledAdminType && controlledAdminType !== adminType) {
@@ -49,10 +53,62 @@ export function LoginForm({ adminType: controlledAdminType, onAdminTypeChange }:
   }, [controlledAdminType])
 
   React.useEffect(() => {
+    // global callback for Turnstile (used by rendered widget)
     ;(window as any).onTurnstileSuccess = (token: string) => {
       setCfToken(token)
     }
+
+    // If Turnstile script already loaded (navigated back), render the widget into the container
+    try {
+      const t = (window as any).turnstile
+      if (t && turnstileRef.current && widgetIdRef.current === null) {
+        // render returns a widget id
+        widgetIdRef.current = t.render(turnstileRef.current, {
+          sitekey: process.env.NEXT_PUBLIC_TURNSTILE_SITEKEY || "0x4AAAAAAC6QmeBE4MEqq_x7",
+          callback: "onTurnstileSuccess",
+          theme: "light",
+        })
+      }
+    } catch (e) {
+      // ignore
+    }
   }, [])
+
+  // Reset Turnstile when `adminType` or `showPassword` changes (after initial mount)
+  React.useEffect(() => {
+    if (isFirstRender.current) {
+      isFirstRender.current = false
+      return
+    }
+
+    try {
+      const t = (window as any).turnstile
+      if (t) {
+        if (widgetIdRef.current != null && typeof t.reset === "function") {
+          try {
+            t.reset(widgetIdRef.current)
+          } catch (e) {
+            try {
+              t.reset()
+            } catch (_) {
+              // ignore
+            }
+          }
+        } else if (typeof t.reset === "function") {
+          try {
+            t.reset()
+          } catch (_) {
+            // ignore
+          }
+        }
+      }
+    } catch (e) {
+      // ignore
+    }
+
+    setCfToken(null)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [adminType, showPassword])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -118,7 +174,35 @@ export function LoginForm({ adminType: controlledAdminType, onAdminTypeChange }:
         throw new Error(data.message || "Login failed")
       }
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to connect to server")
+        setError(err instanceof Error ? err.message : "Failed to connect to server")
+        // Reset Turnstile widget and clear token so user can retry without refreshing
+        try {
+          const t = (window as any).turnstile
+          // prefer resetting the specific widget if we have its id
+          if (t) {
+            if (widgetIdRef.current != null && typeof t.reset === "function") {
+              try {
+                t.reset(widgetIdRef.current)
+              } catch (e) {
+                // fallback to global reset
+                try {
+                  t.reset()
+                } catch (_) {
+                  // ignore
+                }
+              }
+            } else if (typeof t.reset === "function") {
+              try {
+                t.reset()
+              } catch (_) {
+                // ignore
+              }
+            }
+          }
+        } catch (e) {
+          // ignore
+        }
+        setCfToken(null)
     } finally {
       setIsLoading(false)
     }
@@ -250,6 +334,7 @@ export function LoginForm({ adminType: controlledAdminType, onAdminTypeChange }:
 
             <div className="mt-2 flex justify-center">
               <div
+                ref={turnstileRef}
                 className="cf-turnstile"
                 data-sitekey={process.env.NEXT_PUBLIC_TURNSTILE_SITEKEY || "0x4AAAAAAC6QmeBE4MEqq_x7"}
                 data-callback="onTurnstileSuccess"

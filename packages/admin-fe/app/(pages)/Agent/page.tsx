@@ -6,6 +6,17 @@ import { AgentRevampedLayout } from "./_layout"
 import { AuthGuard } from "@/components/auth-guard"
 import { ChatModal } from "@/components/chat-modal"
 
+// Complaint heatmap — loaded client-side only
+const ComplaintGoogleHeatmap = dynamic(() => import("@/components/ComplaintGoogleHeatmap"), {
+  ssr: false,
+  loading: () => (
+    <div className="w-full h-[300px] bg-[#edeeef] rounded-xl flex items-center justify-center text-slate-400">
+      <span className="material-symbols-outlined mr-2 animate-spin" style={{ fontSize: 20 }}>progress_activity</span>
+      Loading heatmap...
+    </div>
+  ),
+})
+
 // Leaflet dynamically imported to avoid SSR issues
 const MapContainer = dynamic(() => import("react-leaflet").then((m) => m.MapContainer), { ssr: false })
 const TileLayer = dynamic(() => import("react-leaflet").then((m) => m.TileLayer), { ssr: false })
@@ -371,6 +382,18 @@ export default function AgentRevampedDashboard() {
                     </div>
                   </div>
                 ))}
+          </div>
+
+          {/* Complaint Heatmap */}
+          <div className="bg-white border border-[#c3c5d9]/40 shadow-sm overflow-hidden">
+            <div className="px-5 py-3 border-b border-[#c3c5d9]/20 flex items-center justify-between bg-[#f8fafc]">
+              <div>
+                <h3 className="text-xs font-black uppercase tracking-widest text-[#0b1c30]">Complaint Location Heatmap</h3>
+                <p className="text-[10px] text-slate-400 font-mono mt-0.5">Real-time density visualisation from registered complaints</p>
+              </div>
+              <span className="material-symbols-outlined text-slate-300" style={{ fontSize: 20 }}>map</span>
+            </div>
+            <ComplaintGoogleHeatmap height="320px" showDensityTable />
           </div>
 
           {/* Filters */}

@@ -3,8 +3,8 @@
 import { useState, useEffect } from "react"
 import dynamic from "next/dynamic"
 
-// Dynamically import Hotmap to avoid SSR issues with Leaflet
-const Hotmap = dynamic(() => import("@/components/Hotmap"), {
+// Dynamically import ComplaintGoogleHeatmap to avoid SSR issues
+const ComplaintGoogleHeatmap = dynamic(() => import("@/components/ComplaintGoogleHeatmap"), {
   ssr: false,
   loading: () => (
     <div className="w-full h-[300px] bg-[#edeeef] rounded-xl flex items-center justify-center text-[#74777d]">
@@ -55,12 +55,7 @@ const ROOT_CAUSES = [
   { label: "Resource Shortage",        pct: 12, color: "#74777d" },
 ]
 
-const HOTSPOT_TABLE = [
-  { ward: "Ward-H East (Mumbai)", density: "High (84)",   cls: "text-[#ba1a1a] font-bold" },
-  { ward: "Shivajinagar (Pune)",  density: "Medium (42)", cls: "text-[#115cb9] font-bold" },
-  { ward: "Sitabuldi (Nagpur)",   density: "Medium (38)", cls: "text-[#115cb9] font-bold" },
-  { ward: "Ward-K West (Mumbai)", density: "Low (12)",    cls: "text-[#44474c] font-bold" },
-]
+
 
 // ═══════════════════════════════════════════════════════════════════════
 // ─── Main Component ───────────────────────────────────────────────────
@@ -283,34 +278,10 @@ export function MunicipalAnalytics() {
       {/* ── Section 3: Geospatial Hotspots ── */}
       <section className="bg-white rounded-xl shadow-sm border border-[#c4c6cd]/10 overflow-hidden">
         <div className="px-6 py-4 border-b border-[#c4c6cd]/10 flex justify-between items-center bg-[#f3f4f5]/50">
-          <h3 className="font-bold text-base text-[#191c1d]">Geospatial Hotspots: Unresolved Critical Complaints</h3>
-          <span className="px-2 py-1 bg-[#ba1a1a]/10 text-[#ba1a1a] text-[10px] font-black rounded uppercase">Critical Density: High</span>
+          <h3 className="font-bold text-base text-[#191c1d]">Geospatial Hotspots: Complaint Location Density</h3>
+          <span className="px-2 py-1 bg-[#ba1a1a]/10 text-[#ba1a1a] text-[10px] font-black rounded uppercase">Live Data</span>
         </div>
-        <div className="grid grid-cols-1 lg:grid-cols-3">
-          {/* Map — reuses existing Hotmap with Google Maps tiles */}
-          <div className="lg:col-span-2 relative overflow-hidden min-h-[300px]">
-            <Hotmap />
-          </div>
-          {/* Density table */}
-          <div className="border-l border-[#c4c6cd]/10 overflow-y-auto max-h-[300px]">
-            <table className="w-full text-left text-xs">
-              <thead className="sticky top-0 bg-[#e7e8e9] z-10">
-                <tr>
-                  <th className="p-4 font-bold uppercase tracking-widest text-[#44474c]">Ward / District</th>
-                  <th className="p-4 font-bold uppercase tracking-widest text-[#44474c]">Density</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-[#c4c6cd]/10">
-                {HOTSPOT_TABLE.map(({ ward, density, cls }) => (
-                  <tr key={ward} className="hover:bg-[#f3f4f5] cursor-pointer transition-colors">
-                    <td className="p-4 font-medium text-[#191c1d]">{ward}</td>
-                    <td className={`p-4 ${cls}`}>{density}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </div>
+        <ComplaintGoogleHeatmap height="360px" showDensityTable />
       </section>
 
       {/* ── Section 4: Intelligence Hub + Export Protocol ── */}
