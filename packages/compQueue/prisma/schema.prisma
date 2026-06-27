@@ -236,6 +236,15 @@ model Complaint {
   managedBySuperAdminId          String?
   moderatedByMunicipalAdminId    String?
   seq                            Int                       @unique @default(autoincrement())
+
+  // Blockchain sync fields
+  blockchainHash                 String?                   @db.VarChar(66)
+  blockchainBlock                BigInt?
+  ipfsHash                       String?
+  isOnChain                      Boolean                   @default(false)
+  blockchainStatus               BlockchainStatus          @default(PENDING)
+  blockchainUpdatedAt            DateTime?
+
   sla                            String?
   AIabusedFlag                   Boolean?
   AIimageVarificationStatus      Boolean?
@@ -261,6 +270,8 @@ model Complaint {
   location                       ComplaintLocation?
   upvotes                        Upvote[]
   coAssignedAgents               Agent[]                   @relation("CoAssignedAgentComplaints")
+
+  @@index([blockchainHash])
 }
 
 model ComplaintLocation {
@@ -475,4 +486,34 @@ enum BadgeRarity {
   RARE
   EPIC
   LEGENDARY
+}
+
+enum BlockchainStatus {
+  PENDING
+  CONFIRMED
+  FAILED
+}
+
+enum SyncEventStatus {
+  PROCESSED
+  DUPLICATE
+  FAILED
+}
+
+model BlockchainSyncEvent {
+  id              String          @id @default(uuid())
+  entityType      String
+  entityId        String
+  keyPrefix       String
+  blockchainHash  String          @db.VarChar(66)
+  blockchainBlock BigInt?
+  ipfsHash        String?
+  isOnChain       Boolean         @default(true)
+  payload         Json
+  status          SyncEventStatus @default(PROCESSED)
+  processedAt     DateTime        @default(now())
+
+  @@unique([keyPrefix, blockchainHash])
+  @@index([entityType, entityId])
+  @@map("blockchain_sync_events")
 }
