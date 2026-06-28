@@ -55,3 +55,9 @@ terraform.tfstate
 razerpay.md
 DASHBOARD_REDESIGN_PLAN.md
 agentplan.md
+
+# blockchain-be generated artifacts (now tracked from monorepo root)
+packages/blockchain-be/backend/prisma/generated/
+packages/blockchain-be/typechain-types/
+packages/blockchain-be/artifacts/
+packages/blockchain-be/cache/

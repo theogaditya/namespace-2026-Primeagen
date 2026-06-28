@@ -1,0 +1,40 @@
+{
+  "name": "grievance-blockchain-worker",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "hardhat test",
+    "compile": "hardhat compile",
+    "build": "tsc",
+    "deploy": "hardhat run scripts/deploy.ts",
+    "dev:backend": "cd backend && bun run dev",
+    "dev:worker": "bun run worker",
+    "dev:all": "sh -c 'trap \"kill 0\" INT TERM EXIT; (cd backend && bun run dev) & bun run worker'",
+    "worker": "ts-node src/worker.ts",
+    "node": "hardhat node"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "axios": "^1.6.0",
+    "dotenv": "^17.2.3",
+    "ethers": "^6.9.0",
+    "express": "^5.2.1",
+    "form-data": "^4.0.0",
+    "ioredis": "^5.8.2",
+    "nft.storage": "^7.2.0",
+    "uuid": "^10.0.0",
+    "web3.storage": "^4.5.5"
+  },
+  "devDependencies": {
+    "@nomicfoundation/hardhat-toolbox": "^6.1.0",
+    "@types/express": "^5.0.6",
+    "@types/node": "^24.10.1",
+    "@types/uuid": "^10.0.0",
+    "hardhat": "^2.26.0",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.9.3"
+  }
+}
