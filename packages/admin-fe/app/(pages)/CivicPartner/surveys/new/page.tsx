@@ -41,6 +41,9 @@ export default function NewSurveyPage() {
   const [step, setStep] = useState(1)
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState("")
+  const [stepErrors, setStepErrors] = useState<Record<number, string[]>>({})
+  const [duplicateTargets, setDuplicateTargets] = useState<Record<number, number[]>>({})
+  const [completedSteps, setCompletedSteps] = useState<Record<number, boolean>>({})
 
   // Step 1: Basic info
   const [title, setTitle] = useState("")
@@ -71,6 +74,21 @@ export default function NewSurveyPage() {
 
   const updateQuestion = (idx: number, patch: Partial<Question>) => {
     setQuestions((prev) => prev.map((q, i) => (i === idx ? { ...q, ...patch } : q)))
+    // clear question-step errors when user edits
+    setStepErrors((prev) => {
+      if (!prev || !prev[2]) return prev
+      const copy = { ...prev }
+      delete copy[2]
+      return copy
+    })
+    setDuplicateTargets((prev) => {
+      if (!prev || prev[idx] == null) return prev
+      const copy = { ...prev }
+      delete copy[idx]
+      return copy
+    })
+    // mark step 2 completed when user edits question
+    setCompletedSteps((prev) => ({ ...prev, 2: true }))
   }
 
   const removeQuestion = (idx: number) => {
@@ -89,6 +107,21 @@ export default function NewSurveyPage() {
         i === qIdx ? { ...q, options: q.options.map((o, j) => (j === oIdx ? value : o)) } : q
       )
     )
+    // clear question-step errors when user edits options
+    setStepErrors((prev) => {
+      if (!prev || !prev[2]) return prev
+      const copy = { ...prev }
+      delete copy[2]
+      return copy
+    })
+    setDuplicateTargets((prev) => {
+      if (!prev || prev[qIdx] == null) return prev
+      const copy = { ...prev }
+      delete copy[qIdx]
+      return copy
+    })
+    // mark step 2 completed when user edits options
+    setCompletedSteps((prev) => ({ ...prev, 2: true }))
   }
 
   const removeOption = (qIdx: number, oIdx: number) => {
@@ -103,27 +136,72 @@ export default function NewSurveyPage() {
     setError("")
     setSaving(true)
     try {
-      // Client-side validation to match backend `createSurveySchema` so we
-      // surface errors to the user instead of receiving a 400 from the API.
-      const validationErrors: string[] = []
-      if (title.trim().length < 3) validationErrors.push('Title must be at least 3 characters')
-      if (description.trim().length < 10) validationErrors.push('Description must be at least 10 characters')
-      const bodyContent = content || description
-      if ((bodyContent || '').trim().length < 10) validationErrors.push('Content/Target department must be at least 10 characters')
-      if (!questions || questions.length < 1) validationErrors.push('Add at least one question')
-      else {
-        questions.forEach((q, i) => {
-          if ((q.questionText || '').trim().length < 3) validationErrors.push(`Question ${i + 1}: text must be at least 3 characters`)
-          if ((q.questionType === 'MCQ' || q.questionType === 'CHECKBOX') && (!q.options || q.options.filter(Boolean).length < 1)) {
-            validationErrors.push(`Question ${i + 1}: add at least one option`)
-          }
-        })
-      }
+      // Client-side validation with per-step error tracking — only when publishing
+      if (publish) {
+        const errs: Record<number, string[]> = {}
+        const dupTargets: Record<number, number[]> = {}
 
-      if (validationErrors.length > 0) {
-        setError(validationErrors.join('; '))
-        setSaving(false)
-        return
+        if (title.trim().length < 3) errs[1] = (errs[1] || []).concat('Title must be at least 3 characters')
+        if (description.trim().length < 10) errs[1] = (errs[1] || []).concat('Description must be at least 10 characters')
+        const bodyContent = content || description
+        if ((bodyContent || '').trim().length < 10) errs[1] = (errs[1] || []).concat('Content/Target department must be at least 10 characters')
+
+        if (!questions || questions.length < 1) {
+          errs[2] = (errs[2] || []).concat('Add at least one question')
+        } else {
+          questions.forEach((q, i) => {
+            if ((q.questionText || '').trim().length < 3) errs[2] = (errs[2] || []).concat(`Question ${i + 1}: text must be at least 3 characters`)
+            if ((q.questionType === 'MCQ' || q.questionType === 'CHECKBOX') && (!q.options || q.options.filter(Boolean).length < 1)) {
+              errs[2] = (errs[2] || []).concat(`Question ${i + 1}: add at least one option`)
+            }
+
+            // duplicate options detection per question
+            if (q.questionType === 'MCQ' || q.questionType === 'CHECKBOX') {
+              const map: Record<string, number[]> = {}
+              q.options.forEach((opt, idx) => {
+                const v = (opt || '').trim().toLowerCase()
+                if (!v) return
+                map[v] = map[v] || []
+                map[v].push(idx)
+              })
+              Object.values(map).forEach((arr) => {
+                if (arr.length > 1) {
+                  errs[2] = (errs[2] || []).concat(`Duplicate option found in question ${i + 1}`)
+                  dupTargets[i] = (dupTargets[i] || []).concat(...arr)
+                }
+              })
+            }
+          })
+        }
+
+        // If any errors, show them grouped and highlight steps/fields
+        if (Object.keys(errs).length > 0) {
+          setStepErrors(errs)
+          setDuplicateTargets(dupTargets)
+          // mark non-errored steps as completed so they stay green
+          setCompletedSteps((prev) => {
+            const copy = { ...prev }
+            for (let i = 1; i <= STEPS.length; i++) {
+              if (!errs[i]) copy[i] = true
+            }
+            return copy
+          })
+          // jump to first step that has an error
+          const first = Math.min(...Object.keys(errs).map((v) => Number(v)))
+          setStep(first)
+          // if it's a question error, scroll to first offending question
+          if (first === 2 && Object.keys(dupTargets).length > 0) {
+            const qIdx = Number(Object.keys(dupTargets)[0])
+            setTimeout(() => {
+              const el = document.getElementById(`question-${qIdx}`)
+              if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' })
+            }, 120)
+          }
+          // attach server/validation message to the current step only
+          setError("")
+          setSaving(false)
+          return
+        }
       }
       // Create the survey
       const createRes = await fetch(`${API}/api/civic-partner/surveys`, {
@@ -139,7 +217,7 @@ export default function NewSurveyPage() {
           questions: questions.map((q) => ({
             questionText: q.questionText,
             questionType: q.questionType,
-            options: ["MCQ", "CHECKBOX"].includes(q.questionType) ? q.options.filter(Boolean) : [],
+            options: ["MCQ", "CHECKBOX"].includes(q.questionType) ? q.options.map(o => o.trim()).filter(Boolean) : [],
             isRequired: q.isRequired,
             order: q.order,
           })),
@@ -178,15 +256,16 @@ export default function NewSurveyPage() {
 
       router.push("/CivicPartner/surveys")
     } catch (err) {
+      // show server errors in current step only
       setError(err instanceof Error ? err.message : "Something went wrong")
     } finally {
       setSaving(false)
     }
   }
 
-  const stepValid = () => {
-    if (step === 1) return title.trim().length > 0 && description.trim().length > 0
-    if (step === 2) return questions.length > 0 && questions.every((q) => q.questionText.trim().length > 0)
+  const stepValid = (s = step) => {
+    if (s === 1) return title.trim().length > 0 && description.trim().length > 0 && (content || description).trim().length >= 10
+    if (s === 2) return questions.length > 0 && questions.every((q) => q.questionText.trim().length > 0)
     return true
   }
 
@@ -219,47 +298,71 @@ export default function NewSurveyPage() {
 
         {/* Stepper */}
         <div className="max-w-5xl mx-auto mb-12">
-          <div className="relative flex justify-between">
-            <div className="absolute top-5 left-0 w-full h-0.5 bg-[#cfe6f2] -z-10" />
-            <div
-              className="absolute top-5 left-0 h-0.5 -z-10 transition-all duration-500"
-              style={{
-                width: `${((step - 1) / (STEPS.length - 1)) * 100}%`,
-                background: "linear-gradient(135deg, #003358 0%, #004a7c 100%)",
-              }}
-            />
-            {STEPS.map((s, i) => (
-              <div key={s} className="flex flex-col items-center gap-2">
-                <div
-                  className={`w-10 h-10 rounded-full flex items-center justify-center font-bold text-sm ${
-                    i + 1 <= step
-                      ? "text-white"
-                      : "bg-white border-2 border-[#cfe6f2] text-[#727780]"
-                  }`}
-                  style={
-                    i + 1 <= step
-                      ? { background: "linear-gradient(135deg, #003358 0%, #004a7c 100%)" }
-                      : {}
-                  }
-                >
-                  {i + 1}
-                </div>
-                <span
-                  className={`text-sm font-${i + 1 === step ? "bold" : "medium"} ${
-                    i + 1 <= step ? "text-[#003358]" : "text-[#727780]"
-                  }`}
-                >
-                  {s}
-                </span>
-              </div>
-            ))}
-          </div>
+            <div className="relative flex justify-between items-center">
+              <div className="absolute top-5 left-0 w-full h-0.5 bg-[#cfe6f2] -z-10" />
+              <div
+                className="absolute top-5 left-0 h-0.5 -z-10 transition-all duration-500"
+                style={{
+                  width: `${((step - 1) / (STEPS.length - 1)) * 100}%`,
+                  background: "linear-gradient(90deg, #34d399 0%, #10b981 40%, #06b6d4 100%)",
+                }}
+              />
+              {STEPS.map((s, i) => {
+                const idx = i + 1
+                const hasError = Boolean(stepErrors && stepErrors[idx] && stepErrors[idx].length)
+                const isCurrent = idx === step
+                const isCompleted = Boolean(completedSteps[idx]) || (idx < step && !hasError)
+                let circleClass = 'text-white'
+                let circleStyle: any = { background: '#004a7c' }
+                if (hasError && idx === step) {
+                  circleClass = 'text-white'
+                  circleStyle = { background: '#ef4444' }
+                } else if (isCompleted) {
+                  circleClass = 'text-white'
+                  circleStyle = { background: '#16a34a' }
+                } else if (isCurrent) {
+                  circleClass = 'text-white'
+                  circleStyle = { background: 'linear-gradient(135deg, #003358 0%, #004a7c 100%)' }
+                } else {
+                  // default step circle: dark background with white number
+                  circleClass = 'text-white'
+                  circleStyle = { background: '#0f1724' }
+                }
+
+                return (
+                  <div key={s} className="flex flex-col items-center gap-2">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        if (idx > step) {
+                          // moving forward: mark current as completed
+                          setCompletedSteps((prev) => ({ ...prev, [step]: true }))
+                        }
+                        setStep(idx)
+                      }}
+                      className={`w-10 h-10 rounded-full flex items-center justify-center font-bold text-sm ${circleClass}`}
+                      style={circleStyle}
+                    >
+                      {idx}
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setStep(idx)}
+                      className={`text-sm ${isCurrent ? 'font-bold' : 'font-medium'} ${hasError ? 'text-rose-600' : idx <= step ? 'text-[#003358]' : 'text-[#727780]'}`}
+                    >
+                      {s}
+                    </button>
+                  </div>
+                )
+              })}
+            </div>
         </div>
 
-        {/* Error Message */}
-        {error && (
+        {/* Per-step Error Message */}
+        {( (stepErrors[step] && stepErrors[step].length > 0) || error ) && (
           <div className="max-w-5xl mx-auto mb-6 bg-[#ffdad6] text-[#93000a] p-4 rounded-xl text-sm font-medium">
-            {error}
+            {stepErrors[step] && stepErrors[step].map((m, i) => <div key={i}>{m}</div>)}
+            {error && <div>{error}</div>}
           </div>
         )}
 
@@ -286,10 +389,20 @@ export default function NewSurveyPage() {
                   <div className="space-y-2">
                     <label className="text-sm font-bold text-[#003358] px-1">Survey Title</label>
                     <input
-                      className="w-full px-6 py-4 bg-[#e6f6ff] border-none rounded-xl focus:ring-2 focus:ring-[#006b5e]/40 text-[#071e27] placeholder:text-[#727780] transition-all"
+                      className={`w-full px-6 py-4 bg-[#e6f6ff] border-none rounded-xl focus:ring-2 focus:ring-[#006b5e]/40 text-[#071e27] placeholder:text-[#727780] transition-all ${stepErrors[1] && title.trim().length < 3 ? 'ring-2 ring-rose-400' : ''}`}
                       placeholder="e.g. 2024 Urban Mobility Feedback"
                       value={title}
-                      onChange={(e) => setTitle(e.target.value)}
+                      onChange={(e) => {
+                        setTitle(e.target.value)
+                        // clear step 1 errors and mark completed when user edits
+                        setStepErrors((prev) => {
+                          if (!prev || !prev[1]) return prev
+                          const copy = { ...prev }
+                          delete copy[1]
+                          return copy
+                        })
+                        setCompletedSteps((prev) => ({ ...prev, 1: true }))
+                      }}
                       suppressHydrationWarning
                     />
                   </div>
@@ -309,10 +422,19 @@ export default function NewSurveyPage() {
                     <div className="space-y-2">
                       <label className="text-sm font-bold text-[#003358] px-1">Target Department</label>
                       <input
-                        className="w-full px-6 py-4 bg-[#e6f6ff] border-none rounded-xl focus:ring-2 focus:ring-[#006b5e]/40 text-[#071e27] transition-all"
+                        className={`w-full px-6 py-4 bg-[#e6f6ff] border-none rounded-xl focus:ring-2 focus:ring-[#006b5e]/40 text-[#071e27] transition-all ${stepErrors[1] && (content || description).trim().length < 10 ? 'ring-2 ring-rose-400' : ''}`}
                         placeholder="Planning & Dev"
                         value={content}
-                        onChange={(e) => setContent(e.target.value)}
+                        onChange={(e) => {
+                          setContent(e.target.value)
+                          setStepErrors((prev) => {
+                            if (!prev || !prev[1]) return prev
+                            const copy = { ...prev }
+                            delete copy[1]
+                            return copy
+                          })
+                          setCompletedSteps((prev) => ({ ...prev, 1: true }))
+                        }}
                         suppressHydrationWarning
                       />
                     </div>
@@ -320,11 +442,20 @@ export default function NewSurveyPage() {
                   <div className="space-y-2">
                     <label className="text-sm font-bold text-[#003358] px-1">Public Description</label>
                     <textarea
-                      className="w-full px-6 py-4 bg-[#e6f6ff] border-none rounded-xl focus:ring-2 focus:ring-[#006b5e]/40 text-[#071e27] resize-none placeholder:text-[#727780] transition-all"
+                      className={`w-full px-6 py-4 bg-[#e6f6ff] border-none rounded-xl focus:ring-2 focus:ring-[#006b5e]/40 text-[#071e27] resize-none placeholder:text-[#727780] transition-all ${stepErrors[1] && description.trim().length < 10 ? 'ring-2 ring-rose-400' : ''}`}
                       placeholder="Briefly describe the purpose of this survey to citizens..."
                       rows={4}
                       value={description}
-                      onChange={(e) => setDescription(e.target.value)}
+                      onChange={(e) => {
+                        setDescription(e.target.value)
+                        setStepErrors((prev) => {
+                          if (!prev || !prev[1]) return prev
+                          const copy = { ...prev }
+                          delete copy[1]
+                          return copy
+                        })
+                        setCompletedSteps((prev) => ({ ...prev, 1: true }))
+                      }}
                       suppressHydrationWarning
                     />
                   </div>
@@ -374,8 +505,9 @@ export default function NewSurveyPage() {
                 {/* Question Cards */}
                 {questions.map((q, idx) => (
                   <div
+                    id={`question-${idx}`}
                     key={idx}
-                    className="bg-white p-8 rounded-xl"
+                    className={`bg-white p-8 rounded-xl ${((duplicateTargets && duplicateTargets[idx] && duplicateTargets[idx].length) || (q.questionText || '').trim().length < 3 || ((q.questionType === 'MCQ' || q.questionType === 'CHECKBOX') && q.options.filter(Boolean).length < 1)) ? 'ring-2 ring-rose-400' : ''}`}
                     style={{ boxShadow: "0 12px 32px -4px rgba(7, 30, 39, 0.06)", border: "1px solid rgba(193,199,208,0.1)" }}
                   >
                     <div className="flex justify-between items-start mb-6">
@@ -441,12 +573,12 @@ export default function NewSurveyPage() {
                           {q.options.map((opt, oIdx) => (
                             <div key={oIdx} className="flex items-center gap-2">
                               <span className="w-5 h-5 rounded-full border-2 border-[#c1c7d0] flex-shrink-0" />
-                              <input
-                                className="flex-1 px-4 py-2 bg-[#f3faff] border-none rounded-lg text-sm text-[#071e27] placeholder:text-[#727780] focus:ring-1 focus:ring-[#006b5e]/30"
-                                placeholder={`Option ${oIdx + 1}`}
-                                value={opt}
-                                onChange={(e) => updateOption(idx, oIdx, e.target.value)}
-                              />
+                                      <input
+                                        className={`flex-1 px-4 py-2 bg-[#f3faff] border-none rounded-lg text-sm text-[#071e27] placeholder:text-[#727780] focus:ring-1 focus:ring-[#006b5e]/30 ${duplicateTargets && duplicateTargets[idx] && duplicateTargets[idx].includes(oIdx) ? 'ring-2 ring-rose-400' : ''}`}
+                                        placeholder={`Option ${oIdx + 1}`}
+                                        value={opt}
+                                        onChange={(e) => updateOption(idx, oIdx, e.target.value)}
+                                      />
                               {q.options.length > 1 && (
                                 <button
                                   onClick={() => removeOption(idx, oIdx)}
@@ -564,7 +696,11 @@ export default function NewSurveyPage() {
               </button>
               {step < 4 && (
                 <button
-                  onClick={() => setStep(step + 1)}
+                  onClick={() => {
+                    // mark current as completed when moving forward
+                    setCompletedSteps((prev) => ({ ...prev, [step]: true }))
+                    setStep(step + 1)
+                  }}
                   disabled={!stepValid()}
                   className="text-white font-bold px-10 py-4 rounded-xl flex items-center gap-3 hover:scale-[1.02] active:scale-95 transition-all disabled:opacity-50"
                   style={{ background: "linear-gradient(135deg, #003358 0%, #004a7c 100%)", boxShadow: "0 12px 32px -4px rgba(7, 30, 39, 0.06)" }}

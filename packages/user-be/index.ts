@@ -21,6 +21,7 @@ import { createUserProfileRouter } from "./routes/userProfile";
 import { createUserStatsRouter } from "./routes/userStats";
 import { createAnnouncementsRouter } from "./routes/announcements";
 import { createUpdateProfileRouter } from "./routes/updateProfile";
+import { createSurveysRouter, createProtectedSurveysRouter } from "./routes/surveys";
 
 dotenv.config();
 
@@ -59,7 +60,7 @@ export class Server {
       optionsSuccessStatus: 200, // Some legacy browsers choke on 204
     };
     this.app.use(cors(corsOptions));
-    
+
     // Handle preflight requests explicitly (Express 5 requires named wildcard)
     this.app.options('/{*path}', cors(corsOptions));
 
@@ -71,7 +72,7 @@ export class Server {
     private initializeRoutes(): void {
       // Auth middleware      this.app.use('/api/complaints/get', authMiddleware, getComplaintRouter(this.db));
       const authMiddleware = createAuthMiddleware(this.db);
-      
+
       // Public routes (no auth required)
       this.app.use('/api',helthPoint(this.db));
       this.app.use('/api/users', addUserRouter(this.db));
@@ -79,7 +80,8 @@ export class Server {
       this.app.use('/api/districts', districtsRouter(this.db));
       this.app.use('/api/categories', categoriesRouter(this.db));
       this.app.use('/api/user', createUserProfileRouter(this.db)); // Public user profile route
-      
+      this.app.use('/api/surveys', createSurveysRouter(this.db)); // Public surveys listing
+
       // Protected routes (auth required)
       this.app.use('/api/users', logoutUserRouter(this.db));
       this.app.use('/api/complaints', authMiddleware, createComplaintRouter(this.db));
@@ -94,6 +96,8 @@ export class Server {
       this.app.use('/api/announcements', authMiddleware, createAnnouncementsRouter());
       // Profile update route (authenticated)
       this.app.use('/api/users', authMiddleware, createUpdateProfileRouter(this.db));
+      // Protected surveys routes (authenticated)
+      this.app.use('/api/surveys', authMiddleware, createProtectedSurveysRouter(this.db));
     }
 
   public getApp(): Express {

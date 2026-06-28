@@ -25,6 +25,7 @@ import HelpfulLinksWidget from "@/components/dashboard/HelpfulLinksWidget";
 import ReportHistoryView from "@/components/dashboard/ReportHistoryView";
 import AllBadgesModal from "@/components/dashboard/AllBadgesModal";
 import ProfileSettingsModal from "@/components/dashboard/ProfileSettingsModal";
+import SurveysView from "@/components/dashboard/SurveysView";
 
 interface StatsData {
   civicScore: number;
@@ -361,6 +362,10 @@ export default function DashboardPage() {
                   </p>
                 </div>
               </div>
+            )}
+
+            {activeView === "surveys" && (
+              <SurveysView authToken={authToken} />
             )}
           </main>
 

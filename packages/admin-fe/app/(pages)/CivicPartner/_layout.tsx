@@ -19,6 +19,7 @@ import {
   MapPinned,
   Command,
   ChevronDown,
+  Archive,
 } from "lucide-react"
 
 /* ─── Navigation Config ─── */
@@ -47,6 +48,7 @@ const NAV_SECTIONS: NavSection[] = [
     title: "Campaigns",
     items: [
       { id: "surveys", label: "Active Surveys", icon: ClipboardList, href: "/CivicPartner/surveys", badge: "NEW", matchPrefix: true },
+      { id: "archived-surveys", label: "Archived & Closed", icon: Archive, href: "/CivicPartner/surveys/archived", matchPrefix: false },
     ],
   },
   {
@@ -66,6 +68,7 @@ const BREADCRUMB_MAP: Record<string, string> = {
   "/CivicPartner": "Dashboard",
   "/CivicPartner/surveys": "Active Surveys",
   "/CivicPartner/surveys/new": "Create New Survey",
+  "/CivicPartner/surveys/archived": "Archived & Closed Surveys",
   "/CivicPartner/analytics": "Heatmaps",
   "/CivicPartner/settings": "Portal Settings",
 }
@@ -167,8 +170,14 @@ export function CivicPartnerLayout({ children }: { children: ReactNode }) {
     ? displayPartner.orgName.split(" ").map((w) => w[0]).join("").slice(0, 2).toUpperCase()
     : "SC"
 
-  const isActive = (item: NavItem) =>
-    item.matchPrefix ? pathname.startsWith(item.href) : pathname === item.href
+  const isActive = (item: NavItem) => {
+    if (!item.matchPrefix) return pathname === item.href
+    // Prevent "Active Surveys" from matching nested routes owned by another nav item
+    if (item.id === "surveys") {
+      return pathname.startsWith(item.href) && !pathname.startsWith("/CivicPartner/surveys/archived")
+    }
+    return pathname.startsWith(item.href)
+  }
 
   const handleNavClick = (href: string) => {
     router.push(href)

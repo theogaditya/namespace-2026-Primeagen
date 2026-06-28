@@ -19,9 +19,13 @@ interface Survey {
 export default function SurveysListPage() {
   const router = useRouter()
   const [surveys, setSurveys] = useState<Survey[]>([])
+   const [actionLoading, setActionLoading] = useState<string | null>(null)
+   const [showArchiveConfirm, setShowArchiveConfirm] = useState(false)
+   const [archiveTarget, setArchiveTarget] = useState<Survey | null>(null)
   const [loading, setLoading] = useState(true)
   const [filter, setFilter] = useState("ALL")
   const [search, setSearch] = useState("")
+  const [exporting, setExporting] = useState(false)
 
   useEffect(() => {
     const load = async () => {
@@ -30,14 +34,63 @@ export default function SurveysListPage() {
         const res = await fetch(url, { credentials: "include" })
         if (res.ok) {
           const data = await res.json()
-          setSurveys(data.surveys ?? [])
+          // Only show active surveys (DRAFT + PUBLISHED) in this view
+               const all: Survey[] = data.surveys ?? []
+               setSurveys(filter === "ALL" ? all.filter(s => s.status === "DRAFT" || s.status === "PUBLISHED") : all)
         }
       } catch (err) { console.error(err) } finally { setLoading(false) }
     }
     load()
   }, [filter])
 
+   const handleArchive = async (sv: Survey) => {
+      // open confirm dialog
+      setArchiveTarget(sv)
+      setShowArchiveConfirm(true)
+   }
+
+   const doArchive = async () => {
+     if (!archiveTarget) return
+     setActionLoading(archiveTarget.id)
+     try {
+       const res = await fetch(`${API}/api/civic-partner/surveys/${archiveTarget.id}`, {
+         method: "DELETE",
+         credentials: "include",
+       })
+       const data = await res.json()
+       if (!res.ok) throw new Error(data.message || "Failed to archive")
+       setSurveys((prev) => prev.filter((p) => p.id !== archiveTarget.id))
+       setShowArchiveConfirm(false)
+       setArchiveTarget(null)
+     } catch (err) {
+       console.error(err)
+       alert(err instanceof Error ? err.message : "Failed to archive")
+     } finally {
+       setActionLoading(null)
+     }
+   }
+
   const filteredSurveys = surveys.filter(s => s.title.toLowerCase().includes(search.toLowerCase()))
+
+  const handleExport = async () => {
+    setExporting(true)
+    try {
+      const fullSurveys = await Promise.all(
+        surveys.map((sv) =>
+          fetch(`${API}/api/civic-partner/surveys/${sv.id}`, { credentials: "include" })
+            .then((r) => r.json())
+            .then((d) => d.survey)
+        )
+      )
+      const blob = new Blob([JSON.stringify(fullSurveys, null, 2)], { type: "application/json" })
+      const url = URL.createObjectURL(blob)
+      const a = document.createElement("a")
+      a.href = url
+      a.download = `surveys-export-${new Date().toISOString().slice(0, 10)}.json`
+      a.click()
+      URL.revokeObjectURL(url)
+    } catch (err) { console.error(err) } finally { setExporting(false) }
+  }
 
   return (
     <CivicPartnerLayout>
@@ -47,8 +100,8 @@ export default function SurveysListPage() {
               <h2 className="text-3xl font-black text-black tracking-tight">Campaign Inventory</h2>
               <p className="text-sm text-gray-400 font-medium">Manage and monitor all your active civic participation campaigns.</p>
            </div>
-           <button 
-             onClick={() => router.push("/CivicPartner/surveys/new")} 
+           <button
+             onClick={() => router.push("/CivicPartner/surveys/new")}
              className="h-11 px-8 bg-[#465FFF] text-white rounded-xl text-xs font-black shadow-lg shadow-[#465FFF]/20 flex items-center gap-2 uppercase tracking-tighter hover:bg-[#3451D1] transition-all"
            >
               <span className="material-symbols-outlined text-sm font-bold">add</span> New Campaign
@@ -64,14 +117,14 @@ export default function SurveysListPage() {
                       <button key={f} onClick={() => setFilter(f)} className={cn("px-5 py-2 rounded-lg text-[10px] font-black uppercase tracking-widest transition-all", filter === f ? "bg-white text-black shadow-sm" : "text-gray-400 hover:text-gray-600")}>{f}</button>
                     ))}
                  </div>
-                 
+
                  {/* This matches the 'white box' screenshot geometry */}
                  <div className="flex items-center gap-3 bg-white px-5 py-2.5 rounded-xl border border-gray-200 w-80 shadow-xs focus-within:shadow-md transition-all">
                     <span className="material-symbols-outlined text-gray-300 text-lg">search</span>
-                    <input 
-                      type="text" 
-                      placeholder="Search campaigns..." 
-                      className="bg-transparent border-none outline-none text-xs text-gray-600 font-bold w-full" 
+                    <input
+                      type="text"
+                      placeholder="Search campaigns..."
+                      className="bg-transparent border-none outline-none text-xs text-gray-600 font-bold w-full"
                       value={search}
                       onChange={(e) => setSearch(e.target.value)}
                     />
@@ -82,11 +135,12 @@ export default function SurveysListPage() {
                  <button className="h-10 px-6 bg-white border border-gray-200 rounded-xl text-[10px] font-black text-gray-400 hover:bg-gray-50 uppercase tracking-widest flex items-center gap-2 transition-all shadow-xs">
                     <span className="material-symbols-outlined text-sm">filter_alt</span> Type: All
                  </button>
-                 <button 
-                   onClick={() => {/* CSV logic */}}
-                   className="h-10 px-6 bg-white border border-gray-200 rounded-xl text-[10px] font-black text-gray-400 hover:bg-gray-50 uppercase tracking-widest flex items-center gap-2 transition-all shadow-xs"
+                 <button
+                   onClick={handleExport}
+                   disabled={exporting || surveys.length === 0}
+                   className="h-10 px-6 bg-white border border-gray-200 rounded-xl text-[10px] font-black text-gray-400 hover:bg-gray-50 uppercase tracking-widest flex items-center gap-2 transition-all shadow-xs disabled:opacity-40 disabled:cursor-not-allowed"
                  >
-                    <span className="material-symbols-outlined text-sm">download</span> Export
+                    <span className="material-symbols-outlined text-sm">download</span> {exporting ? "Exporting…" : "Export"}
                  </button>
               </div>
            </div>
@@ -101,7 +155,7 @@ export default function SurveysListPage() {
                     </tr>
                  </thead>
                  <tbody className="divide-y divide-gray-50">
-                    {loading ? [1,2,3].map(i => <tr key={i} className="animate-pulse"><td className="px-8 py-6"><div className="h-4 w-48 bg-gray-50 rounded" /></td><td className="px-8 py-6"><div className="h-5 w-20 bg-gray-50 rounded-full mx-auto" /></td><td className="px-8 py-6"><div className="h-8 w-8 bg-gray-50 rounded ml-auto" /></td></tr>) : 
+                    {loading ? [1,2,3].map(i => <tr key={i} className="animate-pulse"><td className="px-8 py-6"><div className="h-4 w-48 bg-gray-50 rounded" /></td><td className="px-8 py-6"><div className="h-5 w-20 bg-gray-50 rounded-full mx-auto" /></td><td className="px-8 py-6"><div className="h-8 w-8 bg-gray-50 rounded ml-auto" /></td></tr>) :
                      filteredSurveys.map(sv => (
                       <tr key={sv.id} className="hover:bg-gray-50/30 cursor-pointer group transition-colors" onClick={() => router.push(`/CivicPartner/surveys/${sv.id}`)}>
                          <td className="px-8 py-5">
@@ -115,18 +169,52 @@ export default function SurveysListPage() {
                             <p className="text-sm font-black text-black">{(sv._count?.responses || 0).toLocaleString()}</p>
                             <p className="text-[10px] text-gray-400 font-bold uppercase">Citizens</p>
                          </td>
-                         <td className="px-8 py-5 text-right">
-                            <button className="h-9 w-9 bg-gray-50 rounded-xl text-gray-400 hover:bg-brand-50 hover:text-brand-500 transition-all focus:ring-4 ring-brand-50">
-                               <span className="material-symbols-outlined text-xl">visibility</span>
-                            </button>
-                         </td>
+                                     <td className="px-8 py-5 text-right" onClick={(e) => e.stopPropagation()}>
+                                          <div className="flex items-center justify-end gap-2">
+                                             <button
+                                                onClick={() => router.push(`/CivicPartner/surveys/${sv.id}/edit`)}
+                                                className="h-9 px-3 bg-white border border-gray-200 rounded-xl text-gray-600 hover:bg-gray-50 transition-all"
+                                                title="Edit survey"
+                                             >
+                                                <span className="material-symbols-outlined text-sm">edit</span>
+                                             </button>
+                                             <button
+                                                onClick={() => handleArchive(sv)}
+                                                disabled={actionLoading === sv.id}
+                                                className="h-9 px-3 bg-white border border-gray-200 rounded-xl text-rose-600 hover:bg-rose-50 transition-all disabled:opacity-50"
+                                                title="Archive survey"
+                                             >
+                                                <span className="material-symbols-outlined text-sm">delete</span>
+                                             </button>
+                                             <button
+                                                onClick={() => router.push(`/CivicPartner/surveys/${sv.id}`)}
+                                                className="h-9 w-9 bg-gray-50 rounded-xl text-gray-400 hover:bg-brand-50 hover:text-brand-500 transition-all focus:ring-4 ring-brand-50"
+                                                title="View details"
+                                             >
+                                                <span className="material-symbols-outlined text-xl">visibility</span>
+                                             </button>
+                                          </div>
+                                     </td>
                       </tr>
                     ))}
                  </tbody>
               </table>
            </div>
         </div>
-      </div>
-    </CivicPartnerLayout>
+            {showArchiveConfirm && archiveTarget && (
+               <div className="fixed inset-0 z-50 flex items-center justify-center">
+                  <div className="absolute inset-0 bg-black/40" onClick={() => { setShowArchiveConfirm(false); setArchiveTarget(null); }} />
+                  <div className="bg-white rounded-xl p-6 z-10 w-full max-w-md">
+                     <h3 className="text-lg font-black">Archive campaign</h3>
+                     <p className="text-sm text-gray-500 mt-2">Are you sure you want to archive "{archiveTarget.title}"? This will move it to Archived & Closed.</p>
+                     <div className="mt-4 flex justify-end gap-2">
+                        <button onClick={() => { setShowArchiveConfirm(false); setArchiveTarget(null); }} className="px-4 py-2 border rounded">Cancel</button>
+                        <button onClick={doArchive} disabled={actionLoading === archiveTarget.id} className="px-4 py-2 bg-rose-600 text-white rounded disabled:opacity-50">Archive</button>
+                     </div>
+                  </div>
+               </div>
+            )}
+         </div>
+      </CivicPartnerLayout>
   )
 }

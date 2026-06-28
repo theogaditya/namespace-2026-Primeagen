@@ -3,16 +3,16 @@
 import { useState, useEffect, useRef } from "react"
 import { useRouter } from "next/navigation"
 import { CivicPartnerLayout } from "./_layout"
-import { 
-  BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, 
-  AreaChart, Area, PieChart, Pie, Cell 
+import {
+  BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer,
+  AreaChart, Area, PieChart, Pie, Cell
 } from 'recharts'
 import { cn } from "@/lib/utils"
 const API = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3002"
 const GOOGLE_API_KEY = process.env.NEXT_PUBLIC_GOOGLE_API_KEY || ""
 
 const interactionStats = [
-  { name: 'Jan', value: 400 }, { name: 'Feb', value: 121 }, { name: 'Mar', value: 650 }, 
+  { name: 'Jan', value: 400 }, { name: 'Feb', value: 121 }, { name: 'Mar', value: 650 },
   { name: 'Apr', value: 180 }, { name: 'May', value: 920 }, { name: 'Jun', value: 340 }
 ];
 
@@ -85,7 +85,7 @@ export default function CivicPartnerDashboard() {
             <h2 className="text-3xl font-black text-black tracking-tight">Dashboard Overview</h2>
             <p className="text-sm text-gray-400 font-medium">Welcome back to your civic command center.</p>
          </div>
-         <button 
+         <button
            onClick={() => router.push("/CivicPartner/surveys/new")}
            className="h-11 px-8 bg-[#465FFF] text-white rounded-xl text-xs font-black shadow-lg shadow-[#465FFF]/20 hover:bg-[#3451D1] transition-all flex items-center gap-2 uppercase tracking-tighter"
          >
@@ -94,14 +94,14 @@ export default function CivicPartnerDashboard() {
       </div>
 
       <div className="grid grid-cols-12 gap-4 md:gap-6 pb-20">
-        
+
         {/* Metric Cards - Official Pixel Sync */}
         <div className="col-span-12 xl:col-span-7 grid grid-cols-1 sm:grid-cols-2 gap-4 md:gap-6">
            {[
              { label: "Community", value: stats.responses.toLocaleString(), trend: "11.01%", up: true, icon: "groups" },
              { label: "Campaigns", value: stats.surveys.toString(), trend: "4.35%", up: true, icon: "campaign" },
              { label: "Success Rate", value: "84.2%", trend: "2.59%", up: true, icon: "fact_check" },
-             { label: "Public Drafts", value: stats.drafts.toString(), trend: "0.95%", up: false, icon: "edit_document" }
+             { label: "Drafts", value: stats.drafts.toString(), trend: "0.95%", up: false, icon: "edit_document" }
            ].map((kpi, i) => (
              <div key={i} className="rounded-2xl border border-gray-200 bg-white p-5 md:p-6 shadow-xs">
                 <div className="flex items-center justify-center w-12 h-12 bg-gray-100 rounded-xl">
@@ -130,17 +130,17 @@ export default function CivicPartnerDashboard() {
               <div className="h-[240px] w-full">
                  <ResponsiveContainer width="100%" height="100%">
                     <PieChart>
-                       <Pie 
+                       <Pie
                          data={[
                            { name: "Infrastructure", val: 400, fill: "#465FFF" },
                            { name: "Public Safety", val: 300, fill: "#10B981" },
                            { name: "Health", val: 240, fill: "#F59E0B" },
                            { name: "Education", val: 180, fill: "#EF4444" },
                            { name: "Others", val: 100, fill: "#6366F1" }
-                         ]} 
-                         dataKey="val" 
-                         innerRadius={50} 
-                         outerRadius={80} 
+                         ]}
+                         dataKey="val"
+                         innerRadius={50}
+                         outerRadius={80}
                          paddingAngle={4}
                        />
                        <Tooltip contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 10px 15px -3px rgba(0,0,0,0.1)' }} />
@@ -148,7 +148,7 @@ export default function CivicPartnerDashboard() {
                  </ResponsiveContainer>
               </div>
            </div>
-           
+
            {/* Custom Legend - Sync with User Component */}
            <div className="mt-4 flex flex-wrap gap-x-4 gap-y-2 justify-center border-t border-gray-50 pt-6">
               {[
@@ -259,11 +259,11 @@ export default function CivicPartnerDashboard() {
                  <div ref={mapRef} className="h-[400px] w-full bg-gray-50 rounded-2xl border border-gray-100 overflow-hidden shadow-inner" />
               </div>
               <div className="col-span-12 lg:col-span-4 flex flex-col justify-center space-y-8">
-                 {[ 
-                   { name: "Maharashtra", val: "79%", w: "79%", c: "bg-[#465FFF]" }, 
+                 {[
+                   { name: "Maharashtra", val: "79%", w: "79%", c: "bg-[#465FFF]" },
                    { name: "Delhi NCR", val: "54%", w: "54%", c: "bg-emerald-500" },
                    { name: "Karnataka", val: "23%", w: "23%", c: "bg-amber-500" },
-                   { name: "West Bengal", val: "12%", w: "12%", c: "bg-red-500" } 
+                   { name: "West Bengal", val: "12%", w: "12%", c: "bg-red-500" }
                  ].map((d, i) => (
                     <div key={i}>
                        <div className="flex items-center justify-between mb-3"><p className="text-sm font-black text-gray-800">{d.name}</p><p className="text-xs font-black text-gray-900">{d.val}</p></div>

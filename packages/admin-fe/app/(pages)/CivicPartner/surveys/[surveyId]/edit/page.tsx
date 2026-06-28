@@ -113,10 +113,17 @@ export default function EditSurveyPage({ params }: { params: Promise<{ surveyId:
   }
 
   const updateOption = (qIdx: number, oIdx: number, value: string) => {
+    // prevent duplicate option values within the same question
     setQuestions((prev) =>
-      prev.map((q, i) =>
-        i === qIdx ? { ...q, options: q.options.map((o, j) => (j === oIdx ? value : o)) } : q
-      )
+      prev.map((q, i) => {
+        if (i !== qIdx) return q
+        const exists = q.options.some((existing, j) => j !== oIdx && existing.trim() === value.trim() && value.trim() !== "")
+        if (exists) {
+          setError("Duplicate option values are not allowed")
+          return q
+        }
+        return { ...q, options: q.options.map((o, j) => (j === oIdx ? value : o)) }
+      })
     )
   }
 
@@ -132,6 +139,28 @@ export default function EditSurveyPage({ params }: { params: Promise<{ surveyId:
     setError("")
     setSaving(true)
     try {
+      // Check for duplicate options before saving
+      for (let i = 0; i < questions.length; i++) {
+        const q = questions[i]
+        if (q.questionType === 'MCQ' || q.questionType === 'CHECKBOX') {
+          const seen = new Set<string>()
+          for (let j = 0; j < q.options.length; j++) {
+            const v = (q.options[j] || '').trim().toLowerCase()
+            if (!v) continue
+            if (seen.has(v)) {
+              setError(`Duplicate option "${q.options[j]}" found in question ${i + 1}`)
+              // move user to question card
+              setTimeout(() => {
+                const el = document.getElementById(`question-${i}`)
+                if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' })
+              }, 120)
+              setSaving(false)
+              return
+            }
+            seen.add(v)
+          }
+        }
+      }
       const res = await fetch(`${API}/api/civic-partner/surveys/${surveyId}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
@@ -144,7 +173,7 @@ export default function EditSurveyPage({ params }: { params: Promise<{ surveyId:
           questions: questions.map((q) => ({
             questionText: q.questionText,
             questionType: q.questionType,
-            options: ["MCQ", "CHECKBOX"].includes(q.questionType) ? q.options.filter(Boolean) : [],
+            options: ["MCQ", "CHECKBOX"].includes(q.questionType) ? q.options.map(o => o.trim()).filter(Boolean) : [],
             isRequired: q.isRequired,
             order: q.order,
           })),
@@ -166,6 +195,27 @@ export default function EditSurveyPage({ params }: { params: Promise<{ surveyId:
     setError("")
     setSaving(true)
     try {
+      // Validate duplicate options prior to publish
+      for (let i = 0; i < questions.length; i++) {
+        const q = questions[i]
+        if (q.questionType === 'MCQ' || q.questionType === 'CHECKBOX') {
+          const seen = new Set<string>()
+          for (let j = 0; j < q.options.length; j++) {
+            const v = (q.options[j] || '').trim().toLowerCase()
+            if (!v) continue
+            if (seen.has(v)) {
+              setError(`Duplicate option "${q.options[j]}" found in question ${i + 1}`)
+              setTimeout(() => {
+                const el = document.getElementById(`question-${i}`)
+                if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' })
+              }, 120)
+              setSaving(false)
+              return
+            }
+            seen.add(v)
+          }
+        }
+      }
       // Save first
       await fetch(`${API}/api/civic-partner/surveys/${surveyId}`, {
         method: "PATCH",
@@ -179,7 +229,7 @@ export default function EditSurveyPage({ params }: { params: Promise<{ surveyId:
           questions: questions.map((q) => ({
             questionText: q.questionText,
             questionType: q.questionType,
-            options: ["MCQ", "CHECKBOX"].includes(q.questionType) ? q.options.filter(Boolean) : [],
+            options: ["MCQ", "CHECKBOX"].includes(q.questionType) ? q.options.map(o => o.trim()).filter(Boolean) : [],
             isRequired: q.isRequired,
             order: q.order,
           })),
@@ -219,7 +269,9 @@ export default function EditSurveyPage({ params }: { params: Promise<{ surveyId:
     )
   }
 
-  const isDraft = survey.status === "DRAFT"
+  // DRAFT and PUBLISHED surveys are editable; CLOSED and ARCHIVED are read-only
+  const isEditable = survey.status === "DRAFT" || survey.status === "PUBLISHED"
+  const isDraft = survey.status === "DRAFT" // kept for Publish button logic only
 
   return (
     <CivicPartnerLayout>
@@ -231,10 +283,10 @@ export default function EditSurveyPage({ params }: { params: Promise<{ surveyId:
               className="text-3xl font-extrabold text-[#003358] tracking-tight"
               style={{ fontFamily: "'Manrope', sans-serif" }}
             >
-              {isDraft ? "Edit Survey" : "View Survey"}
+                {isEditable ? "Edit Survey" : survey.status === "ARCHIVED" ? "Archived Survey" : "View Survey"}
             </h2>
             <p className="text-[#42474f] mt-1">
-              {isDraft ? "Modify your draft before publishing" : "This survey is no longer editable"}
+              {isEditable ? `Editing ${survey.status === "PUBLISHED" ? "published" : "draft"} survey.` : survey.status === "ARCHIVED" ? "This survey is archived and read-only." : "This survey is closed and read-only."}
             </p>
           </div>
           <div className="flex gap-3">
@@ -244,14 +296,14 @@ export default function EditSurveyPage({ params }: { params: Promise<{ surveyId:
             >
               Cancel
             </button>
-            {isDraft && (
+            {isEditable && (
               <>
                 <button
                   onClick={handleSave}
                   disabled={saving}
                   className="px-5 py-2.5 bg-[#d5ecf8] text-[#003358] font-semibold rounded-xl hover:bg-[#cfe6f2] transition-colors disabled:opacity-50"
                 >
-                  Save Draft
+                  Save
                 </button>
                 <button
                   onClick={handlePublish}
@@ -291,7 +343,7 @@ export default function EditSurveyPage({ params }: { params: Promise<{ surveyId:
                   className="w-full px-5 py-3 bg-[#e6f6ff] border-none rounded-xl focus:ring-2 focus:ring-[#006b5e]/40 text-[#071e27] disabled:opacity-60"
                   value={title}
                   onChange={(e) => setTitle(e.target.value)}
-                  disabled={!isDraft}
+                  disabled={!isEditable}
                 />
               </div>
               <div className="grid grid-cols-2 gap-6">
@@ -301,7 +353,7 @@ export default function EditSurveyPage({ params }: { params: Promise<{ surveyId:
                     className="w-full px-5 py-3 bg-[#e6f6ff] border-none rounded-xl text-[#071e27] disabled:opacity-60"
                     value={category}
                     onChange={(e) => setCategory(e.target.value)}
-                    disabled={!isDraft}
+                    disabled={!isEditable}
                   >
                     {CATEGORIES.map((c) => (
                       <option key={c}>{c}</option>
@@ -314,7 +366,7 @@ export default function EditSurveyPage({ params }: { params: Promise<{ surveyId:
                     className="w-full px-5 py-3 bg-[#e6f6ff] border-none rounded-xl text-[#071e27] disabled:opacity-60"
                     value={content}
                     onChange={(e) => setContent(e.target.value)}
-                    disabled={!isDraft}
+                  disabled={!isEditable}
                   />
                 </div>
               </div>
@@ -325,7 +377,7 @@ export default function EditSurveyPage({ params }: { params: Promise<{ surveyId:
                   rows={3}
                   value={description}
                   onChange={(e) => setDescription(e.target.value)}
-                  disabled={!isDraft}
+                  disabled={!isEditable}
                 />
               </div>
             </div>
@@ -340,7 +392,7 @@ export default function EditSurveyPage({ params }: { params: Promise<{ surveyId:
               >
                 Questions ({questions.length})
               </h3>
-              {isDraft && (
+              {isEditable && (
                 <button
                   onClick={addQuestion}
                   className="bg-white text-[#006b5e] px-5 py-2.5 rounded-xl font-bold flex items-center gap-2 hover:bg-[#006b5e] hover:text-white transition-all"
@@ -354,13 +406,14 @@ export default function EditSurveyPage({ params }: { params: Promise<{ surveyId:
 
             {questions.map((q, idx) => (
               <div
+                id={`question-${idx}`}
                 key={idx}
                 className="bg-white p-6 rounded-xl"
                 style={{ boxShadow: "0 12px 32px -4px rgba(7, 30, 39, 0.06)", border: "1px solid rgba(193,199,208,0.1)" }}
               >
                 <div className="flex justify-between items-start mb-4">
                   <span className="text-sm font-bold text-[#003358]">Question {idx + 1}</span>
-                  {isDraft && (
+                  {isEditable && (
                     <button onClick={() => removeQuestion(idx)} className="text-[#ba1a1a] hover:bg-[#ffdad6] p-1 rounded-lg">
                       <span className="material-symbols-outlined text-sm">delete</span>
                     </button>
@@ -372,7 +425,7 @@ export default function EditSurveyPage({ params }: { params: Promise<{ surveyId:
                     placeholder="Enter your question..."
                     value={q.questionText}
                     onChange={(e) => updateQuestion(idx, { questionText: e.target.value })}
-                    disabled={!isDraft}
+                    disabled={!isEditable}
                   />
                   <div className="flex gap-4 items-center">
                     <select
@@ -386,7 +439,7 @@ export default function EditSurveyPage({ params }: { params: Promise<{ surveyId:
                             : [],
                         })
                       }
-                      disabled={!isDraft}
+                      disabled={!isEditable}
                     >
                       {Object.entries(QUESTION_TYPE_LABELS).map(([k, v]) => (
                         <option key={k} value={k}>{v}</option>
@@ -397,7 +450,7 @@ export default function EditSurveyPage({ params }: { params: Promise<{ surveyId:
                         type="checkbox"
                         checked={q.isRequired}
                         onChange={(e) => updateQuestion(idx, { isRequired: e.target.checked })}
-                        disabled={!isDraft}
+                        disabled={!isEditable}
                         className="w-4 h-4 rounded text-[#006b5e]"
                       />
                       <span className="text-[#003358] font-medium">Required</span>
@@ -413,16 +466,16 @@ export default function EditSurveyPage({ params }: { params: Promise<{ surveyId:
                             placeholder={`Option ${oIdx + 1}`}
                             value={opt}
                             onChange={(e) => updateOption(idx, oIdx, e.target.value)}
-                            disabled={!isDraft}
+                            disabled={!isEditable}
                           />
-                          {isDraft && q.options.length > 1 && (
+                          {isEditable && q.options.length > 1 && (
                             <button onClick={() => removeOption(idx, oIdx)} className="text-[#727780] hover:text-[#ba1a1a]">
                               <span className="material-symbols-outlined text-sm">close</span>
                             </button>
                           )}
                         </div>
                       ))}
-                      {isDraft && (
+                      {isEditable && (
                         <button onClick={() => addOption(idx)} className="text-xs font-bold text-[#006b5e] flex items-center gap-1">
                           <span className="material-symbols-outlined text-sm">add</span>
                           Add Option

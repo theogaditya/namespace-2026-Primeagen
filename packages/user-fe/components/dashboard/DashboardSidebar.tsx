@@ -9,6 +9,7 @@ import {
   Users,
   BarChart2,
   MapIcon,
+  ClipboardList,
   PlusCircle,
   HelpCircle,
   LogOut,
@@ -16,7 +17,7 @@ import {
   X,
 } from "lucide-react";
 
-export type DashboardView = "dashboard" | "reports" | "community" | "analytics" | "map";
+export type DashboardView = "dashboard" | "reports" | "community" | "analytics" | "map" | "surveys";
 
 interface NavItem {
   label: string;
@@ -30,6 +31,7 @@ const NAV_ITEMS: NavItem[] = [
   { label: "Community", icon: <Users className="w-5 h-5" />, view: "community" },
   { label: "Analytics", icon: <BarChart2 className="w-5 h-5" />, view: "analytics" },
   { label: "Map", icon: <MapIcon className="w-5 h-5" />, view: "map" },
+  { label: "Surveys", icon: <ClipboardList className="w-5 h-5" />, view: "surveys" },
 ];
 
 interface DashboardSidebarProps {

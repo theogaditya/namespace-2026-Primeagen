@@ -128,10 +128,10 @@ export default function (prisma: PrismaClient) {
       if (!existing) {
         return res.status(404).json({ success: false, message: 'Survey not found' });
       }
-      if (existing.status !== 'DRAFT') {
+      if (!['DRAFT', 'PUBLISHED'].includes(existing.status)) {
         return res.status(400).json({
           success: false,
-          message: 'Survey can only be edited while in DRAFT status',
+          message: 'Only DRAFT or PUBLISHED surveys can be edited',
         });
       }
 
@@ -245,6 +245,31 @@ export default function (prisma: PrismaClient) {
       return res.json({ success: true, message: 'Survey reopened', survey });
     } catch (err) {
       console.error('[surveys.reopen]', err);
+      return res.status(500).json({ success: false, message: 'Server error' });
+    }
+  });
+
+  // ─── POST /api/civic-partner/surveys/:surveyId/unarchive ────────────────
+  // Unarchive: moves survey from ARCHIVED back to DRAFT so it can be edited.
+  router.post('/:surveyId/unarchive', async (req, res: any) => {
+    const { id: civicPartnerId } = getCivicPartner(req);
+    const { surveyId } = req.params;
+
+    try {
+      const existing = await prisma.survey.findFirst({ where: { id: surveyId, civicPartnerId } });
+      if (!existing) return res.status(404).json({ success: false, message: 'Survey not found' });
+      if (existing.status !== 'ARCHIVED') {
+        return res.status(400).json({ success: false, message: 'Only ARCHIVED surveys can be unarchived' });
+      }
+
+      const survey = await prisma.survey.update({
+        where: { id: surveyId },
+        data: { status: 'DRAFT', isPublic: false },
+      });
+
+      return res.json({ success: true, message: 'Survey unarchived and moved to draft', survey });
+    } catch (err) {
+      console.error('[surveys.unarchive]', err);
       return res.status(500).json({ success: false, message: 'Server error' });
     }
   });

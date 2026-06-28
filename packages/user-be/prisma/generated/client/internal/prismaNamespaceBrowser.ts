@@ -64,13 +64,20 @@ export const ModelName = {
   ComplaintLocation: 'ComplaintLocation',
   Upvote: 'Upvote',
   NewsUpdate: 'NewsUpdate',
+  Announcement: 'Announcement',
   AuditLog: 'AuditLog',
   RegionalWorkflow: 'RegionalWorkflow',
   Chat: 'Chat',
   operating_states: 'operating_states',
   operating_districts: 'operating_districts',
   Badge: 'Badge',
-  UserBadge: 'UserBadge'
+  UserBadge: 'UserBadge',
+  BlockchainSyncEvent: 'BlockchainSyncEvent',
+  CivicPartner: 'CivicPartner',
+  Survey: 'Survey',
+  SurveyQuestion: 'SurveyQuestion',
+  SurveyResponse: 'SurveyResponse',
+  SurveyAnswer: 'SurveyAnswer'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -298,6 +305,12 @@ export const ComplaintScalarFieldEnum = {
   managedBySuperAdminId: 'managedBySuperAdminId',
   moderatedByMunicipalAdminId: 'moderatedByMunicipalAdminId',
   seq: 'seq',
+  blockchainHash: 'blockchainHash',
+  blockchainBlock: 'blockchainBlock',
+  ipfsHash: 'ipfsHash',
+  isOnChain: 'isOnChain',
+  blockchainStatus: 'blockchainStatus',
+  blockchainUpdatedAt: 'blockchainUpdatedAt',
   sla: 'sla',
   AIabusedFlag: 'AIabusedFlag',
   AIimageVarificationStatus: 'AIimageVarificationStatus',
@@ -348,6 +361,23 @@ export const NewsUpdateScalarFieldEnum = {
 } as const
 
 export type NewsUpdateScalarFieldEnum = (typeof NewsUpdateScalarFieldEnum)[keyof typeof NewsUpdateScalarFieldEnum]
+
+
+export const AnnouncementScalarFieldEnum = {
+  id: 'id',
+  title: 'title',
+  content: 'content',
+  municipality: 'municipality',
+  isActive: 'isActive',
+  priority: 'priority',
+  startsAt: 'startsAt',
+  expiresAt: 'expiresAt',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt',
+  createdById: 'createdById'
+} as const
+
+export type AnnouncementScalarFieldEnum = (typeof AnnouncementScalarFieldEnum)[keyof typeof AnnouncementScalarFieldEnum]
 
 
 export const AuditLogScalarFieldEnum = {
@@ -433,6 +463,104 @@ export const UserBadgeScalarFieldEnum = {
 export type UserBadgeScalarFieldEnum = (typeof UserBadgeScalarFieldEnum)[keyof typeof UserBadgeScalarFieldEnum]
 
 
+export const BlockchainSyncEventScalarFieldEnum = {
+  id: 'id',
+  entityType: 'entityType',
+  entityId: 'entityId',
+  keyPrefix: 'keyPrefix',
+  blockchainHash: 'blockchainHash',
+  blockchainBlock: 'blockchainBlock',
+  ipfsHash: 'ipfsHash',
+  isOnChain: 'isOnChain',
+  payload: 'payload',
+  status: 'status',
+  processedAt: 'processedAt'
+} as const
+
+export type BlockchainSyncEventScalarFieldEnum = (typeof BlockchainSyncEventScalarFieldEnum)[keyof typeof BlockchainSyncEventScalarFieldEnum]
+
+
+export const CivicPartnerScalarFieldEnum = {
+  id: 'id',
+  orgName: 'orgName',
+  orgId: 'orgId',
+  officialEmail: 'officialEmail',
+  password: 'password',
+  phoneNumber: 'phoneNumber',
+  orgType: 'orgType',
+  registrationNo: 'registrationNo',
+  state: 'state',
+  district: 'district',
+  website: 'website',
+  accessLevel: 'accessLevel',
+  status: 'status',
+  isVerified: 'isVerified',
+  verifiedAt: 'verifiedAt',
+  dateOfCreation: 'dateOfCreation',
+  lastUpdated: 'lastUpdated',
+  lastLogin: 'lastLogin'
+} as const
+
+export type CivicPartnerScalarFieldEnum = (typeof CivicPartnerScalarFieldEnum)[keyof typeof CivicPartnerScalarFieldEnum]
+
+
+export const SurveyScalarFieldEnum = {
+  id: 'id',
+  civicPartnerId: 'civicPartnerId',
+  title: 'title',
+  description: 'description',
+  sourceType: 'sourceType',
+  category: 'category',
+  content: 'content',
+  sourceUrl: 'sourceUrl',
+  status: 'status',
+  isPublic: 'isPublic',
+  startsAt: 'startsAt',
+  endsAt: 'endsAt',
+  createdAt: 'createdAt',
+  lastUpdated: 'lastUpdated'
+} as const
+
+export type SurveyScalarFieldEnum = (typeof SurveyScalarFieldEnum)[keyof typeof SurveyScalarFieldEnum]
+
+
+export const SurveyQuestionScalarFieldEnum = {
+  id: 'id',
+  surveyId: 'surveyId',
+  questionText: 'questionText',
+  questionType: 'questionType',
+  options: 'options',
+  isRequired: 'isRequired',
+  order: 'order'
+} as const
+
+export type SurveyQuestionScalarFieldEnum = (typeof SurveyQuestionScalarFieldEnum)[keyof typeof SurveyQuestionScalarFieldEnum]
+
+
+export const SurveyResponseScalarFieldEnum = {
+  id: 'id',
+  surveyId: 'surveyId',
+  userId: 'userId',
+  startedAt: 'startedAt',
+  submittedAt: 'submittedAt',
+  isComplete: 'isComplete'
+} as const
+
+export type SurveyResponseScalarFieldEnum = (typeof SurveyResponseScalarFieldEnum)[keyof typeof SurveyResponseScalarFieldEnum]
+
+
+export const SurveyAnswerScalarFieldEnum = {
+  id: 'id',
+  responseId: 'responseId',
+  questionId: 'questionId',
+  answerText: 'answerText',
+  selectedOpts: 'selectedOpts',
+  ratingValue: 'ratingValue'
+} as const
+
+export type SurveyAnswerScalarFieldEnum = (typeof SurveyAnswerScalarFieldEnum)[keyof typeof SurveyAnswerScalarFieldEnum]
+
+
 export const SortOrder = {
   asc: 'asc',
   desc: 'desc'
@@ -447,6 +575,13 @@ export const NullableJsonNullValueInput = {
 } as const
 
 export type NullableJsonNullValueInput = (typeof NullableJsonNullValueInput)[keyof typeof NullableJsonNullValueInput]
+
+
+export const JsonNullValueInput = {
+  JsonNull: 'JsonNull'
+} as const
+
+export type JsonNullValueInput = (typeof JsonNullValueInput)[keyof typeof JsonNullValueInput]
 
 
 export const QueryMode = {
