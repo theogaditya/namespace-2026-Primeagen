@@ -1,7 +1,6 @@
 "use client"
 
-import type React from "react"
-import { useState, useEffect } from "react"
+import { useState, useEffect, useRef } from "react"
 import { useRouter, usePathname } from "next/navigation"
 import Link from "next/link"
 
@@ -17,8 +16,41 @@ export function AgentRevampedLayout({ children }: AgentRevampedLayoutProps) {
     adminType?: string
   } | null>(null)
   const [sidebarOpen, setSidebarOpen] = useState(false)
+  const [isCollapsed, setIsCollapsed] = useState(false)
+  const [showNotifications, setShowNotifications] = useState(false)
+  const notificationRef = useRef<HTMLDivElement>(null)
+  
+  const notifications = [
+    { id: 1, title: "New Assignment", desc: "Complaint #1024 has been assigned to you.", time: "2m ago", unread: true },
+    { id: 2, title: "Status Verified", desc: "Citizen has verified resolution for #998.", time: "1h ago", unread: true },
+    { id: 3, title: "System Update", desc: "Portal updated to version 1.0.4. Check dev-logs.", time: "3h ago", unread: false },
+  ]
+
   const router = useRouter()
   const pathname = usePathname()
+
+  useEffect(() => {
+    // Restore sidebar state
+    const saved = localStorage.getItem("agentSidebarCollapsed")
+    if (saved === "true") setIsCollapsed(true)
+
+    // Click outside handler for notifications
+    const handleClickOutside = (event: MouseEvent) => {
+      if (notificationRef.current && !notificationRef.current.contains(event.target as Node)) {
+        setShowNotifications(false)
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside)
+    return () => document.removeEventListener("mousedown", handleClickOutside)
+  }, [])
+
+  const toggleCollapse = () => {
+    setIsCollapsed((prev) => {
+      const next = !prev
+      localStorage.setItem("agentSidebarCollapsed", String(next))
+      return next
+    })
+  }
 
   useEffect(() => {
     try {
@@ -69,9 +101,11 @@ export function AgentRevampedLayout({ children }: AgentRevampedLayoutProps) {
   }
 
   const navItems = [
-    { href: "/Agent", icon: "analytics", label: "Intelligence" },
-    { href: "/Agent/my-complaints", icon: "tactic", label: "Operations" },
-    { href: "/Agent/reports", icon: "settings", label: "Management" },
+    { href: "/Agent", icon: "analytics", label: "Agent Dashboard" },
+    { href: "/Agent/my-complaints", icon: "tactic", label: "My Workload" },
+    { href: "/Agent/audit-logs", icon: "history", label: "Audit Logs" },
+    { href: "/Agent/profile", icon: "person", label: "My Profile" },
+    { href: "/Agent/reports", icon: "settings", label: "Analytics" },
   ]
 
   const isActive = (href: string) => pathname === href
@@ -111,8 +145,14 @@ export function AgentRevampedLayout({ children }: AgentRevampedLayoutProps) {
         ::-webkit-scrollbar-track { background: transparent; }
         ::-webkit-scrollbar-thumb { background: #c3c5d9; border-radius: 2px; }
         .nav-item-active { background: #fff; color: #0047cc; font-weight: 700; box-shadow: 0 1px 3px rgba(0,0,0,.08); }
-        .nav-item { display:flex; align-items:center; gap:12px; padding:8px 12px; border-radius:2px; font-size:14px; transition:all .2s; color:#475569; cursor:pointer; }
-        .nav-item:hover { background:#f8f9ff; padding-left:16px; }
+        .nav-item { display:flex; align-items:center; gap:12px; padding:8px 12px; border-radius:2px; font-size:14px; transition:all 0.3s ease; color:#475569; cursor:pointer; overflow:hidden; white-space:nowrap; }
+        .nav-item:hover { background:#f8f9ff; padding-left:14px; }
+        .sidebar-collapsed { width: 80px !important; overflow: hidden; }
+        .sidebar-collapsed .nav-label, .sidebar-collapsed .brand-text, .sidebar-collapsed .profile-text, .sidebar-collapsed .footer-link-text { opacity: 0; width: 0; display: none; }
+        .sidebar-collapsed .nav-item, .sidebar-collapsed .footer-link { justify-content: center; padding: 10px; }
+        .sidebar-collapsed .brand-container { justify-content: center; padding: 0; }
+        .brand-text, .nav-label, .profile-text, .footer-link-text { transition: opacity 0.2s ease, width 0.3s ease; }
+        .footer-link { display: flex; align-items: center; gap: 8px; transition: all 0.3s ease; }
         .scanning-line { height:2px; background:#155dfc; box-shadow:0 0 15px #155dfc; position:absolute; width:100%; top:0; left:0; z-index:10; animation: scanDown 3s linear infinite; }
         @keyframes scanDown { 0%{top:0} 100%{top:100%} }
       `}</style>
@@ -127,28 +167,25 @@ export function AgentRevampedLayout({ children }: AgentRevampedLayoutProps) {
 
       {/* Sidebar */}
       <aside
-        className={`fixed left-0 top-0 h-screen w-64 bg-[#eff4ff] border-r border-[#c3c5d9]/30 py-6 px-4 flex flex-col z-50 transition-transform duration-300 ${
+        className={`fixed left-0 top-0 h-screen w-64 bg-[#eff4ff] border-r border-[#c3c5d9]/30 py-6 px-4 flex flex-col z-50 transition-all duration-300 ${
           sidebarOpen ? "translate-x-0" : "-translate-x-full"
-        } md:translate-x-0`}
+        } md:translate-x-0 ${isCollapsed ? "sidebar-collapsed" : ""}`}
       >
         {/* Brand */}
-        <div className="flex items-center gap-3 px-2 mb-8">
-          <div className="w-8 h-8 bg-[#0047cc] rounded-sm flex items-center justify-center">
-            <span
-              className="material-symbols-outlined text-white"
-              style={{ fontSize: 18, fontVariationSettings: "'FILL' 1" }}
-            >
-              security
-            </span>
+        <div className="flex items-center gap-3 px-2 mb-8 brand-container">
+          <div className="w-8 h-8 rounded-sm flex items-center justify-center flex-shrink-0">
+            <img src="https://swarajdesk.adityahota.online/logo.png" alt="Logo" className="w-8 h-8 object-contain" />
           </div>
-          <div>
-            <h1 className="headline font-bold text-[#0b1c30] tracking-tighter text-lg leading-none">
-              SwarajDesk
-            </h1>
-            <p className="text-[10px] text-[#0047cc] font-medium tracking-widest uppercase mt-1">
-              Agent Portal v1.0
-            </p>
-          </div>
+          {!isCollapsed && (
+            <div className="brand-text">
+              <h1 className="headline font-bold text-[#0b1c30] tracking-tighter text-lg leading-none">
+                SwarajDesk
+              </h1>
+              <p className="text-[10px] text-[#0047cc] font-medium tracking-widest uppercase mt-1">
+                Agent Portal v1.0
+              </p>
+            </div>
+          )}
         </div>
 
         {/* Nav */}
@@ -160,94 +197,126 @@ export function AgentRevampedLayout({ children }: AgentRevampedLayoutProps) {
               onClick={() => setSidebarOpen(false)}
               className={`nav-item ${isActive(item.href) ? "nav-item-active" : ""}`}
             >
-              <span className="material-symbols-outlined" style={{ fontSize: 20 }}>
+              <span className="material-symbols-outlined flex-shrink-0" style={{ fontSize: 20 }}>
                 {item.icon}
               </span>
-              {item.label}
+              {!isCollapsed && <span className="nav-label">{item.label}</span>}
             </Link>
           ))}
         </nav>
 
-        {/* Blockchain Card */}
-        <div className="mt-4 pt-4 border-t border-[#c3c5d9]/30">
-          <div className="bg-gradient-to-br from-indigo-50 via-blue-50 to-indigo-100 rounded-lg p-4">
-            <div className="flex items-center gap-2 mb-3">
-              <div className="p-1.5 bg-indigo-100 rounded-lg">
-                <span className="material-symbols-outlined text-indigo-600" style={{ fontSize: 16 }}>
-                  link
-                </span>
-              </div>
-              <div>
-                <h4 className="text-sm font-bold text-gray-900">Blockchain Verified</h4>
-                <p className="text-[10px] text-gray-500">Ethereum Sepolia Testnet</p>
-              </div>
+        {/* Profile Section in Sidebar */}
+        <div className="mt-auto pt-4 border-t border-[#c3c5d9]/30">
+          <div className={`p-2 rounded-lg bg-[#f8faff] border border-[#c3c5d9]/20 flex items-center gap-3 ${isCollapsed ? 'justify-center' : ''}`}>
+            <div className="w-9 h-9 bg-[#0047cc] rounded-sm flex items-center justify-center text-white text-xs font-black flex-shrink-0">
+              {initials}
             </div>
-            <div className="flex items-center gap-2 mb-3">
-              <div className="relative">
-                <div className="w-8 h-8 rounded-full bg-indigo-100 flex items-center justify-center border border-indigo-200">
-                  <svg viewBox="0 0 256 417" className="w-4 h-4" preserveAspectRatio="xMidYMid">
-                    <path fill="#4F46E5" d="M127.961 0l-2.795 9.5v275.668l2.795 2.79 127.962-75.638z" opacity="0.8" />
-                    <path fill="#4F46E5" d="M127.962 0L0 212.32l127.962 75.639V154.158z" opacity="0.6" />
-                    <path fill="#4F46E5" d="M127.961 312.187l-1.575 1.92v98.199l1.575 4.6L256 236.587z" opacity="0.8" />
-                    <path fill="#4F46E5" d="M127.962 416.905v-104.72L0 236.585z" opacity="0.6" />
-                  </svg>
-                </div>
-                <span className="absolute -top-0.5 -right-0.5 w-2.5 h-2.5 bg-green-500 rounded-full border-2 border-white animate-pulse" />
+            {!isCollapsed && (
+              <div className="min-w-0 profile-text">
+                <p className="text-xs font-bold text-[#0b1c30] truncate">
+                  {adminData?.fullName || "Agent User"}
+                </p>
+                <p className="text-[9px] font-bold text-[#0047cc] uppercase tracking-widest">
+                  Verified Agent
+                </p>
               </div>
-              <div className="flex-1 min-w-0">
-                <p className="text-xs text-gray-700 font-medium">Hashed Transactions</p>
-                <p className="text-[10px] text-gray-500 truncate font-mono">0xD129...35F7</p>
-              </div>
-            </div>
-            <a
-              href="https://app.pinata.cloud/ipfs/files/"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="flex items-center justify-center gap-2 w-full py-2 bg-indigo-600 hover:bg-indigo-700 rounded-lg text-sm font-semibold text-white transition-all"
-            >
-              View on Pinata
-              <span className="material-symbols-outlined" style={{ fontSize: 14 }}>
-                open_in_new
-              </span>
-            </a>
+            )}
           </div>
+          {!isCollapsed && (
+            <button
+              onClick={handleLogout}
+              className="mt-2 w-full flex items-center gap-2 px-3 py-2 text-xs text-red-500 hover:bg-red-50 rounded-sm transition-colors font-bold uppercase tracking-wider"
+            >
+              <span className="material-symbols-outlined" style={{ fontSize: 16 }}>logout</span>
+              Sign Out
+            </button>
+          )}
         </div>
+
+        {!isCollapsed && (
+          <div className="mt-4 pt-4 border-t border-[#c3c5d9]/30">
+            <div className="bg-gradient-to-br from-indigo-50 via-blue-50 to-indigo-100 rounded-lg p-4">
+              <div className="flex items-center gap-2 mb-3">
+                <div className="p-1.5 bg-indigo-100 rounded-lg">
+                  <span className="material-symbols-outlined text-indigo-600" style={{ fontSize: 16 }}>
+                    link
+                  </span>
+                </div>
+                <div>
+                  <h4 className="text-sm font-bold text-gray-900">Blockchain Verified</h4>
+                  <p className="text-[10px] text-gray-500">Ethereum Sepolia Testnet</p>
+                </div>
+              </div>
+              <div className="flex items-center gap-2 mb-3">
+                <div className="relative">
+                  <div className="w-8 h-8 rounded-full bg-indigo-100 flex items-center justify-center border border-indigo-200">
+                    <svg viewBox="0 0 256 417" className="w-4 h-4" preserveAspectRatio="xMidYMid">
+                      <path fill="#4F46E5" d="M127.961 0l-2.795 9.5v275.668l2.795 2.79 127.962-75.638z" opacity="0.8" />
+                      <path fill="#4F46E5" d="M127.962 0L0 212.32l127.962 75.639V154.158z" opacity="0.6" />
+                      <path fill="#4F46E5" d="M127.961 312.187l-1.575 1.92v98.199l1.575 4.6L256 236.587z" opacity="0.8" />
+                      <path fill="#4F46E5" d="M127.962 416.905v-104.72L0 236.585z" opacity="0.6" />
+                    </svg>
+                  </div>
+                  <span className="absolute -top-0.5 -right-0.5 w-2.5 h-2.5 bg-green-500 rounded-full border-2 border-white animate-pulse" />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="text-xs text-gray-700 font-medium">Hashed Transactions</p>
+                  <p className="text-[10px] text-gray-500 truncate font-mono">0xD129...35F7</p>
+                </div>
+              </div>
+              <a
+                href="https://app.pinata.cloud/ipfs/files/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center justify-center gap-2 w-full py-2 bg-indigo-600 hover:bg-indigo-700 rounded-lg text-sm font-semibold text-white transition-all"
+              >
+                View on Pinata
+                <span className="material-symbols-outlined" style={{ fontSize: 14 }}>
+                  open_in_new
+                </span>
+              </a>
+            </div>
+          </div>
+        )}
 
         {/* Footer links */}
         <div className="mt-4 space-y-1">
           <a
             href="#"
-            className="flex items-center gap-2 px-3 py-2 text-xs text-slate-400 hover:text-slate-600 font-mono uppercase tracking-wide"
+            className="footer-link px-3 py-2 text-xs text-slate-400 hover:text-slate-600 font-mono uppercase tracking-wide"
           >
-            <span className="material-symbols-outlined" style={{ fontSize: 14 }}>
+            <span className="material-symbols-outlined flex-shrink-0" style={{ fontSize: 16 }}>
               shield
             </span>
-            Privacy Protocol
+            {!isCollapsed && <span className="footer-link-text">Privacy Protocol</span>}
           </a>
           <a
             href="#"
-            className="flex items-center gap-2 px-3 py-2 text-xs text-slate-400 hover:text-slate-600 font-mono uppercase tracking-wide"
+            className="footer-link px-3 py-2 text-xs text-slate-400 hover:text-slate-600 font-mono uppercase tracking-wide"
           >
-            <span className="material-symbols-outlined" style={{ fontSize: 14 }}>
+            <span className="material-symbols-outlined flex-shrink-0" style={{ fontSize: 16 }}>
               sensors
             </span>
-            System Status
+            {!isCollapsed && <span className="footer-link-text">System Status</span>}
           </a>
         </div>
       </aside>
 
       {/* Main area */}
-      <div className="md:ml-64 min-h-screen flex flex-col">
+      <div className={`transition-all duration-300 min-h-screen flex flex-col ${isCollapsed ? 'md:ml-20' : 'md:ml-64'}`}>
         {/* Top nav */}
         <header className="bg-[#f8f9ff] border-b border-[#c3c5d9]/20 h-16 flex items-center justify-between px-6 sticky top-0 z-30">
           {/* Left: hamburger + breadcrumb */}
           <div className="flex items-center gap-4">
             <button
-              className="md:hidden p-2 hover:bg-[#eff4ff] rounded-sm transition-colors"
-              onClick={() => setSidebarOpen(true)}
+              className="p-2 hover:bg-[#eff4ff] rounded-sm transition-colors"
+              onClick={() => {
+                if (window.innerWidth < 768) setSidebarOpen(true)
+                else toggleCollapse()
+              }}
             >
               <span className="material-symbols-outlined" style={{ fontSize: 20 }}>
-                menu
+                {isCollapsed ? "menu_open" : "menu"}
               </span>
             </button>
             <div className="flex items-center gap-2">
@@ -257,10 +326,14 @@ export function AgentRevampedLayout({ children }: AgentRevampedLayoutProps) {
                 <span className="text-slate-300">/</span>
                 <span className="text-[#0047cc] border-b-2 border-[#0047cc] pb-0.5">
                   {pathname === "/Agent"
-                    ? "INTELLIGENCE"
+                    ? "dashboard"
                     : pathname === "/Agent/my-complaints"
-                    ? "OPERATIONS"
-                    : "MANAGEMENT"}
+                    ? "MY WORKLOAD"
+                    : pathname === "/Agent/audit-logs"
+                    ? "AUDIT LOGS"
+                    : pathname === "/Agent/profile"
+                    ? "PROFILE"
+                    : "ANALYTICS"}
                 </span>
               </nav>
             </div>
@@ -286,21 +359,55 @@ export function AgentRevampedLayout({ children }: AgentRevampedLayoutProps) {
               Role: Agent
             </div>
             <div className="flex items-center gap-1">
-              <button className="p-2 hover:bg-[#eff4ff] rounded-sm transition-colors relative">
-                <span className="material-symbols-outlined text-slate-500" style={{ fontSize: 20 }}>
-                  notifications
-                </span>
-              </button>
+              <div className="relative" ref={notificationRef}>
+                <button 
+                  onClick={() => setShowNotifications(!showNotifications)}
+                  className={`p-2 rounded-sm transition-colors relative ${showNotifications ? 'bg-[#eff4ff] text-[#0047cc]' : 'hover:bg-[#eff4ff] text-slate-500'}`}
+                >
+                  <span className="material-symbols-outlined" style={{ fontSize: 20 }}>
+                    notifications
+                  </span>
+                  <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-red-500 rounded-full border-2 border-[#f8f9ff]" />
+                </button>
+
+                {/* Notification Dropdown */}
+                {showNotifications && (
+                  <div className="absolute right-0 mt-2 w-80 bg-white border border-[#c3c5d9]/30 shadow-2xl z-[100] overflow-hidden animate-in fade-in slide-in-from-top-2 duration-200">
+                    <div className="px-4 py-3 border-b border-[#c3c5d9]/20 flex items-center justify-between bg-[#f8faff]">
+                      <h3 className="text-[10px] font-black uppercase tracking-widest text-[#0b1c30]">Notifications</h3>
+                      <button className="text-[9px] font-bold text-[#0047cc] uppercase hover:underline">Mark all read</button>
+                    </div>
+                    <div className="max-h-64 overflow-y-auto">
+                      {notifications.map((n) => (
+                        <div key={n.id} className={`px-4 py-3 border-b border-[#c3c5d9]/10 hover:bg-[#f8faff] transition-colors cursor-pointer ${n.unread ? 'bg-[#eff4ff]/30' : ''}`}>
+                          <div className="flex gap-3">
+                            <div className={`w-1.5 h-1.5 rounded-full mt-1.5 flex-shrink-0 ${n.unread ? 'bg-[#0047cc]' : 'bg-transparent'}`} />
+                            <div className="min-w-0">
+                              <p className="text-[11px] font-bold text-[#0b1c30] leading-none mb-1">{n.title}</p>
+                              <p className="text-[10px] text-slate-500 leading-tight">{n.desc}</p>
+                              <p className="text-[9px] font-mono text-slate-400 mt-2">{n.time}</p>
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                    <div className="px-4 py-2 border-t border-[#c3c5d9]/20 text-center bg-[#f8faff]">
+                      <button className="text-[9px] font-bold text-slate-500 uppercase tracking-widest hover:text-[#0b1c30]">View all alerts</button>
+                    </div>
+                  </div>
+                )}
+              </div>
+              <div className="h-8 w-px bg-[#c3c5d9]/20 mx-1" />
               <button
-                className="p-2 hover:bg-[#eff4ff] rounded-sm transition-colors"
+                className="p-2 hover:bg-[#eff4ff] rounded-sm transition-colors text-slate-500"
                 onClick={handleLogout}
                 title="Log out"
               >
-                <span className="material-symbols-outlined text-slate-500" style={{ fontSize: 20 }}>
+                <span className="material-symbols-outlined" style={{ fontSize: 20 }}>
                   logout
                 </span>
               </button>
-              <div className="w-8 h-8 rounded-sm bg-[#0047cc] text-white text-xs font-bold flex items-center justify-center uppercase">
+              <div className="w-8 h-8 rounded-sm bg-[#0047cc] text-white text-xs font-bold flex items-center justify-center uppercase ml-1">
                 {initials}
               </div>
             </div>

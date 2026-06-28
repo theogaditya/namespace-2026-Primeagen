@@ -124,6 +124,7 @@ export default function AgentRevampedDashboard() {
   const [compareResult, setCompareResult] = useState<{ match: boolean; confidence: number; reason: string } | null>(null)
   const [compareError, setCompareError] = useState<string | null>(null)
   const [chatComplaint, setChatComplaint] = useState<Complaint | null>(null)
+  const [workloadData, setWorkloadData] = useState<{ currentWorkload: number; workloadLimit: number; availabilityStatus?: string } | null>(null)
 
   useEffect(() => {
     try {
@@ -132,9 +133,69 @@ export default function AgentRevampedDashboard() {
         const obj = JSON.parse(raw)
         setCurrentAdminId(obj?.id || obj?.userId || obj?.adminId || null)
         setAdminType(obj?.adminType || localStorage.getItem("adminType") || null)
+        // Initialize workload from localStorage (login response) as fallback
+        if (obj?.workloadLimit !== undefined || obj?.currentWorkload !== undefined) {
+          setWorkloadData({
+            currentWorkload: obj.currentWorkload ?? 0,
+            workloadLimit: obj.workloadLimit ?? 10,
+            availabilityStatus: obj.availabilityStatus,
+          })
+        }
       }
     } catch {}
   }, [])
+
+  // Fetch agent workload data from /api/agent/me (live data, overrides localStorage fallback)
+  useEffect(() => {
+    const fetchWorkloadData = async () => {
+      try {
+        const token = localStorage.getItem("token")
+        if (!token) return
+        const res = await fetch(`${API_URL}/api/agent/me`, {
+          headers: { Authorization: `Bearer ${token}` },
+        })
+        const data = await res.json()
+        if (data.agent) {
+          const wl = {
+            currentWorkload: data.agent.currentWorkload ?? 0,
+            workloadLimit: data.agent.workloadLimit ?? 10,
+            availabilityStatus: data.agent.availabilityStatus,
+          }
+          setWorkloadData(wl)
+          // Also update localStorage so fallback stays fresh
+          try {
+            const raw = localStorage.getItem("admin")
+            if (raw) {
+              const obj = JSON.parse(raw)
+              obj.currentWorkload = wl.currentWorkload
+              obj.workloadLimit = wl.workloadLimit
+              obj.availabilityStatus = wl.availabilityStatus
+              localStorage.setItem("admin", JSON.stringify(obj))
+            }
+          } catch {}
+        }
+      } catch (e) {
+        console.error("Error fetching workload data", e)
+        // Fallback: if API fails, try localStorage
+        if (!workloadData) {
+          try {
+            const raw = localStorage.getItem("admin")
+            if (raw) {
+              const obj = JSON.parse(raw)
+              if (obj?.workloadLimit !== undefined) {
+                setWorkloadData({
+                  currentWorkload: obj.currentWorkload ?? 0,
+                  workloadLimit: obj.workloadLimit ?? 10,
+                  availabilityStatus: obj.availabilityStatus,
+                })
+              }
+            }
+          } catch {}
+        }
+      }
+    }
+    fetchWorkloadData()
+  }, [assigning])
 
   const fetchComplaints = async (showLoader = true) => {
     if (showLoader) setLoading(true)
@@ -362,6 +423,116 @@ export default function AgentRevampedDashboard() {
               </button>
             </div>
           </div>
+
+          {/* Workload Capacity Indicator */}
+          {workloadData && (() => {
+            const pct = workloadData.workloadLimit > 0
+              ? Math.round((workloadData.currentWorkload / workloadData.workloadLimit) * 100)
+              : 0
+            const remaining = Math.max(0, workloadData.workloadLimit - workloadData.currentWorkload)
+            const isNearFull = pct >= 85
+            const isMid = pct >= 60 && pct < 85
+            const accentColor = isNearFull ? "#ba1a1a" : isMid ? "#c77a00" : "#006c49"
+            const accentBg = isNearFull ? "#ffdad6" : isMid ? "#fff3e0" : "#e6f7ef"
+            const statusText = isNearFull
+              ? "CAPACITY CRITICAL"
+              : isMid
+              ? "MODERATE LOAD"
+              : "CAPACITY AVAILABLE"
+            const statusIcon = isNearFull ? "error" : isMid ? "warning" : "check_circle"
+            // SVG circular gauge parameters
+            const radius = 38
+            const circumference = 2 * Math.PI * radius
+            const dashOffset = circumference - (pct / 100) * circumference
+
+            return (
+              <div className="bg-white border border-[#c3c5d9]/30 shadow-sm p-5 flex items-center gap-6">
+                {/* Circular gauge */}
+                <div className="relative flex-shrink-0" style={{ width: 96, height: 96 }}>
+                  <svg width="96" height="96" viewBox="0 0 96 96">
+                    <circle
+                      cx="48" cy="48" r={radius}
+                      fill="none" stroke="#e5eeff" strokeWidth="7"
+                    />
+                    <circle
+                      cx="48" cy="48" r={radius}
+                      fill="none" stroke={accentColor} strokeWidth="7"
+                      strokeLinecap="round"
+                      strokeDasharray={circumference}
+                      strokeDashoffset={dashOffset}
+                      transform="rotate(-90 48 48)"
+                      style={{ transition: "stroke-dashoffset 0.8s ease-in-out, stroke 0.5s ease" }}
+                    />
+                  </svg>
+                  <div className="absolute inset-0 flex flex-col items-center justify-center">
+                    <span className="text-lg font-mono font-black" style={{ color: accentColor }}>
+                      {pct}%
+                    </span>
+                    <span className="text-[8px] font-bold text-slate-400 uppercase tracking-widest">USED</span>
+                  </div>
+                </div>
+
+                {/* Info */}
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-2">
+                    <span
+                      className="material-symbols-outlined"
+                      style={{ fontSize: 18, color: accentColor, fontVariationSettings: "'FILL' 1" }}
+                    >
+                      {statusIcon}
+                    </span>
+                    <span className="text-[10px] font-black uppercase tracking-widest" style={{ color: accentColor }}>
+                      {statusText}
+                    </span>
+                  </div>
+                  <p className="text-xs text-slate-500 mt-1">
+                    You have <span className="font-mono font-bold text-[#0b1c30]">{workloadData.currentWorkload}</span> of{" "}
+                    <span className="font-mono font-bold text-[#0b1c30]">{workloadData.workloadLimit}</span> complaint slots occupied.
+                  </p>
+                  <div className="mt-2.5 flex items-center gap-4">
+                    <div className="flex-1 h-2 rounded-full overflow-hidden" style={{ backgroundColor: "#e5eeff" }}>
+                      <div
+                        className="h-full rounded-full"
+                        style={{
+                          width: `${Math.min(pct, 100)}%`,
+                          backgroundColor: accentColor,
+                          transition: "width 0.8s ease-in-out, background-color 0.5s ease",
+                        }}
+                      />
+                    </div>
+                    <span className="text-[10px] font-mono font-bold whitespace-nowrap" style={{ color: accentColor }}>
+                      {remaining} SLOTS FREE
+                    </span>
+                  </div>
+                  {isNearFull && (
+                    <p className="text-[10px] text-[#ba1a1a] mt-2 flex items-center gap-1">
+                      <span className="material-symbols-outlined" style={{ fontSize: 12 }}>info</span>
+                      Complete or escalate existing complaints to free up capacity.
+                    </p>
+                  )}
+                </div>
+
+                {/* Quick stats */}
+                <div className="hidden lg:flex flex-col gap-2 text-right flex-shrink-0">
+                  <div
+                    className="px-3 py-2 rounded-sm"
+                    style={{ backgroundColor: accentBg }}
+                  >
+                    <p className="text-[9px] font-bold uppercase tracking-widest text-slate-400">Current</p>
+                    <p className="text-xl font-mono font-black" style={{ color: accentColor }}>
+                      {workloadData.currentWorkload}
+                    </p>
+                  </div>
+                  <div className="px-3 py-2 bg-[#eff4ff] rounded-sm">
+                    <p className="text-[9px] font-bold uppercase tracking-widest text-slate-400">Max Limit</p>
+                    <p className="text-xl font-mono font-black text-[#0047cc]">
+                      {workloadData.workloadLimit}
+                    </p>
+                  </div>
+                </div>
+              </div>
+            )
+          })()}
 
           {/* Stats */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
