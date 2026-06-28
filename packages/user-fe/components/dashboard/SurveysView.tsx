@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect, useCallback } from "react";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import type { SurveyListItem, SurveyResponse } from "@/types/survey";
 import SurveyListPanel from "./surveys/SurveyListPanel";
 import SurveyAttendPanel from "./surveys/SurveyAttendPanel";
@@ -20,10 +20,12 @@ export default function SurveysView({ authToken }: SurveysViewProps) {
   const [total, setTotal] = useState(0);
 
   const [categoryFilter, setCategoryFilter] = useState("");
+  const [statusFilter, setStatusFilter] = useState<"ALL" | "OPEN" | "CLOSED">("OPEN");
   const [searchQuery, setSearchQuery] = useState("");
   const [debouncedSearch, setDebouncedSearch] = useState("");
 
   const [selectedSurveyId, setSelectedSurveyId] = useState<string | null>(null);
+  const [resultsOnly, setResultsOnly] = useState(false);
   const [respondedSurveyIds, setRespondedSurveyIds] = useState<Set<string>>(new Set());
   const [allCategories, setAllCategories] = useState<string[]>([]);
 
@@ -47,8 +49,11 @@ export default function SurveysView({ authToken }: SurveysViewProps) {
       params.set("limit", "12");
       if (categoryFilter) params.set("category", categoryFilter);
       if (debouncedSearch) params.set("search", debouncedSearch);
+      // Forward status filter so the backend returns only the matching surveys
+      if (statusFilter === "CLOSED") params.set("status", "CLOSED");
+      else if (statusFilter === "OPEN") params.set("status", "OPEN");
 
-      const res = await fetch(`/api/surveys?${params.toString()}`, {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/surveys?${params.toString()}`, {
         headers: authToken ? { Authorization: `Bearer ${authToken}` } : {},
       });
       const data = await res.json();
@@ -73,18 +78,31 @@ export default function SurveysView({ authToken }: SurveysViewProps) {
     } finally {
       setLoading(false);
     }
-  }, [page, categoryFilter, debouncedSearch, authToken]);
+  }, [page, categoryFilter, debouncedSearch, statusFilter, authToken]);
 
   useEffect(() => {
     fetchSurveys();
   }, [fetchSurveys]);
+
+  // Listen for status filter change events from SurveyListPanel
+  useEffect(() => {
+    const handler = (e: any) => {
+      const val = e?.detail as "ALL" | "OPEN" | "CLOSED" | undefined
+      if (val) {
+        setStatusFilter(val)
+        setPage(1)
+      }
+    }
+    window.addEventListener('statusFilterChange', handler)
+    return () => window.removeEventListener('statusFilterChange', handler)
+  }, [])
 
   // Fetch user's responded surveys
   const fetchMyResponses = useCallback(async () => {
     if (!authToken) return;
 
     try {
-      const res = await fetch("/api/surveys/my-responses", {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/surveys/my-responses`, {
         headers: { Authorization: `Bearer ${authToken}` },
       });
       const data = await res.json();
@@ -117,14 +135,30 @@ export default function SurveysView({ authToken }: SurveysViewProps) {
   };
 
   const handleSelectSurvey = (survey: SurveyListItem) => {
+    // If the survey is closed (explicit status or endsAt in past), open in results-only mode
+    const isClosed = survey.status === "CLOSED" || (survey.endsAt && new Date(survey.endsAt) <= new Date());
+    setResultsOnly(!!isClosed);
     setSelectedSurveyId(survey.id);
   };
 
   const handleBack = () => {
     setSelectedSurveyId(null);
+    setResultsOnly(false);
     // Refresh the list to get updated response status
     fetchSurveys();
     fetchMyResponses();
+  };
+
+  const [refreshing, setRefreshing] = useState(false);
+
+  const handleRefresh = async () => {
+    setRefreshing(true);
+    try {
+      await fetchSurveys();
+      await fetchMyResponses();
+    } finally {
+      setRefreshing(false);
+    }
   };
 
   return (
@@ -140,40 +174,68 @@ export default function SurveysView({ authToken }: SurveysViewProps) {
             <p className="text-[10px] font-black uppercase tracking-[0.2em] text-violet-700 mb-1">
               Civic Surveys
             </p>
-            <h1 className="text-2xl font-extrabold text-slate-900">
-              Share Your Voice
-            </h1>
-            <p className="text-sm text-slate-500 mt-1">
-              Participate in surveys from civic organisations and help shape community decisions.
-            </p>
+            <h1 className="text-2xl font-extrabold text-slate-900">Share Your Voice</h1>
+            <div className="flex items-start justify-between gap-4">
+              <p className="text-sm text-slate-500 mt-1">
+                Participate in surveys from civic organisations and help shape community decisions.
+              </p>
+              <div className="ml-4 mt-1">
+                <button
+                  onClick={handleRefresh}
+                  disabled={refreshing}
+                  className="h-9 px-3 rounded-lg border border-slate-200 bg-white text-sm font-bold text-slate-600 hover:bg-slate-50 disabled:opacity-50 flex items-center justify-center gap-2"
+                >
+                  <span className="hidden sm:inline leading-none">{refreshing ? "Refreshing…" : "Refresh"}</span>
+                </button>
+              </div>
+            </div>
           </div>
         )}
 
-        {/* Content */}
-        {selectedSurveyId ? (
-          <SurveyAttendPanel
-            surveyId={selectedSurveyId}
-            authToken={authToken}
-            onBack={handleBack}
-          />
-        ) : (
-          <SurveyListPanel
-            surveys={surveys}
-            loading={loading}
-            error={error}
-            page={page}
-            totalPages={totalPages}
-            total={total}
-            categoryFilter={categoryFilter}
-            searchQuery={searchQuery}
-            respondedSurveyIds={respondedSurveyIds}
-            categories={allCategories}
-            onCategoryChange={handleCategoryChange}
-            onSearchChange={handleSearchChange}
-            onPageChange={handlePageChange}
-            onSelectSurvey={handleSelectSurvey}
-          />
-        )}
+        <AnimatePresence mode="wait">
+          {selectedSurveyId ? (
+            <motion.div
+              key={selectedSurveyId}
+              initial={{ opacity: 0, x: 8 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: -8 }}
+              transition={{ duration: 0.18 }}
+            >
+              <SurveyAttendPanel
+                surveyId={selectedSurveyId}
+                authToken={authToken}
+                onBack={handleBack}
+                resultsOnly={resultsOnly}
+              />
+            </motion.div>
+          ) : (
+            <motion.div
+              key="list"
+              initial={{ opacity: 0, x: -8 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: 8 }}
+              transition={{ duration: 0.18 }}
+            >
+              <SurveyListPanel
+                surveys={surveys}
+                loading={loading}
+                error={error}
+                page={page}
+                totalPages={totalPages}
+                total={total}
+                categoryFilter={categoryFilter}
+                statusFilter={statusFilter}
+                searchQuery={searchQuery}
+                respondedSurveyIds={respondedSurveyIds}
+                categories={allCategories}
+                onCategoryChange={handleCategoryChange}
+                onSearchChange={handleSearchChange}
+                onPageChange={handlePageChange}
+                onSelectSurvey={handleSelectSurvey}
+              />
+            </motion.div>
+          )}
+        </AnimatePresence>
       </motion.div>
     </div>
   );

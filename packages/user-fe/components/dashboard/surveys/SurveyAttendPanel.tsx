@@ -18,16 +18,26 @@ import type {
 } from "@/types/survey";
 import SurveyQuestionRenderer from "./SurveyQuestionRenderer";
 
+function getDaysUntilClose(endsAt: string | null): number | null {
+  if (!endsAt) return null;
+  const end = new Date(endsAt);
+  const now = new Date();
+  const diff = end.getTime() - now.getTime();
+  return Math.ceil(diff / (1000 * 60 * 60 * 24));
+}
+
 interface SurveyAttendPanelProps {
   surveyId: string;
   authToken: string | null;
   onBack: () => void;
+  resultsOnly?: boolean;
 }
 
 export default function SurveyAttendPanel({
   surveyId,
   authToken,
   onBack,
+  resultsOnly = false,
 }: SurveyAttendPanelProps) {
   const [survey, setSurvey] = useState<SurveyDetail | null>(null);
   const [loading, setLoading] = useState(true);
@@ -42,6 +52,8 @@ export default function SurveyAttendPanel({
   const [hasResponded, setHasResponded] = useState(false);
   const [submittedAt, setSubmittedAt] = useState<string | null>(null);
   const [checkingResponse, setCheckingResponse] = useState(true);
+  const [results, setResults] = useState<any | null>(null);
+  const [resultsLoading, setResultsLoading] = useState(false);
 
   const startedAtRef = useRef<string>(new Date().toISOString());
 
@@ -51,7 +63,7 @@ export default function SurveyAttendPanel({
       setLoading(true);
       setError(null);
       try {
-        const res = await fetch(`/api/surveys/${surveyId}`, {
+        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/surveys/${surveyId}`, {
           headers: authToken ? { Authorization: `Bearer ${authToken}` } : {},
         });
         const data = await res.json();
@@ -77,7 +89,7 @@ export default function SurveyAttendPanel({
         return;
       }
       try {
-        const res = await fetch(`/api/surveys/${surveyId}/my-response`, {
+        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/surveys/${surveyId}/my-response`, {
           headers: { Authorization: `Bearer ${authToken}` },
         });
         const data: MyResponseCheckResponse = await res.json();
@@ -93,6 +105,47 @@ export default function SurveyAttendPanel({
     }
     checkResponse();
   }, [surveyId, authToken]);
+
+  const fetchResults = useCallback(async () => {
+    setResultsLoading(true);
+    try {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/surveys/${surveyId}/results`, {
+        headers: authToken ? { Authorization: `Bearer ${authToken}` } : {},
+      });
+      if (!res.ok) {
+        // If backend doesn't expose results, clear results and return
+        setResults(null);
+        return;
+      }
+      const data = await res.json();
+      if (data.success) setResults(data.data);
+    } catch (err) {
+      // ignore network errors
+    } finally {
+      setResultsLoading(false);
+    }
+  }, [surveyId, authToken]);
+
+  // When we learn the user has already responded, fetch aggregated results
+  useEffect(() => {
+    if (hasResponded) {
+      fetchResults();
+    }
+  }, [hasResponded, fetchResults]);
+
+  // If parent requests results-only mode, fetch results immediately
+  useEffect(() => {
+    if (resultsOnly) fetchResults();
+  }, [resultsOnly, fetchResults]);
+
+  // If the survey is closed (endsAt in the past or status === 'CLOSED'), fetch results
+  useEffect(() => {
+    if (!survey) return;
+    const days = getDaysUntilClose(survey.endsAt);
+    if (survey.status === 'CLOSED' || (days !== null && days <= 0)) {
+      fetchResults();
+    }
+  }, [survey, fetchResults]);
 
   const handleAnswerChange = useCallback((payload: AnswerPayload) => {
     setAnswers((prev) => ({
@@ -173,7 +226,7 @@ export default function SurveyAttendPanel({
     setSubmitError(null);
 
     try {
-      const res = await fetch(`/api/surveys/${surveyId}/respond`, {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/surveys/${surveyId}/respond`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -185,11 +238,14 @@ export default function SurveyAttendPanel({
         }),
       });
       const data = await res.json();
-      if (data.success) {
-        setSubmitSuccess(true);
-      } else {
-        setSubmitError(data.error || "Failed to submit response");
-      }
+        if (data.success) {
+          setSubmitSuccess(true);
+          setHasResponded(true);
+          setSubmittedAt(data.submittedAt || new Date().toISOString());
+          fetchResults();
+        } else {
+          setSubmitError(data.error || "Failed to submit response");
+        }
     } catch {
       setSubmitError("Failed to submit response. Please try again.");
     } finally {
@@ -268,6 +324,116 @@ export default function SurveyAttendPanel({
             )}
           </div>
         </div>
+        <div className="flex gap-3">
+          <button onClick={onBack} className="px-4 py-2 rounded-xl bg-violet-600 text-white">Back</button>
+        </div>
+
+        {results && (
+          <div className="bg-white rounded-2xl border border-slate-100 p-6">
+            <h3 className="font-bold mb-3">Survey Results</h3>
+            <div className="space-y-4">
+              <div className="text-sm text-slate-500">Total responses: {results?.totalResponses ?? "—"}</div>
+              {results?.perQuestion?.map((q: any) => {
+                const distribution = q.distribution || {};
+                const entries = (Object.entries(distribution) as [string, number][]).sort((a, b) => (b[1] || 0) - (a[1] || 0));
+                const top = entries[0];
+                return (
+                  <div key={q.questionId} className="p-3 bg-slate-50 rounded">
+                    <div className="font-semibold text-sm">{q.questionText}</div>
+                    {entries.length > 0 ? (
+                      <div className="mt-2 text-sm">
+                        <div className="text-sm font-medium">Most selected: <span className="font-semibold">{top[0]}</span> — <span className="text-slate-500">{top[1]} responses</span></div>
+                        <ul className="text-sm mt-2">
+                          {entries.map(([opt, cnt]) => (
+                            <li key={opt} className="flex justify-between">
+                              <span>{opt}</span>
+                              <span className="text-slate-500">{cnt}</span>
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    ) : q.average !== undefined ? (
+                      <div className="text-sm mt-2">Average rating: {q.average} ({q.count} responses)</div>
+                    ) : (
+                      <div className="text-sm mt-2">Responses: {q.count}</div>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        )}
+      </div>
+    );
+  }
+
+  // If opened in results-only mode by parent, show only header + results (no form)
+  if (resultsOnly) {
+    return (
+      <div className="space-y-6">
+        <button
+          onClick={onBack}
+          className="text-violet-600 hover:text-violet-800 font-medium flex items-center gap-1"
+        >
+          <ArrowLeft className="w-4 h-4" />
+          Back to Surveys
+        </button>
+
+        <div className="bg-white rounded-2xl border border-slate-200/70 p-6">
+          <h1 className="text-xl font-extrabold text-slate-900">{survey?.title ?? "Survey"}</h1>
+          <div className="flex flex-wrap items-center gap-3 mt-2">
+            <span className="inline-flex items-center gap-1.5 text-xs text-slate-500">
+              <Building2 className="w-3.5 h-3.5" />
+              {survey?.civicPartner?.orgName}
+            </span>
+            <span className="text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded-full bg-violet-100 text-violet-700">
+              {survey?.category}
+            </span>
+          </div>
+          <p className="text-sm text-slate-600 mt-4">{survey?.description}</p>
+        </div>
+
+        {resultsLoading && !results ? (
+          <div className="mt-4 text-sm text-slate-500">Loading results…</div>
+        ) : null}
+
+        {results ? (
+          <div className="bg-white rounded-2xl border border-slate-100 p-6">
+            <h3 className="font-bold mb-3">Survey Results</h3>
+            <div className="space-y-4">
+              <div className="text-sm text-slate-500">Total responses: {results?.totalResponses ?? "—"}</div>
+              {results?.perQuestion?.map((q: any) => {
+                const distribution = q.distribution || {};
+                const entries = (Object.entries(distribution) as [string, number][]).sort((a, b) => (b[1] || 0) - (a[1] || 0));
+                const top = entries[0];
+                return (
+                  <div key={q.questionId} className="p-3 bg-slate-50 rounded">
+                    <div className="font-semibold text-sm">{q.questionText}</div>
+                    {entries.length > 0 ? (
+                      <div className="mt-2 text-sm">
+                        <div className="text-sm font-medium">Most selected: <span className="font-semibold">{top[0]}</span> — <span className="text-slate-500">{top[1]} responses</span></div>
+                        <ul className="text-sm mt-2">
+                          {entries.map(([opt, cnt]) => (
+                            <li key={opt} className="flex justify-between">
+                              <span>{opt}</span>
+                              <span className="text-slate-500">{cnt}</span>
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    ) : q.average !== undefined ? (
+                      <div className="text-sm mt-2">Average rating: {q.average} ({q.count} responses)</div>
+                    ) : (
+                      <div className="text-sm mt-2">Responses: {q.count}</div>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        ) : (
+          <div className="text-sm text-slate-500">Results are not available for this survey.</div>
+        )}
       </div>
     );
   }
@@ -391,25 +557,80 @@ export default function SurveyAttendPanel({
         </div>
       )}
 
-      {/* Submit button */}
-      <button
-        onClick={handleSubmit}
-        disabled={isSubmitting || !authToken}
-        className={`w-full py-3 px-4 rounded-xl font-bold flex items-center justify-center gap-2 transition-all ${
-          canSubmit && authToken
-            ? "bg-[var(--dash-primary)] text-white shadow-lg shadow-[var(--dash-primary)]/20 hover:scale-[1.01] active:scale-[0.99]"
-            : "bg-slate-200 text-slate-500 cursor-not-allowed"
-        }`}
-      >
-        {isSubmitting ? (
-          <>
-            <Loader2 className="w-4 h-4 animate-spin" />
-            Submitting...
-          </>
-        ) : (
-          "Submit Response"
-        )}
-      </button>
+      {/* Submit / Results buttons */}
+      {getDaysUntilClose(survey.endsAt) !== null && getDaysUntilClose(survey.endsAt)! <= 0 ? (
+        <div>
+          <div className="flex gap-3 mb-3">
+            <button
+              onClick={onBack}
+              className="py-3 px-4 rounded-xl font-bold bg-slate-200 text-slate-600"
+            >
+              Back
+            </button>
+          </div>
+          {/* fetchResults will be triggered automatically for closed surveys */}
+        </div>
+      ) : (
+        <button
+          onClick={handleSubmit}
+          disabled={isSubmitting || !authToken}
+          className={`w-full py-3 px-4 rounded-xl font-bold flex items-center justify-center gap-2 transition-all ${
+            canSubmit && authToken
+              ? "bg-[var(--dash-primary)] text-white shadow-lg shadow-[var(--dash-primary)]/20 hover:scale-[1.01] active:scale-[0.99]"
+              : "bg-slate-200 text-slate-500 cursor-not-allowed"
+          }`}
+        >
+          {isSubmitting ? (
+            <>
+              <Loader2 className="w-4 h-4 animate-spin" />
+              Submitting...
+            </>
+          ) : (
+            "Submit Response"
+          )}
+        </button>
+      )}
+      {/* Results panel: shown automatically when available (after submit, if already responded, or when survey closed) */}
+      {resultsLoading && !results ? (
+        <div className="mt-4 text-sm text-slate-500">Loading results…</div>
+      ) : null}
+      {results && (
+        <div className="mt-4">
+          <div className="bg-white rounded-2xl border border-slate-100 p-6">
+            <h3 className="font-bold mb-3">Survey Results</h3>
+            <div className="space-y-4">
+              <div className="text-sm text-slate-500">Total responses: {results?.totalResponses ?? "—"}</div>
+              {results?.perQuestion?.map((q: any) => {
+                const distribution = q.distribution || {};
+                const entries = (Object.entries(distribution) as [string, number][]).sort((a, b) => (b[1] || 0) - (a[1] || 0));
+                const top = entries[0];
+                return (
+                  <div key={q.questionId} className="p-3 bg-slate-50 rounded">
+                    <div className="font-semibold text-sm">{q.questionText}</div>
+                    {entries.length > 0 ? (
+                      <div className="mt-2 text-sm">
+                        <div className="text-sm font-medium">Most selected: <span className="font-semibold">{top[0]}</span> — <span className="text-slate-500">{top[1]} responses</span></div>
+                        <ul className="text-sm mt-2">
+                          {entries.map(([opt, cnt]) => (
+                            <li key={opt} className="flex justify-between">
+                              <span>{opt}</span>
+                              <span className="text-slate-500">{cnt}</span>
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    ) : q.average !== undefined ? (
+                      <div className="text-sm mt-2">Average rating: {q.average} ({q.count} responses)</div>
+                    ) : (
+                      <div className="text-sm mt-2">Responses: {q.count}</div>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

@@ -19,6 +19,7 @@ interface SurveyListPanelProps {
   totalPages: number;
   total: number;
   categoryFilter: string;
+  statusFilter?: "ALL" | "OPEN" | "CLOSED";
   searchQuery: string;
   respondedSurveyIds: Set<string>;
   categories: string[];
@@ -36,6 +37,7 @@ export default function SurveyListPanel({
   totalPages,
   total,
   categoryFilter,
+  statusFilter = "OPEN",
   searchQuery,
   respondedSurveyIds,
   categories,
@@ -65,7 +67,7 @@ export default function SurveyListPanel({
         </div>
 
         {/* Category filter */}
-        <div className="flex gap-2 overflow-x-auto pb-1 sm:pb-0">
+          <div className="flex gap-2 overflow-x-auto pb-1 sm:pb-0">
           {/* Always show All button */}
           <button
             onClick={() => onCategoryChange("")}
@@ -90,6 +92,39 @@ export default function SurveyListPanel({
               {cat}
             </button>
           ))}
+          {/* Status filter */}
+          <div className="flex items-center ml-3 gap-2">
+            <button onClick={() => onCategoryChange(categoryFilter)} className="sr-only">status</button>
+            <div className="flex items-center gap-1 text-xs text-slate-500">Show:</div>
+            <button onClick={() => onPageChange(1)} className="sr-only">reset</button>
+          </div>
+        </div>
+
+        <div className="flex items-center gap-2 ml-2">
+          <button
+            onClick={() => window.dispatchEvent(new CustomEvent('statusFilterChange', { detail: 'OPEN' }))}
+            className={`px-3 py-1.5 rounded-lg text-xs font-semibold whitespace-nowrap transition-all ${
+              statusFilter === 'OPEN' ? 'bg-violet-100 text-violet-700' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+            }`}
+          >
+            Open
+          </button>
+          <button
+            onClick={() => window.dispatchEvent(new CustomEvent('statusFilterChange', { detail: 'CLOSED' }))}
+            className={`px-3 py-1.5 rounded-lg text-xs font-semibold whitespace-nowrap transition-all ${
+              statusFilter === 'CLOSED' ? 'bg-violet-100 text-violet-700' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+            }`}
+          >
+            Closed
+          </button>
+          <button
+            onClick={() => window.dispatchEvent(new CustomEvent('statusFilterChange', { detail: 'ALL' }))}
+            className={`px-3 py-1.5 rounded-lg text-xs font-semibold whitespace-nowrap transition-all ${
+              statusFilter === 'ALL' ? 'bg-violet-100 text-violet-700' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+            }`}
+          >
+            All
+          </button>
         </div>
       </div>
 
@@ -97,8 +132,11 @@ export default function SurveyListPanel({
       {loading && (
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           {[1, 2, 3, 4].map((i) => (
-            <div
+            <motion.div
               key={i}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 0.3, delay: i * 0.05 }}
               className="bg-slate-100 animate-pulse rounded-2xl h-44"
             />
           ))}
@@ -136,14 +174,22 @@ export default function SurveyListPanel({
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            {surveys.map((survey, index) => (
-              <SurveyCard
+            {surveys
+              .map((survey, index) => (
+              <motion.div
                 key={survey.id}
-                survey={survey}
-                index={index}
-                isCompleted={respondedSurveyIds.has(survey.id)}
-                onSelect={() => onSelectSurvey(survey)}
-              />
+                initial={{ opacity: 0, y: 6 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: index * 0.03 }}
+                layout
+              >
+                <SurveyCard
+                  survey={survey}
+                  index={index}
+                  isCompleted={respondedSurveyIds.has(survey.id)}
+                  onSelect={() => onSelectSurvey(survey)}
+                />
+              </motion.div>
             ))}
           </div>
 

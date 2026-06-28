@@ -274,6 +274,29 @@ export default function (prisma: PrismaClient) {
     }
   });
 
+  // ─── PATCH /api/civic-partner/surveys/:surveyId/visibility ───────────────
+  // Toggle isPublic on a CLOSED survey so it appears (or disappears) in the
+  // public user-facing listing.
+  router.patch('/:surveyId/visibility', async (req, res: any) => {
+    const { id: civicPartnerId } = getCivicPartner(req);
+    const { surveyId } = req.params;
+    try {
+      const existing = await prisma.survey.findFirst({ where: { id: surveyId, civicPartnerId } });
+      if (!existing) return res.status(404).json({ success: false, message: 'Survey not found' });
+      if (existing.status !== 'CLOSED') {
+        return res.status(400).json({ success: false, message: 'Visibility can only be toggled on CLOSED surveys' });
+      }
+      const survey = await prisma.survey.update({
+        where: { id: surveyId },
+        data: { isPublic: !existing.isPublic },
+      });
+      return res.json({ success: true, message: `Survey is now ${survey.isPublic ? 'public' : 'private'}`, survey });
+    } catch (err) {
+      console.error('[surveys.visibility]', err);
+      return res.status(500).json({ success: false, message: 'Server error' });
+    }
+  });
+
   // ─── DELETE /api/civic-partner/surveys/:surveyId ─────────────────────────
   // Soft-delete: moves survey to ARCHIVED status.
   router.delete('/:surveyId', async (req, res: any) => {
@@ -292,6 +315,33 @@ export default function (prisma: PrismaClient) {
       return res.json({ success: true, message: 'Survey archived' });
     } catch (err) {
       console.error('[surveys.archive]', err);
+      return res.status(500).json({ success: false, message: 'Server error' });
+    }
+  });
+
+  // ─── DELETE /api/civic-partner/surveys/:surveyId/permanent ─────────────
+  // Permanent delete: removes survey and all associated questions, answers and responses.
+  router.delete('/:surveyId/permanent', async (req, res: any) => {
+    const { id: civicPartnerId } = getCivicPartner(req);
+    const { surveyId } = req.params;
+    try {
+      const existing = await prisma.survey.findFirst({ where: { id: surveyId, civicPartnerId } });
+      if (!existing) return res.status(404).json({ success: false, message: 'Survey not found' });
+
+      await prisma.$transaction(async (tx) => {
+        const questions = await tx.surveyQuestion.findMany({ where: { surveyId }, select: { id: true } });
+        const qIds = questions.map((q) => q.id);
+        if (qIds.length > 0) {
+          await tx.surveyAnswer.deleteMany({ where: { questionId: { in: qIds } } });
+        }
+        await tx.surveyResponse.deleteMany({ where: { surveyId } });
+        await tx.surveyQuestion.deleteMany({ where: { surveyId } });
+        await tx.survey.delete({ where: { id: surveyId } });
+      });
+
+      return res.json({ success: true, message: 'Survey permanently deleted' });
+    } catch (err) {
+      console.error('[surveys.permanentDelete]', err);
       return res.status(500).json({ success: false, message: 'Server error' });
     }
   });

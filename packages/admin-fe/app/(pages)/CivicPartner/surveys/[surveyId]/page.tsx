@@ -76,7 +76,7 @@ export default function SurveyDetailPage({ params }: { params: Promise<{ surveyI
   const [saving, setSaving]         = useState(false)
   const [transitioning, setTransitioning] = useState(false)
   const [showConfirm, setShowConfirm] = useState(false)
-  const [confirmType, setConfirmType] = useState<"close" | "reopen" | "archive" | null>(null)
+  const [confirmType, setConfirmType] = useState<"close" | "reopen" | "archive" | "delete" | null>(null)
   const [confirmInput, setConfirmInput] = useState("")
   const confirmCbRef = useRef<(() => void) | null>(null)
   const [activeTab, setActiveTab]   = useState<Tab>("overview")
@@ -195,7 +195,7 @@ export default function SurveyDetailPage({ params }: { params: Promise<{ surveyI
     } finally { setTransitioning(false) }
   }
 
-  const openConfirm = (type: "close" | "reopen" | "archive", cb: () => void) => {
+  const openConfirm = (type: "close" | "reopen" | "archive" | "delete", cb: () => void) => {
     setConfirmType(type)
     confirmCbRef.current = cb
     setConfirmInput("")
@@ -361,6 +361,29 @@ export default function SurveyDetailPage({ params }: { params: Promise<{ surveyI
                 {transitioning ? "Reopening…" : "Reopen Survey"}
               </button>
             )}
+            {/* Permanent Delete button */}
+            <button
+              onClick={() => openConfirm('delete', async () => {
+                setTransitioning(true)
+                try {
+                  const res = await fetch(`${API}/api/civic-partner/surveys/${surveyId}/permanent`, {
+                    method: 'DELETE',
+                    credentials: 'include',
+                  })
+                  const data = await res.json()
+                  if (!res.ok) throw new Error(data.message || 'Failed to delete')
+                  showToast('success', 'Survey permanently deleted.')
+                  router.push('/CivicPartner/surveys')
+                } catch (err) {
+                  showToast('error', err instanceof Error ? err.message : 'Failed to delete')
+                } finally { setTransitioning(false) }
+              })}
+              disabled={transitioning}
+              className="h-11 px-4 bg-white border border-gray-200 rounded-xl text-xs font-black text-rose-600 hover:bg-rose-50 transition-all disabled:opacity-40"
+              title="Permanently delete this survey and all its data"
+            >
+              <span className="material-symbols-outlined text-sm">delete_forever</span>
+            </button>
           </div>
         </div>
 
@@ -696,18 +719,26 @@ export default function SurveyDetailPage({ params }: { params: Promise<{ surveyI
       {showConfirm && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
           <div className="bg-white rounded-xl p-6 w-full max-w-lg mx-4">
-            <h3 className="text-lg font-bold mb-3">{confirmType === 'close' ? 'Confirm close survey' : confirmType === 'reopen' ? 'Confirm reopen' : 'Confirm archive'}</h3>
+            <h3 className="text-lg font-bold mb-3">
+              {confirmType === 'close' ? 'Confirm close survey' : confirmType === 'reopen' ? 'Confirm reopen' : confirmType === 'delete' ? 'Permanently delete survey' : 'Confirm archive'}
+            </h3>
             <p className="text-sm text-gray-600 mb-4">
-              {confirmType === 'close' ? 'Type CLOSE to confirm you want to close this survey. Closing will stop accepting responses.' : confirmType === 'reopen' ? 'Are you sure you want to reopen this survey? Reopening will make it live again.' : 'Are you sure you want to archive this survey? This will move it to the Archived list.'}
+              {confirmType === 'close'
+                ? 'Type CLOSE to confirm you want to close this survey. Closing will stop accepting responses.'
+                : confirmType === 'reopen'
+                ? 'Are you sure you want to reopen this survey? Reopening will make it live again.'
+                : confirmType === 'delete'
+                ? 'Type DELETE to permanently remove this survey and all associated data. This action is irreversible.'
+                : 'Are you sure you want to archive this survey? This will move it to the Archived list.'}
             </p>
-            {confirmType === 'close' && (
-              <input value={confirmInput} onChange={(e) => setConfirmInput(e.target.value)} placeholder="Type CLOSE to confirm" className="w-full px-4 py-2 border rounded mb-4" />
+            {(confirmType === 'close' || confirmType === 'delete') && (
+              <input value={confirmInput} onChange={(e) => setConfirmInput(e.target.value)} placeholder={confirmType === 'delete' ? "Type DELETE to confirm" : "Type CLOSE to confirm"} className="w-full px-4 py-2 border rounded mb-4" />
             )}
             <div className="flex justify-end gap-3">
               <button onClick={() => setShowConfirm(false)} className="px-4 py-2 rounded bg-gray-100">Cancel</button>
               <button
                 onClick={runConfirm}
-                disabled={confirmType === 'close' ? confirmInput.trim() !== 'CLOSE' : false}
+                disabled={confirmType === 'close' ? confirmInput.trim() !== 'CLOSE' : confirmType === 'delete' ? confirmInput.trim() !== 'DELETE' : false}
                 className="px-4 py-2 rounded bg-emerald-600 text-white disabled:opacity-50"
               >Confirm</button>
             </div>

@@ -46,17 +46,18 @@ export default function SurveyCard({
   onSelect,
 }: SurveyCardProps) {
   const statusBadge = getStatusBadge(survey.endsAt);
-  const isClosed = getDaysUntilClose(survey.endsAt) !== null && getDaysUntilClose(survey.endsAt)! <= 0;
+  const isClosed = survey.status === 'CLOSED' || (getDaysUntilClose(survey.endsAt) !== null && getDaysUntilClose(survey.endsAt)! <= 0);
 
   return (
     <motion.div
       initial={{ opacity: 0, y: 12 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: index * 0.05 }}
-      className={`bg-white rounded-2xl border border-slate-200/70 p-5 cursor-pointer hover:shadow-md hover:border-violet-200 transition-all relative ${
-        isClosed ? "opacity-60" : ""
-      }`}
-      onClick={!isClosed ? onSelect : undefined}
+      className={`bg-white rounded-2xl border border-slate-200/70 p-5 ${isClosed ? "opacity-60 cursor-pointer" : "cursor-pointer hover:shadow-md hover:border-violet-200"} transition-all relative`}
+      onClick={(e) => {
+        e.stopPropagation();
+        onSelect();
+      }}
     >
       {/* Completed badge */}
       {isCompleted && (
