@@ -15,7 +15,7 @@ export default function (prisma: PrismaClient) {
       const now = new Date();
       const data = await prisma.announcement.findMany({
         where: {
-          municipality,
+          municipality: { equals: municipality, mode: 'insensitive' },
           isActive: true,
           startsAt: { lte: now },
           OR: [{ expiresAt: null }, { expiresAt: { gt: now } }],
