@@ -20,6 +20,7 @@ import {
   Command,
   ChevronDown,
   Archive,
+  FileBarChart,
 } from "lucide-react"
 
 /* ─── Navigation Config ─── */
@@ -52,6 +53,12 @@ const NAV_SECTIONS: NavSection[] = [
     ],
   },
   {
+    title: "Intelligence",
+    items: [
+      { id: "reports", label: "AI Reports", icon: FileBarChart, href: "/CivicPartner/reports", badge: "AI" },
+    ],
+  },
+  {
     title: "System",
     items: [
       { id: "analytics", label: "Heatmaps", icon: MapPinned, href: "/CivicPartner/analytics" },
@@ -70,6 +77,7 @@ const BREADCRUMB_MAP: Record<string, string> = {
   "/CivicPartner/surveys/new": "Create New Survey",
   "/CivicPartner/surveys/archived": "Archived & Closed Surveys",
   "/CivicPartner/analytics": "Heatmaps",
+  "/CivicPartner/reports": "AI Reports",
   "/CivicPartner/settings": "Portal Settings",
 }
 
