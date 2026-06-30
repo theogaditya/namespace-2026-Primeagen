@@ -43,7 +43,7 @@ async function upsertAgents() {
 
 async function upsertMunicipalAdmins() {
   const emails = ['sourab@gmail.com', 'muni@gmail.com', 'roshan@gmail.com'];
-  const municipalities = ['Puri', 'Khorda', 'Cuttack'];
+  const municipalities = ['Puri', 'Khordha', 'Cuttack'];
   let phone = 9000000101;
 
   for (let i = 0; i < emails.length; i++) {
@@ -127,7 +127,7 @@ async function upsertCivicPartners() {
         password: hashed,
         phoneNumber: String(phone),
         officialEmail: p.email,
-        orgType: p.orgType,
+        orgType: p.orgType as any,
         registrationNo: randomUUID(),
         state: p.state,
         isVerified: true,
@@ -140,7 +140,7 @@ async function upsertCivicPartners() {
         officialEmail: p.email,
         password: hashed,
         phoneNumber: String(phone),
-        orgType: p.orgType,
+        orgType: p.orgType as any,
         registrationNo: randomUUID(),
         state: p.state,
         isVerified: true,

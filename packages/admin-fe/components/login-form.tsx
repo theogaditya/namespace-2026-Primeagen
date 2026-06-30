@@ -345,7 +345,7 @@ export function LoginForm({ adminType: controlledAdminType, onAdminTypeChange }:
             <Button
               type="submit"
               className="w-full h-10 sm:h-12 bg-linear-to-r from-blue-800 to-blue-700 hover:from-blue-900 hover:to-blue-800 text-white font-semibold text-sm sm:text-base rounded-xl shadow-lg transition-all duration-200"
-              disabled={isLoading}
+              disabled={isLoading || !cfToken}
             >
               {isLoading ? (
                 <span className="flex items-center gap-2">
