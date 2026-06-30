@@ -312,6 +312,8 @@ export const ComplaintScalarFieldEnum = {
   blockchainStatus: 'blockchainStatus',
   blockchainUpdatedAt: 'blockchainUpdatedAt',
   sla: 'sla',
+  slaDeadline: 'slaDeadline',
+  slaBreached: 'slaBreached',
   AIabusedFlag: 'AIabusedFlag',
   AIimageVarificationStatus: 'AIimageVarificationStatus',
   AIstandardizedSubCategory: 'AIstandardizedSubCategory',

@@ -247,6 +247,8 @@ model Complaint {
   blockchainUpdatedAt            DateTime?
 
   sla                            String?
+  slaDeadline                    DateTime?
+  slaBreached                    Boolean                   @default(false)
   AIabusedFlag                   Boolean?
   AIimageVarificationStatus      Boolean?
   AIstandardizedSubCategory      String?

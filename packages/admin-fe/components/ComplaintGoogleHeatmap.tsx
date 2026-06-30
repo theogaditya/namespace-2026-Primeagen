@@ -32,6 +32,10 @@ interface ComplaintPoint {
   urgency: string
   category: string
   subCategory: string
+  description: string
+  ipfsHash: string | null
+  blockchainHash: string | null
+  isOnChain: boolean
 }
 
 interface DistrictDensity {
@@ -82,6 +86,8 @@ export default function ComplaintGoogleHeatmap({ height = "400px", showDensityTa
   const mapDivRef = useRef<HTMLDivElement>(null)
   const mapInstanceRef = useRef<google.maps.Map | null>(null)
   const heatmapLayerRef = useRef<google.maps.visualization.HeatmapLayer | null>(null)
+  const markersRef = useRef<google.maps.Marker[]>([])
+  const infoWindowRef = useRef<google.maps.InfoWindow | null>(null)
 
   const [points, setPoints] = useState<ComplaintPoint[]>([])
   const [densityRows, setDensityRows] = useState<DistrictDensity[]>([])
@@ -114,6 +120,10 @@ export default function ComplaintGoogleHeatmap({ height = "400px", showDensityTa
             urgency: l.urgency ?? "LOW",
             category: l.category ?? "Unknown",
             subCategory: l.subCategory ?? "",
+            description: l.description ?? "",
+            ipfsHash: l.ipfsHash ?? null,
+            blockchainHash: l.blockchainHash ?? null,
+            isOnChain: l.isOnChain ?? false,
           }))
 
         setPoints(pts)
@@ -222,6 +232,9 @@ export default function ComplaintGoogleHeatmap({ height = "400px", showDensityTa
   useEffect(() => {
     return () => {
       if (heatmapLayerRef.current) heatmapLayerRef.current.setMap(null)
+      markersRef.current.forEach((m) => m.setMap(null))
+      markersRef.current = []
+      if (infoWindowRef.current) infoWindowRef.current.close()
       mapInstanceRef.current = null
       heatmapLayerRef.current = null
     }

@@ -3,50 +3,22 @@ import { getPrisma } from '../lib/prisma';
 import { processedComplaintQueueService } from '../lib/redis/processedComplaintQueueService';
 import { blockchainQueueService } from '../lib/redis/blockchainQueueService';
 import type { BlockchainQueueData } from '../lib/redis/blockchainQueueService';
+import { dispatchNewComplaint } from '../lib/assignmentDispatcher';
 
 const router = Router();
 
 let isAutoAssignPolling = false;
 let autoAssignPollingInterval: NodeJS.Timeout | null = null;
 
-// Departments that get assigned to Agents (field-level)
-const AGENT_DEPARTMENTS = [
-  'INFRASTRUCTURE',
-  'WATER_SUPPLY_SANITATION',
-  'ELECTRICITY_POWER',
-  'MUNICIPAL_SERVICES',
-  'ENVIRONMENT',
-  'POLICE_SERVICES',
-] as const;
-
-// Departments that get assigned to Municipal Admins (administrative-level)
-const MUNICIPAL_ADMIN_DEPARTMENTS = [
-  'EDUCATION',
-  'REVENUE',
-  'HEALTH',
-  'TRANSPORTATION',
-  'ENVIRONMENT',
-  'HOUSING_URBAN_DEVELOPMENT',
-  'SOCIAL_WELFARE',
-  'PUBLIC_GRIEVANCES',
-] as const;
-
-type AgentDepartment = typeof AGENT_DEPARTMENTS[number];
-type MunicipalDepartment = typeof MUNICIPAL_ADMIN_DEPARTMENTS[number];
-
 /**
- * Helper: Pick a random element from an array
- */
-function pickRandom<T>(arr: T[]): T | undefined {
-  if (arr.length === 0) return undefined;
-  const randomIndex = Math.floor(Math.random() * arr.length);
-  return arr[randomIndex];
-}
-
-/**
- * Auto-assign a complaint from the processed queue
- * - If department is in AGENT_DEPARTMENTS → assign to a random agent in same district
- * - If department is in MUNICIPAL_ADMIN_DEPARTMENTS → assign to a municipal admin in same district
+ * Auto-assign a complaint from the processed queue.
+ *
+ * Uses the centralised dispatcher (lib/assignmentDispatcher) which:
+ *   - Agent departments  → sets SLA, leaves in claimable pool (agents claim manually).
+ *   - Municipal admin departments → assigns directly to least-loaded matching admin.
+ *
+ * After dispatching, pushes an entry to the blockchain queue for the immutable
+ * record when the complaint was actually assigned to someone.
  */
 export async function autoAssignComplaint(): Promise<{
   success: boolean;
@@ -67,7 +39,7 @@ export async function autoAssignComplaint(): Promise<{
 
   console.log(`[AutoAssign] Processing complaint id=${id}, dept=${assignedDepartment}, district=${district}`);
 
-  // 2. Fetch the full complaint to ensure it exists and is not already assigned
+  // 2. Fetch the complaint (to verify it exists)
   const complaint = await prisma.complaint.findUnique({
     where: { id },
     include: { location: true },
@@ -78,188 +50,69 @@ export async function autoAssignComplaint(): Promise<{
     return { success: false, message: `Complaint ${id} not found`, complaintId: id };
   }
 
-  // Use district from complaint location if available, fallback to queue data
+  // 3. Dispatch via central routing logic
+  const result = await dispatchNewComplaint(prisma, id);
+
+  if (!result.routed && result.routeTo === 'unknown') {
+    console.warn(`[AutoAssign] Dispatcher could not route complaint ${id}: ${result.message}`);
+    return { success: false, message: result.message, complaintId: id };
+  }
+
+  // 4. Push to blockchain queue for the record
   const complaintDistrict = complaint.location?.district || district;
 
-  if (!complaintDistrict) {
-    console.warn(`[AutoAssign] Complaint ${id} has no district information`);
-    return { success: false, message: `Complaint ${id} has no district`, complaintId: id };
-  }
-
-  // 3. Determine assignment type based on department
-  const isAgentDepartment = AGENT_DEPARTMENTS.includes(assignedDepartment as AgentDepartment);
-  const isMunicipalDepartment = MUNICIPAL_ADMIN_DEPARTMENTS.includes(assignedDepartment as MunicipalDepartment);
-
-  // --- AGENT ASSIGNMENT ---
-  if (isAgentDepartment) {
-    // Find agents in the same municipality (matching complaint's district) with available workload
-    // Use case-insensitive matching for municipality
-    const availableAgents = await prisma.agent.findMany({
-      where: {
-        municipality: {
-          equals: complaintDistrict,
-          mode: 'insensitive',
-        },
-        status: 'ACTIVE',
-      },
+  if (result.routeTo === 'municipal_admin' && result.municipalAdminId) {
+    // Fetch the assigned admin's name for blockchain data
+    const admin = await prisma.departmentMunicipalAdmin.findUnique({
+      where: { id: result.municipalAdminId },
+      select: { id: true, fullName: true },
     });
 
-    console.log(`[AutoAssign] Found ${availableAgents.length} agents in municipality "${complaintDistrict}":`, 
-      availableAgents.map(a => ({ id: a.id, name: a.fullName, municipality: a.municipality, workload: `${a.currentWorkload}/${a.workloadLimit}` })));
-
-    // Filter agents who have capacity (currentWorkload < workloadLimit)
-    const agentsWithCapacity = availableAgents.filter(
-      (agent) => agent.currentWorkload < agent.workloadLimit
-    );
-
-    if (agentsWithCapacity.length === 0) {
-      console.warn(`[AutoAssign] No available agents for complaint ${id} in municipality ${complaintDistrict}, dept ${assignedDepartment} - complaint removed from queue`);
-      // Complaint already popped from queue at start, so it won't be retried
-      return {
-        success: false,
-        message: `No available agents in municipality ${complaintDistrict} for department ${assignedDepartment}`,
-        complaintId: id,
+    if (admin) {
+      const blockchainData: BlockchainQueueData = {
+        id,
+        seq: complaint.seq,
+        status: 'UNDER_PROCESSING',
+        categoryId: complaint.categoryId,
+        subCategory: complaint.subCategory,
+        assignedDepartment,
+        city: complaint.location?.city || '',
+        district: complaintDistrict || '',
+        assignedTo: {
+          type: 'municipal_admin',
+          id: admin.id,
+          name: admin.fullName,
+        },
+        assignedAt: new Date().toISOString(),
       };
+      await blockchainQueueService.pushToQueue(blockchainData);
     }
 
-    // Pick a random agent
-    const selectedAgent = pickRandom(agentsWithCapacity)!;
-
-    // Update complaint and agent workload in a transaction
-    await prisma.$transaction([
-      prisma.complaint.update({
-        where: { id },
-        data: {
-          assignedAgentId: selectedAgent.id,
-          status: 'UNDER_PROCESSING',
-        },
-      }),
-      prisma.agent.update({
-        where: { id: selectedAgent.id },
-        data: {
-          currentWorkload: { increment: 1 },
-        },
-      }),
-    ]);
-
-    // Push to blockchain queue for immutable record
-    const blockchainData: BlockchainQueueData = {
-      id,
-      seq: complaint.seq,
-      status: 'UNDER_PROCESSING',
-      categoryId: complaint.categoryId,
-      subCategory: complaint.subCategory,
-      assignedDepartment: assignedDepartment,
-      city: complaint.location?.city || '',
-      district: complaintDistrict,
-      assignedTo: {
-        type: 'agent',
-        id: selectedAgent.id,
-        name: selectedAgent.fullName,
-      },
-      assignedAt: new Date().toISOString(),
-    };
-    await blockchainQueueService.pushToQueue(blockchainData);
-
-    console.log(`[AutoAssign] Complaint ${id} assigned to agent ${selectedAgent.fullName} (${selectedAgent.id})`);
-
+    console.log(`[AutoAssign] Complaint ${id} dispatched → municipal admin ${admin?.fullName}`);
     return {
       success: true,
-      message: `Complaint assigned to agent ${selectedAgent.fullName}`,
+      message: result.message,
       complaintId: id,
-      assignedTo: { type: 'agent', id: selectedAgent.id, name: selectedAgent.fullName },
+      assignedTo: admin
+        ? { type: 'municipal_admin', id: admin.id, name: admin.fullName }
+        : undefined,
     };
   }
 
-  // --- MUNICIPAL ADMIN ASSIGNMENT ---
-  if (isMunicipalDepartment) {
-    // Find municipal admins in the same district/municipality (department doesn't need to match)
-    // Use case-insensitive matching for municipality
-    const availableAdmins = await prisma.departmentMunicipalAdmin.findMany({
-      where: {
-        municipality: {
-          equals: complaintDistrict,
-          mode: 'insensitive',
-        },
-        status: 'ACTIVE',
-      },
-    });
-
-    console.log(`[AutoAssign] Found ${availableAdmins.length} municipal admins in district "${complaintDistrict}":`,
-      availableAdmins.map(a => ({ id: a.id, name: a.fullName, municipality: a.municipality, workload: `${a.currentWorkload}/${a.workloadLimit}` })));
-
-    // Filter admins who have capacity
-    const adminsWithCapacity = availableAdmins.filter(
-      (admin) => admin.currentWorkload < admin.workloadLimit
-    );
-
-    if (adminsWithCapacity.length === 0) {
-      console.warn(`[AutoAssign] No available municipal admins for complaint ${id} in district ${complaintDistrict}, dept ${assignedDepartment} - complaint removed from queue`);
-      return {
-        success: false,
-        message: `No available municipal admins in district ${complaintDistrict} for department ${assignedDepartment}`,
-        complaintId: id,
-      };
-    }
-
-    // Pick a random municipal admin
-    const selectedAdmin = pickRandom(adminsWithCapacity)!;
-
-    // Update complaint and admin workload in a transaction
-    await prisma.$transaction([
-      prisma.complaint.update({
-        where: { id },
-        data: {
-          managedByMunicipalAdminId: selectedAdmin.id,
-          status: 'UNDER_PROCESSING',
-          // mark escalation level when assigning to a municipal admin
-          escalationLevel: 'MUNICIPAL_ADMIN',
-        },
-      }),
-      prisma.departmentMunicipalAdmin.update({
-        where: { id: selectedAdmin.id },
-        data: {
-          currentWorkload: { increment: 1 },
-        },
-      }),
-    ]);
-
-    // Push to blockchain queue for immutable record
-    const blockchainData: BlockchainQueueData = {
-      id,
-      seq: complaint.seq,
-      status: 'UNDER_PROCESSING',
-      categoryId: complaint.categoryId,
-      subCategory: complaint.subCategory,
-      assignedDepartment: assignedDepartment,
-      city: complaint.location?.city || '',
-      district: complaintDistrict,
-      assignedTo: {
-        type: 'municipal_admin',
-        id: selectedAdmin.id,
-        name: selectedAdmin.fullName,
-      },
-      assignedAt: new Date().toISOString(),
-    };
-    await blockchainQueueService.pushToQueue(blockchainData);
-
-    console.log(`[AutoAssign] Complaint ${id} assigned to municipal admin ${selectedAdmin.fullName} (${selectedAdmin.id})`);
-
+  if (result.routeTo === 'agent_pool') {
+    // Agent department — complaint enters the claimable pool. Blockchain record
+    // will be pushed when an agent actually claims it (in agent.ts).
+    console.log(`[AutoAssign] Complaint ${id} dispatched → agent claimable pool`);
     return {
       success: true,
-      message: `Complaint assigned to municipal admin ${selectedAdmin.fullName}`,
+      message: result.message,
       complaintId: id,
-      assignedTo: { type: 'municipal_admin', id: selectedAdmin.id, name: selectedAdmin.fullName },
     };
   }
 
-  // Department doesn't match any category
-  console.warn(`[AutoAssign] Unknown department ${assignedDepartment} for complaint ${id}`);
-  return {
-    success: false,
-    message: `Unknown department: ${assignedDepartment}`,
-    complaintId: id,
-  };
+  // Fallback: SLA may have been set but routing failed (e.g. no admin found)
+  console.warn(`[AutoAssign] Complaint ${id} partially dispatched: ${result.message}`);
+  return { success: false, message: result.message, complaintId: id };
 }
 
 /**
@@ -278,7 +131,7 @@ export async function processAutoAssignBatch(limit: number = 10): Promise<{
 
   for (let i = 0; i < limit; i++) {
     const result = await autoAssignComplaint();
-    
+
     if (result.message === 'No complaints in processed queue') {
       // Queue is empty, stop processing
       break;
@@ -286,7 +139,7 @@ export async function processAutoAssignBatch(limit: number = 10): Promise<{
 
     results.push(result);
     processed++;
-    
+
     if (result.success) {
       successful++;
     } else {
@@ -306,7 +159,7 @@ export async function processAutoAssignBatch(limit: number = 10): Promise<{
 router.post('/single', async (_req, res) => {
   try {
     const result = await autoAssignComplaint();
-    
+
     if (result.success) {
       res.status(200).json(result);
     } else {
@@ -327,7 +180,7 @@ router.post('/batch', async (req, res) => {
   try {
     const limit = parseInt(req.query.limit as string) || 10;
     const result = await processAutoAssignBatch(limit);
-    
+
     res.status(200).json({
       success: true,
       ...result,
@@ -346,7 +199,7 @@ router.get('/queue-status', async (_req, res) => {
   try {
     const queueLength = await processedComplaintQueueService.getQueueLength();
     const nextComplaint = await processedComplaintQueueService.peekQueue();
-    
+
     res.status(200).json({
       success: true,
       queueLength,
@@ -366,7 +219,7 @@ router.get('/blockchain-queue-status', async (_req, res) => {
   try {
     const queueLength = await blockchainQueueService.getQueueLength();
     const nextComplaint = await blockchainQueueService.peekQueue();
-    
+
     res.status(200).json({
       success: true,
       queueLength,
@@ -385,7 +238,7 @@ router.get('/blockchain-queue-status', async (_req, res) => {
 router.post('/blockchain-queue-pop', async (_req, res) => {
   try {
     const complaint = await blockchainQueueService.popFromQueue();
-    
+
     if (complaint) {
       res.status(200).json({
         success: true,
