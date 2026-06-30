@@ -214,7 +214,7 @@ export default function (prisma: PrismaClient) {
 
       const survey = await prisma.survey.update({
         where: { id: surveyId },
-        data: { status: 'CLOSED', isPublic: false },
+        data: { status: 'CLOSED' },
       });
 
       return res.json({ success: true, message: 'Survey closed', survey });
