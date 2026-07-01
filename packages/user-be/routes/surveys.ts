@@ -49,29 +49,46 @@ export function createSurveysRouter(db: PrismaClient) {
       // Optional filters
       const category = req.query.category as string | undefined;
       const search = req.query.search as string | undefined;
+      const statusParam = ((req.query.status as string) || '').toUpperCase();
 
-      // Build where clause
-      const where: any = {
-        status: "PUBLISHED",
-        isPublic: true,
-        AND: [
-          {
-            OR: [{ startsAt: null }, { startsAt: { lte: now } }],
-          },
-          {
-            OR: [{ endsAt: null }, { endsAt: { gte: now } }],
-          },
-        ],
-      };
+      // Build where clause based on optional ?status filter
+      const basePublic: any = { isPublic: true };
+      let statusClause: any;
+      if (statusParam === 'CLOSED') {
+        statusClause = { status: 'CLOSED' };
+      } else if (statusParam === 'OPEN' || statusParam === 'PUBLISHED') {
+        statusClause = {
+          status: 'PUBLISHED',
+          AND: [
+            { OR: [{ startsAt: null }, { startsAt: { lte: now } }] },
+            { OR: [{ endsAt: null }, { endsAt: { gte: now } }] },
+          ],
+        };
+      } else {
+        // Default: published (active) OR closed
+        statusClause = {
+          OR: [
+            {
+              status: 'PUBLISHED',
+              AND: [
+                { OR: [{ startsAt: null }, { startsAt: { lte: now } }] },
+                { OR: [{ endsAt: null }, { endsAt: { gte: now } }] },
+              ],
+            },
+            { status: 'CLOSED' },
+          ],
+        };
+      }
+
+      const where: any = { ...basePublic, ...statusClause };
 
       if (category) {
         where.category = category;
       }
 
       if (search) {
-        where.OR = [
-          { title: { contains: search, mode: "insensitive" } },
-          { description: { contains: search, mode: "insensitive" } },
+        where.AND = [
+          { OR: [{ title: { contains: search, mode: 'insensitive' } }, { description: { contains: search, mode: 'insensitive' } }] },
         ];
       }
 
@@ -123,23 +140,29 @@ export function createSurveysRouter(db: PrismaClient) {
    * GET /api/surveys/:id - Get single survey with questions
    * Optional auth
    */
-  router.get("/:id", async (req: Request, res: Response) => {
+  router.get("/:id", async (req: Request, res: Response, next) => {
     try {
       const { id } = req.params;
+      // If a reserved sub-path is requested, forward to next middleware
+      // so protected routes (mounted after this router) can handle them.
+      if (id === 'my-responses' || id === 'my-response' || id === 'results') {
+        return next();
+      }
       const now = new Date();
 
       const survey = await db.survey.findFirst({
         where: {
           id,
-          status: "PUBLISHED",
           isPublic: true,
-          AND: [
+          OR: [
             {
-              OR: [{ startsAt: null }, { startsAt: { lte: now } }],
+              status: "PUBLISHED",
+              AND: [
+                { OR: [{ startsAt: null }, { startsAt: { lte: now } }] },
+                { OR: [{ endsAt: null }, { endsAt: { gte: now } }] },
+              ],
             },
-            {
-              OR: [{ endsAt: null }, { endsAt: { gte: now } }],
-            },
+            { status: "CLOSED" },
           ],
         },
         include: {
@@ -173,6 +196,60 @@ export function createSurveysRouter(db: PrismaClient) {
         success: false,
         error: "Failed to fetch survey",
       });
+    }
+  });
+
+  /**
+   * GET /api/surveys/:id/results - Public aggregated results for a survey
+   * Returns per-question breakdown (option frequencies) and total responses.
+   */
+  router.get('/:id/results', async (req: Request, res: Response) => {
+    try {
+      const { id } = req.params;
+      // Ensure survey exists and is visible (published or closed)
+      const survey = await db.survey.findFirst({
+        where: {
+          id,
+          isPublic: true,
+          OR: [{ status: 'PUBLISHED' }, { status: 'CLOSED' }],
+        },
+        include: { questions: true },
+      });
+
+      if (!survey) {
+        return res.status(404).json({ success: false, error: 'Survey not found or not available' });
+      }
+
+      const totalResponses = await db.surveyResponse.count({ where: { surveyId: id } });
+
+      const perQuestion = await Promise.all(
+        survey.questions.map(async (q) => {
+          if (['MCQ', 'CHECKBOX', 'YES_NO'].includes(q.questionType)) {
+            const answers = await db.surveyAnswer.findMany({ where: { questionId: q.id } });
+            const freq: Record<string, number> = {};
+            for (const a of answers) {
+              for (const opt of a.selectedOpts || []) {
+                freq[opt] = (freq[opt] || 0) + 1;
+              }
+            }
+            return { questionId: q.id, questionText: q.questionText, questionType: q.questionType, distribution: freq };
+          }
+          if (q.questionType === 'RATING') {
+            const answers = await db.surveyAnswer.findMany({ where: { questionId: q.id, ratingValue: { not: null } }, select: { ratingValue: true } });
+            const values = answers.map((a) => a.ratingValue as number);
+            const avg = values.length ? Math.round((values.reduce((a,b) => a+b,0)/values.length) * 100) / 100 : null;
+            return { questionId: q.id, questionText: q.questionText, questionType: q.questionType, average: avg, count: values.length };
+          }
+          // TEXT or other types: return count
+          const answers = await db.surveyAnswer.count({ where: { questionId: q.id } });
+          return { questionId: q.id, questionText: q.questionText, questionType: q.questionType, count: answers };
+        })
+      );
+
+      return res.json({ success: true, data: { totalResponses, perQuestion } });
+    } catch (err) {
+      console.error('Error fetching survey results:', err);
+      return res.status(500).json({ success: false, error: 'Failed to fetch results' });
     }
   });
 
@@ -223,6 +300,44 @@ export function createProtectedSurveysRouter(db: PrismaClient) {
         success: false,
         error: "Failed to fetch your responses",
       });
+    }
+  });
+
+  /**
+   * GET /api/surveys/closed - List closed surveys (protected)
+   * Optional query: includePrivate=true to also include isPublic=false surveys
+   */
+  router.get("/closed", async (req: AuthenticatedRequest, res: Response) => {
+    try {
+      const userId = req.user?.id;
+      if (!userId) return res.status(401).json({ success: false, error: 'Unauthorized' });
+
+      const page = Math.max(1, parseInt(req.query.page as string) || 1);
+      const limit = Math.min(50, Math.max(1, parseInt(req.query.limit as string) || 12));
+      const skip = (page - 1) * limit;
+
+      const includePrivate = (req.query.includePrivate === '1' || req.query.includePrivate === 'true');
+
+      const where: any = { status: 'CLOSED' };
+      if (!includePrivate) where.isPublic = true;
+
+      const total = await db.survey.count({ where });
+
+      const surveys = await db.survey.findMany({
+        where,
+        include: {
+          civicPartner: { select: { orgName: true, orgType: true } },
+          _count: { select: { questions: true, responses: true } },
+        },
+        orderBy: { createdAt: 'desc' },
+        skip,
+        take: limit,
+      });
+
+      return res.json({ success: true, data: surveys, pagination: { page, limit, total, totalPages: Math.ceil(total / limit) } });
+    } catch (err) {
+      console.error('Error fetching closed surveys:', err);
+      return res.status(500).json({ success: false, error: 'Failed to fetch closed surveys' });
     }
   });
 

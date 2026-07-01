@@ -10,9 +10,15 @@ import {
   Zap,
   TreePine,
   Bus,
-  ShieldAlert,
+  Shield,
   Building,
   FileText,
+  Heart,
+  BookOpen,
+  Landmark,
+  Users,
+  Home,
+  FileCheck,
 } from "lucide-react";
 import type { Complaint, ComplaintStatus } from "@/app/dashboard/customComps/types";
 
@@ -23,9 +29,18 @@ const CATEGORY_STYLE: Record<string, { icon: React.ReactNode; bg: string; text: 
   INFRASTRUCTURE: { icon: <Construction className="w-5 h-5" />, bg: "bg-green-100", text: "text-green-600" },
   ENVIRONMENT: { icon: <TreePine className="w-5 h-5" />, bg: "bg-emerald-100", text: "text-emerald-600" },
   TRANSPORTATION: { icon: <Bus className="w-5 h-5" />, bg: "bg-indigo-100", text: "text-indigo-600" },
-  POLICE_SERVICES: { icon: <ShieldAlert className="w-5 h-5" />, bg: "bg-red-100", text: "text-red-600" },
-  HOUSING_URBAN_DEVELOPMENT: { icon: <Building className="w-5 h-5" />, bg: "bg-orange-100", text: "text-orange-600" },
-  HEALTH: { icon: <Lightbulb className="w-5 h-5" />, bg: "bg-pink-100", text: "text-pink-600" },
+  // Shield — same icon used for "security" announcements
+  POLICE_SERVICES: { icon: <Shield className="w-5 h-5" />, bg: "bg-red-100", text: "text-red-600" },
+  HOUSING_URBAN_DEVELOPMENT: { icon: <Home className="w-5 h-5" />, bg: "bg-orange-100", text: "text-orange-600" },
+  // Heart — same icon used for "health" announcements
+  HEALTH: { icon: <Heart className="w-5 h-5" />, bg: "bg-pink-100", text: "text-pink-600" },
+  EDUCATION: { icon: <BookOpen className="w-5 h-5" />, bg: "bg-violet-100", text: "text-violet-600" },
+  MUNICIPAL_SERVICES: { icon: <Landmark className="w-5 h-5" />, bg: "bg-teal-100", text: "text-teal-600" },
+  SOCIAL_WELFARE: { icon: <Users className="w-5 h-5" />, bg: "bg-cyan-100", text: "text-cyan-600" },
+  PUBLIC_GRIEVANCES: { icon: <FileCheck className="w-5 h-5" />, bg: "bg-slate-100", text: "text-slate-600" },
+  REVENUE: { icon: <Lightbulb className="w-5 h-5" />, bg: "bg-yellow-100", text: "text-yellow-600" },
+  // catch-all for unmapped department names
+  DEFAULT: { icon: <Building className="w-5 h-5" />, bg: "bg-gray-100", text: "text-gray-500" },
 };
 
 const DEFAULT_CAT_STYLE = { icon: <FileText className="w-5 h-5" />, bg: "bg-slate-100", text: "text-slate-600" };

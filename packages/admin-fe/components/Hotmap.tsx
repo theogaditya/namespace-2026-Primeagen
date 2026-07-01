@@ -26,6 +26,16 @@ const blueIcon = new L.Icon({
   shadowSize: [41, 41],
 });
 
+// Orange icon for REGISTERED complaints
+const registeredIcon = new L.Icon({
+  iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-orange.png',
+  shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-shadow.png',
+  iconSize: [25, 41],
+  iconAnchor: [12, 41],
+  popupAnchor: [1, -34],
+  shadowSize: [41, 41],
+});
+
 // ---------- Types ----------
 interface ComplaintLocation {
   id: string;
@@ -42,6 +52,9 @@ interface ComplaintLocation {
   locality: string | null;
   pin: string | null;
   category: string;
+  ipfsHash: string | null;
+  blockchainHash: string | null;
+  isOnChain: boolean;
 }
 
 interface HotspotCluster {
@@ -246,6 +259,9 @@ export default function Hotmap() {
             locality: loc.locality,
             pin: loc.pin,
             category: loc.category || "Unknown",
+            ipfsHash: loc.ipfsHash ?? null,
+            blockchainHash: loc.blockchainHash ?? null,
+            isOnChain: loc.isOnChain ?? false,
           }));
 
         console.log(`[Hotmap] Loaded ${locations.length} complaint locations`);
@@ -356,14 +372,43 @@ export default function Hotmap() {
               />
             ))}
 
-            {/* Individual complaint markers */}
-            {complaints.map((c) => (
-              <Marker
-                key={`preview-${c.id}`}
-                position={[c.latitude, c.longitude]}
-                icon={blueIcon}
-              />
-            ))}
+            {/* Individual complaint markers — REGISTERED get orange icon + mini popup */}
+            {complaints.map((c) => {
+              const isRegistered = c.status === 'REGISTERED';
+              return (
+                <Marker
+                  key={`preview-${c.id}`}
+                  position={[c.latitude, c.longitude]}
+                  icon={isRegistered ? registeredIcon : blueIcon}
+                >
+                  {isRegistered && (
+                    <Popup>
+                      <div style={{ minWidth: 200, maxWidth: 260, fontSize: 12 }}>
+                        <div style={{ fontWeight: 700, marginBottom: 2 }}>#{c.seq} — {c.subCategory}</div>
+                        <div style={{ color: '#6b7280', marginBottom: 4 }}>
+                          {c.description.length > 80 ? c.description.slice(0, 80) + '…' : c.description}
+                        </div>
+                        {c.ipfsHash && (
+                          <div style={{ marginTop: 4, wordBreak: 'break-all' }}>
+                            <span style={{ fontWeight: 600, color: '#7c3aed' }}>IPFS: </span>
+                            <span style={{ fontSize: 10, color: '#374151' }}>{c.ipfsHash}</span>
+                          </div>
+                        )}
+                        {!c.ipfsHash && c.blockchainHash && (
+                          <div style={{ marginTop: 4, wordBreak: 'break-all' }}>
+                            <span style={{ fontWeight: 600, color: '#2563eb' }}>TX: </span>
+                            <span style={{ fontSize: 10, color: '#374151' }}>{c.blockchainHash}</span>
+                          </div>
+                        )}
+                        {!c.ipfsHash && !c.blockchainHash && (
+                          <div style={{ marginTop: 4, fontSize: 10, color: '#9ca3af' }}>Not yet on-chain</div>
+                        )}
+                      </div>
+                    </Popup>
+                  )}
+                </Marker>
+              );
+            })}
           </MapContainer>
 
           {/* Legend */}
@@ -471,53 +516,71 @@ export default function Hotmap() {
                 ))}
 
                 {/* Individual complaint markers with popups */}
-                {complaints.map((c) => (
-                  <Marker
-                    key={`modal-${c.id}`}
-                    position={[c.latitude, c.longitude]}
-                    icon={blueIcon}
-                  >
-                    <Popup>
-                      <div style={{ minWidth: 220, maxWidth: 280 }}>
-                        <div style={{ fontWeight: 700, marginBottom: 4 }}>
-                          #{c.seq} - {c.category || "N/A"}
-                        </div>
-                        <div style={{ fontSize: 13, marginBottom: 6 }}>{c.subCategory}</div>
-                        <div
-                          style={{
-                            fontSize: 12, color: "#6b7280", marginBottom: 6,
-                            maxHeight: 60, overflow: "hidden", textOverflow: "ellipsis",
-                          }}
-                        >
-                          {c.description.length > 100 ? c.description.substring(0, 100) + "..." : c.description}
-                        </div>
-                        <div style={{ fontSize: 11, color: "#9ca3af" }}>
-                          {c.locality}, {c.city}
-                        </div>
-                        <div style={{ marginTop: 6, display: "flex", gap: 6, alignItems: "center" }}>
-                          <span
+                {complaints.map((c) => {
+                  const isRegistered = c.status === 'REGISTERED';
+                  return (
+                    <Marker
+                      key={`modal-${c.id}`}
+                      position={[c.latitude, c.longitude]}
+                      icon={isRegistered ? registeredIcon : blueIcon}
+                    >
+                      <Popup>
+                        <div style={{ minWidth: 220, maxWidth: 300 }}>
+                          <div style={{ fontWeight: 700, marginBottom: 4 }}>
+                            #{c.seq} — {c.category || 'N/A'}
+                          </div>
+                          <div style={{ fontSize: 13, marginBottom: 6 }}>{c.subCategory}</div>
+                          <div
                             style={{
-                              padding: "2px 6px", borderRadius: 4, fontSize: 10,
-                              background: c.status === "COMPLETED" ? "#dcfce7" : c.status === "REGISTERED" ? "#dbeafe" : "#fef3c7",
-                              color: c.status === "COMPLETED" ? "#166534" : c.status === "REGISTERED" ? "#1e40af" : "#92400e",
+                              fontSize: 12, color: '#6b7280', marginBottom: 6,
+                              maxHeight: 60, overflow: 'hidden', textOverflow: 'ellipsis',
                             }}
                           >
-                            {c.status.replace(/_/g, " ")}
-                          </span>
-                          <span
-                            style={{
-                              padding: "2px 6px", borderRadius: 4, fontSize: 10,
-                              background: c.urgency === "CRITICAL" ? "#fee2e2" : c.urgency === "HIGH" ? "#ffedd5" : "#f3f4f6",
-                              color: c.urgency === "CRITICAL" ? "#991b1b" : c.urgency === "HIGH" ? "#9a3412" : "#374151",
-                            }}
-                          >
-                            {c.urgency}
-                          </span>
+                            {c.description.length > 100 ? c.description.substring(0, 100) + '…' : c.description}
+                          </div>
+                          <div style={{ fontSize: 11, color: '#9ca3af', marginBottom: 6 }}>
+                            {c.locality}, {c.city}
+                          </div>
+                          <div style={{ display: 'flex', gap: 6, alignItems: 'center', marginBottom: 6 }}>
+                            <span
+                              style={{
+                                padding: '2px 6px', borderRadius: 4, fontSize: 10,
+                                background: c.status === 'COMPLETED' ? '#dcfce7' : c.status === 'REGISTERED' ? '#fff7ed' : '#fef3c7',
+                                color: c.status === 'COMPLETED' ? '#166534' : c.status === 'REGISTERED' ? '#c2410c' : '#92400e',
+                                fontWeight: 600,
+                              }}
+                            >
+                              {c.status.replace(/_/g, ' ')}
+                            </span>
+                            <span
+                              style={{
+                                padding: '2px 6px', borderRadius: 4, fontSize: 10,
+                                background: c.urgency === 'CRITICAL' ? '#fee2e2' : c.urgency === 'HIGH' ? '#ffedd5' : '#f3f4f6',
+                                color: c.urgency === 'CRITICAL' ? '#991b1b' : c.urgency === 'HIGH' ? '#9a3412' : '#374151',
+                              }}
+                            >
+                              {c.urgency}
+                            </span>
+                          </div>
+                          {/* Blockchain info */}
+                          {c.ipfsHash ? (
+                            <div style={{ borderTop: '1px solid #e5e7eb', paddingTop: 6 }}>
+                              <div style={{ fontSize: 10, fontWeight: 700, color: '#7c3aed', marginBottom: 2 }}>IPFS Hash</div>
+                              <div style={{ fontSize: 9, color: '#374151', wordBreak: 'break-all', fontFamily: 'monospace' }}>{c.ipfsHash}</div>
+                            </div>
+                          ) : c.blockchainHash ? (
+                            <div style={{ borderTop: '1px solid #e5e7eb', paddingTop: 6 }}>
+                              <div style={{ fontSize: 10, fontWeight: 700, color: '#2563eb', marginBottom: 2 }}>Blockchain TX</div>
+                              <div style={{ fontSize: 9, color: '#374151', wordBreak: 'break-all', fontFamily: 'monospace' }}>{c.blockchainHash}</div>
+                            </div>
+                          ) : (
+                            <div style={{ borderTop: '1px solid #e5e7eb', paddingTop: 6, fontSize: 10, color: '#9ca3af' }}>Not yet on-chain</div>
+                          )}
                         </div>
-                      </div>
-                    </Popup>
-                  </Marker>
-                ))}
+                      </Popup>
+                    </Marker>
+                  );
+                })}
               </MapContainer>
             </div>
 

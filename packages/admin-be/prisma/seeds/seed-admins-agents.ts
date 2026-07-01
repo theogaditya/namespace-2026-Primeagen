@@ -9,35 +9,74 @@ function nameFromEmail(email: string) {
   return local.charAt(0).toUpperCase() + local.slice(1);
 }
 
+// All departments that field agents belong to, mapped to a short abbreviation used in email generation.
+const AGENT_DEPARTMENTS: { dept: string; abbr: string }[] = [
+  { dept: 'INFRASTRUCTURE',           abbr: 'infra'    },
+  { dept: 'EDUCATION',                abbr: 'edu'      },
+  { dept: 'REVENUE',                  abbr: 'rev'      },
+  { dept: 'HEALTH',                   abbr: 'health'   },
+  { dept: 'WATER_SUPPLY_SANITATION',  abbr: 'wss'      },
+  { dept: 'ELECTRICITY_POWER',        abbr: 'elec'     },
+  { dept: 'TRANSPORTATION',           abbr: 'trans'    },
+  { dept: 'MUNICIPAL_SERVICES',       abbr: 'muni'     },
+  { dept: 'POLICE_SERVICES',          abbr: 'police'   },
+  { dept: 'ENVIRONMENT',              abbr: 'env'      },
+  { dept: 'HOUSING_URBAN_DEVELOPMENT',abbr: 'housing'  },
+  { dept: 'SOCIAL_WELFARE',           abbr: 'welfare'  },
+  { dept: 'PUBLIC_GRIEVANCES',        abbr: 'griev'    },
+];
+
+const MUNICIPALITIES = ['Cuttack', 'Khorda', 'Puri'];
+
+// Generates a display name from an email local-part like "infra.cuttack.1"
+function agentNameFromSlug(slug: string): string {
+  // "infra.cuttack.1" → "Infra Cuttack 1"
+  return slug
+    .split('.')
+    .map(part => part.charAt(0).toUpperCase() + part.slice(1))
+    .join(' ');
+}
+
 async function upsertAgents() {
-  const emails = ['ankita@gmail.com', 'ani@gmail.com', 'devi@gmail.com'];
-  let phone = 9000000001;
+  // 2 agents × 13 departments × 3 municipalities = 78 agents total
+  let phone = 9100000001;
 
-  for (const email of emails) {
-    const fullName = nameFromEmail(email);
-    const hashed = await bcrypt.hash('123123123', 10);
+  for (const municipality of MUNICIPALITIES) {
+    const muniSlug = municipality.toLowerCase();
 
-    await prisma.agent.upsert({
-      where: { email },
-      update: {
-        fullName,
-        password: hashed,
-        phoneNumber: String(phone),
-        officialEmail: email,
-        department: 'MUNICIPAL_SERVICES',
-      },
-      create: {
-        id: randomUUID(),
-        email,
-        fullName,
-        password: hashed,
-        phoneNumber: String(phone),
-        officialEmail: email,
-        department: 'MUNICIPAL_SERVICES',
-      },
-    });
-    console.log('Upserted agent:', email);
-    phone += 1;
+    for (const { dept, abbr } of AGENT_DEPARTMENTS) {
+      for (let idx = 1; idx <= 2; idx++) {
+        const slug = `${abbr}.${muniSlug}.${idx}`;
+        const email = `${slug}@gov.in`;
+        const fullName = agentNameFromSlug(slug);
+        const hashed = await bcrypt.hash('123123123', 10);
+
+        await prisma.agent.upsert({
+          where: { officialEmail: email },
+          update: {
+            fullName,
+            password: hashed,
+            phoneNumber: String(phone),
+            email,
+            municipality,
+            department: dept as any,
+          },
+          create: {
+            id: randomUUID(),
+            email,
+            fullName,
+            password: hashed,
+            phoneNumber: String(phone),
+            officialEmail: email,
+            department: dept as any,
+            municipality,
+          },
+        });
+
+        console.log(`Upserted agent: ${email}  (${dept} / ${municipality})`);
+        phone += 1;
+      }
+    }
   }
 }
 
@@ -127,7 +166,7 @@ async function upsertCivicPartners() {
         password: hashed,
         phoneNumber: String(phone),
         officialEmail: p.email,
-        orgType: p.orgType,
+        orgType: p.orgType as any,
         registrationNo: randomUUID(),
         state: p.state,
         isVerified: true,
@@ -140,7 +179,7 @@ async function upsertCivicPartners() {
         officialEmail: p.email,
         password: hashed,
         phoneNumber: String(phone),
-        orgType: p.orgType,
+        orgType: p.orgType as any,
         registrationNo: randomUUID(),
         state: p.state,
         isVerified: true,

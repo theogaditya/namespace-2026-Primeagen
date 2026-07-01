@@ -51,8 +51,8 @@ function getDeterministicOffset(id: string, seed: number): number {
 
 // Helper to get coordinates from district/city name with deterministic offset
 function getCoordinatesFromLocation(
-  district: string | null, 
-  city: string | null, 
+  district: string | null,
+  city: string | null,
   locality: string | null,
   complaintId: string
 ): { lat: number; lng: number } | null {
@@ -68,27 +68,27 @@ function getCoordinatesFromLocation(
     // Try partial match
     for (const [key, coords] of Object.entries(JHARKHAND_DISTRICTS)) {
       if (normalizedDistrict.includes(key) || key.includes(normalizedDistrict)) {
-        return { 
-          lat: coords.lat + getDeterministicOffset(complaintId, 1), 
-          lng: coords.lng + getDeterministicOffset(complaintId, 2) 
+        return {
+          lat: coords.lat + getDeterministicOffset(complaintId, 1),
+          lng: coords.lng + getDeterministicOffset(complaintId, 2)
         };
       }
     }
   }
-  
+
   // Try city as fallback
   if (city) {
     const normalizedCity = city.toLowerCase().trim();
     for (const [key, coords] of Object.entries(JHARKHAND_DISTRICTS)) {
       if (normalizedCity.includes(key) || key.includes(normalizedCity)) {
-        return { 
-          lat: coords.lat + getDeterministicOffset(complaintId, 1), 
-          lng: coords.lng + getDeterministicOffset(complaintId, 2) 
+        return {
+          lat: coords.lat + getDeterministicOffset(complaintId, 1),
+          lng: coords.lng + getDeterministicOffset(complaintId, 2)
         };
       }
     }
   }
-  
+
   return null;
 }
 
@@ -492,6 +492,9 @@ export default function (prisma: PrismaClient) {
           status: true,
           urgency: true,
           submissionDate: true,
+          blockchainHash: true,
+          ipfsHash: true,
+          isOnChain: true,
           category: {
             select: {
               name: true,
@@ -553,6 +556,9 @@ export default function (prisma: PrismaClient) {
             city: c.location?.city ?? null,
             locality: c.location?.locality ?? null,
             pin: c.location?.pin ?? null,
+            ipfsHash: c.ipfsHash ?? null,
+            blockchainHash: c.blockchainHash ?? null,
+            isOnChain: c.isOnChain,
           };
         })
         .filter((loc): loc is NonNullable<typeof loc> => loc !== null);

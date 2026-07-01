@@ -494,44 +494,58 @@ export default function AgentRevampedMyComplaints() {
                   </div>
 
                   {/* Status update */}
-                  {canUpdate(selectedComplaint) && (
-                    <div className="pt-4 border-t border-[#c3c5d9]/20">
-                      <p className="text-[9px] font-bold uppercase text-slate-400 tracking-widest mb-2">Update Status</p>
-                      <div className="flex flex-wrap gap-2 mb-3">
-                        {["UNDER_PROCESSING", "COMPLETED", "ON_HOLD", "FORWARDED"].map((s) => (
-                          <button
-                            key={s}
-                            disabled={statusUpdating || selectedComplaint.status === s}
-                            onClick={() => updateStatus(selectedComplaint.id, s)}
-                            className={`px-3 py-1.5 text-[10px] font-bold uppercase border transition-all active:scale-95 disabled:opacity-40 ${
-                              selectedComplaint.status === s
-                                ? "bg-[#0047cc] text-white border-[#0047cc]"
-                                : "bg-white border-[#c3c5d9] hover:border-[#0047cc] text-[#0047cc]"
-                            }`}
-                          >
-                            {toTitle(s)}
-                          </button>
-                        ))}
+                  {(() => {
+                    const isEscalated = ["ESCALATED_TO_MUNICIPAL_LEVEL", "ESCALATED_TO_STATE_LEVEL"].includes(selectedComplaint.status)
+                    if (isEscalated) {
+                      return (
+                        <div className="pt-4 border-t border-[#c3c5d9]/20">
+                          <p className="text-xs text-orange-700 bg-orange-50 p-3 border border-orange-200 flex items-start gap-2">
+                            <span className="material-symbols-outlined flex-shrink-0" style={{ fontSize: 14 }}>move_up</span>
+                            This complaint has been escalated to Municipal Admin. Status updates are now handled by the receiving authority.
+                          </p>
+                        </div>
+                      )
+                    }
+                    if (canUpdate(selectedComplaint)) {
+                      return (
+                        <div className="pt-4 border-t border-[#c3c5d9]/20">
+                          <p className="text-[9px] font-bold uppercase text-slate-400 tracking-widest mb-2">Update Status</p>
+                          <div className="flex flex-wrap gap-2 mb-3">
+                            {["UNDER_PROCESSING", "COMPLETED", "ON_HOLD", "FORWARDED"].map((s) => (
+                              <button
+                                key={s}
+                                disabled={statusUpdating || selectedComplaint.status === s}
+                                onClick={() => updateStatus(selectedComplaint.id, s)}
+                                className={`px-3 py-1.5 text-[10px] font-bold uppercase border transition-all active:scale-95 disabled:opacity-40 ${
+                                  selectedComplaint.status === s
+                                    ? "bg-[#0047cc] text-white border-[#0047cc]"
+                                    : "bg-white border-[#c3c5d9] hover:border-[#0047cc] text-[#0047cc]"
+                                }`}
+                              >
+                                {toTitle(s)}
+                              </button>
+                            ))}
+                          </div>
+                          {adminType === "AGENT" && (
+                            <button
+                              disabled={statusUpdating}
+                              onClick={() => updateStatus(selectedComplaint.id, "ESCALATED_TO_MUNICIPAL_LEVEL")}
+                              className="w-full py-2 bg-[#ba1a1a] text-white text-[10px] font-bold uppercase tracking-widest hover:brightness-110 active:scale-95 transition-all disabled:opacity-40"
+                            >
+                              Escalate to Municipal Admin
+                            </button>
+                          )}
+                        </div>
+                      )
+                    }
+                    return (
+                      <div className="pt-4 border-t border-[#c3c5d9]/20">
+                        <p className="text-xs text-amber-700 bg-amber-50 p-3 border border-amber-200">
+                          This complaint is no longer assigned to you. Status updates are disabled.
+                        </p>
                       </div>
-                      {!["ESCALATED_TO_MUNICIPAL_LEVEL", "ESCALATED_TO_STATE_LEVEL"].includes(selectedComplaint.status) &&
-                        adminType === "AGENT" && (
-                          <button
-                            disabled={statusUpdating}
-                            onClick={() => updateStatus(selectedComplaint.id, "ESCALATED_TO_MUNICIPAL_LEVEL")}
-                            className="w-full py-2 bg-[#ba1a1a] text-white text-[10px] font-bold uppercase tracking-widest hover:brightness-110 active:scale-95 transition-all disabled:opacity-40"
-                          >
-                            Escalate to Municipal Admin
-                          </button>
-                        )}
-                    </div>
-                  )}
-                  {!canUpdate(selectedComplaint) && (
-                    <div className="pt-4 border-t border-[#c3c5d9]/20">
-                      <p className="text-xs text-amber-700 bg-amber-50 p-3 border border-amber-200">
-                        This complaint is no longer assigned to you. Status updates are disabled.
-                      </p>
-                    </div>
-                  )}
+                    )
+                  })()}
                 </div>
               </div>
 

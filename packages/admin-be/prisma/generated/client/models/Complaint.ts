@@ -70,6 +70,8 @@ export type ComplaintMinAggregateOutputType = {
   blockchainStatus: $Enums.BlockchainStatus | null
   blockchainUpdatedAt: Date | null
   sla: string | null
+  slaDeadline: Date | null
+  slaBreached: boolean | null
   AIabusedFlag: boolean | null
   AIimageVarificationStatus: boolean | null
   AIstandardizedSubCategory: string | null
@@ -109,6 +111,8 @@ export type ComplaintMaxAggregateOutputType = {
   blockchainStatus: $Enums.BlockchainStatus | null
   blockchainUpdatedAt: Date | null
   sla: string | null
+  slaDeadline: Date | null
+  slaBreached: boolean | null
   AIabusedFlag: boolean | null
   AIimageVarificationStatus: boolean | null
   AIstandardizedSubCategory: string | null
@@ -148,6 +152,8 @@ export type ComplaintCountAggregateOutputType = {
   blockchainStatus: number
   blockchainUpdatedAt: number
   sla: number
+  slaDeadline: number
+  slaBreached: number
   AIabusedFlag: number
   AIimageVarificationStatus: number
   AIstandardizedSubCategory: number
@@ -206,6 +212,8 @@ export type ComplaintMinAggregateInputType = {
   blockchainStatus?: true
   blockchainUpdatedAt?: true
   sla?: true
+  slaDeadline?: true
+  slaBreached?: true
   AIabusedFlag?: true
   AIimageVarificationStatus?: true
   AIstandardizedSubCategory?: true
@@ -245,6 +253,8 @@ export type ComplaintMaxAggregateInputType = {
   blockchainStatus?: true
   blockchainUpdatedAt?: true
   sla?: true
+  slaDeadline?: true
+  slaBreached?: true
   AIabusedFlag?: true
   AIimageVarificationStatus?: true
   AIstandardizedSubCategory?: true
@@ -284,6 +294,8 @@ export type ComplaintCountAggregateInputType = {
   blockchainStatus?: true
   blockchainUpdatedAt?: true
   sla?: true
+  slaDeadline?: true
+  slaBreached?: true
   AIabusedFlag?: true
   AIimageVarificationStatus?: true
   AIstandardizedSubCategory?: true
@@ -413,6 +425,8 @@ export type ComplaintGroupByOutputType = {
   blockchainStatus: $Enums.BlockchainStatus
   blockchainUpdatedAt: Date | null
   sla: string | null
+  slaDeadline: Date | null
+  slaBreached: boolean
   AIabusedFlag: boolean | null
   AIimageVarificationStatus: boolean | null
   AIstandardizedSubCategory: string | null
@@ -478,6 +492,8 @@ export type ComplaintWhereInput = {
   blockchainStatus?: Prisma.EnumBlockchainStatusFilter<"Complaint"> | $Enums.BlockchainStatus
   blockchainUpdatedAt?: Prisma.DateTimeNullableFilter<"Complaint"> | Date | string | null
   sla?: Prisma.StringNullableFilter<"Complaint"> | string | null
+  slaDeadline?: Prisma.DateTimeNullableFilter<"Complaint"> | Date | string | null
+  slaBreached?: Prisma.BoolFilter<"Complaint"> | boolean
   AIabusedFlag?: Prisma.BoolNullableFilter<"Complaint"> | boolean | null
   AIimageVarificationStatus?: Prisma.BoolNullableFilter<"Complaint"> | boolean | null
   AIstandardizedSubCategory?: Prisma.StringNullableFilter<"Complaint"> | string | null
@@ -534,6 +550,8 @@ export type ComplaintOrderByWithRelationInput = {
   blockchainStatus?: Prisma.SortOrder
   blockchainUpdatedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   sla?: Prisma.SortOrderInput | Prisma.SortOrder
+  slaDeadline?: Prisma.SortOrderInput | Prisma.SortOrder
+  slaBreached?: Prisma.SortOrder
   AIabusedFlag?: Prisma.SortOrderInput | Prisma.SortOrder
   AIimageVarificationStatus?: Prisma.SortOrderInput | Prisma.SortOrder
   AIstandardizedSubCategory?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -593,6 +611,8 @@ export type ComplaintWhereUniqueInput = Prisma.AtLeast<{
   blockchainStatus?: Prisma.EnumBlockchainStatusFilter<"Complaint"> | $Enums.BlockchainStatus
   blockchainUpdatedAt?: Prisma.DateTimeNullableFilter<"Complaint"> | Date | string | null
   sla?: Prisma.StringNullableFilter<"Complaint"> | string | null
+  slaDeadline?: Prisma.DateTimeNullableFilter<"Complaint"> | Date | string | null
+  slaBreached?: Prisma.BoolFilter<"Complaint"> | boolean
   AIabusedFlag?: Prisma.BoolNullableFilter<"Complaint"> | boolean | null
   AIimageVarificationStatus?: Prisma.BoolNullableFilter<"Complaint"> | boolean | null
   AIstandardizedSubCategory?: Prisma.StringNullableFilter<"Complaint"> | string | null
@@ -649,6 +669,8 @@ export type ComplaintOrderByWithAggregationInput = {
   blockchainStatus?: Prisma.SortOrder
   blockchainUpdatedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   sla?: Prisma.SortOrderInput | Prisma.SortOrder
+  slaDeadline?: Prisma.SortOrderInput | Prisma.SortOrder
+  slaBreached?: Prisma.SortOrder
   AIabusedFlag?: Prisma.SortOrderInput | Prisma.SortOrder
   AIimageVarificationStatus?: Prisma.SortOrderInput | Prisma.SortOrder
   AIstandardizedSubCategory?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -699,6 +721,8 @@ export type ComplaintScalarWhereWithAggregatesInput = {
   blockchainStatus?: Prisma.EnumBlockchainStatusWithAggregatesFilter<"Complaint"> | $Enums.BlockchainStatus
   blockchainUpdatedAt?: Prisma.DateTimeNullableWithAggregatesFilter<"Complaint"> | Date | string | null
   sla?: Prisma.StringNullableWithAggregatesFilter<"Complaint"> | string | null
+  slaDeadline?: Prisma.DateTimeNullableWithAggregatesFilter<"Complaint"> | Date | string | null
+  slaBreached?: Prisma.BoolWithAggregatesFilter<"Complaint"> | boolean
   AIabusedFlag?: Prisma.BoolNullableWithAggregatesFilter<"Complaint"> | boolean | null
   AIimageVarificationStatus?: Prisma.BoolNullableWithAggregatesFilter<"Complaint"> | boolean | null
   AIstandardizedSubCategory?: Prisma.StringNullableWithAggregatesFilter<"Complaint"> | string | null
@@ -732,6 +756,8 @@ export type ComplaintCreateInput = {
   blockchainStatus?: $Enums.BlockchainStatus
   blockchainUpdatedAt?: Date | string | null
   sla?: string | null
+  slaDeadline?: Date | string | null
+  slaBreached?: boolean
   AIabusedFlag?: boolean | null
   AIimageVarificationStatus?: boolean | null
   AIstandardizedSubCategory?: string | null
@@ -788,6 +814,8 @@ export type ComplaintUncheckedCreateInput = {
   blockchainStatus?: $Enums.BlockchainStatus
   blockchainUpdatedAt?: Date | string | null
   sla?: string | null
+  slaDeadline?: Date | string | null
+  slaBreached?: boolean
   AIabusedFlag?: boolean | null
   AIimageVarificationStatus?: boolean | null
   AIstandardizedSubCategory?: string | null
@@ -825,6 +853,8 @@ export type ComplaintUpdateInput = {
   blockchainStatus?: Prisma.EnumBlockchainStatusFieldUpdateOperationsInput | $Enums.BlockchainStatus
   blockchainUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   sla?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  slaDeadline?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  slaBreached?: Prisma.BoolFieldUpdateOperationsInput | boolean
   AIabusedFlag?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   AIimageVarificationStatus?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   AIstandardizedSubCategory?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -881,6 +911,8 @@ export type ComplaintUncheckedUpdateInput = {
   blockchainStatus?: Prisma.EnumBlockchainStatusFieldUpdateOperationsInput | $Enums.BlockchainStatus
   blockchainUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   sla?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  slaDeadline?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  slaBreached?: Prisma.BoolFieldUpdateOperationsInput | boolean
   AIabusedFlag?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   AIimageVarificationStatus?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   AIstandardizedSubCategory?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -928,6 +960,8 @@ export type ComplaintCreateManyInput = {
   blockchainStatus?: $Enums.BlockchainStatus
   blockchainUpdatedAt?: Date | string | null
   sla?: string | null
+  slaDeadline?: Date | string | null
+  slaBreached?: boolean
   AIabusedFlag?: boolean | null
   AIimageVarificationStatus?: boolean | null
   AIstandardizedSubCategory?: string | null
@@ -960,6 +994,8 @@ export type ComplaintUpdateManyMutationInput = {
   blockchainStatus?: Prisma.EnumBlockchainStatusFieldUpdateOperationsInput | $Enums.BlockchainStatus
   blockchainUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   sla?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  slaDeadline?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  slaBreached?: Prisma.BoolFieldUpdateOperationsInput | boolean
   AIabusedFlag?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   AIimageVarificationStatus?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   AIstandardizedSubCategory?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1002,6 +1038,8 @@ export type ComplaintUncheckedUpdateManyInput = {
   blockchainStatus?: Prisma.EnumBlockchainStatusFieldUpdateOperationsInput | $Enums.BlockchainStatus
   blockchainUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   sla?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  slaDeadline?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  slaBreached?: Prisma.BoolFieldUpdateOperationsInput | boolean
   AIabusedFlag?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   AIimageVarificationStatus?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   AIstandardizedSubCategory?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1054,6 +1092,8 @@ export type ComplaintCountOrderByAggregateInput = {
   blockchainStatus?: Prisma.SortOrder
   blockchainUpdatedAt?: Prisma.SortOrder
   sla?: Prisma.SortOrder
+  slaDeadline?: Prisma.SortOrder
+  slaBreached?: Prisma.SortOrder
   AIabusedFlag?: Prisma.SortOrder
   AIimageVarificationStatus?: Prisma.SortOrder
   AIstandardizedSubCategory?: Prisma.SortOrder
@@ -1103,6 +1143,8 @@ export type ComplaintMaxOrderByAggregateInput = {
   blockchainStatus?: Prisma.SortOrder
   blockchainUpdatedAt?: Prisma.SortOrder
   sla?: Prisma.SortOrder
+  slaDeadline?: Prisma.SortOrder
+  slaBreached?: Prisma.SortOrder
   AIabusedFlag?: Prisma.SortOrder
   AIimageVarificationStatus?: Prisma.SortOrder
   AIstandardizedSubCategory?: Prisma.SortOrder
@@ -1142,6 +1184,8 @@ export type ComplaintMinOrderByAggregateInput = {
   blockchainStatus?: Prisma.SortOrder
   blockchainUpdatedAt?: Prisma.SortOrder
   sla?: Prisma.SortOrder
+  slaDeadline?: Prisma.SortOrder
+  slaBreached?: Prisma.SortOrder
   AIabusedFlag?: Prisma.SortOrder
   AIimageVarificationStatus?: Prisma.SortOrder
   AIstandardizedSubCategory?: Prisma.SortOrder
@@ -1704,6 +1748,8 @@ export type ComplaintCreateWithoutUserInput = {
   blockchainStatus?: $Enums.BlockchainStatus
   blockchainUpdatedAt?: Date | string | null
   sla?: string | null
+  slaDeadline?: Date | string | null
+  slaBreached?: boolean
   AIabusedFlag?: boolean | null
   AIimageVarificationStatus?: boolean | null
   AIstandardizedSubCategory?: string | null
@@ -1758,6 +1804,8 @@ export type ComplaintUncheckedCreateWithoutUserInput = {
   blockchainStatus?: $Enums.BlockchainStatus
   blockchainUpdatedAt?: Date | string | null
   sla?: string | null
+  slaDeadline?: Date | string | null
+  slaBreached?: boolean
   AIabusedFlag?: boolean | null
   AIimageVarificationStatus?: boolean | null
   AIstandardizedSubCategory?: string | null
@@ -1834,6 +1882,8 @@ export type ComplaintScalarWhereInput = {
   blockchainStatus?: Prisma.EnumBlockchainStatusFilter<"Complaint"> | $Enums.BlockchainStatus
   blockchainUpdatedAt?: Prisma.DateTimeNullableFilter<"Complaint"> | Date | string | null
   sla?: Prisma.StringNullableFilter<"Complaint"> | string | null
+  slaDeadline?: Prisma.DateTimeNullableFilter<"Complaint"> | Date | string | null
+  slaBreached?: Prisma.BoolFilter<"Complaint"> | boolean
   AIabusedFlag?: Prisma.BoolNullableFilter<"Complaint"> | boolean | null
   AIimageVarificationStatus?: Prisma.BoolNullableFilter<"Complaint"> | boolean | null
   AIstandardizedSubCategory?: Prisma.StringNullableFilter<"Complaint"> | string | null
@@ -1867,6 +1917,8 @@ export type ComplaintCreateWithoutAssignedAgentInput = {
   blockchainStatus?: $Enums.BlockchainStatus
   blockchainUpdatedAt?: Date | string | null
   sla?: string | null
+  slaDeadline?: Date | string | null
+  slaBreached?: boolean
   AIabusedFlag?: boolean | null
   AIimageVarificationStatus?: boolean | null
   AIstandardizedSubCategory?: string | null
@@ -1921,6 +1973,8 @@ export type ComplaintUncheckedCreateWithoutAssignedAgentInput = {
   blockchainStatus?: $Enums.BlockchainStatus
   blockchainUpdatedAt?: Date | string | null
   sla?: string | null
+  slaDeadline?: Date | string | null
+  slaBreached?: boolean
   AIabusedFlag?: boolean | null
   AIimageVarificationStatus?: boolean | null
   AIstandardizedSubCategory?: string | null
@@ -1969,6 +2023,8 @@ export type ComplaintCreateWithoutCoAssignedAgentsInput = {
   blockchainStatus?: $Enums.BlockchainStatus
   blockchainUpdatedAt?: Date | string | null
   sla?: string | null
+  slaDeadline?: Date | string | null
+  slaBreached?: boolean
   AIabusedFlag?: boolean | null
   AIimageVarificationStatus?: boolean | null
   AIstandardizedSubCategory?: string | null
@@ -2024,6 +2080,8 @@ export type ComplaintUncheckedCreateWithoutCoAssignedAgentsInput = {
   blockchainStatus?: $Enums.BlockchainStatus
   blockchainUpdatedAt?: Date | string | null
   sla?: string | null
+  slaDeadline?: Date | string | null
+  slaBreached?: boolean
   AIabusedFlag?: boolean | null
   AIimageVarificationStatus?: boolean | null
   AIstandardizedSubCategory?: string | null
@@ -2098,6 +2156,8 @@ export type ComplaintCreateWithoutManagedByMunicipalAdminInput = {
   blockchainStatus?: $Enums.BlockchainStatus
   blockchainUpdatedAt?: Date | string | null
   sla?: string | null
+  slaDeadline?: Date | string | null
+  slaBreached?: boolean
   AIabusedFlag?: boolean | null
   AIimageVarificationStatus?: boolean | null
   AIstandardizedSubCategory?: string | null
@@ -2152,6 +2212,8 @@ export type ComplaintUncheckedCreateWithoutManagedByMunicipalAdminInput = {
   blockchainStatus?: $Enums.BlockchainStatus
   blockchainUpdatedAt?: Date | string | null
   sla?: string | null
+  slaDeadline?: Date | string | null
+  slaBreached?: boolean
   AIabusedFlag?: boolean | null
   AIimageVarificationStatus?: boolean | null
   AIstandardizedSubCategory?: string | null
@@ -2200,6 +2262,8 @@ export type ComplaintCreateWithoutModeratedByMunicipalAdminInput = {
   blockchainStatus?: $Enums.BlockchainStatus
   blockchainUpdatedAt?: Date | string | null
   sla?: string | null
+  slaDeadline?: Date | string | null
+  slaBreached?: boolean
   AIabusedFlag?: boolean | null
   AIimageVarificationStatus?: boolean | null
   AIstandardizedSubCategory?: string | null
@@ -2254,6 +2318,8 @@ export type ComplaintUncheckedCreateWithoutModeratedByMunicipalAdminInput = {
   blockchainStatus?: $Enums.BlockchainStatus
   blockchainUpdatedAt?: Date | string | null
   sla?: string | null
+  slaDeadline?: Date | string | null
+  slaBreached?: boolean
   AIabusedFlag?: boolean | null
   AIimageVarificationStatus?: boolean | null
   AIstandardizedSubCategory?: string | null
@@ -2334,6 +2400,8 @@ export type ComplaintCreateWithoutCrossDeptIssueSuperMunicipalInput = {
   blockchainStatus?: $Enums.BlockchainStatus
   blockchainUpdatedAt?: Date | string | null
   sla?: string | null
+  slaDeadline?: Date | string | null
+  slaBreached?: boolean
   AIabusedFlag?: boolean | null
   AIimageVarificationStatus?: boolean | null
   AIstandardizedSubCategory?: string | null
@@ -2388,6 +2456,8 @@ export type ComplaintUncheckedCreateWithoutCrossDeptIssueSuperMunicipalInput = {
   blockchainStatus?: $Enums.BlockchainStatus
   blockchainUpdatedAt?: Date | string | null
   sla?: string | null
+  slaDeadline?: Date | string | null
+  slaBreached?: boolean
   AIabusedFlag?: boolean | null
   AIimageVarificationStatus?: boolean | null
   AIstandardizedSubCategory?: string | null
@@ -2452,6 +2522,8 @@ export type ComplaintCreateWithoutEscalatedToStateAdminInput = {
   blockchainStatus?: $Enums.BlockchainStatus
   blockchainUpdatedAt?: Date | string | null
   sla?: string | null
+  slaDeadline?: Date | string | null
+  slaBreached?: boolean
   AIabusedFlag?: boolean | null
   AIimageVarificationStatus?: boolean | null
   AIstandardizedSubCategory?: string | null
@@ -2506,6 +2578,8 @@ export type ComplaintUncheckedCreateWithoutEscalatedToStateAdminInput = {
   blockchainStatus?: $Enums.BlockchainStatus
   blockchainUpdatedAt?: Date | string | null
   sla?: string | null
+  slaDeadline?: Date | string | null
+  slaBreached?: boolean
   AIabusedFlag?: boolean | null
   AIimageVarificationStatus?: boolean | null
   AIstandardizedSubCategory?: string | null
@@ -2570,6 +2644,8 @@ export type ComplaintCreateWithoutEscalatedToSuperStateAdminInput = {
   blockchainStatus?: $Enums.BlockchainStatus
   blockchainUpdatedAt?: Date | string | null
   sla?: string | null
+  slaDeadline?: Date | string | null
+  slaBreached?: boolean
   AIabusedFlag?: boolean | null
   AIimageVarificationStatus?: boolean | null
   AIstandardizedSubCategory?: string | null
@@ -2624,6 +2700,8 @@ export type ComplaintUncheckedCreateWithoutEscalatedToSuperStateAdminInput = {
   blockchainStatus?: $Enums.BlockchainStatus
   blockchainUpdatedAt?: Date | string | null
   sla?: string | null
+  slaDeadline?: Date | string | null
+  slaBreached?: boolean
   AIabusedFlag?: boolean | null
   AIimageVarificationStatus?: boolean | null
   AIstandardizedSubCategory?: string | null
@@ -2688,6 +2766,8 @@ export type ComplaintCreateWithoutManagedBySuperAdminInput = {
   blockchainStatus?: $Enums.BlockchainStatus
   blockchainUpdatedAt?: Date | string | null
   sla?: string | null
+  slaDeadline?: Date | string | null
+  slaBreached?: boolean
   AIabusedFlag?: boolean | null
   AIimageVarificationStatus?: boolean | null
   AIstandardizedSubCategory?: string | null
@@ -2742,6 +2822,8 @@ export type ComplaintUncheckedCreateWithoutManagedBySuperAdminInput = {
   blockchainStatus?: $Enums.BlockchainStatus
   blockchainUpdatedAt?: Date | string | null
   sla?: string | null
+  slaDeadline?: Date | string | null
+  slaBreached?: boolean
   AIabusedFlag?: boolean | null
   AIimageVarificationStatus?: boolean | null
   AIstandardizedSubCategory?: string | null
@@ -2806,6 +2888,8 @@ export type ComplaintCreateWithoutCategoryInput = {
   blockchainStatus?: $Enums.BlockchainStatus
   blockchainUpdatedAt?: Date | string | null
   sla?: string | null
+  slaDeadline?: Date | string | null
+  slaBreached?: boolean
   AIabusedFlag?: boolean | null
   AIimageVarificationStatus?: boolean | null
   AIstandardizedSubCategory?: string | null
@@ -2860,6 +2944,8 @@ export type ComplaintUncheckedCreateWithoutCategoryInput = {
   blockchainStatus?: $Enums.BlockchainStatus
   blockchainUpdatedAt?: Date | string | null
   sla?: string | null
+  slaDeadline?: Date | string | null
+  slaBreached?: boolean
   AIabusedFlag?: boolean | null
   AIimageVarificationStatus?: boolean | null
   AIstandardizedSubCategory?: string | null
@@ -2924,6 +3010,8 @@ export type ComplaintCreateWithoutLocationInput = {
   blockchainStatus?: $Enums.BlockchainStatus
   blockchainUpdatedAt?: Date | string | null
   sla?: string | null
+  slaDeadline?: Date | string | null
+  slaBreached?: boolean
   AIabusedFlag?: boolean | null
   AIimageVarificationStatus?: boolean | null
   AIstandardizedSubCategory?: string | null
@@ -2979,6 +3067,8 @@ export type ComplaintUncheckedCreateWithoutLocationInput = {
   blockchainStatus?: $Enums.BlockchainStatus
   blockchainUpdatedAt?: Date | string | null
   sla?: string | null
+  slaDeadline?: Date | string | null
+  slaBreached?: boolean
   AIabusedFlag?: boolean | null
   AIimageVarificationStatus?: boolean | null
   AIstandardizedSubCategory?: string | null
@@ -3031,6 +3121,8 @@ export type ComplaintUpdateWithoutLocationInput = {
   blockchainStatus?: Prisma.EnumBlockchainStatusFieldUpdateOperationsInput | $Enums.BlockchainStatus
   blockchainUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   sla?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  slaDeadline?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  slaBreached?: Prisma.BoolFieldUpdateOperationsInput | boolean
   AIabusedFlag?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   AIimageVarificationStatus?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   AIstandardizedSubCategory?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -3086,6 +3178,8 @@ export type ComplaintUncheckedUpdateWithoutLocationInput = {
   blockchainStatus?: Prisma.EnumBlockchainStatusFieldUpdateOperationsInput | $Enums.BlockchainStatus
   blockchainUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   sla?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  slaDeadline?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  slaBreached?: Prisma.BoolFieldUpdateOperationsInput | boolean
   AIabusedFlag?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   AIimageVarificationStatus?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   AIstandardizedSubCategory?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -3123,6 +3217,8 @@ export type ComplaintCreateWithoutUpvotesInput = {
   blockchainStatus?: $Enums.BlockchainStatus
   blockchainUpdatedAt?: Date | string | null
   sla?: string | null
+  slaDeadline?: Date | string | null
+  slaBreached?: boolean
   AIabusedFlag?: boolean | null
   AIimageVarificationStatus?: boolean | null
   AIstandardizedSubCategory?: string | null
@@ -3178,6 +3274,8 @@ export type ComplaintUncheckedCreateWithoutUpvotesInput = {
   blockchainStatus?: $Enums.BlockchainStatus
   blockchainUpdatedAt?: Date | string | null
   sla?: string | null
+  slaDeadline?: Date | string | null
+  slaBreached?: boolean
   AIabusedFlag?: boolean | null
   AIimageVarificationStatus?: boolean | null
   AIstandardizedSubCategory?: string | null
@@ -3230,6 +3328,8 @@ export type ComplaintUpdateWithoutUpvotesInput = {
   blockchainStatus?: Prisma.EnumBlockchainStatusFieldUpdateOperationsInput | $Enums.BlockchainStatus
   blockchainUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   sla?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  slaDeadline?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  slaBreached?: Prisma.BoolFieldUpdateOperationsInput | boolean
   AIabusedFlag?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   AIimageVarificationStatus?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   AIstandardizedSubCategory?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -3285,6 +3385,8 @@ export type ComplaintUncheckedUpdateWithoutUpvotesInput = {
   blockchainStatus?: Prisma.EnumBlockchainStatusFieldUpdateOperationsInput | $Enums.BlockchainStatus
   blockchainUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   sla?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  slaDeadline?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  slaBreached?: Prisma.BoolFieldUpdateOperationsInput | boolean
   AIabusedFlag?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   AIimageVarificationStatus?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   AIstandardizedSubCategory?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -3322,6 +3424,8 @@ export type ComplaintCreateWithoutAuditLogsInput = {
   blockchainStatus?: $Enums.BlockchainStatus
   blockchainUpdatedAt?: Date | string | null
   sla?: string | null
+  slaDeadline?: Date | string | null
+  slaBreached?: boolean
   AIabusedFlag?: boolean | null
   AIimageVarificationStatus?: boolean | null
   AIstandardizedSubCategory?: string | null
@@ -3377,6 +3481,8 @@ export type ComplaintUncheckedCreateWithoutAuditLogsInput = {
   blockchainStatus?: $Enums.BlockchainStatus
   blockchainUpdatedAt?: Date | string | null
   sla?: string | null
+  slaDeadline?: Date | string | null
+  slaBreached?: boolean
   AIabusedFlag?: boolean | null
   AIimageVarificationStatus?: boolean | null
   AIstandardizedSubCategory?: string | null
@@ -3429,6 +3535,8 @@ export type ComplaintUpdateWithoutAuditLogsInput = {
   blockchainStatus?: Prisma.EnumBlockchainStatusFieldUpdateOperationsInput | $Enums.BlockchainStatus
   blockchainUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   sla?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  slaDeadline?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  slaBreached?: Prisma.BoolFieldUpdateOperationsInput | boolean
   AIabusedFlag?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   AIimageVarificationStatus?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   AIstandardizedSubCategory?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -3484,6 +3592,8 @@ export type ComplaintUncheckedUpdateWithoutAuditLogsInput = {
   blockchainStatus?: Prisma.EnumBlockchainStatusFieldUpdateOperationsInput | $Enums.BlockchainStatus
   blockchainUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   sla?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  slaDeadline?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  slaBreached?: Prisma.BoolFieldUpdateOperationsInput | boolean
   AIabusedFlag?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   AIimageVarificationStatus?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   AIstandardizedSubCategory?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -3521,6 +3631,8 @@ export type ComplaintCreateWithoutChatsInput = {
   blockchainStatus?: $Enums.BlockchainStatus
   blockchainUpdatedAt?: Date | string | null
   sla?: string | null
+  slaDeadline?: Date | string | null
+  slaBreached?: boolean
   AIabusedFlag?: boolean | null
   AIimageVarificationStatus?: boolean | null
   AIstandardizedSubCategory?: string | null
@@ -3576,6 +3688,8 @@ export type ComplaintUncheckedCreateWithoutChatsInput = {
   blockchainStatus?: $Enums.BlockchainStatus
   blockchainUpdatedAt?: Date | string | null
   sla?: string | null
+  slaDeadline?: Date | string | null
+  slaBreached?: boolean
   AIabusedFlag?: boolean | null
   AIimageVarificationStatus?: boolean | null
   AIstandardizedSubCategory?: string | null
@@ -3628,6 +3742,8 @@ export type ComplaintUpdateWithoutChatsInput = {
   blockchainStatus?: Prisma.EnumBlockchainStatusFieldUpdateOperationsInput | $Enums.BlockchainStatus
   blockchainUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   sla?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  slaDeadline?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  slaBreached?: Prisma.BoolFieldUpdateOperationsInput | boolean
   AIabusedFlag?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   AIimageVarificationStatus?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   AIstandardizedSubCategory?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -3683,6 +3799,8 @@ export type ComplaintUncheckedUpdateWithoutChatsInput = {
   blockchainStatus?: Prisma.EnumBlockchainStatusFieldUpdateOperationsInput | $Enums.BlockchainStatus
   blockchainUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   sla?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  slaDeadline?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  slaBreached?: Prisma.BoolFieldUpdateOperationsInput | boolean
   AIabusedFlag?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   AIimageVarificationStatus?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   AIstandardizedSubCategory?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -3728,6 +3846,8 @@ export type ComplaintCreateManyUserInput = {
   blockchainStatus?: $Enums.BlockchainStatus
   blockchainUpdatedAt?: Date | string | null
   sla?: string | null
+  slaDeadline?: Date | string | null
+  slaBreached?: boolean
   AIabusedFlag?: boolean | null
   AIimageVarificationStatus?: boolean | null
   AIstandardizedSubCategory?: string | null
@@ -3760,6 +3880,8 @@ export type ComplaintUpdateWithoutUserInput = {
   blockchainStatus?: Prisma.EnumBlockchainStatusFieldUpdateOperationsInput | $Enums.BlockchainStatus
   blockchainUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   sla?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  slaDeadline?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  slaBreached?: Prisma.BoolFieldUpdateOperationsInput | boolean
   AIabusedFlag?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   AIimageVarificationStatus?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   AIstandardizedSubCategory?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -3814,6 +3936,8 @@ export type ComplaintUncheckedUpdateWithoutUserInput = {
   blockchainStatus?: Prisma.EnumBlockchainStatusFieldUpdateOperationsInput | $Enums.BlockchainStatus
   blockchainUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   sla?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  slaDeadline?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  slaBreached?: Prisma.BoolFieldUpdateOperationsInput | boolean
   AIabusedFlag?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   AIimageVarificationStatus?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   AIstandardizedSubCategory?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -3860,6 +3984,8 @@ export type ComplaintUncheckedUpdateManyWithoutUserInput = {
   blockchainStatus?: Prisma.EnumBlockchainStatusFieldUpdateOperationsInput | $Enums.BlockchainStatus
   blockchainUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   sla?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  slaDeadline?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  slaBreached?: Prisma.BoolFieldUpdateOperationsInput | boolean
   AIabusedFlag?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   AIimageVarificationStatus?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   AIstandardizedSubCategory?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -3901,6 +4027,8 @@ export type ComplaintCreateManyAssignedAgentInput = {
   blockchainStatus?: $Enums.BlockchainStatus
   blockchainUpdatedAt?: Date | string | null
   sla?: string | null
+  slaDeadline?: Date | string | null
+  slaBreached?: boolean
   AIabusedFlag?: boolean | null
   AIimageVarificationStatus?: boolean | null
   AIstandardizedSubCategory?: string | null
@@ -3933,6 +4061,8 @@ export type ComplaintUpdateWithoutAssignedAgentInput = {
   blockchainStatus?: Prisma.EnumBlockchainStatusFieldUpdateOperationsInput | $Enums.BlockchainStatus
   blockchainUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   sla?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  slaDeadline?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  slaBreached?: Prisma.BoolFieldUpdateOperationsInput | boolean
   AIabusedFlag?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   AIimageVarificationStatus?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   AIstandardizedSubCategory?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -3987,6 +4117,8 @@ export type ComplaintUncheckedUpdateWithoutAssignedAgentInput = {
   blockchainStatus?: Prisma.EnumBlockchainStatusFieldUpdateOperationsInput | $Enums.BlockchainStatus
   blockchainUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   sla?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  slaDeadline?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  slaBreached?: Prisma.BoolFieldUpdateOperationsInput | boolean
   AIabusedFlag?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   AIimageVarificationStatus?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   AIstandardizedSubCategory?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -4033,6 +4165,8 @@ export type ComplaintUncheckedUpdateManyWithoutAssignedAgentInput = {
   blockchainStatus?: Prisma.EnumBlockchainStatusFieldUpdateOperationsInput | $Enums.BlockchainStatus
   blockchainUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   sla?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  slaDeadline?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  slaBreached?: Prisma.BoolFieldUpdateOperationsInput | boolean
   AIabusedFlag?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   AIimageVarificationStatus?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   AIstandardizedSubCategory?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -4065,6 +4199,8 @@ export type ComplaintUpdateWithoutCoAssignedAgentsInput = {
   blockchainStatus?: Prisma.EnumBlockchainStatusFieldUpdateOperationsInput | $Enums.BlockchainStatus
   blockchainUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   sla?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  slaDeadline?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  slaBreached?: Prisma.BoolFieldUpdateOperationsInput | boolean
   AIabusedFlag?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   AIimageVarificationStatus?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   AIstandardizedSubCategory?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -4120,6 +4256,8 @@ export type ComplaintUncheckedUpdateWithoutCoAssignedAgentsInput = {
   blockchainStatus?: Prisma.EnumBlockchainStatusFieldUpdateOperationsInput | $Enums.BlockchainStatus
   blockchainUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   sla?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  slaDeadline?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  slaBreached?: Prisma.BoolFieldUpdateOperationsInput | boolean
   AIabusedFlag?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   AIimageVarificationStatus?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   AIstandardizedSubCategory?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -4166,6 +4304,8 @@ export type ComplaintUncheckedUpdateManyWithoutCoAssignedAgentsInput = {
   blockchainStatus?: Prisma.EnumBlockchainStatusFieldUpdateOperationsInput | $Enums.BlockchainStatus
   blockchainUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   sla?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  slaDeadline?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  slaBreached?: Prisma.BoolFieldUpdateOperationsInput | boolean
   AIabusedFlag?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   AIimageVarificationStatus?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   AIstandardizedSubCategory?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -4207,6 +4347,8 @@ export type ComplaintCreateManyManagedByMunicipalAdminInput = {
   blockchainStatus?: $Enums.BlockchainStatus
   blockchainUpdatedAt?: Date | string | null
   sla?: string | null
+  slaDeadline?: Date | string | null
+  slaBreached?: boolean
   AIabusedFlag?: boolean | null
   AIimageVarificationStatus?: boolean | null
   AIstandardizedSubCategory?: string | null
@@ -4248,6 +4390,8 @@ export type ComplaintCreateManyModeratedByMunicipalAdminInput = {
   blockchainStatus?: $Enums.BlockchainStatus
   blockchainUpdatedAt?: Date | string | null
   sla?: string | null
+  slaDeadline?: Date | string | null
+  slaBreached?: boolean
   AIabusedFlag?: boolean | null
   AIimageVarificationStatus?: boolean | null
   AIstandardizedSubCategory?: string | null
@@ -4280,6 +4424,8 @@ export type ComplaintUpdateWithoutManagedByMunicipalAdminInput = {
   blockchainStatus?: Prisma.EnumBlockchainStatusFieldUpdateOperationsInput | $Enums.BlockchainStatus
   blockchainUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   sla?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  slaDeadline?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  slaBreached?: Prisma.BoolFieldUpdateOperationsInput | boolean
   AIabusedFlag?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   AIimageVarificationStatus?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   AIstandardizedSubCategory?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -4334,6 +4480,8 @@ export type ComplaintUncheckedUpdateWithoutManagedByMunicipalAdminInput = {
   blockchainStatus?: Prisma.EnumBlockchainStatusFieldUpdateOperationsInput | $Enums.BlockchainStatus
   blockchainUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   sla?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  slaDeadline?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  slaBreached?: Prisma.BoolFieldUpdateOperationsInput | boolean
   AIabusedFlag?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   AIimageVarificationStatus?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   AIstandardizedSubCategory?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -4380,6 +4528,8 @@ export type ComplaintUncheckedUpdateManyWithoutManagedByMunicipalAdminInput = {
   blockchainStatus?: Prisma.EnumBlockchainStatusFieldUpdateOperationsInput | $Enums.BlockchainStatus
   blockchainUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   sla?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  slaDeadline?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  slaBreached?: Prisma.BoolFieldUpdateOperationsInput | boolean
   AIabusedFlag?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   AIimageVarificationStatus?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   AIstandardizedSubCategory?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -4412,6 +4562,8 @@ export type ComplaintUpdateWithoutModeratedByMunicipalAdminInput = {
   blockchainStatus?: Prisma.EnumBlockchainStatusFieldUpdateOperationsInput | $Enums.BlockchainStatus
   blockchainUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   sla?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  slaDeadline?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  slaBreached?: Prisma.BoolFieldUpdateOperationsInput | boolean
   AIabusedFlag?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   AIimageVarificationStatus?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   AIstandardizedSubCategory?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -4466,6 +4618,8 @@ export type ComplaintUncheckedUpdateWithoutModeratedByMunicipalAdminInput = {
   blockchainStatus?: Prisma.EnumBlockchainStatusFieldUpdateOperationsInput | $Enums.BlockchainStatus
   blockchainUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   sla?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  slaDeadline?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  slaBreached?: Prisma.BoolFieldUpdateOperationsInput | boolean
   AIabusedFlag?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   AIimageVarificationStatus?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   AIstandardizedSubCategory?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -4512,6 +4666,8 @@ export type ComplaintUncheckedUpdateManyWithoutModeratedByMunicipalAdminInput = 
   blockchainStatus?: Prisma.EnumBlockchainStatusFieldUpdateOperationsInput | $Enums.BlockchainStatus
   blockchainUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   sla?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  slaDeadline?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  slaBreached?: Prisma.BoolFieldUpdateOperationsInput | boolean
   AIabusedFlag?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   AIimageVarificationStatus?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   AIstandardizedSubCategory?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -4553,6 +4709,8 @@ export type ComplaintCreateManyCrossDeptIssueSuperMunicipalInput = {
   blockchainStatus?: $Enums.BlockchainStatus
   blockchainUpdatedAt?: Date | string | null
   sla?: string | null
+  slaDeadline?: Date | string | null
+  slaBreached?: boolean
   AIabusedFlag?: boolean | null
   AIimageVarificationStatus?: boolean | null
   AIstandardizedSubCategory?: string | null
@@ -4585,6 +4743,8 @@ export type ComplaintUpdateWithoutCrossDeptIssueSuperMunicipalInput = {
   blockchainStatus?: Prisma.EnumBlockchainStatusFieldUpdateOperationsInput | $Enums.BlockchainStatus
   blockchainUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   sla?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  slaDeadline?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  slaBreached?: Prisma.BoolFieldUpdateOperationsInput | boolean
   AIabusedFlag?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   AIimageVarificationStatus?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   AIstandardizedSubCategory?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -4639,6 +4799,8 @@ export type ComplaintUncheckedUpdateWithoutCrossDeptIssueSuperMunicipalInput = {
   blockchainStatus?: Prisma.EnumBlockchainStatusFieldUpdateOperationsInput | $Enums.BlockchainStatus
   blockchainUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   sla?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  slaDeadline?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  slaBreached?: Prisma.BoolFieldUpdateOperationsInput | boolean
   AIabusedFlag?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   AIimageVarificationStatus?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   AIstandardizedSubCategory?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -4685,6 +4847,8 @@ export type ComplaintUncheckedUpdateManyWithoutCrossDeptIssueSuperMunicipalInput
   blockchainStatus?: Prisma.EnumBlockchainStatusFieldUpdateOperationsInput | $Enums.BlockchainStatus
   blockchainUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   sla?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  slaDeadline?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  slaBreached?: Prisma.BoolFieldUpdateOperationsInput | boolean
   AIabusedFlag?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   AIimageVarificationStatus?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   AIstandardizedSubCategory?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -4726,6 +4890,8 @@ export type ComplaintCreateManyEscalatedToStateAdminInput = {
   blockchainStatus?: $Enums.BlockchainStatus
   blockchainUpdatedAt?: Date | string | null
   sla?: string | null
+  slaDeadline?: Date | string | null
+  slaBreached?: boolean
   AIabusedFlag?: boolean | null
   AIimageVarificationStatus?: boolean | null
   AIstandardizedSubCategory?: string | null
@@ -4758,6 +4924,8 @@ export type ComplaintUpdateWithoutEscalatedToStateAdminInput = {
   blockchainStatus?: Prisma.EnumBlockchainStatusFieldUpdateOperationsInput | $Enums.BlockchainStatus
   blockchainUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   sla?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  slaDeadline?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  slaBreached?: Prisma.BoolFieldUpdateOperationsInput | boolean
   AIabusedFlag?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   AIimageVarificationStatus?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   AIstandardizedSubCategory?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -4812,6 +4980,8 @@ export type ComplaintUncheckedUpdateWithoutEscalatedToStateAdminInput = {
   blockchainStatus?: Prisma.EnumBlockchainStatusFieldUpdateOperationsInput | $Enums.BlockchainStatus
   blockchainUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   sla?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  slaDeadline?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  slaBreached?: Prisma.BoolFieldUpdateOperationsInput | boolean
   AIabusedFlag?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   AIimageVarificationStatus?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   AIstandardizedSubCategory?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -4858,6 +5028,8 @@ export type ComplaintUncheckedUpdateManyWithoutEscalatedToStateAdminInput = {
   blockchainStatus?: Prisma.EnumBlockchainStatusFieldUpdateOperationsInput | $Enums.BlockchainStatus
   blockchainUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   sla?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  slaDeadline?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  slaBreached?: Prisma.BoolFieldUpdateOperationsInput | boolean
   AIabusedFlag?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   AIimageVarificationStatus?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   AIstandardizedSubCategory?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -4899,6 +5071,8 @@ export type ComplaintCreateManyEscalatedToSuperStateAdminInput = {
   blockchainStatus?: $Enums.BlockchainStatus
   blockchainUpdatedAt?: Date | string | null
   sla?: string | null
+  slaDeadline?: Date | string | null
+  slaBreached?: boolean
   AIabusedFlag?: boolean | null
   AIimageVarificationStatus?: boolean | null
   AIstandardizedSubCategory?: string | null
@@ -4931,6 +5105,8 @@ export type ComplaintUpdateWithoutEscalatedToSuperStateAdminInput = {
   blockchainStatus?: Prisma.EnumBlockchainStatusFieldUpdateOperationsInput | $Enums.BlockchainStatus
   blockchainUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   sla?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  slaDeadline?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  slaBreached?: Prisma.BoolFieldUpdateOperationsInput | boolean
   AIabusedFlag?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   AIimageVarificationStatus?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   AIstandardizedSubCategory?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -4985,6 +5161,8 @@ export type ComplaintUncheckedUpdateWithoutEscalatedToSuperStateAdminInput = {
   blockchainStatus?: Prisma.EnumBlockchainStatusFieldUpdateOperationsInput | $Enums.BlockchainStatus
   blockchainUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   sla?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  slaDeadline?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  slaBreached?: Prisma.BoolFieldUpdateOperationsInput | boolean
   AIabusedFlag?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   AIimageVarificationStatus?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   AIstandardizedSubCategory?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -5031,6 +5209,8 @@ export type ComplaintUncheckedUpdateManyWithoutEscalatedToSuperStateAdminInput =
   blockchainStatus?: Prisma.EnumBlockchainStatusFieldUpdateOperationsInput | $Enums.BlockchainStatus
   blockchainUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   sla?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  slaDeadline?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  slaBreached?: Prisma.BoolFieldUpdateOperationsInput | boolean
   AIabusedFlag?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   AIimageVarificationStatus?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   AIstandardizedSubCategory?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -5072,6 +5252,8 @@ export type ComplaintCreateManyManagedBySuperAdminInput = {
   blockchainStatus?: $Enums.BlockchainStatus
   blockchainUpdatedAt?: Date | string | null
   sla?: string | null
+  slaDeadline?: Date | string | null
+  slaBreached?: boolean
   AIabusedFlag?: boolean | null
   AIimageVarificationStatus?: boolean | null
   AIstandardizedSubCategory?: string | null
@@ -5104,6 +5286,8 @@ export type ComplaintUpdateWithoutManagedBySuperAdminInput = {
   blockchainStatus?: Prisma.EnumBlockchainStatusFieldUpdateOperationsInput | $Enums.BlockchainStatus
   blockchainUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   sla?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  slaDeadline?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  slaBreached?: Prisma.BoolFieldUpdateOperationsInput | boolean
   AIabusedFlag?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   AIimageVarificationStatus?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   AIstandardizedSubCategory?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -5158,6 +5342,8 @@ export type ComplaintUncheckedUpdateWithoutManagedBySuperAdminInput = {
   blockchainStatus?: Prisma.EnumBlockchainStatusFieldUpdateOperationsInput | $Enums.BlockchainStatus
   blockchainUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   sla?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  slaDeadline?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  slaBreached?: Prisma.BoolFieldUpdateOperationsInput | boolean
   AIabusedFlag?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   AIimageVarificationStatus?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   AIstandardizedSubCategory?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -5204,6 +5390,8 @@ export type ComplaintUncheckedUpdateManyWithoutManagedBySuperAdminInput = {
   blockchainStatus?: Prisma.EnumBlockchainStatusFieldUpdateOperationsInput | $Enums.BlockchainStatus
   blockchainUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   sla?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  slaDeadline?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  slaBreached?: Prisma.BoolFieldUpdateOperationsInput | boolean
   AIabusedFlag?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   AIimageVarificationStatus?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   AIstandardizedSubCategory?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -5245,6 +5433,8 @@ export type ComplaintCreateManyCategoryInput = {
   blockchainStatus?: $Enums.BlockchainStatus
   blockchainUpdatedAt?: Date | string | null
   sla?: string | null
+  slaDeadline?: Date | string | null
+  slaBreached?: boolean
   AIabusedFlag?: boolean | null
   AIimageVarificationStatus?: boolean | null
   AIstandardizedSubCategory?: string | null
@@ -5277,6 +5467,8 @@ export type ComplaintUpdateWithoutCategoryInput = {
   blockchainStatus?: Prisma.EnumBlockchainStatusFieldUpdateOperationsInput | $Enums.BlockchainStatus
   blockchainUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   sla?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  slaDeadline?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  slaBreached?: Prisma.BoolFieldUpdateOperationsInput | boolean
   AIabusedFlag?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   AIimageVarificationStatus?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   AIstandardizedSubCategory?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -5331,6 +5523,8 @@ export type ComplaintUncheckedUpdateWithoutCategoryInput = {
   blockchainStatus?: Prisma.EnumBlockchainStatusFieldUpdateOperationsInput | $Enums.BlockchainStatus
   blockchainUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   sla?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  slaDeadline?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  slaBreached?: Prisma.BoolFieldUpdateOperationsInput | boolean
   AIabusedFlag?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   AIimageVarificationStatus?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   AIstandardizedSubCategory?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -5377,6 +5571,8 @@ export type ComplaintUncheckedUpdateManyWithoutCategoryInput = {
   blockchainStatus?: Prisma.EnumBlockchainStatusFieldUpdateOperationsInput | $Enums.BlockchainStatus
   blockchainUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   sla?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  slaDeadline?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  slaBreached?: Prisma.BoolFieldUpdateOperationsInput | boolean
   AIabusedFlag?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   AIimageVarificationStatus?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   AIstandardizedSubCategory?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -5477,6 +5673,8 @@ export type ComplaintSelect<ExtArgs extends runtime.Types.Extensions.InternalArg
   blockchainStatus?: boolean
   blockchainUpdatedAt?: boolean
   sla?: boolean
+  slaDeadline?: boolean
+  slaBreached?: boolean
   AIabusedFlag?: boolean
   AIimageVarificationStatus?: boolean
   AIstandardizedSubCategory?: boolean
@@ -5534,6 +5732,8 @@ export type ComplaintSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Ext
   blockchainStatus?: boolean
   blockchainUpdatedAt?: boolean
   sla?: boolean
+  slaDeadline?: boolean
+  slaBreached?: boolean
   AIabusedFlag?: boolean
   AIimageVarificationStatus?: boolean
   AIstandardizedSubCategory?: boolean
@@ -5585,6 +5785,8 @@ export type ComplaintSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Ext
   blockchainStatus?: boolean
   blockchainUpdatedAt?: boolean
   sla?: boolean
+  slaDeadline?: boolean
+  slaBreached?: boolean
   AIabusedFlag?: boolean
   AIimageVarificationStatus?: boolean
   AIstandardizedSubCategory?: boolean
@@ -5636,6 +5838,8 @@ export type ComplaintSelectScalar = {
   blockchainStatus?: boolean
   blockchainUpdatedAt?: boolean
   sla?: boolean
+  slaDeadline?: boolean
+  slaBreached?: boolean
   AIabusedFlag?: boolean
   AIimageVarificationStatus?: boolean
   AIstandardizedSubCategory?: boolean
@@ -5648,7 +5852,7 @@ export type ComplaintSelectScalar = {
   abuseMetadata?: boolean
 }
 
-export type ComplaintOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "submissionDate" | "complainantId" | "subCategory" | "description" | "urgency" | "attachmentUrl" | "status" | "upvoteCount" | "isPublic" | "assignedAgentId" | "assignedDepartment" | "categoryId" | "crossDeptIssueSuperMunicipalId" | "dateOfResolution" | "escalatedToStateAdminId" | "escalatedToSuperStateAdminId" | "escalationLevel" | "managedByMunicipalAdminId" | "managedBySuperAdminId" | "moderatedByMunicipalAdminId" | "seq" | "blockchainHash" | "blockchainBlock" | "ipfsHash" | "isOnChain" | "blockchainStatus" | "blockchainUpdatedAt" | "sla" | "AIabusedFlag" | "AIimageVarificationStatus" | "AIstandardizedSubCategory" | "lastUpdated" | "isDuplicate" | "qualityScore" | "qualityBreakdown" | "hasSimilarComplaints" | "similarComplaintIds" | "abuseMetadata", ExtArgs["result"]["complaint"]>
+export type ComplaintOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "submissionDate" | "complainantId" | "subCategory" | "description" | "urgency" | "attachmentUrl" | "status" | "upvoteCount" | "isPublic" | "assignedAgentId" | "assignedDepartment" | "categoryId" | "crossDeptIssueSuperMunicipalId" | "dateOfResolution" | "escalatedToStateAdminId" | "escalatedToSuperStateAdminId" | "escalationLevel" | "managedByMunicipalAdminId" | "managedBySuperAdminId" | "moderatedByMunicipalAdminId" | "seq" | "blockchainHash" | "blockchainBlock" | "ipfsHash" | "isOnChain" | "blockchainStatus" | "blockchainUpdatedAt" | "sla" | "slaDeadline" | "slaBreached" | "AIabusedFlag" | "AIimageVarificationStatus" | "AIstandardizedSubCategory" | "lastUpdated" | "isDuplicate" | "qualityScore" | "qualityBreakdown" | "hasSimilarComplaints" | "similarComplaintIds" | "abuseMetadata", ExtArgs["result"]["complaint"]>
 export type ComplaintInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   assignedAgent?: boolean | Prisma.Complaint$assignedAgentArgs<ExtArgs>
   category?: boolean | Prisma.CategoryDefaultArgs<ExtArgs>
@@ -5737,6 +5941,8 @@ export type $ComplaintPayload<ExtArgs extends runtime.Types.Extensions.InternalA
     blockchainStatus: $Enums.BlockchainStatus
     blockchainUpdatedAt: Date | null
     sla: string | null
+    slaDeadline: Date | null
+    slaBreached: boolean
     AIabusedFlag: boolean | null
     AIimageVarificationStatus: boolean | null
     AIstandardizedSubCategory: string | null
@@ -6213,6 +6419,8 @@ export interface ComplaintFieldRefs {
   readonly blockchainStatus: Prisma.FieldRef<"Complaint", 'BlockchainStatus'>
   readonly blockchainUpdatedAt: Prisma.FieldRef<"Complaint", 'DateTime'>
   readonly sla: Prisma.FieldRef<"Complaint", 'String'>
+  readonly slaDeadline: Prisma.FieldRef<"Complaint", 'DateTime'>
+  readonly slaBreached: Prisma.FieldRef<"Complaint", 'Boolean'>
   readonly AIabusedFlag: Prisma.FieldRef<"Complaint", 'Boolean'>
   readonly AIimageVarificationStatus: Prisma.FieldRef<"Complaint", 'Boolean'>
   readonly AIstandardizedSubCategory: Prisma.FieldRef<"Complaint", 'String'>

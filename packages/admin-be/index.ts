@@ -18,6 +18,7 @@ import complaintRoutes from './routes/complaint';
 // import { userComplaintsRouter } from './routes/userComplaints';
 import { healthPoint } from './routes/health';
 import autoAssignRouter, { startAutoAssignPolling } from './routes/autoAssign';
+import { startSlaCron } from './lib/slaCron';
 import publicAnnouncementRoutes from './routes/publicAnnouncementRoutes';
 
 export class Server {
@@ -75,6 +76,7 @@ export class Server {
 
     // startComplaintPolling(this.db);
     startAutoAssignPolling();
+    startSlaCron(this.db);
   }
 
   public getApp(): Express {

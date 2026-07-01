@@ -271,7 +271,8 @@ export default function DashboardPage() {
           />
 
           <main className="flex-1 overflow-auto">
-            {activeView === "dashboard" && (
+            <div className="min-h-screen flex flex-col">
+              {activeView === "dashboard" && (
               <div className="pt-8 px-4 lg:px-8 pb-12 max-w-7xl mx-auto w-full">
                 <DashboardAIChatHub
                   user={user}
@@ -367,9 +368,10 @@ export default function DashboardPage() {
             {activeView === "surveys" && (
               <SurveysView authToken={authToken} />
             )}
-          </main>
+            </div>
 
-          <LandingFooter />
+            <LandingFooter />
+          </main>
         </div>
 
         <ComplaintDetailModal

@@ -93,7 +93,7 @@ export class Server {
       // User stats route (authenticated)
       this.app.use('/api/users', authMiddleware, createUserStatsRouter(this.db));
       // Announcements route (authenticated)
-      this.app.use('/api/announcements', authMiddleware, createAnnouncementsRouter());
+      this.app.use('/api/announcements', authMiddleware, createAnnouncementsRouter(this.db));
       // Profile update route (authenticated)
       this.app.use('/api/users', authMiddleware, createUpdateProfileRouter(this.db));
       // Protected surveys routes (authenticated)

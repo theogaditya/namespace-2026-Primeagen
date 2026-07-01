@@ -12,6 +12,7 @@ interface Survey {
   id: string
   title: string
   status: "DRAFT" | "PUBLISHED" | "CLOSED" | "ARCHIVED"
+  isPublic: boolean
   _count?: { responses: number; questions: number }
 }
 
@@ -22,6 +23,21 @@ export default function CivicPartnerSettingsPage() {
   const [loading, setLoading] = useState(true)
   const [cachedPartner, setCachedPartner] = useState<CivicPartner | null>(null)
   const [selectedSurvey, setSelectedSurvey] = useState<Survey | null>(null)
+  const [togglingId, setTogglingId] = useState<string | null>(null)
+
+  const handleToggleVisibility = async (survey: Survey) => {
+    setTogglingId(survey.id)
+    try {
+      const res = await fetch(`${API}/api/civic-partner/surveys/${survey.id}/visibility`, {
+        method: 'PATCH',
+        credentials: 'include',
+      })
+      if (res.ok) {
+        const data = await res.json()
+        setSurveys(prev => prev.map(s => s.id === survey.id ? { ...s, isPublic: data.survey.isPublic } : s))
+      }
+    } catch (err) { console.error(err) } finally { setTogglingId(null) }
+  }
 
   useEffect(() => {
     // Immediate load from local cache for instant visibility
@@ -57,7 +73,7 @@ export default function CivicPartnerSettingsPage() {
            <div className="col-span-12 lg:col-span-8 space-y-8">
               <div className="bg-white rounded-2xl border border-gray-200 p-8 shadow-sm">
                  <h3 className="text-lg font-bold text-black mb-8">Organization Profile</h3>
-                 
+
                  {!displayPartner ? (
                     <div className="space-y-4 animate-pulse">
                        {[1,2,3].map(i => <div key={i} className="h-12 bg-gray-50 rounded-xl" />)}
@@ -74,7 +90,7 @@ export default function CivicPartnerSettingsPage() {
                              <div className="h-12 w-full flex items-center px-5 bg-gray-50 border border-gray-100 rounded-xl font-bold text-black">{displayPartner.officialEmail}</div>
                           </div>
                        </div>
-                       
+
                        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                           <div className="space-y-2">
                              <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest pl-1">Primary State</label>
@@ -112,9 +128,34 @@ export default function CivicPartnerSettingsPage() {
                              <tr key={s.id} className="hover:bg-gray-50/50 transition-colors">
                                 <td className="px-8 py-5">
                                    <p className="text-sm font-bold text-black tracking-tight">{s.title}</p>
-                                   <span className="text-[10px] font-black text-emerald-500 uppercase mt-1 inline-block">{s.status}</span>
+                                   <div className="flex items-center gap-2 mt-1">
+                                     <span className="text-[10px] font-black text-emerald-500 uppercase">{s.status}</span>
+                                     {s.status === 'CLOSED' && (
+                                       <span className={cn(
+                                         'text-[10px] font-black uppercase px-1.5 py-0.5 rounded-full',
+                                         s.isPublic ? 'bg-emerald-50 text-emerald-600' : 'bg-gray-100 text-gray-500'
+                                       )}>
+                                         {s.isPublic ? 'Public' : 'Private'}
+                                       </span>
+                                     )}
+                                   </div>
                                 </td>
-                                <td className="px-8 py-5 text-right">
+                                <td className="px-8 py-5 text-right flex items-center justify-end gap-3">
+                                   {s.status === 'CLOSED' && (
+                                     <button
+                                       onClick={() => handleToggleVisibility(s)}
+                                       disabled={togglingId === s.id}
+                                       className={cn(
+                                         'text-xs font-black px-3 py-1.5 rounded-lg transition-all',
+                                         s.isPublic
+                                           ? 'bg-amber-50 text-amber-600 hover:bg-amber-100'
+                                           : 'bg-emerald-50 text-emerald-600 hover:bg-emerald-100',
+                                         togglingId === s.id && 'opacity-50 cursor-not-allowed'
+                                       )}
+                                     >
+                                       {togglingId === s.id ? '...' : s.isPublic ? 'Make Private' : 'Make Public'}
+                                     </button>
+                                   )}
                                    <button onClick={() => router.push(`/CivicPartner/surveys/${s.id}`)} className="text-xs font-black text-brand-500 hover:underline">Manage Center &rarr;</button>
                                 </td>
                              </tr>
@@ -133,7 +174,7 @@ export default function CivicPartnerSettingsPage() {
                  </div>
                  <h4 className="text-xl font-black text-black mb-2">{displayPartner?.isVerified ? 'Official Account' : 'Security Check Pending'}</h4>
                  <p className="text-xs text-gray-400 font-medium leading-relaxed px-4">Account verification ensures trust with citizens and unlocks high-volume response limits.</p>
-                 
+
                  <div className="mt-10 space-y-3">
                     <button onClick={() => router.push("/CivicPartner/help")} className="w-full h-12 flex items-center justify-center gap-2 rounded-xl border border-gray-200 text-sm font-bold text-gray-700 hover:bg-gray-50 transition-all">Support Center</button>
                     <button onClick={logout} className="w-full h-12 flex items-center justify-center gap-2 rounded-xl bg-red-50 text-red-600 text-sm font-black hover:bg-red-500 hover:text-white transition-all">Logout Identity</button>

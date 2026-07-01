@@ -19,7 +19,7 @@ export function AgentRevampedLayout({ children }: AgentRevampedLayoutProps) {
   const [isCollapsed, setIsCollapsed] = useState(false)
   const [showNotifications, setShowNotifications] = useState(false)
   const notificationRef = useRef<HTMLDivElement>(null)
-  
+
   const notifications = [
     { id: 1, title: "New Assignment", desc: "Complaint #1024 has been assigned to you.", time: "2m ago", unread: true },
     { id: 2, title: "Status Verified", desc: "Citizen has verified resolution for #998.", time: "1h ago", unread: true },
@@ -278,28 +278,6 @@ export function AgentRevampedLayout({ children }: AgentRevampedLayoutProps) {
             </div>
           </div>
         )}
-
-        {/* Footer links */}
-        <div className="mt-4 space-y-1">
-          <a
-            href="#"
-            className="footer-link px-3 py-2 text-xs text-slate-400 hover:text-slate-600 font-mono uppercase tracking-wide"
-          >
-            <span className="material-symbols-outlined flex-shrink-0" style={{ fontSize: 16 }}>
-              shield
-            </span>
-            {!isCollapsed && <span className="footer-link-text">Privacy Protocol</span>}
-          </a>
-          <a
-            href="#"
-            className="footer-link px-3 py-2 text-xs text-slate-400 hover:text-slate-600 font-mono uppercase tracking-wide"
-          >
-            <span className="material-symbols-outlined flex-shrink-0" style={{ fontSize: 16 }}>
-              sensors
-            </span>
-            {!isCollapsed && <span className="footer-link-text">System Status</span>}
-          </a>
-        </div>
       </aside>
 
       {/* Main area */}
@@ -320,10 +298,7 @@ export function AgentRevampedLayout({ children }: AgentRevampedLayoutProps) {
               </span>
             </button>
             <div className="flex items-center gap-2">
-              <span className="text-xs font-mono text-slate-400">PATH //</span>
               <nav className="flex gap-2 text-xs font-bold uppercase tracking-widest headline">
-                <span className="text-slate-400">DASHBOARD</span>
-                <span className="text-slate-300">/</span>
                 <span className="text-[#0047cc] border-b-2 border-[#0047cc] pb-0.5">
                   {pathname === "/Agent"
                     ? "dashboard"
@@ -360,7 +335,7 @@ export function AgentRevampedLayout({ children }: AgentRevampedLayoutProps) {
             </div>
             <div className="flex items-center gap-1">
               <div className="relative" ref={notificationRef}>
-                <button 
+                <button
                   onClick={() => setShowNotifications(!showNotifications)}
                   className={`p-2 rounded-sm transition-colors relative ${showNotifications ? 'bg-[#eff4ff] text-[#0047cc]' : 'hover:bg-[#eff4ff] text-slate-500'}`}
                 >
