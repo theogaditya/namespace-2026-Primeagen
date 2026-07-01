@@ -5,6 +5,7 @@ import { CivicPartnerLayout } from "../_layout"
 import { useReportStream, PipelineStep } from "@/hooks/useReportStream"
 import { cn } from "@/lib/utils"
 import { Download, Share2, Sparkles, Globe, ChevronRight, AlertTriangle, CheckCircle, Loader2, Activity } from "lucide-react"
+import { Folder, Trash2, Eye } from "lucide-react"
 
 const SURVEY_API = process.env.NEXT_PUBLIC_SURVEY_REPORT || "http://localhost:8000"
 
@@ -47,6 +48,15 @@ interface HealthData {
 
 /* ─── Report Tabs ─── */
 type ReportTab = "fusion" | "backend" | "survey"
+
+interface SavedReport {
+  id: string
+  title: string
+  type: string
+  category?: string
+  createdAt: number
+  report: Record<string, unknown>
+}
 
 /* ─── PDF Generation ─── */
 async function downloadReportPDF(
@@ -118,6 +128,9 @@ export default function CivicPartnerReportsPage() {
   const [metricsLoading, setMetricsLoading] = useState(false)
   const [mode, setMode] = useState<"survey" | "analyze">("survey")
   const consoleRef = useRef<HTMLDivElement>(null)
+  const [showHistory, setShowHistory] = useState(false)
+  const [historyReports, setHistoryReports] = useState<SavedReport[]>([])
+  const lastSavedRef = useRef<Record<string, string>>({})
 
   // Auto-scroll console
   useEffect(() => {
@@ -125,6 +138,50 @@ export default function CivicPartnerReportsPage() {
       consoleRef.current.scrollTop = consoleRef.current.scrollHeight
     }
   }, [stream.logLines, stream.surveyTokens, stream.backendTokens, stream.fusionTokens, stream.analyzeTokens])
+
+  // LocalStorage helpers
+  const STORAGE_KEY = "swaraj_reports_v1"
+
+  const loadSavedReports = useCallback((): SavedReport[] => {
+    try {
+      const raw = localStorage.getItem(STORAGE_KEY)
+      if (!raw) return []
+      return JSON.parse(raw) as SavedReport[]
+    } catch {
+      return []
+    }
+  }, [])
+
+  const persistSavedReports = useCallback((arr: SavedReport[]) => {
+    try { localStorage.setItem(STORAGE_KEY, JSON.stringify(arr)) } catch { }
+    setHistoryReports(arr)
+  }, [])
+
+  const saveReportToLocal = useCallback((r: Record<string, unknown> | null, meta: { title: string, type: string, category?: string }) => {
+    if (!r) return
+    try {
+      const payload = JSON.stringify(r)
+      // avoid saving duplicates by content
+      const last = lastSavedRef.current[meta.type + (meta.category||"")]
+      if (last === payload) return
+      lastSavedRef.current[meta.type + (meta.category||"")] = payload
+
+      const all = loadSavedReports()
+      const item: SavedReport = {
+        id: String(Date.now()),
+        title: meta.title,
+        type: meta.type,
+        category: meta.category,
+        createdAt: Date.now(),
+        report: r,
+      }
+      const next = [item, ...all].slice(0, 200)
+      persistSavedReports(next)
+    } catch (e) { /* ignore */ }
+  }, [loadSavedReports, persistSavedReports])
+
+  // load history on mount
+  useEffect(() => { setHistoryReports(loadSavedReports()) }, [loadSavedReports])
 
   // Fetch metrics and health on mount (and allow manual refresh)
   const fetchAllMetrics = useCallback(async () => {
@@ -158,6 +215,20 @@ export default function CivicPartnerReportsPage() {
   useEffect(() => {
     fetchAllMetrics()
   }, [fetchAllMetrics])
+
+  // Persist completed reports when they become available
+  useEffect(() => {
+    // Fusion report (final)
+    if (stream.fusionReport) {
+      saveReportToLocal(stream.fusionReport, { title: `${selectedCategory || "Civic"} — Fusion Report`, type: "fusion", category: selectedCategory || undefined })
+      setHistoryReports(loadSavedReports())
+    }
+    // Analyze report (global)
+    if (stream.analyzeReport) {
+      saveReportToLocal(stream.analyzeReport, { title: `Global Analysis Report`, type: "analyze" })
+      setHistoryReports(loadSavedReports())
+    }
+  }, [stream.fusionReport, stream.analyzeReport, saveReportToLocal, loadSavedReports, selectedCategory])
 
   const handleGenerateSurvey = useCallback(() => {
     if (!selectedCategory) return
@@ -224,6 +295,13 @@ export default function CivicPartnerReportsPage() {
                     <Sparkles className="w-4 h-4" />
                   )}
                   {stream.isStreaming ? "Generating..." : "Generate AI Report"}
+                </button>
+                <button
+                  onClick={() => setShowHistory(true)}
+                  className="h-11 px-4 bg-white border border-slate-200 text-slate-600 rounded-xl text-xs font-bold shadow-sm hover:bg-slate-50 flex items-center gap-2"
+                  title="Report History"
+                >
+                  <Folder className="w-4 h-4" /> History
                 </button>
               </div>
             </div>
@@ -578,6 +656,42 @@ export default function CivicPartnerReportsPage() {
               <h4 className="text-sm font-black text-red-700">Pipeline Error</h4>
               <p className="text-sm text-red-600 mt-1">{stream.error}</p>
               <p className="text-xs text-red-400 mt-2">Ensure the AI server is running at {SURVEY_API}</p>
+            </div>
+          </div>
+        )}
+
+        {/* History Modal */}
+        {showHistory && (
+          <div className="fixed inset-0 z-[60] flex items-center justify-center">
+            <div className="absolute inset-0 bg-black/40" onClick={() => setShowHistory(false)} />
+            <div className="relative bg-white w-full max-w-4xl mx-4 rounded-2xl shadow-2xl p-6 z-10">
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="text-lg font-black">Saved Reports</h3>
+                <div className="flex items-center gap-2">
+                  <button onClick={() => { setHistoryReports(loadSavedReports()); }} className="px-3 py-1 rounded bg-slate-50">Refresh</button>
+                  <button onClick={() => setShowHistory(false)} className="px-3 py-1 rounded bg-slate-50">Close</button>
+                </div>
+              </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 max-h-[60vh] overflow-y-auto">
+                {historyReports.length === 0 ? (
+                  <div className="p-6 text-center text-slate-400">No saved reports yet.</div>
+                ) : historyReports.map((h) => (
+                  <div key={h.id} className="p-4 rounded-xl border shadow-sm bg-slate-50">
+                    <div className="flex items-start justify-between gap-2">
+                      <div>
+                        <div className="text-sm font-bold">{h.title}</div>
+                        <div className="text-xs text-slate-500">{h.type.toUpperCase()} · {h.category || "All"}</div>
+                        <div className="text-xs text-slate-400 mt-2">{new Date(h.createdAt).toLocaleString()}</div>
+                      </div>
+                      <div className="flex gap-2">
+                        <button onClick={() => { setShowHistory(false); /* load into viewer */ setTimeout(() => { if (h.type === 'analyze') { setMode('analyze'); stream.cancel(); } else { setMode('survey'); setActiveTab(h.type as ReportTab); } }, 50); setTimeout(() => { /* set display using state: directly put into stream replacement area */ stream.cancel(); /* temporarily set display via local state by setting history report as displayReport via download flow */ }, 100); }} className="p-2 rounded bg-white border"> <Eye className="w-4 h-4"/> </button>
+                        <button onClick={() => downloadReportPDF(h.report, h.title)} className="p-2 rounded bg-white border"> <Download className="w-4 h-4"/> </button>
+                        <button onClick={() => { const next = loadSavedReports().filter(x => x.id !== h.id); persistSavedReports(next); }} className="p-2 rounded bg-white border text-red-500"> <Trash2 className="w-4 h-4"/> </button>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
             </div>
           </div>
         )}
