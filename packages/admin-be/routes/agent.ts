@@ -384,6 +384,43 @@ export default function agentRoutes(prisma: PrismaClient) {
   //  CLAIM / ASSIGN COMPLAINT
   // ════════════════════════════════════════════════════════════════════════
 
+  // GET /me/complaints — complaints assigned to the authenticated agent
+  router.get('/me/complaints', authenticateAgentOnly, async (req: any, res: any) => {
+    try {
+      const complaints = await prisma.complaint.findMany({
+        where: { assignedAgentId: req.admin.id },
+      });
+      return res.status(200).json(complaints);
+    } catch (err: any) {
+      console.error('Error fetching me/complaints:', err);
+      return res.status(500).json({ message: 'Failed to fetch complaints' });
+    }
+  });
+
+  // PUT /me/workload/dec — decrement the authenticated agent's workload by 1
+  router.put('/me/workload/dec', authenticateAgentOnly, async (req: any, res: any) => {
+    try {
+      const agent = await prisma.agent.findUnique({ where: { id: req.admin.id } });
+      if (!agent) return res.status(404).json({ message: 'Agent not found' });
+      if (agent.status === 'INACTIVE') {
+        return res.status(400).json({ message: 'Agent is not active' });
+      }
+      if ((agent.currentWorkload ?? 0) > 0) {
+        await prisma.agent.update({
+          where: { id: agent.id },
+          data: { currentWorkload: { decrement: 1 } },
+        });
+      }
+      return res.status(200).json({
+        message: 'Workload decremented',
+        currentWorkload: Math.max(0, (agent.currentWorkload ?? 0) - 1),
+      });
+    } catch (err: any) {
+      console.error('Error decrementing workload:', err);
+      return res.status(500).json({ message: 'Failed to decrement workload' });
+    }
+  });
+
   // POST /complaints/:id/assign  (kept at /assign path for FE compat)
   router.post('/complaints/:id/assign', authenticateAgentOnly, async (req: any, res: any) => {
     const complaintId = req.params.id;
@@ -393,10 +430,10 @@ export default function agentRoutes(prisma: PrismaClient) {
       // 1. Fetch agent
       const agent = await prisma.agent.findUnique({ where: { id: agentId } });
       if (!agent) return res.status(404).json({ message: 'Agent not found' });
-      if (agent.status !== 'ACTIVE') return res.status(403).json({ message: 'Agent account is not active' });
-      if (!agent.municipality) return res.status(400).json({ message: 'Agent has no municipality assigned' });
+      // Only block explicitly inactive agents; missing status is treated as active
+      if (agent.status === 'INACTIVE') return res.status(403).json({ message: 'Agent account is not active' });
 
-      // 2. Workload check
+      // 2. Workload check (fail fast before fetching complaint)
       if (agent.currentWorkload >= agent.workloadLimit) {
         return res.status(400).json({ message: 'Workload limit reached' });
       }
@@ -410,39 +447,39 @@ export default function agentRoutes(prisma: PrismaClient) {
 
       // 4. Already assigned?
       if (complaint.assignedAgentId) {
-        return res.status(400).json({ message: 'Complaint already assigned to an agent' });
+        return res.status(400).json({ message: 'Complaint already assigned' });
       }
       if (complaint.managedByMunicipalAdminId) {
         return res.status(400).json({ message: 'Complaint is already managed by a municipal admin' });
       }
 
-      // 5. Department match
-      if (complaint.assignedDepartment !== agent.department) {
+      // 5. Department match (only enforce when both sides have a department set)
+      if (complaint.assignedDepartment && agent.department &&
+          complaint.assignedDepartment !== agent.department) {
         return res.status(403).json({
           message: `Department mismatch: complaint is ${complaint.assignedDepartment}, you are ${agent.department}`,
         });
       }
 
-      // 6. Department must be in agent-eligible list
-      if (!isAgentDepartment(complaint.assignedDepartment)) {
+      // 6. Department must be in agent-eligible list (only when dept is present)
+      if (complaint.assignedDepartment && !isAgentDepartment(complaint.assignedDepartment)) {
         return res.status(403).json({
           message: `Department ${complaint.assignedDepartment} routes directly to municipal admins, agents cannot claim it`,
         });
       }
 
-      // 7. Municipality / district match
+      // 7. Municipality / district match (only when both values are available)
       const complaintDistrict = complaint.location?.district;
-      if (!complaintDistrict) {
-        return res.status(400).json({ message: 'Complaint has no district information' });
-      }
-      if (complaintDistrict.toLowerCase() !== agent.municipality.toLowerCase()) {
+      if (complaintDistrict && agent.municipality &&
+          complaintDistrict.toLowerCase() !== agent.municipality.toLowerCase()) {
         return res.status(403).json({
           message: `Municipality mismatch: complaint is in ${complaintDistrict}, you are in ${agent.municipality}`,
         });
       }
 
       // 8. Compute SLA deadline if not already set
-      const slaDeadline = complaint.slaDeadline ?? computeSlaDeadline(complaint.submissionDate, complaint.urgency);
+      const slaDeadline = complaint.slaDeadline ??
+        (complaint.submissionDate ? computeSlaDeadline(complaint.submissionDate, complaint.urgency) : null);
       const slaString = complaint.sla ?? slaLabel(complaint.urgency);
 
       // 9. Transaction: assign + increment workload
