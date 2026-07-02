@@ -1,0 +1,633 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Blockchain Complaint Check</title>
+    <style>
+      :root {
+        --bg: #f4f7fb;
+        --card: #ffffff;
+        --soft-card: #f8fbff;
+        --text: #1c2230;
+        --muted: #5f6b7a;
+        --accent: #0b63f3;
+        --ok: #128a4b;
+        --warn: #9d6d00;
+        --bad: #b42318;
+        --border: #d6deea;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        background: linear-gradient(180deg, #f4f7fb 0%, #e9f0fb 100%);
+        color: var(--text);
+        min-height: 100vh;
+      }
+
+      .wrap {
+        max-width: 920px;
+        margin: 24px auto;
+        padding: 0 16px 24px;
+      }
+
+      h1 {
+        margin: 0 0 6px;
+        font-size: 28px;
+      }
+
+      .sub {
+        margin: 0 0 22px;
+        color: var(--muted);
+      }
+
+      .card {
+        background: var(--card);
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        padding: 16px;
+        margin-bottom: 16px;
+        box-shadow: 0 6px 18px rgba(12, 26, 75, 0.05);
+      }
+
+      .row {
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+        align-items: center;
+      }
+
+      label {
+        font-size: 14px;
+        color: var(--muted);
+      }
+
+      input {
+        width: 100%;
+        max-width: 460px;
+        padding: 10px 12px;
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        font-size: 14px;
+      }
+
+      button {
+        padding: 10px 14px;
+        border: 0;
+        border-radius: 8px;
+        background: var(--accent);
+        color: #fff;
+        font-weight: 600;
+        cursor: pointer;
+      }
+
+      button:hover {
+        filter: brightness(0.95);
+      }
+
+      .outline-btn {
+        background: #fff;
+        color: var(--accent);
+        border: 1px solid var(--accent);
+      }
+
+      .status {
+        margin-top: 10px;
+        font-weight: 600;
+      }
+
+      .ok {
+        color: var(--ok);
+      }
+
+      .warn {
+        color: var(--warn);
+      }
+
+      .bad {
+        color: var(--bad);
+      }
+
+      .grid {
+        display: grid;
+        grid-template-columns: 180px 1fr;
+        gap: 8px 12px;
+        margin-top: 12px;
+      }
+
+      .k {
+        color: var(--muted);
+        font-size: 13px;
+      }
+
+      .v {
+        font-size: 14px;
+        overflow-wrap: anywhere;
+      }
+
+      .link {
+        color: var(--accent);
+        text-decoration: none;
+        font-weight: 600;
+      }
+
+      .link:hover {
+        text-decoration: underline;
+      }
+
+      .modal {
+        position: fixed;
+        inset: 0;
+        z-index: 1000;
+        display: none;
+        align-items: center;
+        justify-content: center;
+        padding: 18px;
+      }
+
+      .modal.open {
+        display: flex;
+      }
+
+      .modal-backdrop {
+        position: absolute;
+        inset: 0;
+        background: rgba(17, 24, 39, 0.55);
+      }
+
+      .modal-panel {
+        position: relative;
+        width: min(960px, 100%);
+        max-height: 90vh;
+        overflow-y: auto;
+        background: #fff;
+        border: 1px solid var(--border);
+        border-radius: 14px;
+        padding: 18px;
+        box-shadow: 0 20px 44px rgba(5, 20, 60, 0.24);
+      }
+
+      .modal-head {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+      }
+
+      .modal-title {
+        margin: 0;
+        font-size: 24px;
+      }
+
+      .badge {
+        display: inline-block;
+        margin-top: 8px;
+        padding: 6px 10px;
+        border-radius: 999px;
+        font-size: 12px;
+        font-weight: 700;
+      }
+
+      .badge-row {
+        margin-top: 8px;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+      }
+
+      .badge.ok {
+        background: #e7f7ef;
+        color: var(--ok);
+      }
+
+      .badge.warn {
+        background: #fff6dd;
+        color: var(--warn);
+      }
+
+      .badge.bad {
+        background: #feeceb;
+        color: var(--bad);
+      }
+
+      .modal-sub {
+        color: var(--muted);
+        margin: 8px 0 14px;
+      }
+
+      .result-cards {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 12px;
+      }
+
+      .result-card {
+        background: var(--soft-card);
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        padding: 12px;
+      }
+
+      .result-card h3 {
+        margin: 0;
+        font-size: 16px;
+      }
+
+      .result-card.full {
+        grid-column: 1 / -1;
+      }
+
+      @media (max-width: 680px) {
+        .grid {
+          grid-template-columns: 1fr;
+        }
+
+        .result-cards {
+          grid-template-columns: 1fr;
+        }
+
+        .modal-title {
+          font-size: 20px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="wrap">
+      <h1>Complaint Blockchain Test</h1>
+      <p class="sub">Use this page to verify if a complaint was registered on blockchain and fetch by transaction hash.</p>
+
+      <section class="card">
+        <h2>1) Check Complaint Status</h2>
+        <div class="row">
+          <div>
+            <label for="complaintId">Complaint ID or Seq</label><br />
+            <input id="complaintId" placeholder="e.g. 3 or complaint UUID" />
+          </div>
+          <button id="checkComplaintBtn" type="button">Check Complaint</button>
+        </div>
+        <div id="complaintStatus" class="status"></div>
+        <p class="sub">Result opens in a modal card view with complaint details and live chain verification.</p>
+      </section>
+
+      <section class="card">
+        <h2>2) Check by Transaction Hash</h2>
+        <div class="row">
+          <div>
+            <label for="txHash">Transaction Hash</label><br />
+            <input id="txHash" placeholder="0x..." />
+          </div>
+          <button id="checkTxBtn" type="button">Check Hash</button>
+        </div>
+        <div id="txStatus" class="status"></div>
+        <p class="sub">Use this when you already have a transaction hash and want user-specific complaint details.</p>
+      </section>
+    </div>
+
+    <div id="resultModal" class="modal" aria-hidden="true" role="dialog" aria-modal="true">
+      <div id="modalBackdrop" class="modal-backdrop"></div>
+      <div class="modal-panel">
+        <div class="modal-head">
+          <h2 id="modalTitle" class="modal-title">Complaint Blockchain Result</h2>
+          <button id="closeModalBtn" type="button" class="outline-btn">Close</button>
+        </div>
+        <div class="badge-row">
+          <span id="modalDbBadge" class="badge warn">DB:PENDING</span>
+          <span id="modalChainBadge" class="badge warn">CHAIN:UNKNOWN</span>
+        </div>
+        <p id="modalSubtitle" class="modal-sub"></p>
+
+        <div class="result-cards">
+          <section class="result-card">
+            <h3>Blockchain Card</h3>
+            <div id="modalChainGrid" class="grid"></div>
+          </section>
+
+          <section class="result-card">
+            <h3>Verification Card</h3>
+            <div id="modalVerificationGrid" class="grid"></div>
+          </section>
+
+          <section class="result-card full">
+            <h3>Complaint Details Card</h3>
+            <div id="modalComplaintGrid" class="grid"></div>
+          </section>
+
+          <section class="result-card full">
+            <h3>Location Card</h3>
+            <div id="modalLocationGrid" class="grid"></div>
+          </section>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      const complaintIdInput = document.getElementById("complaintId");
+      const txHashInput = document.getElementById("txHash");
+      const checkComplaintBtn = document.getElementById("checkComplaintBtn");
+      const checkTxBtn = document.getElementById("checkTxBtn");
+      const complaintStatus = document.getElementById("complaintStatus");
+      const txStatus = document.getElementById("txStatus");
+      const resultModal = document.getElementById("resultModal");
+      const modalBackdrop = document.getElementById("modalBackdrop");
+      const closeModalBtn = document.getElementById("closeModalBtn");
+      const modalTitle = document.getElementById("modalTitle");
+      const modalDbBadge = document.getElementById("modalDbBadge");
+      const modalChainBadge = document.getElementById("modalChainBadge");
+      const modalSubtitle = document.getElementById("modalSubtitle");
+      const modalChainGrid = document.getElementById("modalChainGrid");
+      const modalVerificationGrid = document.getElementById("modalVerificationGrid");
+      const modalComplaintGrid = document.getElementById("modalComplaintGrid");
+      const modalLocationGrid = document.getElementById("modalLocationGrid");
+
+      function isUrl(value) {
+        return typeof value === "string" && /^https?:\/\//.test(value);
+      }
+
+      function renderGrid(node, data) {
+        node.innerHTML = "";
+        Object.entries(data).forEach(([k, v]) => {
+          const key = document.createElement("div");
+          key.className = "k";
+          key.textContent = k;
+
+          const value = document.createElement("div");
+          value.className = "v";
+          if (isUrl(v)) {
+            const a = document.createElement("a");
+            a.href = v;
+            a.target = "_blank";
+            a.rel = "noopener noreferrer";
+            a.className = "link";
+            a.textContent = "Open Link";
+            value.appendChild(a);
+          } else {
+            value.textContent = v === null || v === undefined ? "null" : String(v);
+          }
+
+          node.appendChild(key);
+          node.appendChild(value);
+        });
+      }
+
+      function setStatus(node, kind, text) {
+        node.className = `status ${kind}`;
+        node.textContent = text;
+      }
+
+      function setBadge(el, label, status, kind) {
+        const upperStatus = (status || "UNKNOWN").toString().toUpperCase();
+        el.className = `badge ${kind}`;
+        el.textContent = `${label}:${upperStatus}`;
+      }
+
+      function getDbKind(dbStatus) {
+        const s = (dbStatus || "").toUpperCase();
+        if (s === "CONFIRMED") {
+          return "ok";
+        }
+        if (s === "FAILED") {
+          return "bad";
+        }
+        return "warn";
+      }
+
+      function getChainKind(chainStatus, verified) {
+        const s = (chainStatus || "").toUpperCase();
+        if (verified || s === "VERIFIED") {
+          return "ok";
+        }
+        if (["FAILED", "ERROR", "MISMATCH_CONTRACT"].includes(s)) {
+          return "bad";
+        }
+        return "warn";
+      }
+
+      function getSubtitle(dbStatus, chainStatus, chainMessage) {
+        const db = (dbStatus || "").toUpperCase();
+        const chain = (chainStatus || "").toUpperCase();
+
+        if (chain === "VERIFIED") {
+          return "Saved in DB and verified on Sepolia blockchain.";
+        }
+
+        if (db === "CONFIRMED" && chain === "TX_NOT_FOUND") {
+          return "Saved in DB, but hash not found on Sepolia. This usually means test/dummy hash or wrong worker hash.";
+        }
+
+        if (db === "PENDING") {
+          return "Complaint is saved in DB and waiting for worker blockchain sync.";
+        }
+
+        return chainMessage || "Blockchain status loaded from API.";
+      }
+
+      function openModal() {
+        resultModal.classList.add("open");
+        resultModal.setAttribute("aria-hidden", "false");
+      }
+
+      function closeModal() {
+        resultModal.classList.remove("open");
+        resultModal.setAttribute("aria-hidden", "true");
+      }
+
+      function renderModalFromComplaint(data) {
+        const dbStatus = data.status;
+        const chainStatus = data.chainVerification?.status;
+        setBadge(modalDbBadge, "DB", dbStatus, getDbKind(dbStatus));
+        setBadge(modalChainBadge, "CHAIN", chainStatus, getChainKind(chainStatus, data.chainVerification?.verified));
+        modalTitle.textContent = `Complaint #${data.seq} Blockchain Result`;
+        modalSubtitle.textContent = getSubtitle(dbStatus, chainStatus, data.chainVerification?.message);
+
+        renderGrid(modalChainGrid, {
+          complaintId: data.complaintId,
+          seq: data.seq,
+          status: data.status,
+          transactionHash: data.transactionHash,
+          blockchainBlock: data.blockchainBlock,
+          ipfsHash: data.ipfsHash,
+          isOnChain: data.isOnChain,
+          explorerUrl: data.explorerUrl,
+          blockchainUpdatedAt: data.blockchainUpdatedAt,
+        });
+
+        renderGrid(modalVerificationGrid, {
+          verificationStatus: data.chainVerification?.status,
+          verified: data.chainVerification?.verified,
+          checkedAt: data.chainVerification?.checkedAt,
+          providerConfigured: data.chainVerification?.providerConfigured,
+          expectedContractAddress: data.chainVerification?.expectedContractAddress,
+          toMatchesContract: data.chainVerification?.toMatchesContract,
+          receiptBlockNumber: data.chainVerification?.receipt?.blockNumber,
+          receiptStatus: data.chainVerification?.receipt?.status,
+          confirmations: data.chainVerification?.receipt?.confirmations,
+        });
+
+        renderGrid(modalComplaintGrid, {
+          complaintId: data.complaint?.complaintId,
+          seq: data.complaint?.seq,
+          subCategory: data.complaint?.subCategory,
+          description: data.complaint?.description,
+          urgency: data.complaint?.urgency,
+          complaintStatus: data.complaint?.complaintStatus,
+          assignedDepartment: data.complaint?.assignedDepartment,
+          categoryName: data.complaint?.categoryName,
+          isPublic: data.complaint?.isPublic,
+          attachmentUrl: data.complaint?.attachmentUrl,
+          submissionDate: data.complaint?.submissionDate,
+        });
+
+        renderGrid(modalLocationGrid, {
+          state: data.complaint?.location?.state,
+          district: data.complaint?.location?.district,
+          city: data.complaint?.location?.city,
+          locality: data.complaint?.location?.locality,
+          street: data.complaint?.location?.street,
+          pin: data.complaint?.location?.pin,
+          municipal: data.complaint?.location?.municipal,
+          country: data.complaint?.location?.country,
+          latitude: data.complaint?.location?.latitude,
+          longitude: data.complaint?.location?.longitude,
+          source: data.complaint?.location?.source,
+        });
+
+        openModal();
+      }
+
+      function renderModalFromTx(data) {
+        const dbStatus = data.complaint?.blockchainStatus;
+        const chainStatus = data.chainVerification?.status;
+        setBadge(modalDbBadge, "DB", dbStatus, getDbKind(dbStatus));
+        setBadge(modalChainBadge, "CHAIN", chainStatus, getChainKind(chainStatus, data.chainVerification?.verified));
+        modalTitle.textContent = "Transaction Hash Verification Result";
+        modalSubtitle.textContent = getSubtitle(dbStatus, chainStatus, data.chainVerification?.message);
+
+        renderGrid(modalChainGrid, {
+          txHash: data.txHash,
+          transactionHash: data.complaint?.blockchainHash,
+          blockchainBlock: data.complaint?.blockchainBlock,
+          blockchainStatus: data.complaint?.blockchainStatus,
+          explorerUrl: data.explorerUrl,
+        });
+
+        renderGrid(modalVerificationGrid, {
+          verificationStatus: data.chainVerification?.status,
+          verified: data.chainVerification?.verified,
+          checkedAt: data.chainVerification?.checkedAt,
+          providerConfigured: data.chainVerification?.providerConfigured,
+          expectedContractAddress: data.chainVerification?.expectedContractAddress,
+          toMatchesContract: data.chainVerification?.toMatchesContract,
+          receiptBlockNumber: data.chainVerification?.receipt?.blockNumber,
+          receiptStatus: data.chainVerification?.receipt?.status,
+          confirmations: data.chainVerification?.receipt?.confirmations,
+        });
+
+        renderGrid(modalComplaintGrid, {
+          complaintId: data.complaint?.complaintId,
+          seq: data.complaint?.seq,
+          subCategory: data.complaint?.subCategory,
+          description: data.complaint?.description,
+          urgency: data.complaint?.urgency,
+          complaintStatus: data.complaint?.complaintStatus,
+          assignedDepartment: data.complaint?.assignedDepartment,
+          categoryName: data.complaint?.categoryName,
+          isPublic: data.complaint?.isPublic,
+          attachmentUrl: data.complaint?.attachmentUrl,
+          submissionDate: data.complaint?.submissionDate,
+        });
+
+        renderGrid(modalLocationGrid, {
+          state: data.complaint?.location?.state,
+          district: data.complaint?.location?.district,
+          city: data.complaint?.location?.city,
+          locality: data.complaint?.location?.locality,
+          street: data.complaint?.location?.street,
+          pin: data.complaint?.location?.pin,
+          municipal: data.complaint?.location?.municipal,
+          country: data.complaint?.location?.country,
+          latitude: data.complaint?.location?.latitude,
+          longitude: data.complaint?.location?.longitude,
+          source: data.complaint?.location?.source,
+        });
+
+        openModal();
+      }
+
+      async function checkComplaint() {
+        const id = complaintIdInput.value.trim();
+        if (!id) {
+          setStatus(complaintStatus, "bad", "Enter complaint ID or seq first.");
+          return;
+        }
+
+        try {
+          const res = await fetch(`/api/complaints/${encodeURIComponent(id)}/blockchain/live`);
+          const data = await res.json();
+
+          if (!res.ok) {
+            setStatus(complaintStatus, "bad", data.error || "Failed to fetch complaint.");
+            return;
+          }
+
+          if (data.chainVerification?.status === "VERIFIED") {
+            setStatus(complaintStatus, "ok", "Complaint verified on Sepolia blockchain.");
+          } else if (data.status === "CONFIRMED" && data.blockchainHash) {
+            setStatus(complaintStatus, "ok", "Complaint registered successfully on blockchain.");
+          } else if (data.status === "PENDING") {
+            setStatus(complaintStatus, "warn", "Complaint is pending blockchain registration.");
+          } else {
+            setStatus(complaintStatus, "warn", `Complaint status: ${data.status}`);
+          }
+
+          renderModalFromComplaint(data);
+        } catch (err) {
+          setStatus(complaintStatus, "bad", `Request error: ${err.message}`);
+        }
+      }
+
+      async function checkTx() {
+        const txHash = txHashInput.value.trim();
+        if (!txHash) {
+          setStatus(txStatus, "bad", "Enter transaction hash first.");
+          return;
+        }
+
+        try {
+          const res = await fetch(`/api/blockchain/tx/${encodeURIComponent(txHash)}`);
+          const data = await res.json();
+
+          if (!res.ok) {
+            setStatus(txStatus, "bad", data.error || "Failed to fetch tx hash.");
+            return;
+          }
+
+          if (data.chainVerification?.status === "VERIFIED") {
+            setStatus(txStatus, "ok", "Hash verified on Sepolia and linked complaint loaded.");
+          } else {
+            setStatus(txStatus, "warn", `Hash found, verification status: ${data.chainVerification?.status || "UNKNOWN"}`);
+          }
+
+          renderModalFromTx(data);
+        } catch (err) {
+          setStatus(txStatus, "bad", `Request error: ${err.message}`);
+        }
+      }
+
+      checkComplaintBtn.addEventListener("click", checkComplaint);
+      checkTxBtn.addEventListener("click", checkTx);
+      closeModalBtn.addEventListener("click", closeModal);
+      modalBackdrop.addEventListener("click", closeModal);
+      document.addEventListener("keydown", (event) => {
+        if (event.key === "Escape") {
+          closeModal();
+        }
+      });
+    </script>
+  </body>
+</html>

@@ -17,7 +17,7 @@ const RECAPTCHA_SITE_KEY = process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY || "";
 //   ? (process.env.NEXT_PUBLIC_USER_BE_URL?.replace("localhost", window.location.hostname) || `http://${window.location.hostname}:3000`)
 //   : (process.env.NEXT_PUBLIC_USER_BE_URL || "http://localhost:3000");
 
-const USER_BE_URL = process.env.NEXT_PUBLIC_USER_BE_URL || "http://localhost:3000";
+const USER_BE_URL = process.env.NEXT_PUBLIC_USER_BE_URL || "http://localhost:4000";
 
 export default function LoginUser() {
   const router = useRouter();

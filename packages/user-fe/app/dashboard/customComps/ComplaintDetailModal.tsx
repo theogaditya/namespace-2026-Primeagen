@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "@/lib/utils";
 import { useComplaintLike } from "@/contexts/LikeContext";
@@ -10,6 +10,7 @@ import {
   URGENCY_CONFIG,
   DEPARTMENT_CONFIG,
   formatDate,
+  formatDateTime,
   Department,
 } from "./types";
 import {
@@ -31,6 +32,74 @@ import {
   ZoomIn,
 } from "lucide-react";
 import type { Variants } from "framer-motion";
+
+type ChainVerificationStatus =
+  | "NO_TX_HASH"
+  | "RPC_NOT_CONFIGURED"
+  | "TX_NOT_FOUND"
+  | "PENDING"
+  | "FAILED"
+  | "MISMATCH_CONTRACT"
+  | "VERIFIED"
+  | "ERROR";
+
+interface BlockchainLiveResponse {
+  ok: boolean;
+  complaintId: string;
+  seq: number;
+  status: string;
+  transactionHash: string | null;
+  blockchainHash: string | null;
+  blockchainBlock: string | null;
+  ipfsHash: string | null;
+  isOnChain: boolean;
+  explorerUrl: string | null;
+  blockchainUpdatedAt: string | null;
+  chainVerification: {
+    status: ChainVerificationStatus;
+    verified: boolean;
+    checkedAt: string;
+    providerConfigured: boolean;
+    message: string;
+    expectedContractAddress: string | null;
+    toMatchesContract: boolean | null;
+    receipt: {
+      blockNumber: number | null;
+      status: number | null;
+      gasUsed: string | null;
+      from: string | null;
+      to: string | null;
+      confirmations: number | null;
+    } | null;
+  } | null;
+}
+
+function shortHash(value: string): string {
+  if (value.length <= 18) {
+    return value;
+  }
+  return `${value.slice(0, 10)}...${value.slice(-8)}`;
+}
+
+function getChainBadgeClass(status?: ChainVerificationStatus): string {
+  switch (status) {
+    case "VERIFIED":
+      return "bg-emerald-500/20 text-emerald-300 border border-emerald-500/30";
+    case "PENDING":
+      return "bg-amber-500/20 text-amber-300 border border-amber-500/30";
+    case "FAILED":
+    case "MISMATCH_CONTRACT":
+    case "ERROR":
+      return "bg-rose-500/20 text-rose-300 border border-rose-500/30";
+    case "NO_TX_HASH":
+    case "TX_NOT_FOUND":
+      return "bg-slate-500/20 text-slate-300 border border-slate-500/30";
+    case "RPC_NOT_CONFIGURED":
+      return "bg-indigo-500/20 text-indigo-300 border border-indigo-500/30";
+    default:
+      return "bg-slate-500/20 text-slate-300 border border-slate-500/30";
+  }
+}
 
 interface ComplaintDetailModalProps {
   complaint: Complaint | null;
@@ -278,6 +347,69 @@ export function ComplaintDetailModal({
   isLoading = false,
   hideAssignmentTimeline = false,
 }: ComplaintDetailModalProps) {
+  const [blockchainLive, setBlockchainLive] = useState<BlockchainLiveResponse | null>(null);
+  const [blockchainLoading, setBlockchainLoading] = useState(false);
+  const [blockchainError, setBlockchainError] = useState<string | null>(null);
+
+  const complaintLookupKey = complaint?.id || (complaint?.seq ? String(complaint.seq) : null);
+
+  useEffect(() => {
+    if (!isOpen || !complaintLookupKey) {
+      setBlockchainLive(null);
+      setBlockchainError(null);
+      setBlockchainLoading(false);
+      return;
+    }
+
+    const controller = new AbortController();
+
+    const fetchBlockchainLive = async () => {
+      setBlockchainLoading(true);
+      setBlockchainError(null);
+
+      try {
+        const response = await fetch(
+          `/api/complaint/${encodeURIComponent(complaintLookupKey)}/blockchain/live`,
+          {
+            method: "GET",
+            cache: "no-store",
+            signal: controller.signal,
+          }
+        );
+
+        const data = await response.json();
+
+        if (!response.ok) {
+          throw new Error(data?.error || "Failed to load blockchain verification status");
+        }
+
+        setBlockchainLive(data as BlockchainLiveResponse);
+      } catch (error) {
+        if (controller.signal.aborted) {
+          return;
+        }
+
+        const message =
+          error instanceof Error
+            ? error.message
+            : "Failed to load blockchain verification status";
+
+        setBlockchainLive(null);
+        setBlockchainError(message);
+      } finally {
+        if (!controller.signal.aborted) {
+          setBlockchainLoading(false);
+        }
+      }
+    };
+
+    fetchBlockchainLive();
+
+    return () => {
+      controller.abort();
+    };
+  }, [complaintLookupKey, isOpen]);
+
   if (!isOpen) return null;
 
   const statusConfig = complaint ? STATUS_CONFIG[complaint.status] : null;
@@ -485,6 +617,102 @@ export function ComplaintDetailModal({
 
                     {/* Right Column */}
                     <div className="lg:col-span-4 space-y-6">
+                      {/* Live Blockchain Verification */}
+                      <div className="bg-slate-950 rounded-xl p-5 text-white border border-slate-800 shadow-lg">
+                        <div className="flex items-center justify-between mb-4">
+                          <h3 className="font-[var(--font-headline)] font-bold text-sm tracking-wide">
+                            Blockchain Verification
+                          </h3>
+                          <span className="px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
+                            Live
+                          </span>
+                        </div>
+
+                        {blockchainLoading && (
+                          <div className="flex items-center gap-2 text-sm text-slate-300">
+                            <span className="w-4 h-4 border-2 border-slate-500 border-t-slate-200 rounded-full animate-spin" />
+                            Checking on-chain proof...
+                          </div>
+                        )}
+
+                        {!blockchainLoading && blockchainError && (
+                          <p className="text-sm text-rose-300">{blockchainError}</p>
+                        )}
+
+                        {!blockchainLoading && !blockchainError && blockchainLive && (
+                          <div className="space-y-3">
+                            <div className="flex items-center justify-between gap-2">
+                              <span
+                                className={cn(
+                                  "px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider",
+                                  getChainBadgeClass(blockchainLive.chainVerification?.status)
+                                )}
+                              >
+                                {blockchainLive.chainVerification?.status || "UNKNOWN"}
+                              </span>
+                              <span
+                                className={cn(
+                                  "text-xs font-semibold",
+                                  blockchainLive.isOnChain ? "text-emerald-300" : "text-amber-300"
+                                )}
+                              >
+                                {blockchainLive.isOnChain ? "Stored On-Chain" : "Pending On-Chain"}
+                              </span>
+                            </div>
+
+                            {blockchainLive.transactionHash ? (
+                              <a
+                                href={
+                                  blockchainLive.explorerUrl ||
+                                  `https://sepolia.etherscan.io/tx/${blockchainLive.transactionHash}`
+                                }
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="flex items-center justify-between gap-2 text-xs bg-white/5 border border-white/10 rounded-lg px-3 py-2 hover:bg-white/10 transition-colors"
+                              >
+                                <span className="font-mono text-slate-200">
+                                  {shortHash(blockchainLive.transactionHash)}
+                                </span>
+                                <ExternalLink className="w-3.5 h-3.5 text-slate-300" />
+                              </a>
+                            ) : (
+                              <p className="text-xs text-slate-300">Transaction hash not available yet.</p>
+                            )}
+
+                            <div className="grid grid-cols-2 gap-2 text-xs">
+                              <div className="rounded-lg bg-white/5 border border-white/10 p-2">
+                                <p className="text-slate-400">Sync State</p>
+                                <p className="font-semibold text-slate-100">{blockchainLive.status}</p>
+                              </div>
+                              <div className="rounded-lg bg-white/5 border border-white/10 p-2">
+                                <p className="text-slate-400">Block</p>
+                                <p className="font-semibold text-slate-100">
+                                  {blockchainLive.blockchainBlock || "-"}
+                                </p>
+                              </div>
+                              <div className="rounded-lg bg-white/5 border border-white/10 p-2">
+                                <p className="text-slate-400">Confirmations</p>
+                                <p className="font-semibold text-slate-100">
+                                  {blockchainLive.chainVerification?.receipt?.confirmations ?? "-"}
+                                </p>
+                              </div>
+                              <div className="rounded-lg bg-white/5 border border-white/10 p-2">
+                                <p className="text-slate-400">Updated</p>
+                                <p className="font-semibold text-slate-100">
+                                  {blockchainLive.blockchainUpdatedAt
+                                    ? formatDateTime(blockchainLive.blockchainUpdatedAt)
+                                    : "-"}
+                                </p>
+                              </div>
+                            </div>
+
+                            <p className="text-[11px] text-slate-300 leading-relaxed">
+                              {blockchainLive.chainVerification?.message || "Blockchain status fetched."}
+                            </p>
+                          </div>
+                        )}
+                      </div>
+
                       {/* Location Card */}
                       {complaint.location && (
                         <div className="bg-[#f1f3ff] rounded-xl overflow-hidden border border-gray-100">
