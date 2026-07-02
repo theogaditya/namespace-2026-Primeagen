@@ -39,29 +39,7 @@ interface Complaint {
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL
 
-// ─── Dummy placeholders for empty-state preview ────────────────────────────────
-const DUMMY_COMPLAINTS: Complaint[] = [
-  {
-    id: "dummy-1",
-    seq: 9042,
-    title: "Broken Water Main — Sector 4",
-    description:
-      "Major water pipeline leak reported near the residential block. Residents facing severe water shortage for over 2 days. Requires immediate field dispatch.",
-    category: { id: "cat-1", name: "Water Supply" },
-    subCategory: "Pipeline Leak",
-    status: "UNDER_PROCESSING",
-    urgency: "CRITICAL",
-    department: "Water Supply",
-    submissionDate: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString(),
-    lastUpdated: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString(),
-    attachmentUrl: null,
-    location: { district: "Central", city: "New Delhi", locality: "Sector 4, Rohini", street: null, pin: "110085" },
-    complainant: { id: "u1", name: "Harish Vardhan", email: "harish@example.com", phone: "+91 98765 43210" },
-    assignedAgent: null,
-    managedByMunicipalAdmin: null,
-    escalatedToStateAdmin: { id: "a1", name: "State Admin V.", email: "state@gov.in" }
-  },
-]
+import NoDataAnimation from "../../../../components/ui/NoDataAnimation"
 
 // ─── Utilities ─────────────────────────────────────────────────────────────────
 const toTitle = (s: string | undefined) => {
@@ -301,8 +279,8 @@ export function StateMyComplaints() {
     })
   }, [complaints, statusFilter, priorityFilter, searchTerm])
 
-  const isDummy = !loading && complaints.length === 0
-  const displayComplaints = isDummy ? DUMMY_COMPLAINTS : filteredComplaints
+  const isEmpty = !loading && complaints.length === 0
+  const displayComplaints = filteredComplaints
   const canUpdate = (c: Complaint) =>
     !!currentAdminId && c.escalatedToStateAdmin?.id === currentAdminId
 
@@ -444,13 +422,7 @@ export function StateMyComplaints() {
         </div>
       </section>
 
-      {/* ── Dummy notice ── */}
-      {isDummy && (
-        <div className="bg-amber-50 border border-amber-200 rounded-xl px-5 py-3 text-sm text-amber-700 font-medium flex items-center gap-3">
-          <span className="material-symbols-outlined text-amber-500">info</span>
-          No escalated complaints assigned to you yet. Showing sample data for preview.
-        </div>
-      )}
+      {isEmpty && <NoDataAnimation />}
 
       {/* ── High-Density Table ── */}
       <div className="bg-white rounded-xl overflow-hidden">
@@ -592,11 +564,10 @@ export function StateMyComplaints() {
       <div className="flex items-center justify-between pt-2 border-t border-[#c4c6cd]/10">
         <div className="flex items-center gap-4">
           <span className="text-xs text-[#44474c] font-medium">
-            Showing {displayComplaints.length} of{" "}
-            {isDummy ? 2 : pagination.totalItems} complaints
+            Showing {displayComplaints.length} of {pagination.totalItems} complaints
           </span>
         </div>
-        {pagination.totalPages > 1 && !isDummy && (
+        {pagination.totalPages > 1 && (
           <div className="flex items-center gap-1">
             <button
               disabled={pagination.currentPage <= 1}

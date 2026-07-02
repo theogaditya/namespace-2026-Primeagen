@@ -265,12 +265,12 @@ export function AgentRevampedLayout({ children }: AgentRevampedLayoutProps) {
                 </div>
               </div>
               <a
-                href="https://app.pinata.cloud/ipfs/files/"
+                href="https://sepolia.etherscan.io/address/0x522ba372e9fE6ecfEd24b773528b447bBdF823b2"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="flex items-center justify-center gap-2 w-full py-2 bg-indigo-600 hover:bg-indigo-700 rounded-lg text-sm font-semibold text-white transition-all"
               >
-                View on Pinata
+                View on Sepolia
                 <span className="material-symbols-outlined" style={{ fontSize: 14 }}>
                   open_in_new
                 </span>
