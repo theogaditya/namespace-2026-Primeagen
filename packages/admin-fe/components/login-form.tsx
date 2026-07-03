@@ -21,7 +21,7 @@ const adminTypeLabels: Record<AdminType, string> = {
 
 const adminTypeRoutes: Record<AdminType, string> = {
   STATE_ADMIN: "/State",
-  MUNICIPAL_ADMIN: "/Municipal",
+  MUNICIPAL_ADMIN: "/Municipal?tab=reports",
   AGENT: "/Agent",
   CIVIC_PARTNER: "/CivicPartner",
 }

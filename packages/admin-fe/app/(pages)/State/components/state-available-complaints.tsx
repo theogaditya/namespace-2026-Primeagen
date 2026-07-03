@@ -158,7 +158,7 @@ function ComplaintLocationMap({ lat, lng }: { lat: number; lng: number }) {
 // ═══════════════════════════════════════════════════════════════════════
 // ─── Main Component ───────────────────────────────────────────────────
 // ═══════════════════════════════════════════════════════════════════════
-export function StateAvailableComplaints() {
+export function StateAvailableComplaints({ onTabChange }: { onTabChange?: (tab: 'dashboard' | 'my-complaints' | 'reports' | 'municipal-management') => void }) {
   // ── State ──
   const [complaints, setComplaints] = useState<Complaint[]>([])
   const [loading, setLoading] = useState(true)
@@ -377,6 +377,25 @@ export function StateAvailableComplaints() {
           <h2 className="text-3xl font-black text-[#041627] tracking-tight">State Complaints Registry</h2>
           <p className="text-[#44474c] text-sm font-medium mt-1">Manage and resolve citizen grievances at the state level across departments.</p>
         </div>
+        {/* ── AI Generated Reports Button ── */}
+        <button
+          onClick={() => onTabChange?.('reports')}
+          className="group relative flex items-center gap-3 px-5 py-3 rounded-xl font-black text-sm text-white overflow-hidden shadow-lg shadow-[#115cb9]/25 hover:shadow-[#115cb9]/40 hover:scale-[1.02] active:scale-[0.98] transition-all duration-200"
+          style={{ background: 'linear-gradient(135deg, #115cb9 0%, #041627 100%)' }}
+        >
+          {/* Subtle animated shimmer */}
+          <span className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500"
+            style={{ background: 'linear-gradient(135deg, rgba(255,255,255,0.08) 0%, transparent 60%)' }}
+          />
+          {/* Ping dot */}
+          <span className="relative flex h-2 w-2 shrink-0">
+            <span className="absolute inline-flex h-full w-full rounded-full bg-sky-300 opacity-75 animate-ping" />
+            <span className="relative inline-flex h-2 w-2 rounded-full bg-sky-200" />
+          </span>
+          <span className="material-symbols-outlined text-lg" style={{ fontVariationSettings: "'FILL' 1" }}>auto_awesome</span>
+          <span className="tracking-tight">AI Generated Reports</span>
+          <span className="material-symbols-outlined text-base opacity-60 group-hover:opacity-100 group-hover:translate-x-0.5 transition-all">arrow_forward</span>
+        </button>
       </div>
 
       {/* ── KPI Cards ── */}

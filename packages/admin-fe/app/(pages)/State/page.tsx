@@ -17,7 +17,7 @@ export default function StatePage() {
   return (
     <AuthGuard requiredAdminType="STATE_ADMIN">
       <StateAdminLayout activeTab={activeTab} onTabChange={setActiveTab}>
-        {activeTab === 'dashboard' && <StateAvailableComplaints />}
+        {activeTab === 'dashboard' && <StateAvailableComplaints onTabChange={setActiveTab} />}
         {activeTab === 'my-complaints' && <StateMyComplaints />}
         {activeTab === 'reports' && <StateAnalytics />}
         {activeTab === 'municipal-management' && <MunicipalAdminManagement />}
