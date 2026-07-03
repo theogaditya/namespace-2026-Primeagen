@@ -42,9 +42,9 @@ export function SuperAdminLayout({ children, activeTab = 'dashboard', onTabChang
       const raw = typeof window !== 'undefined' ? localStorage.getItem('admin') : null
       if (raw) {
         const parsed = JSON.parse(raw)
-        setAdminData({ 
-          fullName: parsed.fullName || parsed.name, 
-          officialEmail: parsed.officialEmail || parsed.email, 
+        setAdminData({
+          fullName: parsed.fullName || parsed.name,
+          officialEmail: parsed.officialEmail || parsed.email,
           id: parsed.id,
           adminType: parsed.adminType || localStorage.getItem('adminType')
         })
@@ -90,7 +90,7 @@ export function SuperAdminLayout({ children, activeTab = 'dashboard', onTabChang
             <div className="flex h-full flex-col">
               <div className="flex h-16 items-center justify-between border-b bg-white px-4">
                 <div className="flex items-center">
-                  <img src="https://swarajdesk.adityahota.online/logo.png" alt="SwarajDesk logo" className="h-8 w-8 mr-2" />
+                  <img src="https://swarajdesk.adityahota.online/logo.png" alt="SwarajDesk logo" className="h-12 w-12 mr-2 object-contain" />
                   <h1 className="text-xl font-bold text-red-600">Super Admin</h1>
                 </div>
                 <Button variant="ghost" size="icon" onClick={() => setSidebarOpen(false)}>
@@ -109,7 +109,7 @@ export function SuperAdminLayout({ children, activeTab = 'dashboard', onTabChang
                           ? "bg-red-50 border-r-2 border-red-600 text-red-700"
                           : "text-gray-600 hover:bg-gray-50 hover:text-gray-900",
                         "group flex items-center px-2 py-2 text-sm font-medium rounded-md w-full text-left",
-                      )} 
+                      )}
                     >
                       <item.icon
                         className={cn(
@@ -131,8 +131,8 @@ export function SuperAdminLayout({ children, activeTab = 'dashboard', onTabChang
       <div className="hidden lg:fixed lg:inset-y-0 lg:flex lg:w-64 lg:flex-col">
         <div className="flex min-h-0 flex-1 flex-col bg-white border-r border-gray-200">
           <div className="flex h-16 items-center justify-center border-b bg-white px-4">
-            <div className="flex items-center">
-              <img src="https://swarajdesk.adityahota.online/logo.png" alt="SwarajDesk logo" className="h-8 w-8 mr-2" />
+              <div className="flex items-center">
+              <img src="https://swarajdesk.adityahota.online/logo.png" alt="SwarajDesk logo" className="h-12 w-12 mr-2 object-contain" />
               <h1 className="text-xl font-bold text-red-600">Super Admin</h1>
             </div>
           </div>

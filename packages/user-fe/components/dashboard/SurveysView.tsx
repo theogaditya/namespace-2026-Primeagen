@@ -28,6 +28,7 @@ export default function SurveysView({ authToken }: SurveysViewProps) {
   const [resultsOnly, setResultsOnly] = useState(false);
   const [respondedSurveyIds, setRespondedSurveyIds] = useState<Set<string>>(new Set());
   const [allCategories, setAllCategories] = useState<string[]>([]);
+  const [trending, setTrending] = useState(false);
 
   // Debounce search
   useEffect(() => {
@@ -161,6 +162,20 @@ export default function SurveysView({ authToken }: SurveysViewProps) {
     }
   };
 
+  function getResponseCount(s: any) {
+    if (!s) return 0;
+    if (typeof s.responseCount === "number") return s.responseCount;
+    if (typeof s.responsesCount === "number") return s.responsesCount;
+    if (s._count && typeof s._count.responses === "number") return s._count.responses;
+    if (Array.isArray(s.responses)) return s.responses.length;
+    return 0;
+  }
+
+  const displaySurveys = React.useMemo(() => {
+    if (!trending) return surveys;
+    return [...surveys].sort((a, b) => getResponseCount(b) - getResponseCount(a));
+  }, [surveys, trending]);
+
   return (
     <div className="pt-8 px-4 lg:px-8 pb-12 max-w-5xl mx-auto w-full">
       <motion.div
@@ -175,17 +190,23 @@ export default function SurveysView({ authToken }: SurveysViewProps) {
               Civic Surveys
             </p>
             <h1 className="text-2xl font-extrabold text-slate-900">Share Your Voice</h1>
-            <div className="flex items-start justify-between gap-4">
-              <p className="text-sm text-slate-500 mt-1">
+            <div className="flex items-center justify-between gap-4">
+              <p className="text-sm text-slate-500">
                 Participate in surveys from civic organisations and help shape community decisions.
               </p>
-              <div className="ml-4 mt-1">
+              <div className="ml-4 flex items-center gap-2">
                 <button
                   onClick={handleRefresh}
                   disabled={refreshing}
                   className="h-9 px-3 rounded-lg border border-slate-200 bg-white text-sm font-bold text-slate-600 hover:bg-slate-50 disabled:opacity-50 flex items-center justify-center gap-2"
                 >
                   <span className="hidden sm:inline leading-none">{refreshing ? "Refreshing…" : "Refresh"}</span>
+                </button>
+                <button
+                  onClick={() => { setTrending((s) => { const next = !s; setPage(1); return next }) }}
+                  className={`h-9 px-3 rounded-lg border text-sm font-bold ${trending ? 'bg-amber-100 border-amber-200 text-amber-800' : 'bg-white border-slate-200 text-slate-600 hover:bg-slate-50'}`}
+                >
+                  Trending
                 </button>
               </div>
             </div>
@@ -217,7 +238,7 @@ export default function SurveysView({ authToken }: SurveysViewProps) {
               transition={{ duration: 0.18 }}
             >
               <SurveyListPanel
-                surveys={surveys}
+                surveys={displaySurveys}
                 loading={loading}
                 error={error}
                 page={page}

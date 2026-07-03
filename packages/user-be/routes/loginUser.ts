@@ -25,8 +25,8 @@ export function loginUserRouter(db: PrismaClient) {
 
       const { email, password, captchaToken } = validationResult.data;
 
-      // Verify reCAPTCHA token with Google (skip in local dev)
-      if (!SKIP_CAPTCHA) {
+      // Verify reCAPTCHA token with Google (always run verification; tests mock `fetch`)
+      try {
         const captchaResponse = await fetch(
           "https://www.google.com/recaptcha/api/siteverify",
           {
@@ -44,6 +44,10 @@ export function loginUserRouter(db: PrismaClient) {
             message: "CAPTCHA verification failed. Please try again.",
           });
         }
+      } catch (e) {
+        // If the verification request fails (network, etc.), treat as bad request
+        console.error('CAPTCHA verification error:', e);
+        return res.status(400).json({ success: false, message: 'CAPTCHA verification failed. Please try again.' });
       }
       const user = await db.user.findUnique({
         where: { email },

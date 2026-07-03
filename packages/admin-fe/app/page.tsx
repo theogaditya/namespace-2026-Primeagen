@@ -13,7 +13,7 @@ export default function Home() {
             <img
               src="https://swarajdesk.adityahota.online/logo.png"
               alt="SwarajDesk Logo"
-              className="h-16 w-auto block"
+              className="h-12 w-auto block"
             />
           </div>
         </div>

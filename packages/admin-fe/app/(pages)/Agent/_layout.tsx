@@ -3,10 +3,36 @@
 import { useState, useEffect, useRef } from "react"
 import { useRouter, usePathname } from "next/navigation"
 import Link from "next/link"
+import {
+  Home, ClipboardList, History, BarChart3, User,
+  LogOut, Menu, Bell, Search, ChevronRight
+} from "lucide-react"
 
 interface AgentRevampedLayoutProps {
   children: React.ReactNode
 }
+
+const NAV_SECTIONS = [
+  {
+    title: "MENU",
+    items: [{ href: "/Agent", icon: Home, label: "Dashboard" }],
+  },
+  {
+    title: "WORKLOAD",
+    items: [{ href: "/Agent/my-complaints", icon: ClipboardList, label: "My Workload" }],
+  },
+  {
+    title: "LOGS",
+    items: [
+      { href: "/Agent/audit-logs", icon: History, label: "Audit Logs" },
+      { href: "/Agent/profile", icon: User, label: "My Profile" },
+    ],
+  },
+  {
+    title: "ANALYTICS",
+    items: [{ href: "/Agent/reports", icon: BarChart3, label: "Analytics" }],
+  },
+]
 
 export function AgentRevampedLayout({ children }: AgentRevampedLayoutProps) {
   const [adminData, setAdminData] = useState<{
@@ -23,34 +49,37 @@ export function AgentRevampedLayout({ children }: AgentRevampedLayoutProps) {
   const notifications = [
     { id: 1, title: "New Assignment", desc: "Complaint #1024 has been assigned to you.", time: "2m ago", unread: true },
     { id: 2, title: "Status Verified", desc: "Citizen has verified resolution for #998.", time: "1h ago", unread: true },
-    { id: 3, title: "System Update", desc: "Portal updated to version 1.0.4. Check dev-logs.", time: "3h ago", unread: false },
+    { id: 3, title: "System Update", desc: "Portal updated to version 1.0.4.", time: "3h ago", unread: false },
   ]
 
   const router = useRouter()
   const pathname = usePathname()
 
   useEffect(() => {
-    // Restore sidebar state
     const saved = localStorage.getItem("agentSidebarCollapsed")
     if (saved === "true") setIsCollapsed(true)
 
-    // Click outside handler for notifications
     const handleClickOutside = (event: MouseEvent) => {
       if (notificationRef.current && !notificationRef.current.contains(event.target as Node)) {
         setShowNotifications(false)
       }
     }
     document.addEventListener("mousedown", handleClickOutside)
-    return () => document.removeEventListener("mousedown", handleClickOutside)
-  }, [])
 
-  const toggleCollapse = () => {
-    setIsCollapsed((prev) => {
-      const next = !prev
-      localStorage.setItem("agentSidebarCollapsed", String(next))
-      return next
-    })
-  }
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if ((e.ctrlKey || e.metaKey) && e.key === "b") {
+        e.preventDefault()
+        toggleCollapse()
+      }
+    }
+    document.addEventListener("keydown", handleKeyDown)
+
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside)
+      document.removeEventListener("keydown", handleKeyDown)
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   useEffect(() => {
     try {
@@ -68,6 +97,14 @@ export function AgentRevampedLayout({ children }: AgentRevampedLayoutProps) {
       console.warn("Failed to parse admin from localStorage", err)
     }
   }, [])
+
+  const toggleCollapse = () => {
+    setIsCollapsed((prev) => {
+      const next = !prev
+      localStorage.setItem("agentSidebarCollapsed", String(next))
+      return next
+    })
+  }
 
   const handleLogout = async () => {
     try {
@@ -93,171 +130,129 @@ export function AgentRevampedLayout({ children }: AgentRevampedLayoutProps) {
       localStorage.removeItem("adminType")
     } catch {}
     try { window.dispatchEvent(new Event("authChange")) } catch {}
-    try {
-      window.location.replace('/')
-    } catch (e) {
-      router.push('/')
-    }
+    try { window.location.replace("/") } catch { router.push("/") }
   }
-
-  const navItems = [
-    { href: "/Agent", icon: "analytics", label: "Agent Dashboard" },
-    { href: "/Agent/my-complaints", icon: "tactic", label: "My Workload" },
-    { href: "/Agent/audit-logs", icon: "history", label: "Audit Logs" },
-    { href: "/Agent/profile", icon: "person", label: "My Profile" },
-    { href: "/Agent/reports", icon: "settings", label: "Analytics" },
-  ]
 
   const isActive = (href: string) => pathname === href
 
   const initials = adminData?.fullName
-    ? adminData.fullName
-        .split(" ")
-        .map((n) => n[0])
-        .slice(0, 2)
-        .join("")
+    ? adminData.fullName.split(" ").map((n) => n[0]).slice(0, 2).join("")
     : "AG"
 
+  const activeLabel =
+    NAV_SECTIONS.flatMap((s) => s.items).find((i) => isActive(i.href))?.label ?? "Dashboard"
+
+  const sidebarWidth = isCollapsed ? "w-[88px]" : "w-[280px]"
+  const mainMargin = isCollapsed ? "md:ml-[88px]" : "md:ml-[280px]"
+
   return (
-    <div
-      className="min-h-screen bg-[#f8f9ff] font-[Inter,sans-serif] text-[#0b1c30]"
-      style={{ fontFamily: "'Inter', sans-serif" }}
-    >
-      {/* Google Fonts + Material Symbols */}
-      <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap');
-        @import url('https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap');
-        .material-symbols-outlined {
-          font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
-          vertical-align: middle;
-          font-family: 'Material Symbols Outlined';
-          font-style: normal;
-          display: inline-block;
-          line-height: 1;
-          text-transform: none;
-          letter-spacing: normal;
-          word-wrap: normal;
-          white-space: nowrap;
-          direction: ltr;
-        }
-        .headline { font-family: 'Space Grotesk', sans-serif; }
-        ::-webkit-scrollbar { width: 4px; height: 4px; }
-        ::-webkit-scrollbar-track { background: transparent; }
-        ::-webkit-scrollbar-thumb { background: #c3c5d9; border-radius: 2px; }
-        .nav-item-active { background: #fff; color: #0047cc; font-weight: 700; box-shadow: 0 1px 3px rgba(0,0,0,.08); }
-        .nav-item { display:flex; align-items:center; gap:12px; padding:8px 12px; border-radius:2px; font-size:14px; transition:all 0.3s ease; color:#475569; cursor:pointer; overflow:hidden; white-space:nowrap; }
-        .nav-item:hover { background:#f8f9ff; padding-left:14px; }
-        .sidebar-collapsed { width: 80px !important; overflow: hidden; }
-        .sidebar-collapsed .nav-label, .sidebar-collapsed .brand-text, .sidebar-collapsed .profile-text, .sidebar-collapsed .footer-link-text { opacity: 0; width: 0; display: none; }
-        .sidebar-collapsed .nav-item, .sidebar-collapsed .footer-link { justify-content: center; padding: 10px; }
-        .sidebar-collapsed .brand-container { justify-content: center; padding: 0; }
-        .brand-text, .nav-label, .profile-text, .footer-link-text { transition: opacity 0.2s ease, width 0.3s ease; }
-        .footer-link { display: flex; align-items: center; gap: 8px; transition: all 0.3s ease; }
-        .scanning-line { height:2px; background:#155dfc; box-shadow:0 0 15px #155dfc; position:absolute; width:100%; top:0; left:0; z-index:10; animation: scanDown 3s linear infinite; }
-        @keyframes scanDown { 0%{top:0} 100%{top:100%} }
+    <div className="min-h-screen bg-[#F9FAFB] font-outfit">
+      <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet" />
+      <style jsx global>{`
+        @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800;900&display=swap');
+        .font-outfit { font-family: 'Outfit', sans-serif; }
+        ::-webkit-scrollbar { width: 4px; }
+        ::-webkit-scrollbar-thumb { background: #E2E8F0; border-radius: 10px; }
       `}</style>
 
       {/* Mobile overlay */}
       {sidebarOpen && (
         <div
-          className="fixed inset-0 z-40 bg-black/40 lg:hidden"
+          className="fixed inset-0 z-40 bg-black/50 lg:hidden"
           onClick={() => setSidebarOpen(false)}
         />
       )}
 
       {/* Sidebar */}
       <aside
-        className={`fixed left-0 top-0 h-screen w-64 bg-[#eff4ff] border-r border-[#c3c5d9]/30 py-6 px-4 flex flex-col z-50 transition-all duration-300 ${
-          sidebarOpen ? "translate-x-0" : "-translate-x-full"
-        } md:translate-x-0 ${isCollapsed ? "sidebar-collapsed" : ""}`}
+        className={`fixed left-0 top-0 h-screen ${sidebarWidth} bg-white border-r border-slate-200/80 shadow-xl shadow-slate-200/30 flex flex-col z-50 transition-all duration-300 ease-in-out
+          ${sidebarOpen ? "translate-x-0" : "-translate-x-full"} md:translate-x-0`}
       >
-        {/* Brand */}
-        <div className="flex items-center gap-3 px-2 mb-8 brand-container">
-          <div className="w-8 h-8 rounded-sm flex items-center justify-center flex-shrink-0">
-            <img src="https://swarajdesk.adityahota.online/logo.png" alt="Logo" className="w-8 h-8 object-contain" />
+        {/* Logo */}
+        <div className={`flex items-center gap-3 px-5 h-16 border-b border-slate-100 flex-shrink-0 ${isCollapsed ? "justify-center px-0" : ""}`}>
+          <div className="h-14 w-14 rounded-xl bg-white shadow-md border border-slate-100 flex items-center justify-center flex-shrink-0">
+            <img
+              src="/logo.png"
+              alt="SwarajDesk"
+              className="h-12 w-12 object-contain"
+            />
           </div>
           {!isCollapsed && (
-            <div className="brand-text">
-              <h1 className="headline font-bold text-[#0b1c30] tracking-tighter text-lg leading-none">
-                SwarajDesk
-              </h1>
-              <p className="text-[10px] text-[#0047cc] font-medium tracking-widest uppercase mt-1">
-                Agent Portal v1.0
-              </p>
+            <div>
+              <h1 className="font-outfit font-bold text-slate-900 text-base leading-none tracking-tight">SwarajDesk</h1>
+              <p className="text-[10px] text-slate-400 font-medium uppercase tracking-widest mt-0.5">Agent Portal</p>
             </div>
           )}
         </div>
 
         {/* Nav */}
-        <nav className="flex-1 space-y-1">
-          {navItems.map((item) => (
-            <Link
-              key={item.href}
-              href={item.href}
-              onClick={() => setSidebarOpen(false)}
-              className={`nav-item ${isActive(item.href) ? "nav-item-active" : ""}`}
-            >
-              <span className="material-symbols-outlined flex-shrink-0" style={{ fontSize: 20 }}>
-                {item.icon}
-              </span>
-              {!isCollapsed && <span className="nav-label">{item.label}</span>}
-            </Link>
+        <nav className="flex-1 overflow-y-auto py-4 px-3 space-y-5">
+          {NAV_SECTIONS.map((section) => (
+            <div key={section.title}>
+              {!isCollapsed && (
+                <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest px-3 mb-2">
+                  {section.title}
+                </p>
+              )}
+              <div className="space-y-0.5">
+                {section.items.map((item) => {
+                  const active = isActive(item.href)
+                  const Icon = item.icon
+                  return (
+                    <Link
+                      key={item.href}
+                      href={item.href}
+                      onClick={() => setSidebarOpen(false)}
+                      className={`flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-semibold transition-all duration-200 group
+                        ${isCollapsed ? "justify-center" : ""}
+                        ${active
+                          ? "bg-[#EEF2FF] text-[#465FFF]"
+                          : "text-slate-600 hover:bg-slate-50 hover:text-slate-900"
+                        }`}
+                      title={isCollapsed ? item.label : undefined}
+                    >
+                      <Icon size={18} className="flex-shrink-0" />
+                      {!isCollapsed && (
+                        <>
+                          <span className="flex-1">{item.label}</span>
+                          {active && <ChevronRight size={14} className="text-[#465FFF]" />}
+                        </>
+                      )}
+                    </Link>
+                  )
+                })}
+              </div>
+            </div>
           ))}
         </nav>
 
-        {/* Profile Section in Sidebar */}
-        <div className="mt-auto pt-4 border-t border-[#c3c5d9]/30">
-          <div className={`p-2 rounded-lg bg-[#f8faff] border border-[#c3c5d9]/20 flex items-center gap-3 ${isCollapsed ? 'justify-center' : ''}`}>
-            <div className="w-9 h-9 bg-[#0047cc] rounded-sm flex items-center justify-center text-white text-xs font-black flex-shrink-0">
-              {initials}
-            </div>
-            {!isCollapsed && (
-              <div className="min-w-0 profile-text">
-                <p className="text-xs font-bold text-[#0b1c30] truncate">
-                  {adminData?.fullName || "Agent User"}
-                </p>
-                <p className="text-[9px] font-bold text-[#0047cc] uppercase tracking-widest">
-                  Verified Agent
-                </p>
-              </div>
-            )}
-          </div>
-          {!isCollapsed && (
-            <button
-              onClick={handleLogout}
-              className="mt-2 w-full flex items-center gap-2 px-3 py-2 text-xs text-red-500 hover:bg-red-50 rounded-sm transition-colors font-bold uppercase tracking-wider"
-            >
-              <span className="material-symbols-outlined" style={{ fontSize: 16 }}>logout</span>
-              Sign Out
-            </button>
-          )}
-        </div>
-
+        {/* Blockchain widget */}
         {!isCollapsed && (
-          <div className="mt-4 pt-4 border-t border-[#c3c5d9]/30">
-            <div className="bg-gradient-to-br from-indigo-50 via-blue-50 to-indigo-100 rounded-lg p-4">
+          <div className="px-3 pb-3">
+            <div className="bg-gradient-to-br from-indigo-50 via-blue-50 to-indigo-100 rounded-xl p-4 border border-indigo-100">
               <div className="flex items-center gap-2 mb-3">
                 <div className="p-1.5 bg-indigo-100 rounded-lg">
-                  <span className="material-symbols-outlined text-indigo-600" style={{ fontSize: 16 }}>
-                    link
-                  </span>
+                  <svg viewBox="0 0 256 417" className="w-4 h-4" preserveAspectRatio="xMidYMid">
+                    <path fill="#4F46E5" d="M127.961 0l-2.795 9.5v275.668l2.795 2.79 127.962-75.638z" opacity="0.8" />
+                    <path fill="#4F46E5" d="M127.962 0L0 212.32l127.962 75.639V154.158z" opacity="0.6" />
+                    <path fill="#4F46E5" d="M127.961 312.187l-1.575 1.92v98.199l1.575 4.6L256 236.587z" opacity="0.8" />
+                    <path fill="#4F46E5" d="M127.962 416.905v-104.72L0 236.585z" opacity="0.6" />
+                  </svg>
                 </div>
                 <div>
-                  <h4 className="text-sm font-bold text-gray-900">Blockchain Verified</h4>
+                  <h4 className="text-xs font-bold text-gray-900">Blockchain Verified</h4>
                   <p className="text-[10px] text-gray-500">Ethereum Sepolia Testnet</p>
                 </div>
               </div>
               <div className="flex items-center gap-2 mb-3">
                 <div className="relative">
-                  <div className="w-8 h-8 rounded-full bg-indigo-100 flex items-center justify-center border border-indigo-200">
-                    <svg viewBox="0 0 256 417" className="w-4 h-4" preserveAspectRatio="xMidYMid">
+                  <div className="w-7 h-7 rounded-full bg-indigo-100 flex items-center justify-center border border-indigo-200">
+                    <svg viewBox="0 0 256 417" className="w-3 h-3" preserveAspectRatio="xMidYMid">
                       <path fill="#4F46E5" d="M127.961 0l-2.795 9.5v275.668l2.795 2.79 127.962-75.638z" opacity="0.8" />
                       <path fill="#4F46E5" d="M127.962 0L0 212.32l127.962 75.639V154.158z" opacity="0.6" />
-                      <path fill="#4F46E5" d="M127.961 312.187l-1.575 1.92v98.199l1.575 4.6L256 236.587z" opacity="0.8" />
-                      <path fill="#4F46E5" d="M127.962 416.905v-104.72L0 236.585z" opacity="0.6" />
                     </svg>
                   </div>
-                  <span className="absolute -top-0.5 -right-0.5 w-2.5 h-2.5 bg-green-500 rounded-full border-2 border-white animate-pulse" />
+                  <span className="absolute -top-0.5 -right-0.5 w-2 h-2 bg-green-500 rounded-full border-2 border-white animate-pulse" />
                 </div>
                 <div className="flex-1 min-w-0">
                   <p className="text-xs text-gray-700 font-medium">Hashed Transactions</p>
@@ -268,121 +263,139 @@ export function AgentRevampedLayout({ children }: AgentRevampedLayoutProps) {
                 href="https://sepolia.etherscan.io/address/0x522ba372e9fE6ecfEd24b773528b447bBdF823b2"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex items-center justify-center gap-2 w-full py-2 bg-indigo-600 hover:bg-indigo-700 rounded-lg text-sm font-semibold text-white transition-all"
+                className="flex items-center justify-center gap-1.5 w-full py-2 bg-indigo-600 hover:bg-indigo-700 rounded-lg text-xs font-semibold text-white transition-all"
               >
                 View on Sepolia
-                <span className="material-symbols-outlined" style={{ fontSize: 14 }}>
-                  open_in_new
-                </span>
               </a>
             </div>
           </div>
         )}
+
+        {/* Profile + logout */}
+        <div className={`border-t border-slate-100 p-3 flex-shrink-0 ${isCollapsed ? "flex flex-col items-center gap-2" : ""}`}>
+          {isCollapsed ? (
+            <>
+              <div className="h-9 w-9 rounded-xl bg-[#EEF2FF] text-[#465FFF] flex items-center justify-center text-xs font-bold uppercase">
+                {initials}
+              </div>
+              <button
+                onClick={handleLogout}
+                className="p-2 text-slate-400 hover:bg-red-50 hover:text-red-500 rounded-xl transition-colors"
+                title="Sign Out"
+              >
+                <LogOut size={16} />
+              </button>
+            </>
+          ) : (
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3 min-w-0">
+                <div className="h-9 w-9 rounded-xl bg-[#EEF2FF] text-[#465FFF] flex items-center justify-center text-xs font-bold uppercase flex-shrink-0">
+                  {initials}
+                </div>
+                <div className="min-w-0">
+                  <p className="text-sm font-bold text-slate-900 truncate leading-none font-outfit">
+                    {adminData?.fullName || "Agent User"}
+                  </p>
+                  <p className="text-[10px] text-slate-500 uppercase tracking-widest mt-0.5">Field Agent</p>
+                </div>
+              </div>
+              <button
+                onClick={handleLogout}
+                className="p-2 text-slate-400 hover:bg-red-50 hover:text-red-500 rounded-xl transition-colors flex-shrink-0"
+                title="Sign Out"
+              >
+                <LogOut size={16} />
+              </button>
+            </div>
+          )}
+        </div>
       </aside>
 
       {/* Main area */}
-      <div className={`transition-all duration-300 min-h-screen flex flex-col ${isCollapsed ? 'md:ml-20' : 'md:ml-64'}`}>
-        {/* Top nav */}
-        <header className="bg-[#f8f9ff] border-b border-[#c3c5d9]/20 h-16 flex items-center justify-between px-6 sticky top-0 z-30">
-          {/* Left: hamburger + breadcrumb */}
+      <div className={`transition-all duration-300 min-h-screen flex flex-col ${mainMargin}`}>
+        {/* Header */}
+        <header className="bg-white/80 backdrop-blur-xl border-b border-slate-100 h-16 flex items-center justify-between px-6 sticky top-0 z-30">
+          {/* Left: toggle + breadcrumb */}
           <div className="flex items-center gap-4">
             <button
-              className="p-2 hover:bg-[#eff4ff] rounded-sm transition-colors"
+              className="p-2 hover:bg-slate-100 rounded-xl transition-colors text-slate-500"
               onClick={() => {
-                if (window.innerWidth < 768) setSidebarOpen(true)
+                if (typeof window !== "undefined" && window.innerWidth < 768) setSidebarOpen(true)
                 else toggleCollapse()
               }}
             >
-              <span className="material-symbols-outlined" style={{ fontSize: 20 }}>
-                {isCollapsed ? "menu_open" : "menu"}
-              </span>
+              <Menu size={20} />
             </button>
-            <div className="flex items-center gap-2">
-              <nav className="flex gap-2 text-xs font-bold uppercase tracking-widest headline">
-                <span className="text-[#0047cc] border-b-2 border-[#0047cc] pb-0.5">
-                  {pathname === "/Agent"
-                    ? "dashboard"
-                    : pathname === "/Agent/my-complaints"
-                    ? "MY WORKLOAD"
-                    : pathname === "/Agent/audit-logs"
-                    ? "AUDIT LOGS"
-                    : pathname === "/Agent/profile"
-                    ? "PROFILE"
-                    : "ANALYTICS"}
-                </span>
-              </nav>
+            <div className="flex items-center gap-2 text-sm font-outfit">
+              <span className="text-slate-400 font-medium">Agent</span>
+              <ChevronRight size={14} className="text-slate-300" />
+              <span className="font-bold text-slate-900">{activeLabel}</span>
             </div>
           </div>
 
-          {/* Right: search + role + user */}
+          {/* Right */}
           <div className="flex items-center gap-3">
-            <div className="hidden md:flex relative">
-              <span
-                className="material-symbols-outlined absolute left-2 top-1/2 -translate-y-1/2 text-slate-400"
-                style={{ fontSize: 16 }}
-              >
-                search
-              </span>
+            <div className="hidden md:flex items-center gap-2 bg-slate-50 border border-slate-200 rounded-xl px-3 py-2">
+              <Search size={14} className="text-slate-400" />
               <input
                 type="text"
-                placeholder="SEARCH ID..."
-                className="bg-[#eff4ff] border-none text-[10px] font-mono w-44 h-8 pl-8 pr-2 focus:outline-none focus:ring-1 focus:ring-[#0047cc] rounded-sm"
+                placeholder="Search complaints..."
+                className="bg-transparent text-sm w-44 focus:outline-none text-slate-700 placeholder:text-slate-400 font-outfit"
               />
             </div>
-            <div className="h-8 w-px bg-[#c3c5d9]/20" />
-            <div className="px-2 py-1 bg-[#dce1ff] text-[#0047cc] text-[10px] font-bold uppercase tracking-tighter rounded-sm">
-              Role: Agent
-            </div>
-            <div className="flex items-center gap-1">
-              <div className="relative" ref={notificationRef}>
-                <button
-                  onClick={() => setShowNotifications(!showNotifications)}
-                  className={`p-2 rounded-sm transition-colors relative ${showNotifications ? 'bg-[#eff4ff] text-[#0047cc]' : 'hover:bg-[#eff4ff] text-slate-500'}`}
-                >
-                  <span className="material-symbols-outlined" style={{ fontSize: 20 }}>
-                    notifications
-                  </span>
-                  <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-red-500 rounded-full border-2 border-[#f8f9ff]" />
-                </button>
 
-                {/* Notification Dropdown */}
-                {showNotifications && (
-                  <div className="absolute right-0 mt-2 w-80 bg-white border border-[#c3c5d9]/30 shadow-2xl z-[100] overflow-hidden animate-in fade-in slide-in-from-top-2 duration-200">
-                    <div className="px-4 py-3 border-b border-[#c3c5d9]/20 flex items-center justify-between bg-[#f8faff]">
-                      <h3 className="text-[10px] font-black uppercase tracking-widest text-[#0b1c30]">Notifications</h3>
-                      <button className="text-[9px] font-bold text-[#0047cc] uppercase hover:underline">Mark all read</button>
-                    </div>
-                    <div className="max-h-64 overflow-y-auto">
-                      {notifications.map((n) => (
-                        <div key={n.id} className={`px-4 py-3 border-b border-[#c3c5d9]/10 hover:bg-[#f8faff] transition-colors cursor-pointer ${n.unread ? 'bg-[#eff4ff]/30' : ''}`}>
-                          <div className="flex gap-3">
-                            <div className={`w-1.5 h-1.5 rounded-full mt-1.5 flex-shrink-0 ${n.unread ? 'bg-[#0047cc]' : 'bg-transparent'}`} />
-                            <div className="min-w-0">
-                              <p className="text-[11px] font-bold text-[#0b1c30] leading-none mb-1">{n.title}</p>
-                              <p className="text-[10px] text-slate-500 leading-tight">{n.desc}</p>
-                              <p className="text-[9px] font-mono text-slate-400 mt-2">{n.time}</p>
-                            </div>
+            <div className="hidden sm:flex items-center gap-2 px-3 py-1.5 bg-[#EEF2FF] rounded-xl">
+              <span className="w-2 h-2 rounded-full bg-[#465FFF]" />
+              <span className="text-xs font-bold text-[#465FFF] tracking-tight font-outfit">AGENT PORTAL</span>
+            </div>
+
+            {/* Notifications */}
+            <div className="relative" ref={notificationRef}>
+              <button
+                onClick={() => setShowNotifications(!showNotifications)}
+                className="p-2 text-slate-500 hover:bg-slate-100 rounded-xl transition-colors relative"
+              >
+                <Bell size={18} />
+                <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-red-500 rounded-full border-2 border-white" />
+              </button>
+
+              {showNotifications && (
+                <div className="absolute right-0 mt-2 w-80 bg-white border border-slate-200 rounded-2xl shadow-xl z-[100] overflow-hidden">
+                  <div className="px-4 py-3 border-b border-slate-100 flex items-center justify-between">
+                    <h3 className="text-xs font-bold text-slate-900 uppercase tracking-widest font-outfit">Notifications</h3>
+                    <button className="text-[10px] font-bold text-[#465FFF] hover:underline">Mark all read</button>
+                  </div>
+                  <div className="max-h-64 overflow-y-auto">
+                    {notifications.map((n) => (
+                      <div
+                        key={n.id}
+                        className={`px-4 py-3 border-b border-slate-50 hover:bg-slate-50 transition-colors cursor-pointer ${n.unread ? "bg-[#EEF2FF]/30" : ""}`}
+                      >
+                        <div className="flex gap-3">
+                          <div className={`w-1.5 h-1.5 rounded-full mt-1.5 flex-shrink-0 ${n.unread ? "bg-[#465FFF]" : "bg-transparent"}`} />
+                          <div className="min-w-0">
+                            <p className="text-xs font-bold text-slate-900 leading-none mb-1">{n.title}</p>
+                            <p className="text-[11px] text-slate-500 leading-tight">{n.desc}</p>
+                            <p className="text-[10px] font-mono text-slate-400 mt-1">{n.time}</p>
                           </div>
                         </div>
-                      ))}
-                    </div>
-                    <div className="px-4 py-2 border-t border-[#c3c5d9]/20 text-center bg-[#f8faff]">
-                      <button className="text-[9px] font-bold text-slate-500 uppercase tracking-widest hover:text-[#0b1c30]">View all alerts</button>
-                    </div>
+                      </div>
+                    ))}
                   </div>
-                )}
+                  <div className="px-4 py-2.5 border-t border-slate-100 text-center">
+                    <button className="text-[10px] font-bold text-slate-500 uppercase tracking-widest hover:text-slate-900">View all alerts</button>
+                  </div>
+                </div>
+              )}
+            </div>
+
+            <div className="h-8 w-px bg-slate-200 hidden sm:block" />
+            <div className="flex items-center gap-2.5">
+              <div className="text-right hidden sm:block">
+                <p className="text-sm font-bold text-slate-900 leading-none font-outfit">{adminData?.fullName || "Agent"}</p>
+                <p className="text-[10px] text-slate-400 uppercase mt-0.5 tracking-wider">Field Agent</p>
               </div>
-              <div className="h-8 w-px bg-[#c3c5d9]/20 mx-1" />
-              <button
-                className="p-2 hover:bg-[#eff4ff] rounded-sm transition-colors text-slate-500"
-                onClick={handleLogout}
-                title="Log out"
-              >
-                <span className="material-symbols-outlined" style={{ fontSize: 20 }}>
-                  logout
-                </span>
-              </button>
-              <div className="w-8 h-8 rounded-sm bg-[#0047cc] text-white text-xs font-bold flex items-center justify-center uppercase ml-1">
+              <div className="h-9 w-9 rounded-xl bg-[#EEF2FF] text-[#465FFF] flex items-center justify-center text-xs font-bold uppercase">
                 {initials}
               </div>
             </div>

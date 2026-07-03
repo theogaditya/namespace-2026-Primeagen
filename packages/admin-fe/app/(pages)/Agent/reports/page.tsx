@@ -5,13 +5,11 @@ import dynamic from "next/dynamic"
 import { AgentRevampedLayout } from "../_layout"
 import { AuthGuard } from "@/components/auth-guard"
 
-// Dynamically import Hotmap to avoid SSR issues with Leaflet
-const Hotmap = dynamic(() => import("@/components/Hotmap"), {
+// Dynamically import ComplaintGoogleHeatmap to avoid SSR issues
+const ComplaintGoogleHeatmap = dynamic(() => import("@/components/ComplaintGoogleHeatmap"), {
   ssr: false,
   loading: () => (
-    <div className="w-full h-[350px] bg-[#eff4ff] flex items-center justify-center text-slate-400 text-sm font-mono animate-pulse">
-      Loading complaint map...
-    </div>
+    <div className="w-full h-[400px] bg-slate-50 animate-pulse rounded-2xl" />
   ),
 })
 
@@ -385,20 +383,16 @@ export default function AgentRevampedReports() {
             </div>
           </div>
           {/* Complaint Hotspot Map */}
-          <section className="bg-white shadow-sm border border-[#c3c5d9]/10">
-            <div className="px-8 py-5 border-b border-[#c3c5d9]/10 flex items-center justify-between">
-              <h3 className="headline text-sm font-bold uppercase tracking-widest text-[#0b1c30] flex items-center gap-2">
-                <span className="w-2 h-2 bg-[#ba1a1a] inline-block animate-pulse" />
-                Complaint Hotspot Intelligence
-              </h3>
-              <span className="text-[10px] font-mono text-slate-400 uppercase">
-                Live · Google Maps · Leaflet Clustering
-              </span>
+          <div className="bg-white rounded-2xl border border-gray-200 overflow-hidden shadow-sm flex flex-col">
+            <div className="p-8 border-b border-gray-100 flex justify-between items-center">
+              <div>
+                <h3 className="text-lg font-bold text-black font-outfit">Complaint Hotspot Map</h3>
+                <p className="text-xs text-emerald-500 font-black uppercase mt-1 tracking-tighter">Live · Google Maps · Heatmap Clustering</p>
+              </div>
+              <span className="material-symbols-outlined text-gray-300" style={{ fontSize: 32 }}>map</span>
             </div>
-            <div className="p-4">
-              <Hotmap />
-            </div>
-          </section>
+            <ComplaintGoogleHeatmap height="400px" showDensityTable />
+          </div>
 
           {/* Resolution log table */}
 

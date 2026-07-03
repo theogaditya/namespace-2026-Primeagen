@@ -545,13 +545,32 @@ function validateAnswer(
 
     case "MCQ":
     case "YES_NO":
-      if (!answer.selectedOpts || answer.selectedOpts.length !== 1) {
-        return { isValid: false, error: `Select exactly one option for: "${question.questionText}"` };
-      }
-      const selectedOpt = answer.selectedOpts[0];
-      if (!selectedOpt || !question.options.includes(selectedOpt)) {
-        return { isValid: false, error: `Invalid option selected for: "${question.questionText}"` };
-      }
+        if (!answer.selectedOpts || answer.selectedOpts.length !== 1) {
+          return { isValid: false, error: `Select exactly one option for: "${question.questionText}"` };
+        }
+        const selectedOpt = answer.selectedOpts[0];
+        if (!selectedOpt) {
+          return { isValid: false, error: `Invalid option selected for: "${question.questionText}"` };
+        }
+
+        // For YES_NO questions it's common for the stored question options to be empty
+        // (seeded surveys may omit explicit options). Accept canonical Yes/No values
+        // in that case, otherwise validate against provided options.
+        if (question.questionType === 'YES_NO') {
+          const normalized = String(selectedOpt).toLowerCase();
+          const okByText = normalized === 'yes' || normalized === 'no' || normalized === 'y' || normalized === 'n';
+          if (question.options && question.options.length > 0) {
+            if (!question.options.includes(selectedOpt)) {
+              return { isValid: false, error: `Invalid option selected for: "${question.questionText}"` };
+            }
+          } else if (!okByText) {
+            return { isValid: false, error: `Invalid option selected for: "${question.questionText}"` };
+          }
+        } else {
+          if (!question.options.includes(selectedOpt)) {
+            return { isValid: false, error: `Invalid option selected for: "${question.questionText}"` };
+          }
+        }
       break;
 
     case "CHECKBOX":

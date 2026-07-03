@@ -1,4 +1,5 @@
-import { z } from 'zod';
+import * as zod from 'zod';
+const z = (zod as any).z ?? zod;
 
 export const userLocationSchema = z.object({
   pin: z.string().regex(/^\d{6}$/, 'PIN must be 6 digits'),
@@ -15,7 +16,7 @@ export const userSignupSchema = z.object({
   phoneNumber: z.string().regex(/^\+?[1-9]\d{9,14}$/, 'Invalid phone number'),
   name: z.string().min(2, 'Name must be at least 2 characters'),
   password: z.string().min(8, 'Password must be at least 8 characters'),
-  dateOfBirth: z.string().refine((date) => {
+  dateOfBirth: z.string().refine((date: string) => {
     const dob = new Date(date);
     const age = new Date().getFullYear() - dob.getFullYear();
     return age >= 18 && age <= 120;

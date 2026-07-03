@@ -63,7 +63,8 @@ export default function SurveyAttendPanel({
       setLoading(true);
       setError(null);
       try {
-        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/surveys/${surveyId}`, {
+        const encodedId = encodeURIComponent(surveyId);
+        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/surveys/${encodedId}`, {
           headers: authToken ? { Authorization: `Bearer ${authToken}` } : {},
         });
         const data = await res.json();
@@ -89,7 +90,8 @@ export default function SurveyAttendPanel({
         return;
       }
       try {
-        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/surveys/${surveyId}/my-response`, {
+        const encodedId = encodeURIComponent(surveyId);
+        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/surveys/${encodedId}/my-response`, {
           headers: { Authorization: `Bearer ${authToken}` },
         });
         const data: MyResponseCheckResponse = await res.json();
@@ -109,7 +111,8 @@ export default function SurveyAttendPanel({
   const fetchResults = useCallback(async () => {
     setResultsLoading(true);
     try {
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/surveys/${surveyId}/results`, {
+      const encodedId = encodeURIComponent(surveyId);
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/surveys/${encodedId}/results`, {
         headers: authToken ? { Authorization: `Bearer ${authToken}` } : {},
       });
       if (!res.ok) {
@@ -226,7 +229,8 @@ export default function SurveyAttendPanel({
     setSubmitError(null);
 
     try {
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/surveys/${surveyId}/respond`, {
+      const encodedId = encodeURIComponent(surveyId);
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/surveys/${encodedId}/respond`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -237,14 +241,21 @@ export default function SurveyAttendPanel({
           startedAt: startedAtRef.current,
         }),
       });
-      const data = await res.json();
-        if (data.success) {
+      let data: any = null;
+      try {
+        data = await res.json();
+      } catch (e) {
+        console.error("Failed to parse submit response as JSON", e);
+      }
+      if (res.ok && data?.success) {
           setSubmitSuccess(true);
           setHasResponded(true);
           setSubmittedAt(data.submittedAt || new Date().toISOString());
           fetchResults();
-        } else {
-          setSubmitError(data.error || "Failed to submit response");
+      } else {
+        const errMsg = data?.error || (data ? JSON.stringify(data) : `HTTP ${res.status}`);
+        console.error("Submit failed:", res.status, errMsg);
+        setSubmitError(errMsg || "Failed to submit response");
         }
     } catch {
       setSubmitError("Failed to submit response. Please try again.");

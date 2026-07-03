@@ -1,4 +1,5 @@
-import { z } from 'zod';
+import * as zod from 'zod';
+const z = (zod as any).z ?? zod;
 
 export const complaintUrgencyEnum = z.enum(['LOW', 'MEDIUM', 'HIGH', 'CRITICAL']);
 

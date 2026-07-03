@@ -43,7 +43,7 @@ export function MunicipalAdminManagement() {
     try {
       const token = localStorage.getItem("token")
       if (!token) return
-      const res = await fetch(`${API_URL}/api/state-admin/all`, {
+      const res = await fetch(`${API_URL}/api/municipal-admin/all`, {
         headers: { Authorization: `Bearer ${token}` },
       })
       if (res.ok) {

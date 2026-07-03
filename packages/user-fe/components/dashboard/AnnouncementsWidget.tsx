@@ -25,6 +25,7 @@ interface Announcement {
   priority?: number;
   startsAt?: string;
   expiresAt?: string;
+  isActive?: boolean;
 }
 
 const ICON_MAP: Record<string, React.ReactNode> = {
@@ -200,7 +201,17 @@ export default function AnnouncementsWidget() {
         if (!response.ok) return;
         const data = await response.json();
         if (data?.success && Array.isArray(data.data)) {
-          setAnnouncements(data.data);
+          const now = Date.now();
+          const filtered = data.data.filter((a: any) => {
+            // exclude explicitly inactive announcements
+            if (a.isActive === false) return false;
+            // exclude expired
+            if (a.expiresAt && new Date(a.expiresAt).getTime() < now) return false;
+            // exclude announcements scheduled for future
+            if (a.startsAt && new Date(a.startsAt).getTime() > now) return false;
+            return true;
+          });
+          setAnnouncements(filtered);
         }
       } catch {
         // silently fall through – empty state is shown
