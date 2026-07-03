@@ -62,7 +62,8 @@ function densityLevel(count: number, max: number): "High" | "Medium" | "Low" {
 let scriptLoadPromise: Promise<void> | null = null
 
 function loadGoogleMapsScript(): Promise<void> {
-  if ((window as any).google?.maps?.visualization) return Promise.resolve()
+  // Check that the marker library (AdvancedMarkerElement) is available
+  if ((window as any).google?.maps?.marker?.AdvancedMarkerElement) return Promise.resolve()
   if (scriptLoadPromise) return scriptLoadPromise
   scriptLoadPromise = new Promise((resolve, reject) => {
     // remove any previous failed script
@@ -70,7 +71,8 @@ function loadGoogleMapsScript(): Promise<void> {
     if (existing) existing.remove()
     const script = document.createElement("script")
     script.id = "gm-complaint-heatmap"
-    script.src = `https://maps.googleapis.com/maps/api/js?key=${GOOGLE_API_KEY}&libraries=visualization&callback=__gmComplaintHeatmapReady`
+    // Use 'marker' library for AdvancedMarkerElement + PinElement
+    script.src = `https://maps.googleapis.com/maps/api/js?key=${GOOGLE_API_KEY}&libraries=marker&callback=__gmComplaintHeatmapReady`
     script.async = true
     ;(window as any).__gmComplaintHeatmapReady = () => {
       resolve()
@@ -85,9 +87,15 @@ function loadGoogleMapsScript(): Promise<void> {
 export default function ComplaintGoogleHeatmap({ height = "400px", showDensityTable = false, className = "" }: Props) {
   const mapDivRef = useRef<HTMLDivElement>(null)
   const mapInstanceRef = useRef<google.maps.Map | null>(null)
-  const heatmapLayerRef = useRef<google.maps.visualization.HeatmapLayer | null>(null)
-  const markersRef = useRef<google.maps.Marker[]>([])
+  // Density circles replace the deprecated HeatmapLayer
+  const densityCirclesRef = useRef<google.maps.Circle[]>([])
+  // AdvancedMarkerElement replaces the deprecated google.maps.Marker
+  const markersRef = useRef<any[]>([])
   const infoWindowRef = useRef<google.maps.InfoWindow | null>(null)
+  // Points grouped by district for quick panning / centering
+  const districtPointsRef = useRef<Record<string, ComplaintPoint[]>>({})
+  // Ensure initial focus to top district runs only once
+  const initialFocusDoneRef = useRef(false)
 
   const [points, setPoints] = useState<ComplaintPoint[]>([])
   const [densityRows, setDensityRows] = useState<DistrictDensity[]>([])
@@ -128,12 +136,17 @@ export default function ComplaintGoogleHeatmap({ height = "400px", showDensityTa
 
         setPoints(pts)
 
-        // Compute district density
+        // Compute district density and keep list of points per district
         const distCounts: Record<string, number> = {}
+        const districtPoints: Record<string, ComplaintPoint[]> = {}
         pts.forEach((p) => {
           const key = p.district || p.city || "Unknown"
           distCounts[key] = (distCounts[key] || 0) + 1
+          districtPoints[key] = districtPoints[key] || []
+          districtPoints[key].push(p)
         })
+        districtPointsRef.current = districtPoints
+
         const max = Math.max(1, ...Object.values(distCounts))
         const rows: DistrictDensity[] = Object.entries(distCounts)
           .sort((a, b) => b[1] - a[1])
@@ -168,57 +181,222 @@ export default function ComplaintGoogleHeatmap({ height = "400px", showDensityTa
           mapInstanceRef.current = new window.google.maps.Map(mapDivRef.current, {
             center,
             zoom: points.length > 0 ? 7 : DEFAULT_ZOOM,
+            // mapId is required for AdvancedMarkerElement
+            mapId: process.env.NEXT_PUBLIC_GOOGLE_MAP_ID || "DEMO_MAP_ID",
             styles: [
               { featureType: "water", elementType: "all", stylers: [{ color: "#c8dff5" }, { lightness: 10 }] },
               { featureType: "road", elementType: "all", stylers: [{ lightness: 30 }] },
               { featureType: "poi", elementType: "labels", stylers: [{ visibility: "off" }] },
             ],
-            mapTypeControl: false,
-            streetViewControl: false,
+            mapTypeControl: true,
+            streetViewControl: true,
+            rotateControl: true,
+            zoomControl: true,
             fullscreenControl: true,
           })
         }
 
-        // Build heatmap data
-        const heatData = points.map(
-          (p) => new window.google.maps.LatLng(p.latitude, p.longitude)
-        )
+        // ── Density overlay (replaces deprecated HeatmapLayer) ───
+        // Transparent stacking circles: overlapping areas naturally compound
+        // opacity to give a visual density/heat effect.
+        densityCirclesRef.current.forEach((c) => c.setMap(null))
+        densityCirclesRef.current = []
 
-        // Remove old heatmap layer if any
-        if (heatmapLayerRef.current) {
-          heatmapLayerRef.current.setMap(null)
+        if (points.length > 0) {
+          const URGENCY_FILL: Record<string, string> = {
+            CRITICAL: "#ba1a1a",
+            HIGH:     "#d97706",
+            MEDIUM:   "#115cb9",
+            LOW:      "#1a8754",
+          }
+
+          // Helper: approximate haversine distance (meters)
+          const haversineMeters = (a: { lat: number; lng: number }, b: { lat: number; lng: number }) => {
+            const toRad = (v: number) => (v * Math.PI) / 180
+            const R = 6371000 // earth meters
+            const dLat = toRad(b.lat - a.lat)
+            const dLon = toRad(b.lng - a.lng)
+            const lat1 = toRad(a.lat)
+            const lat2 = toRad(b.lat)
+            const sinDLat = Math.sin(dLat / 2)
+            const sinDLon = Math.sin(dLon / 2)
+            const aa = sinDLat * sinDLat + sinDLon * sinDLon * Math.cos(lat1) * Math.cos(lat2)
+            const c = 2 * Math.atan2(Math.sqrt(aa), Math.sqrt(1 - aa))
+            return R * c
+          }
+
+          // Dynamic radius parameters
+          const BASE_RADIUS = 1200 // meters for single nearby point
+          const MIN_RADIUS = 350
+          const MAX_RADIUS = 8000
+          const NEARBY_CHECK_METERS = 500
+
+          for (let i = 0; i < points.length; i++) {
+            const p = points[i]
+            let nearby = 0
+            for (let j = 0; j < points.length; j++) {
+              if (i === j) continue
+              const d = haversineMeters({ lat: p.latitude, lng: p.longitude }, { lat: points[j].latitude, lng: points[j].longitude })
+              if (d <= NEARBY_CHECK_METERS) nearby++
+            }
+
+            const countFactor = Math.sqrt(1 + nearby) // smooth growth
+            const radiusMeters = Math.min(MAX_RADIUS, Math.max(MIN_RADIUS, Math.round(BASE_RADIUS * countFactor)))
+
+            const circle = new window.google.maps.Circle({
+              center: { lat: p.latitude, lng: p.longitude },
+              radius: radiusMeters,
+              strokeOpacity: 0,
+              strokeWeight: 0,
+              fillColor: URGENCY_FILL[p.urgency] ?? "#115cb9",
+              fillOpacity: Math.min(0.2, 0.05 * (1 + nearby)),
+              map: mapInstanceRef.current!,
+              zIndex: 1,
+            })
+            densityCirclesRef.current.push(circle)
+          }
+
+          // Auto-focus: if not done yet, focus map on the district with highest density
+          if (!initialFocusDoneRef.current) {
+            initialFocusDoneRef.current = true
+            const groups = districtPointsRef.current || {}
+            // pick the district with the most points
+            const topDistrict = Object.entries(groups).sort((a, b) => b[1].length - a[1].length)[0]
+            const MAX_FOCUS_ZOOM = 12
+            if (topDistrict && topDistrict[1] && topDistrict[1].length > 0) {
+              const ptsForDistrict = topDistrict[1]
+              if (ptsForDistrict.length === 1) {
+                const p = ptsForDistrict[0]
+                mapInstanceRef.current.setCenter({ lat: p.latitude, lng: p.longitude })
+                mapInstanceRef.current.setZoom(Math.min(MAX_FOCUS_ZOOM, 12))
+              } else {
+                const bounds = new window.google.maps.LatLngBounds()
+                ptsForDistrict.forEach((pp) => bounds.extend(new window.google.maps.LatLng(pp.latitude, pp.longitude)))
+                mapInstanceRef.current.fitBounds(bounds, { left: 60, right: 60, top: 60, bottom: 60 })
+                // After fitBounds completes, ensure we are not zoomed in too far
+                window.google.maps.event.addListenerOnce(mapInstanceRef.current, 'idle', () => {
+                  const z = mapInstanceRef.current!.getZoom() || 0
+                  if (z > MAX_FOCUS_ZOOM) mapInstanceRef.current!.setZoom(MAX_FOCUS_ZOOM)
+                })
+              }
+            } else {
+              const avgLat = points.reduce((s, p) => s + p.latitude, 0) / points.length
+              const avgLng = points.reduce((s, p) => s + p.longitude, 0) / points.length
+              mapInstanceRef.current.setCenter({ lat: avgLat, lng: avgLng })
+              mapInstanceRef.current.setZoom(points.length > 50 ? 7 : points.length > 10 ? 8 : 10)
+            }
+          }
         }
 
-        if (heatData.length > 0) {
-          heatmapLayerRef.current = new window.google.maps.visualization.HeatmapLayer({
-            data: heatData,
-            map: mapInstanceRef.current,
-            radius: 30,
-            opacity: 0.75,
-            gradient: [
-              "rgba(0, 255, 255, 0)",
-              "rgba(0, 255, 255, 1)",
-              "rgba(0, 191, 255, 1)",
-              "rgba(0, 127, 255, 1)",
-              "rgba(0, 63, 255, 1)",
-              "rgba(0, 0, 255, 1)",
-              "rgba(0, 0, 223, 1)",
-              "rgba(0, 0, 191, 1)",
-              "rgba(0, 0, 159, 1)",
-              "rgba(0, 0, 127, 1)",
-              "rgba(63, 0, 91, 1)",
-              "rgba(127, 0, 63, 1)",
-              "rgba(191, 0, 31, 1)",
-              "rgba(255, 0, 0, 1)",
-            ],
+        // ── Complaint markers with info popups ────────────────────
+        // Clear any previously placed AdvancedMarkerElement instances
+        markersRef.current.forEach((m) => { m.map = null })
+        markersRef.current = []
+
+        // One shared InfoWindow so only one popup is open at a time
+        if (!infoWindowRef.current) {
+          infoWindowRef.current = new window.google.maps.InfoWindow()
+        }
+
+        // Urgency colour → coloured PinElement
+        const URGENCY_COLOR: Record<string, string> = {
+          CRITICAL: "#ba1a1a",
+          HIGH:     "#d97706",
+          MEDIUM:   "#115cb9",
+          LOW:      "#1a8754",
+        }
+
+        const { AdvancedMarkerElement, PinElement } = (window as any).google.maps.marker
+
+        // Prepare counts for identical coordinates so we can spiderfy overlapping pins
+        const coordCountMap: Record<string, number> = {}
+        points.forEach((pp) => {
+          const key = `${pp.latitude.toFixed(6)}|${pp.longitude.toFixed(6)}`
+          coordCountMap[key] = (coordCountMap[key] || 0) + 1
+        })
+        const coordIndexMap: Record<string, number> = {}
+
+        points.forEach((p) => {
+          const pinColor = URGENCY_COLOR[p.urgency] ?? "#115cb9"
+
+          // PinElement gives a proper coloured teardrop pin
+          const pin = new PinElement({
+            background: pinColor,
+            borderColor: "rgba(0,0,0,0.25)",
+            glyphColor: "#ffffff",
+            scale: 0.85,
           })
 
-          // Auto-pan to data centroid
-          const avgLat = points.reduce((s, p) => s + p.latitude, 0) / points.length
-          const avgLng = points.reduce((s, p) => s + p.longitude, 0) / points.length
-          mapInstanceRef.current.setCenter({ lat: avgLat, lng: avgLng })
-          mapInstanceRef.current.setZoom(points.length > 50 ? 7 : points.length > 10 ? 8 : 10)
-        }
+          // If multiple complaints share the exact coords, offset them in a small circle
+          const key = `${p.latitude.toFixed(6)}|${p.longitude.toFixed(6)}`
+          const totalAtCoord = coordCountMap[key] || 1
+          const idxAtCoord = (coordIndexMap[key] = (coordIndexMap[key] || 0) + 1) - 1
+
+          let position = { lat: p.latitude, lng: p.longitude }
+          if (totalAtCoord > 1) {
+            const angle = (idxAtCoord * 2 * Math.PI) / totalAtCoord
+            // radius in meters for spiderfy; spread slightly depending on crowding
+            const radiusMeters = 8 + Math.floor(idxAtCoord / 6) * 6
+            // approximate meters -> degrees conversion
+            const metersToLat = (m: number) => m / 111320
+            const metersToLng = (m: number, atLat: number) => m / (111320 * Math.cos((atLat * Math.PI) / 180))
+            const dLat = metersToLat(radiusMeters * Math.cos(angle))
+            const dLng = metersToLng(radiusMeters * Math.sin(angle), p.latitude)
+            position = { lat: p.latitude + dLat, lng: p.longitude + dLng }
+          }
+
+          const marker = new AdvancedMarkerElement({
+            position,
+            map: mapInstanceRef.current,
+            title: `#${p.seq} – ${p.category}`,
+            content: pin.element,
+            zIndex: 10,
+          })
+
+          marker.addListener("click", () => {
+            const statusLabel = p.status.replace(/_/g, " ").toLowerCase().replace(/\b\w/g, (c) => c.toUpperCase())
+            const location    = [p.city, p.district].filter(Boolean).join(", ") || "Location unavailable"
+            const desc        = p.description.length > 110 ? p.description.slice(0, 110) + "…" : p.description
+
+            infoWindowRef.current!.setContent(`
+              <div style="font-family:system-ui,sans-serif;max-width:250px;padding:2px 4px 4px">
+                <div style="display:flex;align-items:center;gap:6px;margin-bottom:8px">
+                  <span style="
+                    display:inline-block;width:10px;height:10px;border-radius:50%;
+                    background:${pinColor};flex-shrink:0;border:1.5px solid #fff;
+                    box-shadow:0 0 0 1.5px ${pinColor}
+                  "></span>
+                  <span style="font-weight:800;font-size:13px;color:#191c1d">
+                    #${p.seq} &mdash; ${p.category}
+                  </span>
+                </div>
+                <table style="border-collapse:collapse;width:100%;font-size:11.5px;color:#44474c">
+                  <tr>
+                    <td style="padding:2px 6px 2px 0;font-weight:600;white-space:nowrap">Status</td>
+                    <td style="padding:2px 0">${statusLabel}</td>
+                  </tr>
+                  <tr>
+                    <td style="padding:2px 6px 2px 0;font-weight:600;white-space:nowrap">Urgency</td>
+                    <td style="padding:2px 0;font-weight:700;color:${pinColor}">${p.urgency}</td>
+                  </tr>
+                  ${p.subCategory ? `<tr>
+                    <td style="padding:2px 6px 2px 0;font-weight:600;white-space:nowrap">Sub-category</td>
+                    <td style="padding:2px 0">${p.subCategory}</td>
+                  </tr>` : ""}
+                  <tr>
+                    <td style="padding:2px 6px 2px 0;font-weight:600;white-space:nowrap">Location</td>
+                    <td style="padding:2px 0">${location}</td>
+                  </tr>
+                </table>
+                ${desc ? `<div style="margin-top:7px;padding-top:7px;border-top:1px solid #e7e8e9;font-size:11px;color:#44474c;line-height:1.5">${desc}</div>` : ""}
+                ${p.isOnChain ? `<div style="margin-top:6px;font-size:10px;font-weight:700;color:#1a8754">✓ Verified on Blockchain</div>` : ""}
+              </div>
+            `)
+            infoWindowRef.current!.open(mapInstanceRef.current!, marker)
+          })
+
+          markersRef.current.push(marker)
+        })
       } catch (err) {
         console.error("[ComplaintGoogleHeatmap] map init error:", err)
         setMapError("Could not load Google Maps. Check your API key.")
@@ -231,12 +409,12 @@ export default function ComplaintGoogleHeatmap({ height = "400px", showDensityTa
   // ── 3. Cleanup on unmount ─────────────────────────────────────────
   useEffect(() => {
     return () => {
-      if (heatmapLayerRef.current) heatmapLayerRef.current.setMap(null)
-      markersRef.current.forEach((m) => m.setMap(null))
+      densityCirclesRef.current.forEach((c) => c.setMap(null))
+      densityCirclesRef.current = []
+      markersRef.current.forEach((m) => { m.map = null })
       markersRef.current = []
-      if (infoWindowRef.current) infoWindowRef.current.close()
+      if (infoWindowRef.current) { infoWindowRef.current.close(); infoWindowRef.current = null }
       mapInstanceRef.current = null
-      heatmapLayerRef.current = null
     }
   }, [])
 
@@ -268,18 +446,16 @@ export default function ComplaintGoogleHeatmap({ height = "400px", showDensityTa
         <div ref={mapDivRef} className="w-full rounded-xl" style={{ height }} />
         {/* Legend */}
         {!loadingData && points.length > 0 && (
-          <div className="absolute bottom-3 left-3 bg-white/90 backdrop-blur-sm rounded-lg px-3 py-2 text-[10px] font-bold shadow-md flex items-center gap-3">
-            <span className="text-[#44474c] uppercase tracking-widest">Density</span>
-            <span className="flex items-center gap-1">
-              <span className="inline-block w-3 h-3 rounded-full bg-blue-500" /> Low
-            </span>
-            <span className="flex items-center gap-1">
-              <span className="inline-block w-3 h-3 rounded-full bg-orange-500" /> Medium
-            </span>
-            <span className="flex items-center gap-1">
-              <span className="inline-block w-3 h-3 rounded-full bg-red-500" /> High
-            </span>
-            <span className="text-[#44474c] ml-1">{points.length.toLocaleString()} complaints</span>
+          <div className="absolute bottom-3 left-3 bg-white/90 backdrop-blur-sm rounded-lg px-3 py-2 text-[10px] font-bold shadow-md flex flex-col gap-2">
+            {/* Density overlay + pin urgency legend */}
+            <div className="flex items-center gap-3 flex-wrap">
+              <span className="text-[#44474c] uppercase tracking-widest">Urgency</span>
+              <span className="flex items-center gap-1"><span className="inline-block w-3 h-3 rounded-full" style={{ background: "#1a8754" }} /> Low</span>
+              <span className="flex items-center gap-1"><span className="inline-block w-3 h-3 rounded-full" style={{ background: "#115cb9" }} /> Medium</span>
+              <span className="flex items-center gap-1"><span className="inline-block w-3 h-3 rounded-full" style={{ background: "#d97706" }} /> High</span>
+              <span className="flex items-center gap-1"><span className="inline-block w-3 h-3 rounded-full" style={{ background: "#ba1a1a" }} /> Critical</span>
+              <span className="text-[#44474c] ml-1 border-l border-[#c4c6cd]/40 pl-3">{points.length.toLocaleString()} complaints</span>
+            </div>
           </div>
         )}
       </div>
@@ -296,10 +472,32 @@ export default function ComplaintGoogleHeatmap({ height = "400px", showDensityTa
             </thead>
             <tbody className="divide-y divide-[#c4c6cd]/10">
               {densityRows.map(({ district, count, level }) => (
-                <tr key={district} className="hover:bg-[#f3f4f5] transition-colors">
-                  <td className="p-3 font-medium text-[#191c1d] truncate max-w-[100px]">{district}</td>
-                  <td className={`p-3 ${levelStyle[level]}`}>{level} ({count})</td>
-                </tr>
+                    <tr
+                      key={district}
+                      onClick={() => {
+                        try {
+                          const pts = districtPointsRef.current[district] || []
+                          if (!mapInstanceRef.current || pts.length === 0) return
+                          const MAX_FOCUS_ZOOM = 12
+                          if (pts.length === 1) {
+                            mapInstanceRef.current.setCenter({ lat: pts[0].latitude, lng: pts[0].longitude })
+                            mapInstanceRef.current.setZoom(Math.min(MAX_FOCUS_ZOOM, 12))
+                          } else {
+                            const bounds = new window.google.maps.LatLngBounds()
+                            pts.forEach((pp) => bounds.extend(new window.google.maps.LatLng(pp.latitude, pp.longitude)))
+                            mapInstanceRef.current.fitBounds(bounds, { left: 60, right: 60, top: 60, bottom: 60 })
+                            window.google.maps.event.addListenerOnce(mapInstanceRef.current, 'idle', () => {
+                              const z = mapInstanceRef.current!.getZoom() || 0
+                              if (z > MAX_FOCUS_ZOOM) mapInstanceRef.current!.setZoom(MAX_FOCUS_ZOOM)
+                            })
+                          }
+                        } catch (e) { console.error('panToDistrict error', e) }
+                      }}
+                      className="hover:bg-[#f3f4f5] transition-colors cursor-pointer"
+                    >
+                      <td className="p-3 font-medium text-[#191c1d] truncate max-w-[100px]">{district}</td>
+                      <td className={`p-3 ${levelStyle[level]}`}>{level} ({count})</td>
+                    </tr>
               ))}
             </tbody>
           </table>

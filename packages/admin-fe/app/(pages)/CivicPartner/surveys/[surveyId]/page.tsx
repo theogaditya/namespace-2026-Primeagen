@@ -135,6 +135,11 @@ export default function SurveyDetailPage({ params }: { params: Promise<{ surveyI
           { featureType: "all",   elementType: "labels.text.fill", stylers: [{ color: "#7c93a3" }] },
           { featureType: "water", elementType: "all",               stylers: [{ color: "#465FFF" }, { opacity: 0.1 }] },
         ],
+        mapTypeControl: true,
+        streetViewControl: true,
+        rotateControl: true,
+        zoomControl: true,
+        fullscreenControl: true,
       })
       const pts = [
         new google.maps.LatLng(19.076, 72.878), new google.maps.LatLng(19.08, 72.88),

@@ -48,7 +48,12 @@ export default function AnalyticsListPage() {
           const map = new google.maps.Map(mapRef.current, {
             center: { lat: 19.0760, lng: 72.8777 },
             zoom: 11,
-            styles: [ { "featureType": "water", "elementType": "all", "stylers": [{"color": "#465FFF"}, {"opacity": 0.05}] } ]
+            styles: [ { "featureType": "water", "elementType": "all", "stylers": [{"color": "#465FFF"}, {"opacity": 0.05}] } ],
+            mapTypeControl: true,
+            streetViewControl: true,
+            rotateControl: true,
+            zoomControl: true,
+            fullscreenControl: true,
           });
           const heatmapData = [
             new google.maps.LatLng(19.0760, 72.8777), new google.maps.LatLng(19.0800, 72.8800),
