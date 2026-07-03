@@ -72,7 +72,7 @@ function loadGoogleMapsScript(): Promise<void> {
     const script = document.createElement("script")
     script.id = "gm-complaint-heatmap"
     // Use 'marker' library for AdvancedMarkerElement + PinElement
-    script.src = `https://maps.googleapis.com/maps/api/js?key=${GOOGLE_API_KEY}&libraries=marker&callback=__gmComplaintHeatmapReady`
+    script.src = `https://maps.googleapis.com/maps/api/js?key=${GOOGLE_API_KEY}&libraries=marker&loading=async&callback=__gmComplaintHeatmapReady`
     script.async = true
     ;(window as any).__gmComplaintHeatmapReady = () => {
       resolve()
@@ -178,16 +178,13 @@ export default function ComplaintGoogleHeatmap({ height = "400px", showDensityTa
             ? { lat: points[0].latitude, lng: points[0].longitude }
             : DEFAULT_CENTER
 
+          // mapId is required for AdvancedMarkerElement; styles cannot coexist with mapId
+          // (cloud console controls styling when a mapId is present)
+          const mapId = process.env.NEXT_PUBLIC_GOOGLE_MAP_ID || "DEMO_MAP_ID"
           mapInstanceRef.current = new window.google.maps.Map(mapDivRef.current, {
             center,
             zoom: points.length > 0 ? 7 : DEFAULT_ZOOM,
-            // mapId is required for AdvancedMarkerElement
-            mapId: process.env.NEXT_PUBLIC_GOOGLE_MAP_ID || "DEMO_MAP_ID",
-            styles: [
-              { featureType: "water", elementType: "all", stylers: [{ color: "#c8dff5" }, { lightness: 10 }] },
-              { featureType: "road", elementType: "all", stylers: [{ lightness: 30 }] },
-              { featureType: "poi", elementType: "labels", stylers: [{ visibility: "off" }] },
-            ],
+            mapId,
             mapTypeControl: true,
             streetViewControl: true,
             rotateControl: true,
@@ -349,11 +346,11 @@ export default function ComplaintGoogleHeatmap({ height = "400px", showDensityTa
             position,
             map: mapInstanceRef.current,
             title: `#${p.seq} – ${p.category}`,
-            content: pin.element,
+            content: pin,
             zIndex: 10,
           })
 
-          marker.addListener("click", () => {
+          marker.addListener("gmp-click", () => {
             const statusLabel = p.status.replace(/_/g, " ").toLowerCase().replace(/\b\w/g, (c) => c.toUpperCase())
             const location    = [p.city, p.district].filter(Boolean).join(", ") || "Location unavailable"
             const desc        = p.description.length > 110 ? p.description.slice(0, 110) + "…" : p.description
@@ -450,10 +447,10 @@ export default function ComplaintGoogleHeatmap({ height = "400px", showDensityTa
             {/* Density overlay + pin urgency legend */}
             <div className="flex items-center gap-3 flex-wrap">
               <span className="text-[#44474c] uppercase tracking-widest">Urgency</span>
-              <span className="flex items-center gap-1"><span className="inline-block w-3 h-3 rounded-full" style={{ background: "#1a8754" }} /> Low</span>
-              <span className="flex items-center gap-1"><span className="inline-block w-3 h-3 rounded-full" style={{ background: "#115cb9" }} /> Medium</span>
-              <span className="flex items-center gap-1"><span className="inline-block w-3 h-3 rounded-full" style={{ background: "#d97706" }} /> High</span>
-              <span className="flex items-center gap-1"><span className="inline-block w-3 h-3 rounded-full" style={{ background: "#ba1a1a" }} /> Critical</span>
+              <span className="flex items-center gap-1"><span className="inline-block w-3 h-3 rounded-full" style={{ backgroundColor: "#1a8754" }} /> Low</span>
+              <span className="flex items-center gap-1"><span className="inline-block w-3 h-3 rounded-full" style={{ backgroundColor: "#115cb9" }} /> Medium</span>
+              <span className="flex items-center gap-1"><span className="inline-block w-3 h-3 rounded-full" style={{ backgroundColor: "#d97706" }} /> High</span>
+              <span className="flex items-center gap-1"><span className="inline-block w-3 h-3 rounded-full" style={{ backgroundColor: "#ba1a1a" }} /> Critical</span>
               <span className="text-[#44474c] ml-1 border-l border-[#c4c6cd]/40 pl-3">{points.length.toLocaleString()} complaints</span>
             </div>
           </div>

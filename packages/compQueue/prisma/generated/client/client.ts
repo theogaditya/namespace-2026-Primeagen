@@ -105,6 +105,11 @@ export type Upvote = Prisma.UpvoteModel
  */
 export type NewsUpdate = Prisma.NewsUpdateModel
 /**
+ * Model Announcement
+ * 
+ */
+export type Announcement = Prisma.AnnouncementModel
+/**
  * Model AuditLog
  * 
  */
@@ -139,3 +144,33 @@ export type Badge = Prisma.BadgeModel
  * 
  */
 export type UserBadge = Prisma.UserBadgeModel
+/**
+ * Model BlockchainSyncEvent
+ * 
+ */
+export type BlockchainSyncEvent = Prisma.BlockchainSyncEventModel
+/**
+ * Model CivicPartner
+ * 
+ */
+export type CivicPartner = Prisma.CivicPartnerModel
+/**
+ * Model Survey
+ * 
+ */
+export type Survey = Prisma.SurveyModel
+/**
+ * Model SurveyQuestion
+ * 
+ */
+export type SurveyQuestion = Prisma.SurveyQuestionModel
+/**
+ * Model SurveyResponse
+ * 
+ */
+export type SurveyResponse = Prisma.SurveyResponseModel
+/**
+ * Model SurveyAnswer
+ * 
+ */
+export type SurveyAnswer = Prisma.SurveyAnswerModel

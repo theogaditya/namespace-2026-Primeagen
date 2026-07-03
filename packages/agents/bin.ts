@@ -11,11 +11,11 @@ import { rateLimiter } from "./lib/guardrails/rateLimiter";
 
 async function bootstrap() {
   try {
-    console.log("Starting SwarajDesk Agents Service...");
+    // Starting agents (minimal startup logs)
 
     // Initialize Prisma (read-only)
     const prisma = getPrisma();
-    console.log("Prisma client initialized (read-only)");
+    // Prisma client initialized
 
     // Initialize Redis (for session memory + rate limiting)
     try {
@@ -23,7 +23,6 @@ async function bootstrap() {
         setTimeout(() => reject(new Error("Redis connect timeout (5s)")), 5000)
       );
       await Promise.race([sessionMemory.connect(), redisTimeout]);
-      console.log("Redis client connected (session memory)");
     } catch (redisErr) {
       console.warn("Redis connection failed (session memory will use in-memory fallback):", (redisErr as Error).message);
     }
@@ -31,7 +30,6 @@ async function bootstrap() {
     // Rate limiter Redis (separate, non-critical)
     try {
       await rateLimiter.connect();
-      console.log("Redis client connected (rate limiter)");
     } catch (rlErr) {
       console.warn("Rate limiter Redis failed (rate limiting disabled):", (rlErr as Error).message);
     }
@@ -43,12 +41,11 @@ async function bootstrap() {
 
     app.listen(PORT, () => {
       console.log(`Agents Service running on port ${PORT}`);
-      console.log(`Environment: ${process.env.NODE_ENV || "development"}`);
     });
 
     // Graceful shutdown
     const shutdown = async () => {
-      console.log("Shutting down Agents Service...");
+      // shutting down
       try {
         await sessionMemory.disconnect();
       } catch {}

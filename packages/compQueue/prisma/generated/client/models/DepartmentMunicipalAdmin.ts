@@ -358,6 +358,7 @@ export type DepartmentMunicipalAdminWhereInput = {
   managedByStateAdmin?: Prisma.XOR<Prisma.DepartmentStateAdminNullableScalarRelationFilter, Prisma.DepartmentStateAdminWhereInput> | null
   managedBySuperMunicipal?: Prisma.XOR<Prisma.SuperMunicipalAdminNullableScalarRelationFilter, Prisma.SuperMunicipalAdminWhereInput> | null
   newsUpdates?: Prisma.NewsUpdateListRelationFilter
+  announcements?: Prisma.AnnouncementListRelationFilter
 }
 
 export type DepartmentMunicipalAdminOrderByWithRelationInput = {
@@ -387,6 +388,7 @@ export type DepartmentMunicipalAdminOrderByWithRelationInput = {
   managedByStateAdmin?: Prisma.DepartmentStateAdminOrderByWithRelationInput
   managedBySuperMunicipal?: Prisma.SuperMunicipalAdminOrderByWithRelationInput
   newsUpdates?: Prisma.NewsUpdateOrderByRelationAggregateInput
+  announcements?: Prisma.AnnouncementOrderByRelationAggregateInput
 }
 
 export type DepartmentMunicipalAdminWhereUniqueInput = Prisma.AtLeast<{
@@ -419,6 +421,7 @@ export type DepartmentMunicipalAdminWhereUniqueInput = Prisma.AtLeast<{
   managedByStateAdmin?: Prisma.XOR<Prisma.DepartmentStateAdminNullableScalarRelationFilter, Prisma.DepartmentStateAdminWhereInput> | null
   managedBySuperMunicipal?: Prisma.XOR<Prisma.SuperMunicipalAdminNullableScalarRelationFilter, Prisma.SuperMunicipalAdminWhereInput> | null
   newsUpdates?: Prisma.NewsUpdateListRelationFilter
+  announcements?: Prisma.AnnouncementListRelationFilter
 }, "id" | "officialEmail">
 
 export type DepartmentMunicipalAdminOrderByWithAggregationInput = {
@@ -500,6 +503,7 @@ export type DepartmentMunicipalAdminCreateInput = {
   managedByStateAdmin?: Prisma.DepartmentStateAdminCreateNestedOneWithoutManagedMunicipalAdminsInput
   managedBySuperMunicipal?: Prisma.SuperMunicipalAdminCreateNestedOneWithoutManagedDepartmentAdminsInput
   newsUpdates?: Prisma.NewsUpdateCreateNestedManyWithoutCreatedByInput
+  announcements?: Prisma.AnnouncementCreateNestedManyWithoutCreatedByInput
 }
 
 export type DepartmentMunicipalAdminUncheckedCreateInput = {
@@ -527,6 +531,7 @@ export type DepartmentMunicipalAdminUncheckedCreateInput = {
   managedComplaints?: Prisma.ComplaintUncheckedCreateNestedManyWithoutManagedByMunicipalAdminInput
   communityModeration?: Prisma.ComplaintUncheckedCreateNestedManyWithoutModeratedByMunicipalAdminInput
   newsUpdates?: Prisma.NewsUpdateUncheckedCreateNestedManyWithoutCreatedByInput
+  announcements?: Prisma.AnnouncementUncheckedCreateNestedManyWithoutCreatedByInput
 }
 
 export type DepartmentMunicipalAdminUpdateInput = {
@@ -554,6 +559,7 @@ export type DepartmentMunicipalAdminUpdateInput = {
   managedByStateAdmin?: Prisma.DepartmentStateAdminUpdateOneWithoutManagedMunicipalAdminsNestedInput
   managedBySuperMunicipal?: Prisma.SuperMunicipalAdminUpdateOneWithoutManagedDepartmentAdminsNestedInput
   newsUpdates?: Prisma.NewsUpdateUpdateManyWithoutCreatedByNestedInput
+  announcements?: Prisma.AnnouncementUpdateManyWithoutCreatedByNestedInput
 }
 
 export type DepartmentMunicipalAdminUncheckedUpdateInput = {
@@ -581,6 +587,7 @@ export type DepartmentMunicipalAdminUncheckedUpdateInput = {
   managedComplaints?: Prisma.ComplaintUncheckedUpdateManyWithoutManagedByMunicipalAdminNestedInput
   communityModeration?: Prisma.ComplaintUncheckedUpdateManyWithoutModeratedByMunicipalAdminNestedInput
   newsUpdates?: Prisma.NewsUpdateUncheckedUpdateManyWithoutCreatedByNestedInput
+  announcements?: Prisma.AnnouncementUncheckedUpdateManyWithoutCreatedByNestedInput
 }
 
 export type DepartmentMunicipalAdminCreateManyInput = {
@@ -909,6 +916,20 @@ export type DepartmentMunicipalAdminUpdateOneRequiredWithoutNewsUpdatesNestedInp
   update?: Prisma.XOR<Prisma.XOR<Prisma.DepartmentMunicipalAdminUpdateToOneWithWhereWithoutNewsUpdatesInput, Prisma.DepartmentMunicipalAdminUpdateWithoutNewsUpdatesInput>, Prisma.DepartmentMunicipalAdminUncheckedUpdateWithoutNewsUpdatesInput>
 }
 
+export type DepartmentMunicipalAdminCreateNestedOneWithoutAnnouncementsInput = {
+  create?: Prisma.XOR<Prisma.DepartmentMunicipalAdminCreateWithoutAnnouncementsInput, Prisma.DepartmentMunicipalAdminUncheckedCreateWithoutAnnouncementsInput>
+  connectOrCreate?: Prisma.DepartmentMunicipalAdminCreateOrConnectWithoutAnnouncementsInput
+  connect?: Prisma.DepartmentMunicipalAdminWhereUniqueInput
+}
+
+export type DepartmentMunicipalAdminUpdateOneRequiredWithoutAnnouncementsNestedInput = {
+  create?: Prisma.XOR<Prisma.DepartmentMunicipalAdminCreateWithoutAnnouncementsInput, Prisma.DepartmentMunicipalAdminUncheckedCreateWithoutAnnouncementsInput>
+  connectOrCreate?: Prisma.DepartmentMunicipalAdminCreateOrConnectWithoutAnnouncementsInput
+  upsert?: Prisma.DepartmentMunicipalAdminUpsertWithoutAnnouncementsInput
+  connect?: Prisma.DepartmentMunicipalAdminWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.DepartmentMunicipalAdminUpdateToOneWithWhereWithoutAnnouncementsInput, Prisma.DepartmentMunicipalAdminUpdateWithoutAnnouncementsInput>, Prisma.DepartmentMunicipalAdminUncheckedUpdateWithoutAnnouncementsInput>
+}
+
 export type DepartmentMunicipalAdminCreateWithoutManagedAgentsInput = {
   id?: string
   fullName: string
@@ -933,6 +954,7 @@ export type DepartmentMunicipalAdminCreateWithoutManagedAgentsInput = {
   managedByStateAdmin?: Prisma.DepartmentStateAdminCreateNestedOneWithoutManagedMunicipalAdminsInput
   managedBySuperMunicipal?: Prisma.SuperMunicipalAdminCreateNestedOneWithoutManagedDepartmentAdminsInput
   newsUpdates?: Prisma.NewsUpdateCreateNestedManyWithoutCreatedByInput
+  announcements?: Prisma.AnnouncementCreateNestedManyWithoutCreatedByInput
 }
 
 export type DepartmentMunicipalAdminUncheckedCreateWithoutManagedAgentsInput = {
@@ -959,6 +981,7 @@ export type DepartmentMunicipalAdminUncheckedCreateWithoutManagedAgentsInput = {
   managedComplaints?: Prisma.ComplaintUncheckedCreateNestedManyWithoutManagedByMunicipalAdminInput
   communityModeration?: Prisma.ComplaintUncheckedCreateNestedManyWithoutModeratedByMunicipalAdminInput
   newsUpdates?: Prisma.NewsUpdateUncheckedCreateNestedManyWithoutCreatedByInput
+  announcements?: Prisma.AnnouncementUncheckedCreateNestedManyWithoutCreatedByInput
 }
 
 export type DepartmentMunicipalAdminCreateOrConnectWithoutManagedAgentsInput = {
@@ -1001,6 +1024,7 @@ export type DepartmentMunicipalAdminUpdateWithoutManagedAgentsInput = {
   managedByStateAdmin?: Prisma.DepartmentStateAdminUpdateOneWithoutManagedMunicipalAdminsNestedInput
   managedBySuperMunicipal?: Prisma.SuperMunicipalAdminUpdateOneWithoutManagedDepartmentAdminsNestedInput
   newsUpdates?: Prisma.NewsUpdateUpdateManyWithoutCreatedByNestedInput
+  announcements?: Prisma.AnnouncementUpdateManyWithoutCreatedByNestedInput
 }
 
 export type DepartmentMunicipalAdminUncheckedUpdateWithoutManagedAgentsInput = {
@@ -1027,6 +1051,7 @@ export type DepartmentMunicipalAdminUncheckedUpdateWithoutManagedAgentsInput = {
   managedComplaints?: Prisma.ComplaintUncheckedUpdateManyWithoutManagedByMunicipalAdminNestedInput
   communityModeration?: Prisma.ComplaintUncheckedUpdateManyWithoutModeratedByMunicipalAdminNestedInput
   newsUpdates?: Prisma.NewsUpdateUncheckedUpdateManyWithoutCreatedByNestedInput
+  announcements?: Prisma.AnnouncementUncheckedUpdateManyWithoutCreatedByNestedInput
 }
 
 export type DepartmentMunicipalAdminCreateWithoutManagedBySuperMunicipalInput = {
@@ -1053,6 +1078,7 @@ export type DepartmentMunicipalAdminCreateWithoutManagedBySuperMunicipalInput = 
   communityModeration?: Prisma.ComplaintCreateNestedManyWithoutModeratedByMunicipalAdminInput
   managedByStateAdmin?: Prisma.DepartmentStateAdminCreateNestedOneWithoutManagedMunicipalAdminsInput
   newsUpdates?: Prisma.NewsUpdateCreateNestedManyWithoutCreatedByInput
+  announcements?: Prisma.AnnouncementCreateNestedManyWithoutCreatedByInput
 }
 
 export type DepartmentMunicipalAdminUncheckedCreateWithoutManagedBySuperMunicipalInput = {
@@ -1079,6 +1105,7 @@ export type DepartmentMunicipalAdminUncheckedCreateWithoutManagedBySuperMunicipa
   managedComplaints?: Prisma.ComplaintUncheckedCreateNestedManyWithoutManagedByMunicipalAdminInput
   communityModeration?: Prisma.ComplaintUncheckedCreateNestedManyWithoutModeratedByMunicipalAdminInput
   newsUpdates?: Prisma.NewsUpdateUncheckedCreateNestedManyWithoutCreatedByInput
+  announcements?: Prisma.AnnouncementUncheckedCreateNestedManyWithoutCreatedByInput
 }
 
 export type DepartmentMunicipalAdminCreateOrConnectWithoutManagedBySuperMunicipalInput = {
@@ -1157,6 +1184,7 @@ export type DepartmentMunicipalAdminCreateWithoutManagedByStateAdminInput = {
   communityModeration?: Prisma.ComplaintCreateNestedManyWithoutModeratedByMunicipalAdminInput
   managedBySuperMunicipal?: Prisma.SuperMunicipalAdminCreateNestedOneWithoutManagedDepartmentAdminsInput
   newsUpdates?: Prisma.NewsUpdateCreateNestedManyWithoutCreatedByInput
+  announcements?: Prisma.AnnouncementCreateNestedManyWithoutCreatedByInput
 }
 
 export type DepartmentMunicipalAdminUncheckedCreateWithoutManagedByStateAdminInput = {
@@ -1183,6 +1211,7 @@ export type DepartmentMunicipalAdminUncheckedCreateWithoutManagedByStateAdminInp
   managedComplaints?: Prisma.ComplaintUncheckedCreateNestedManyWithoutManagedByMunicipalAdminInput
   communityModeration?: Prisma.ComplaintUncheckedCreateNestedManyWithoutModeratedByMunicipalAdminInput
   newsUpdates?: Prisma.NewsUpdateUncheckedCreateNestedManyWithoutCreatedByInput
+  announcements?: Prisma.AnnouncementUncheckedCreateNestedManyWithoutCreatedByInput
 }
 
 export type DepartmentMunicipalAdminCreateOrConnectWithoutManagedByStateAdminInput = {
@@ -1235,6 +1264,7 @@ export type DepartmentMunicipalAdminCreateWithoutManagedComplaintsInput = {
   managedByStateAdmin?: Prisma.DepartmentStateAdminCreateNestedOneWithoutManagedMunicipalAdminsInput
   managedBySuperMunicipal?: Prisma.SuperMunicipalAdminCreateNestedOneWithoutManagedDepartmentAdminsInput
   newsUpdates?: Prisma.NewsUpdateCreateNestedManyWithoutCreatedByInput
+  announcements?: Prisma.AnnouncementCreateNestedManyWithoutCreatedByInput
 }
 
 export type DepartmentMunicipalAdminUncheckedCreateWithoutManagedComplaintsInput = {
@@ -1261,6 +1291,7 @@ export type DepartmentMunicipalAdminUncheckedCreateWithoutManagedComplaintsInput
   managedAgents?: Prisma.AgentUncheckedCreateNestedManyWithoutManagedByMunicipalInput
   communityModeration?: Prisma.ComplaintUncheckedCreateNestedManyWithoutModeratedByMunicipalAdminInput
   newsUpdates?: Prisma.NewsUpdateUncheckedCreateNestedManyWithoutCreatedByInput
+  announcements?: Prisma.AnnouncementUncheckedCreateNestedManyWithoutCreatedByInput
 }
 
 export type DepartmentMunicipalAdminCreateOrConnectWithoutManagedComplaintsInput = {
@@ -1292,6 +1323,7 @@ export type DepartmentMunicipalAdminCreateWithoutCommunityModerationInput = {
   managedByStateAdmin?: Prisma.DepartmentStateAdminCreateNestedOneWithoutManagedMunicipalAdminsInput
   managedBySuperMunicipal?: Prisma.SuperMunicipalAdminCreateNestedOneWithoutManagedDepartmentAdminsInput
   newsUpdates?: Prisma.NewsUpdateCreateNestedManyWithoutCreatedByInput
+  announcements?: Prisma.AnnouncementCreateNestedManyWithoutCreatedByInput
 }
 
 export type DepartmentMunicipalAdminUncheckedCreateWithoutCommunityModerationInput = {
@@ -1318,6 +1350,7 @@ export type DepartmentMunicipalAdminUncheckedCreateWithoutCommunityModerationInp
   managedAgents?: Prisma.AgentUncheckedCreateNestedManyWithoutManagedByMunicipalInput
   managedComplaints?: Prisma.ComplaintUncheckedCreateNestedManyWithoutManagedByMunicipalAdminInput
   newsUpdates?: Prisma.NewsUpdateUncheckedCreateNestedManyWithoutCreatedByInput
+  announcements?: Prisma.AnnouncementUncheckedCreateNestedManyWithoutCreatedByInput
 }
 
 export type DepartmentMunicipalAdminCreateOrConnectWithoutCommunityModerationInput = {
@@ -1360,6 +1393,7 @@ export type DepartmentMunicipalAdminUpdateWithoutManagedComplaintsInput = {
   managedByStateAdmin?: Prisma.DepartmentStateAdminUpdateOneWithoutManagedMunicipalAdminsNestedInput
   managedBySuperMunicipal?: Prisma.SuperMunicipalAdminUpdateOneWithoutManagedDepartmentAdminsNestedInput
   newsUpdates?: Prisma.NewsUpdateUpdateManyWithoutCreatedByNestedInput
+  announcements?: Prisma.AnnouncementUpdateManyWithoutCreatedByNestedInput
 }
 
 export type DepartmentMunicipalAdminUncheckedUpdateWithoutManagedComplaintsInput = {
@@ -1386,6 +1420,7 @@ export type DepartmentMunicipalAdminUncheckedUpdateWithoutManagedComplaintsInput
   managedAgents?: Prisma.AgentUncheckedUpdateManyWithoutManagedByMunicipalNestedInput
   communityModeration?: Prisma.ComplaintUncheckedUpdateManyWithoutModeratedByMunicipalAdminNestedInput
   newsUpdates?: Prisma.NewsUpdateUncheckedUpdateManyWithoutCreatedByNestedInput
+  announcements?: Prisma.AnnouncementUncheckedUpdateManyWithoutCreatedByNestedInput
 }
 
 export type DepartmentMunicipalAdminUpsertWithoutCommunityModerationInput = {
@@ -1423,6 +1458,7 @@ export type DepartmentMunicipalAdminUpdateWithoutCommunityModerationInput = {
   managedByStateAdmin?: Prisma.DepartmentStateAdminUpdateOneWithoutManagedMunicipalAdminsNestedInput
   managedBySuperMunicipal?: Prisma.SuperMunicipalAdminUpdateOneWithoutManagedDepartmentAdminsNestedInput
   newsUpdates?: Prisma.NewsUpdateUpdateManyWithoutCreatedByNestedInput
+  announcements?: Prisma.AnnouncementUpdateManyWithoutCreatedByNestedInput
 }
 
 export type DepartmentMunicipalAdminUncheckedUpdateWithoutCommunityModerationInput = {
@@ -1449,6 +1485,7 @@ export type DepartmentMunicipalAdminUncheckedUpdateWithoutCommunityModerationInp
   managedAgents?: Prisma.AgentUncheckedUpdateManyWithoutManagedByMunicipalNestedInput
   managedComplaints?: Prisma.ComplaintUncheckedUpdateManyWithoutManagedByMunicipalAdminNestedInput
   newsUpdates?: Prisma.NewsUpdateUncheckedUpdateManyWithoutCreatedByNestedInput
+  announcements?: Prisma.AnnouncementUncheckedUpdateManyWithoutCreatedByNestedInput
 }
 
 export type DepartmentMunicipalAdminCreateWithoutNewsUpdatesInput = {
@@ -1475,6 +1512,7 @@ export type DepartmentMunicipalAdminCreateWithoutNewsUpdatesInput = {
   communityModeration?: Prisma.ComplaintCreateNestedManyWithoutModeratedByMunicipalAdminInput
   managedByStateAdmin?: Prisma.DepartmentStateAdminCreateNestedOneWithoutManagedMunicipalAdminsInput
   managedBySuperMunicipal?: Prisma.SuperMunicipalAdminCreateNestedOneWithoutManagedDepartmentAdminsInput
+  announcements?: Prisma.AnnouncementCreateNestedManyWithoutCreatedByInput
 }
 
 export type DepartmentMunicipalAdminUncheckedCreateWithoutNewsUpdatesInput = {
@@ -1501,6 +1539,7 @@ export type DepartmentMunicipalAdminUncheckedCreateWithoutNewsUpdatesInput = {
   managedAgents?: Prisma.AgentUncheckedCreateNestedManyWithoutManagedByMunicipalInput
   managedComplaints?: Prisma.ComplaintUncheckedCreateNestedManyWithoutManagedByMunicipalAdminInput
   communityModeration?: Prisma.ComplaintUncheckedCreateNestedManyWithoutModeratedByMunicipalAdminInput
+  announcements?: Prisma.AnnouncementUncheckedCreateNestedManyWithoutCreatedByInput
 }
 
 export type DepartmentMunicipalAdminCreateOrConnectWithoutNewsUpdatesInput = {
@@ -1543,6 +1582,7 @@ export type DepartmentMunicipalAdminUpdateWithoutNewsUpdatesInput = {
   communityModeration?: Prisma.ComplaintUpdateManyWithoutModeratedByMunicipalAdminNestedInput
   managedByStateAdmin?: Prisma.DepartmentStateAdminUpdateOneWithoutManagedMunicipalAdminsNestedInput
   managedBySuperMunicipal?: Prisma.SuperMunicipalAdminUpdateOneWithoutManagedDepartmentAdminsNestedInput
+  announcements?: Prisma.AnnouncementUpdateManyWithoutCreatedByNestedInput
 }
 
 export type DepartmentMunicipalAdminUncheckedUpdateWithoutNewsUpdatesInput = {
@@ -1569,6 +1609,131 @@ export type DepartmentMunicipalAdminUncheckedUpdateWithoutNewsUpdatesInput = {
   managedAgents?: Prisma.AgentUncheckedUpdateManyWithoutManagedByMunicipalNestedInput
   managedComplaints?: Prisma.ComplaintUncheckedUpdateManyWithoutManagedByMunicipalAdminNestedInput
   communityModeration?: Prisma.ComplaintUncheckedUpdateManyWithoutModeratedByMunicipalAdminNestedInput
+  announcements?: Prisma.AnnouncementUncheckedUpdateManyWithoutCreatedByNestedInput
+}
+
+export type DepartmentMunicipalAdminCreateWithoutAnnouncementsInput = {
+  id?: string
+  fullName: string
+  adminId?: string
+  officialEmail: string
+  phoneNumber: string
+  password: string
+  department: $Enums.Department
+  municipality: string
+  accessLevel?: $Enums.AccessLevel
+  dateOfCreation?: Date | string
+  lastUpdated?: Date | string
+  status?: $Enums.Status
+  lastLogin?: Date | string | null
+  workloadLimit?: number
+  currentWorkload?: number
+  resolutionRate?: number
+  slaComplianceRate?: number | null
+  escalationCount?: number
+  managedAgents?: Prisma.AgentCreateNestedManyWithoutManagedByMunicipalInput
+  managedComplaints?: Prisma.ComplaintCreateNestedManyWithoutManagedByMunicipalAdminInput
+  communityModeration?: Prisma.ComplaintCreateNestedManyWithoutModeratedByMunicipalAdminInput
+  managedByStateAdmin?: Prisma.DepartmentStateAdminCreateNestedOneWithoutManagedMunicipalAdminsInput
+  managedBySuperMunicipal?: Prisma.SuperMunicipalAdminCreateNestedOneWithoutManagedDepartmentAdminsInput
+  newsUpdates?: Prisma.NewsUpdateCreateNestedManyWithoutCreatedByInput
+}
+
+export type DepartmentMunicipalAdminUncheckedCreateWithoutAnnouncementsInput = {
+  id?: string
+  fullName: string
+  adminId?: string
+  officialEmail: string
+  phoneNumber: string
+  password: string
+  department: $Enums.Department
+  municipality: string
+  accessLevel?: $Enums.AccessLevel
+  dateOfCreation?: Date | string
+  lastUpdated?: Date | string
+  status?: $Enums.Status
+  lastLogin?: Date | string | null
+  workloadLimit?: number
+  currentWorkload?: number
+  resolutionRate?: number
+  slaComplianceRate?: number | null
+  escalationCount?: number
+  managedByStateAdminId?: string | null
+  managedBySuperMunicipalId?: string | null
+  managedAgents?: Prisma.AgentUncheckedCreateNestedManyWithoutManagedByMunicipalInput
+  managedComplaints?: Prisma.ComplaintUncheckedCreateNestedManyWithoutManagedByMunicipalAdminInput
+  communityModeration?: Prisma.ComplaintUncheckedCreateNestedManyWithoutModeratedByMunicipalAdminInput
+  newsUpdates?: Prisma.NewsUpdateUncheckedCreateNestedManyWithoutCreatedByInput
+}
+
+export type DepartmentMunicipalAdminCreateOrConnectWithoutAnnouncementsInput = {
+  where: Prisma.DepartmentMunicipalAdminWhereUniqueInput
+  create: Prisma.XOR<Prisma.DepartmentMunicipalAdminCreateWithoutAnnouncementsInput, Prisma.DepartmentMunicipalAdminUncheckedCreateWithoutAnnouncementsInput>
+}
+
+export type DepartmentMunicipalAdminUpsertWithoutAnnouncementsInput = {
+  update: Prisma.XOR<Prisma.DepartmentMunicipalAdminUpdateWithoutAnnouncementsInput, Prisma.DepartmentMunicipalAdminUncheckedUpdateWithoutAnnouncementsInput>
+  create: Prisma.XOR<Prisma.DepartmentMunicipalAdminCreateWithoutAnnouncementsInput, Prisma.DepartmentMunicipalAdminUncheckedCreateWithoutAnnouncementsInput>
+  where?: Prisma.DepartmentMunicipalAdminWhereInput
+}
+
+export type DepartmentMunicipalAdminUpdateToOneWithWhereWithoutAnnouncementsInput = {
+  where?: Prisma.DepartmentMunicipalAdminWhereInput
+  data: Prisma.XOR<Prisma.DepartmentMunicipalAdminUpdateWithoutAnnouncementsInput, Prisma.DepartmentMunicipalAdminUncheckedUpdateWithoutAnnouncementsInput>
+}
+
+export type DepartmentMunicipalAdminUpdateWithoutAnnouncementsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  fullName?: Prisma.StringFieldUpdateOperationsInput | string
+  adminId?: Prisma.StringFieldUpdateOperationsInput | string
+  officialEmail?: Prisma.StringFieldUpdateOperationsInput | string
+  phoneNumber?: Prisma.StringFieldUpdateOperationsInput | string
+  password?: Prisma.StringFieldUpdateOperationsInput | string
+  department?: Prisma.EnumDepartmentFieldUpdateOperationsInput | $Enums.Department
+  municipality?: Prisma.StringFieldUpdateOperationsInput | string
+  accessLevel?: Prisma.EnumAccessLevelFieldUpdateOperationsInput | $Enums.AccessLevel
+  dateOfCreation?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  lastUpdated?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  status?: Prisma.EnumStatusFieldUpdateOperationsInput | $Enums.Status
+  lastLogin?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  workloadLimit?: Prisma.IntFieldUpdateOperationsInput | number
+  currentWorkload?: Prisma.IntFieldUpdateOperationsInput | number
+  resolutionRate?: Prisma.FloatFieldUpdateOperationsInput | number
+  slaComplianceRate?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  escalationCount?: Prisma.IntFieldUpdateOperationsInput | number
+  managedAgents?: Prisma.AgentUpdateManyWithoutManagedByMunicipalNestedInput
+  managedComplaints?: Prisma.ComplaintUpdateManyWithoutManagedByMunicipalAdminNestedInput
+  communityModeration?: Prisma.ComplaintUpdateManyWithoutModeratedByMunicipalAdminNestedInput
+  managedByStateAdmin?: Prisma.DepartmentStateAdminUpdateOneWithoutManagedMunicipalAdminsNestedInput
+  managedBySuperMunicipal?: Prisma.SuperMunicipalAdminUpdateOneWithoutManagedDepartmentAdminsNestedInput
+  newsUpdates?: Prisma.NewsUpdateUpdateManyWithoutCreatedByNestedInput
+}
+
+export type DepartmentMunicipalAdminUncheckedUpdateWithoutAnnouncementsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  fullName?: Prisma.StringFieldUpdateOperationsInput | string
+  adminId?: Prisma.StringFieldUpdateOperationsInput | string
+  officialEmail?: Prisma.StringFieldUpdateOperationsInput | string
+  phoneNumber?: Prisma.StringFieldUpdateOperationsInput | string
+  password?: Prisma.StringFieldUpdateOperationsInput | string
+  department?: Prisma.EnumDepartmentFieldUpdateOperationsInput | $Enums.Department
+  municipality?: Prisma.StringFieldUpdateOperationsInput | string
+  accessLevel?: Prisma.EnumAccessLevelFieldUpdateOperationsInput | $Enums.AccessLevel
+  dateOfCreation?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  lastUpdated?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  status?: Prisma.EnumStatusFieldUpdateOperationsInput | $Enums.Status
+  lastLogin?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  workloadLimit?: Prisma.IntFieldUpdateOperationsInput | number
+  currentWorkload?: Prisma.IntFieldUpdateOperationsInput | number
+  resolutionRate?: Prisma.FloatFieldUpdateOperationsInput | number
+  slaComplianceRate?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  escalationCount?: Prisma.IntFieldUpdateOperationsInput | number
+  managedByStateAdminId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  managedBySuperMunicipalId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  managedAgents?: Prisma.AgentUncheckedUpdateManyWithoutManagedByMunicipalNestedInput
+  managedComplaints?: Prisma.ComplaintUncheckedUpdateManyWithoutManagedByMunicipalAdminNestedInput
+  communityModeration?: Prisma.ComplaintUncheckedUpdateManyWithoutModeratedByMunicipalAdminNestedInput
+  newsUpdates?: Prisma.NewsUpdateUncheckedUpdateManyWithoutCreatedByNestedInput
 }
 
 export type DepartmentMunicipalAdminCreateManyManagedBySuperMunicipalInput = {
@@ -1617,6 +1782,7 @@ export type DepartmentMunicipalAdminUpdateWithoutManagedBySuperMunicipalInput = 
   communityModeration?: Prisma.ComplaintUpdateManyWithoutModeratedByMunicipalAdminNestedInput
   managedByStateAdmin?: Prisma.DepartmentStateAdminUpdateOneWithoutManagedMunicipalAdminsNestedInput
   newsUpdates?: Prisma.NewsUpdateUpdateManyWithoutCreatedByNestedInput
+  announcements?: Prisma.AnnouncementUpdateManyWithoutCreatedByNestedInput
 }
 
 export type DepartmentMunicipalAdminUncheckedUpdateWithoutManagedBySuperMunicipalInput = {
@@ -1643,6 +1809,7 @@ export type DepartmentMunicipalAdminUncheckedUpdateWithoutManagedBySuperMunicipa
   managedComplaints?: Prisma.ComplaintUncheckedUpdateManyWithoutManagedByMunicipalAdminNestedInput
   communityModeration?: Prisma.ComplaintUncheckedUpdateManyWithoutModeratedByMunicipalAdminNestedInput
   newsUpdates?: Prisma.NewsUpdateUncheckedUpdateManyWithoutCreatedByNestedInput
+  announcements?: Prisma.AnnouncementUncheckedUpdateManyWithoutCreatedByNestedInput
 }
 
 export type DepartmentMunicipalAdminUncheckedUpdateManyWithoutManagedBySuperMunicipalInput = {
@@ -1713,6 +1880,7 @@ export type DepartmentMunicipalAdminUpdateWithoutManagedByStateAdminInput = {
   communityModeration?: Prisma.ComplaintUpdateManyWithoutModeratedByMunicipalAdminNestedInput
   managedBySuperMunicipal?: Prisma.SuperMunicipalAdminUpdateOneWithoutManagedDepartmentAdminsNestedInput
   newsUpdates?: Prisma.NewsUpdateUpdateManyWithoutCreatedByNestedInput
+  announcements?: Prisma.AnnouncementUpdateManyWithoutCreatedByNestedInput
 }
 
 export type DepartmentMunicipalAdminUncheckedUpdateWithoutManagedByStateAdminInput = {
@@ -1739,6 +1907,7 @@ export type DepartmentMunicipalAdminUncheckedUpdateWithoutManagedByStateAdminInp
   managedComplaints?: Prisma.ComplaintUncheckedUpdateManyWithoutManagedByMunicipalAdminNestedInput
   communityModeration?: Prisma.ComplaintUncheckedUpdateManyWithoutModeratedByMunicipalAdminNestedInput
   newsUpdates?: Prisma.NewsUpdateUncheckedUpdateManyWithoutCreatedByNestedInput
+  announcements?: Prisma.AnnouncementUncheckedUpdateManyWithoutCreatedByNestedInput
 }
 
 export type DepartmentMunicipalAdminUncheckedUpdateManyWithoutManagedByStateAdminInput = {
@@ -1773,6 +1942,7 @@ export type DepartmentMunicipalAdminCountOutputType = {
   managedComplaints: number
   communityModeration: number
   newsUpdates: number
+  announcements: number
 }
 
 export type DepartmentMunicipalAdminCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -1780,6 +1950,7 @@ export type DepartmentMunicipalAdminCountOutputTypeSelect<ExtArgs extends runtim
   managedComplaints?: boolean | DepartmentMunicipalAdminCountOutputTypeCountManagedComplaintsArgs
   communityModeration?: boolean | DepartmentMunicipalAdminCountOutputTypeCountCommunityModerationArgs
   newsUpdates?: boolean | DepartmentMunicipalAdminCountOutputTypeCountNewsUpdatesArgs
+  announcements?: boolean | DepartmentMunicipalAdminCountOutputTypeCountAnnouncementsArgs
 }
 
 /**
@@ -1820,6 +1991,13 @@ export type DepartmentMunicipalAdminCountOutputTypeCountNewsUpdatesArgs<ExtArgs 
   where?: Prisma.NewsUpdateWhereInput
 }
 
+/**
+ * DepartmentMunicipalAdminCountOutputType without action
+ */
+export type DepartmentMunicipalAdminCountOutputTypeCountAnnouncementsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.AnnouncementWhereInput
+}
+
 
 export type DepartmentMunicipalAdminSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
@@ -1848,6 +2026,7 @@ export type DepartmentMunicipalAdminSelect<ExtArgs extends runtime.Types.Extensi
   managedByStateAdmin?: boolean | Prisma.DepartmentMunicipalAdmin$managedByStateAdminArgs<ExtArgs>
   managedBySuperMunicipal?: boolean | Prisma.DepartmentMunicipalAdmin$managedBySuperMunicipalArgs<ExtArgs>
   newsUpdates?: boolean | Prisma.DepartmentMunicipalAdmin$newsUpdatesArgs<ExtArgs>
+  announcements?: boolean | Prisma.DepartmentMunicipalAdmin$announcementsArgs<ExtArgs>
   _count?: boolean | Prisma.DepartmentMunicipalAdminCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["departmentMunicipalAdmin"]>
 
@@ -1932,6 +2111,7 @@ export type DepartmentMunicipalAdminInclude<ExtArgs extends runtime.Types.Extens
   managedByStateAdmin?: boolean | Prisma.DepartmentMunicipalAdmin$managedByStateAdminArgs<ExtArgs>
   managedBySuperMunicipal?: boolean | Prisma.DepartmentMunicipalAdmin$managedBySuperMunicipalArgs<ExtArgs>
   newsUpdates?: boolean | Prisma.DepartmentMunicipalAdmin$newsUpdatesArgs<ExtArgs>
+  announcements?: boolean | Prisma.DepartmentMunicipalAdmin$announcementsArgs<ExtArgs>
   _count?: boolean | Prisma.DepartmentMunicipalAdminCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type DepartmentMunicipalAdminIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -1952,6 +2132,7 @@ export type $DepartmentMunicipalAdminPayload<ExtArgs extends runtime.Types.Exten
     managedByStateAdmin: Prisma.$DepartmentStateAdminPayload<ExtArgs> | null
     managedBySuperMunicipal: Prisma.$SuperMunicipalAdminPayload<ExtArgs> | null
     newsUpdates: Prisma.$NewsUpdatePayload<ExtArgs>[]
+    announcements: Prisma.$AnnouncementPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -2374,6 +2555,7 @@ export interface Prisma__DepartmentMunicipalAdminClient<T, Null = never, ExtArgs
   managedByStateAdmin<T extends Prisma.DepartmentMunicipalAdmin$managedByStateAdminArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.DepartmentMunicipalAdmin$managedByStateAdminArgs<ExtArgs>>): Prisma.Prisma__DepartmentStateAdminClient<runtime.Types.Result.GetResult<Prisma.$DepartmentStateAdminPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   managedBySuperMunicipal<T extends Prisma.DepartmentMunicipalAdmin$managedBySuperMunicipalArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.DepartmentMunicipalAdmin$managedBySuperMunicipalArgs<ExtArgs>>): Prisma.Prisma__SuperMunicipalAdminClient<runtime.Types.Result.GetResult<Prisma.$SuperMunicipalAdminPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   newsUpdates<T extends Prisma.DepartmentMunicipalAdmin$newsUpdatesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.DepartmentMunicipalAdmin$newsUpdatesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$NewsUpdatePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  announcements<T extends Prisma.DepartmentMunicipalAdmin$announcementsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.DepartmentMunicipalAdmin$announcementsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$AnnouncementPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -2950,6 +3132,30 @@ export type DepartmentMunicipalAdmin$newsUpdatesArgs<ExtArgs extends runtime.Typ
   take?: number
   skip?: number
   distinct?: Prisma.NewsUpdateScalarFieldEnum | Prisma.NewsUpdateScalarFieldEnum[]
+}
+
+/**
+ * DepartmentMunicipalAdmin.announcements
+ */
+export type DepartmentMunicipalAdmin$announcementsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the Announcement
+   */
+  select?: Prisma.AnnouncementSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the Announcement
+   */
+  omit?: Prisma.AnnouncementOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.AnnouncementInclude<ExtArgs> | null
+  where?: Prisma.AnnouncementWhereInput
+  orderBy?: Prisma.AnnouncementOrderByWithRelationInput | Prisma.AnnouncementOrderByWithRelationInput[]
+  cursor?: Prisma.AnnouncementWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.AnnouncementScalarFieldEnum | Prisma.AnnouncementScalarFieldEnum[]
 }
 
 /**

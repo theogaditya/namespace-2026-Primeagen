@@ -45,7 +45,8 @@ export const AccessLevel = {
   SUPER_STATE_ADMIN: 'SUPER_STATE_ADMIN',
   DEPT_MUNICIPAL_ADMIN: 'DEPT_MUNICIPAL_ADMIN',
   DEPT_STATE_ADMIN: 'DEPT_STATE_ADMIN',
-  AGENT: 'AGENT'
+  AGENT: 'AGENT',
+  CIVIC_PARTNER: 'CIVIC_PARTNER'
 } as const
 
 export type AccessLevel = (typeof AccessLevel)[keyof typeof AccessLevel]
@@ -122,3 +123,58 @@ export const BadgeRarity = {
 } as const
 
 export type BadgeRarity = (typeof BadgeRarity)[keyof typeof BadgeRarity]
+
+
+export const BlockchainStatus = {
+  PENDING: 'PENDING',
+  CONFIRMED: 'CONFIRMED',
+  FAILED: 'FAILED'
+} as const
+
+export type BlockchainStatus = (typeof BlockchainStatus)[keyof typeof BlockchainStatus]
+
+
+export const SyncEventStatus = {
+  PROCESSED: 'PROCESSED',
+  DUPLICATE: 'DUPLICATE',
+  FAILED: 'FAILED'
+} as const
+
+export type SyncEventStatus = (typeof SyncEventStatus)[keyof typeof SyncEventStatus]
+
+
+export const CivicPartnerType = {
+  NGO: 'NGO',
+  GOVERNMENT_BODY: 'GOVERNMENT_BODY'
+} as const
+
+export type CivicPartnerType = (typeof CivicPartnerType)[keyof typeof CivicPartnerType]
+
+
+export const SurveySourceType = {
+  NGO: 'NGO',
+  SURVEY: 'SURVEY'
+} as const
+
+export type SurveySourceType = (typeof SurveySourceType)[keyof typeof SurveySourceType]
+
+
+export const SurveyStatus = {
+  DRAFT: 'DRAFT',
+  PUBLISHED: 'PUBLISHED',
+  CLOSED: 'CLOSED',
+  ARCHIVED: 'ARCHIVED'
+} as const
+
+export type SurveyStatus = (typeof SurveyStatus)[keyof typeof SurveyStatus]
+
+
+export const QuestionType = {
+  TEXT: 'TEXT',
+  MCQ: 'MCQ',
+  CHECKBOX: 'CHECKBOX',
+  RATING: 'RATING',
+  YES_NO: 'YES_NO'
+} as const
+
+export type QuestionType = (typeof QuestionType)[keyof typeof QuestionType]

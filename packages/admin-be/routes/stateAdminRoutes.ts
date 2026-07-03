@@ -13,6 +13,16 @@ export default function(prisma: PrismaClient) {
   const envFile = nodeEnv === 'production' ? '.env.prod' : '.env.local';
   dotenv.config({ path: envFile });
 
+  // Helper to convert BigInt values from Prisma into JSON-safe strings
+  function safeJson(obj: any) {
+    try {
+      return JSON.parse(JSON.stringify(obj, (_k, v) => (typeof v === 'bigint' ? v.toString() : v)));
+    } catch (e) {
+      // Fallback: return the original object if serialization fails
+      return obj;
+    }
+  }
+
 router.post('/login', async (req, res:any) => {
   const { officialEmail, password } = req.body;
 
@@ -53,7 +63,7 @@ router.post('/login', async (req, res:any) => {
     httpOnly: true,
     secure: process.env.NODE_ENV === 'production', // secure only in prod
     sameSite: 'strict',
-    maxAge: 7 * 24 * 60 * 60 * 1000 // 7 days in 
+    maxAge: 7 * 24 * 60 * 60 * 1000 // 7 days in
   });
 
   return res.json({
@@ -87,7 +97,7 @@ router.get('/state-admins', async (req, res: any) => {
       orderBy: { dateOfCreation: 'desc' }
     });
 
-    return res.json({ success: true, data: stateAdmins });
+    return res.json({ success: true, data: safeJson(stateAdmins) });
   } catch (error) {
     console.error('Get State Admins Error:', error);
     return res.status(500).json({ success: false, message: 'Server error' });
@@ -112,7 +122,7 @@ router.get('/complaints',authenticateStateAdminOnly, async (req, res:any) => {
       complainant: User || null
     }));
 
-    return res.json({ success: true, complaints });
+    return res.json({ success: true, complaints: safeJson(complaints) });
   } catch (error) {
     console.error(error);
     return res.status(500).json({ success: false, message: 'Failed to fetch complaints' });
@@ -137,8 +147,8 @@ router.put('/complaints/:id/status', authenticateStateAdminOnly, async (req: any
     ];
 
     if (!status || !validStatuses.includes(status)) {
-      return res.status(400).json({ 
-        success: false, 
+      return res.status(400).json({
+        success: false,
         message: 'Invalid status. Valid statuses are: ' + validStatuses.join(', ')
       });
     }
@@ -148,15 +158,15 @@ router.put('/complaints/:id/status', authenticateStateAdminOnly, async (req: any
     });
 
     if (!existingComplaint) {
-      return res.status(404).json({ 
-        success: false, 
-        message: 'Complaint not found' 
+      return res.status(404).json({
+        success: false,
+        message: 'Complaint not found'
       });
     }
 
     const updatedComplaintRaw = await prisma.complaint.update({
       where: { id },
-      data: { 
+      data: {
         status,
         ...(status === 'COMPLETED' && { dateOfResolution: new Date() })
       },
@@ -202,16 +212,16 @@ router.put('/complaints/:id/status', authenticateStateAdminOnly, async (req: any
     const { User, ...complaintRest } = updatedComplaintRaw as any;
     const updatedComplaint = { ...complaintRest, complainant: User || null };
 
-    return res.json({ 
-      success: true, 
+    return res.json({
+      success: true,
       message: 'Complaint status updated successfully',
-      complaint: updatedComplaint 
+      complaint: safeJson(updatedComplaint)
     });
 
   } catch (error: any) {
     console.error('Error updating complaint status:', error);
-    return res.status(500).json({ 
-      success: false, 
+    return res.status(500).json({
+      success: false,
       message: 'Failed to update complaint status',
       error: process.env.NODE_ENV === 'development' ? error.message : undefined
     });
@@ -242,7 +252,7 @@ router.put('/complaints/:id/escalate', authenticateStateAdminOnly, async (req: a
     return res.json({
       success: true,
       message: 'Complaint escalated successfully',
-      complaint: updated,
+      complaint: safeJson(updated),
     });
   } catch (error: any) {
     console.error('Escalation error:', error);
@@ -301,11 +311,11 @@ router.get('/my-complaints', authenticateStateAdminOnly, async (req: any, res: a
       complainant: User || null
     }));
 
-    return res.json({ success: true, complaints, pagination: { total, page, limit, totalPages: Math.ceil(total / limit) } });
+    return res.json({ success: true, complaints: safeJson(complaints), pagination: { total, page, limit, totalPages: Math.ceil(total / limit) } });
   } catch (error: any) {
     console.error('Error fetching state admin complaints:', error);
-    return res.status(500).json({ 
-      success: false, 
+    return res.status(500).json({
+      success: false,
       message: 'Failed to fetch complaints',
       error: process.env.NODE_ENV === 'development' ? error.message : undefined
     });
@@ -345,11 +355,11 @@ router.get('/municipal-admins', authenticateStateAdminOnly, async (req: any, res
       }
     });
 
-    return res.json({ success: true, data: municipalAdmins });
+    return res.json({ success: true, data: safeJson(municipalAdmins) });
   } catch (error: any) {
     console.error('Error fetching municipal admins:', error);
-    return res.status(500).json({ 
-      success: false, 
+    return res.status(500).json({
+      success: false,
       message: 'Failed to fetch municipal admins',
       error: process.env.NODE_ENV === 'development' ? error.message : undefined
     });
@@ -364,9 +374,9 @@ router.post('/municipal-admins', authenticateStateAdminOnly, async (req: any, re
 
     // Validate required fields
     if (!fullName || !officialEmail || !password) {
-      return res.status(400).json({ 
-        success: false, 
-        message: 'Full name, email, and password are required' 
+      return res.status(400).json({
+        success: false,
+        message: 'Full name, email, and password are required'
       });
     }
 
@@ -376,9 +386,9 @@ router.post('/municipal-admins', authenticateStateAdminOnly, async (req: any, re
     });
 
     if (existingAdmin) {
-      return res.status(400).json({ 
-        success: false, 
-        message: 'An admin with this email already exists' 
+      return res.status(400).json({
+        success: false,
+        message: 'An admin with this email already exists'
       });
     }
 
@@ -416,15 +426,15 @@ router.post('/municipal-admins', authenticateStateAdminOnly, async (req: any, re
       }
     });
 
-    return res.status(201).json({ 
-      success: true, 
+    return res.status(201).json({
+      success: true,
       message: 'Municipal admin created successfully',
-      data: newAdmin 
+      data: safeJson(newAdmin)
     });
   } catch (error: any) {
     console.error('Error creating municipal admin:', error);
-    return res.status(500).json({ 
-      success: false, 
+    return res.status(500).json({
+      success: false,
       message: 'Failed to create municipal admin',
       error: process.env.NODE_ENV === 'development' ? error.message : undefined
     });
@@ -439,9 +449,9 @@ router.patch('/municipal-admins/:id/status', authenticateStateAdminOnly, async (
     const stateAdminId = req.admin.id;
 
     if (!status || !['ACTIVE', 'INACTIVE'].includes(status)) {
-      return res.status(400).json({ 
-        success: false, 
-        message: 'Invalid status. Must be ACTIVE or INACTIVE' 
+      return res.status(400).json({
+        success: false,
+        message: 'Invalid status. Must be ACTIVE or INACTIVE'
       });
     }
 
@@ -457,9 +467,9 @@ router.patch('/municipal-admins/:id/status', authenticateStateAdminOnly, async (
     });
 
     if (!municipalAdmin) {
-      return res.status(404).json({ 
-        success: false, 
-        message: 'Municipal admin not found or not under your management' 
+      return res.status(404).json({
+        success: false,
+        message: 'Municipal admin not found or not under your management'
       });
     }
 
@@ -474,15 +484,15 @@ router.patch('/municipal-admins/:id/status', authenticateStateAdminOnly, async (
       }
     });
 
-    return res.json({ 
-      success: true, 
+    return res.json({
+      success: true,
       message: `Municipal admin ${status === 'ACTIVE' ? 'activated' : 'deactivated'} successfully`,
-      data: updatedAdmin 
+      data: updatedAdmin
     });
   } catch (error: any) {
     console.error('Error updating municipal admin status:', error);
-    return res.status(500).json({ 
-      success: false, 
+    return res.status(500).json({
+      success: false,
       message: 'Failed to update municipal admin status',
       error: process.env.NODE_ENV === 'development' ? error.message : undefined
     });

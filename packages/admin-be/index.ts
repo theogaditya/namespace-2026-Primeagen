@@ -20,6 +20,7 @@ import { healthPoint } from './routes/health';
 import autoAssignRouter, { startAutoAssignPolling } from './routes/autoAssign';
 import { startSlaCron } from './lib/slaCron';
 import publicAnnouncementRoutes from './routes/publicAnnouncementRoutes';
+import aiAgentCTARoutes from './routes/aiAgentCTARoutes';
 
 export class Server {
   private app: Express;
@@ -68,6 +69,9 @@ export class Server {
     // this.app.use('/api/complaint', complaintProcessingRouter(this.db));
     // this.app.use('/api/users', userComplaintsRouter(this.db));
     this.app.use('/api/auto-assign', autoAssignRouter);
+
+    // AI Agent CTA routes — accessible by State Admin & Super Admin
+    this.app.use('/api/agent-cta', aiAgentCTARoutes(this.db));
 
     this.app.use('/api', healthPoint(this.db));
     this.app.get('/health', (req, res) => {

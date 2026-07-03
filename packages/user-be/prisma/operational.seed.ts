@@ -55,7 +55,7 @@ async function main() {
     console.log('State already exists:', odisha.name);
   }
 
-  const odishaDistricts = ['Khordha', 'Puri'];
+  const odishaDistricts = ['Khorda', 'Puri'];
 
   for (const districtName of odishaDistricts) {
     const existing = await prisma.operating_districts.findFirst({

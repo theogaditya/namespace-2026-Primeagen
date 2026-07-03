@@ -124,7 +124,6 @@ export function createAgentRouter(db: PrismaClient) {
     // 7. Handle escalation to Help AI
     if (result.shouldEscalate) {
       try {
-        console.log("[AgentRouter] Escalating to Help AI for user:", userId);
         const helpResult = await helpAI({
           message,
           userId,

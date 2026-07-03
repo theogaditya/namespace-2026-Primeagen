@@ -9,6 +9,7 @@ import { createHealthRoutes } from "./routes/health";
 import { createDedupRouter } from "./routes/dedup";
 import { createModerateRouter } from "./routes/moderate";
 import { createQualityRouter } from "./routes/quality";
+import { createReportRouter } from "./routes/report";
 
 export function createApp(db: PrismaClient) {
   const app = express();
@@ -30,6 +31,7 @@ export function createApp(db: PrismaClient) {
   app.use("/api/voice", auth, createVoiceRoutes(db));
   app.use("/api/dedup", auth, createDedupRouter(db));
   app.use("/api/quality-score", auth, createQualityRouter());
+  app.use("/api/report", auth, createReportRouter(db));
 
   return app;
 }
