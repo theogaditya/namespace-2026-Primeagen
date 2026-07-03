@@ -36,7 +36,7 @@ export default function ChatService(prisma: PrismaClient) {
           user: {
             select: { id: true, name: true, email: true },
           },
-          agent: {
+          Agent: {
             select: { id: true, fullName: true, email: true },
           },
         },
@@ -60,7 +60,7 @@ export default function ChatService(prisma: PrismaClient) {
             user: {
               select: { id: true, name: true, email: true },
             },
-            agent: {
+            Agent: {
               select: { id: true, fullName: true, email: true },
             },
           },
@@ -89,7 +89,7 @@ export default function ChatService(prisma: PrismaClient) {
           user: {
             select: { id: true, name: true, email: true },
           },
-          agent: {
+          Agent: {
             select: { id: true, fullName: true, email: true },
           },
         },
@@ -114,7 +114,7 @@ export default function ChatService(prisma: PrismaClient) {
           user: {
             select: { id: true, name: true, email: true },
           },
-          agent: {
+          Agent: {
             select: { id: true, fullName: true, email: true },
           },
         },
