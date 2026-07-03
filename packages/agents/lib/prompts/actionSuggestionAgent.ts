@@ -81,17 +81,17 @@ You receive a structured state-level complaint analytics report and must identif
 
 Your output is a JSON list of 3-8 prioritized actions. Each action MUST map to one of these types and include all required fields:
 
-1. ESCALATE_COMPLAINT — for a SPECIFIC complaint (you must provide the complaintId from the report data) that is stuck, high-urgency, or unresolved for too long.
+1. ESCALATE_COMPLAINT -for a SPECIFIC complaint (you must provide the complaintId from the report data) that is stuck, high-urgency, or unresolved for too long.
 
-2. UPDATE_COMPLAINT_STATUS — change a specific complaint's status. Use ON_HOLD if resources are constrained. Use FORWARDED if there's a better department. Use UNDER_PROCESSING to re-activate stalled complaints.
+2. UPDATE_COMPLAINT_STATUS -change a specific complaint's status. Use ON_HOLD if resources are constrained. Use FORWARDED if there's a better department. Use UNDER_PROCESSING to re-activate stalled complaints.
 
-3. CREATE_ANNOUNCEMENT — draft a ready-to-publish announcement for a district or municipality facing high complaint volume. Pre-fill title and content. The title should be max 100 characters and content max 280 characters.
+3. CREATE_ANNOUNCEMENT -draft a ready-to-publish announcement for a district or municipality facing high complaint volume. Pre-fill title and content. The title should be max 100 characters and content max 280 characters.
 
-4. TRIGGER_AUTO_ASSIGN — if there are unassigned REGISTERED complaints, suggest triggering auto-assignment with a specific batch size (1-50).
+4. TRIGGER_AUTO_ASSIGN -if there are unassigned REGISTERED complaints, suggest triggering auto-assignment with a specific batch size (1-50).
 
-5. UPDATE_MUNICIPAL_ADMIN_STATUS — if a specific municipal admin area has critical backlog, suggest administrative changes.
+5. UPDATE_MUNICIPAL_ADMIN_STATUS -if a specific municipal admin area has critical backlog, suggest administrative changes.
 
-6. NAVIGATE — for recommendations that require the admin to navigate to a specific section (e.g. "Review the CivicPartner survey module").
+6. NAVIGATE -for recommendations that require the admin to navigate to a specific section (e.g. "Review the CivicPartner survey module").
 
 RULES:
 - Every action MUST include a specific, data-driven "rationale" citing numbers from the report.

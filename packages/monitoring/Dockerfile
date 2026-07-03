@@ -12,7 +12,7 @@ COPY . .
 EXPOSE 4000
 
 ## Bake the EC2 SSH key into the image at /ec2-keys/
-# WARNING: embedding private keys into images is sensitive — ensure registry access is restricted.
+# WARNING: embedding private keys into images is sensitive -ensure registry access is restricted.
 COPY .key/ec2-iit-pair /ec2-keys/ec2-iit-pair
 RUN chmod 600 /ec2-keys/ec2-iit-pair && chown root:root /ec2-keys/ec2-iit-pair || true
 

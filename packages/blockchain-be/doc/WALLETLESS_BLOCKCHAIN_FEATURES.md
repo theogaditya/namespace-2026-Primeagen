@@ -1,6 +1,6 @@
 # SwarajDesk: Walletless Blockchain Innovations 🚀
 
-This document outlines the flagship blockchain features designed for the Google Solution Challenge. These features are specifically architected for rural India — meaning **citizens do not need crypto wallets, seed phrases, or gas money**. 
+This document outlines the flagship blockchain features designed for the Google Solution Challenge. These features are specifically architected for rural India -meaning **citizens do not need crypto wallets, seed phrases, or gas money**.
 
 The system uses a **Custodial Relayer Backend Worker**, meaning the SwarajDesk server pays the gas fees and communicates with the Sepolia blockchain in the background.
 
@@ -46,7 +46,7 @@ The system uses a **Custodial Relayer Backend Worker**, meaning the SwarajDesk s
 ## 🔍 Innovation 4: Live On-Chain Complaint Audit Tracking (The Trustless Timeline)
 *How citizens experience the blockchain without touching crypto.*
 
-**The Problem:** Asking a villager to install MetaMask to track a complaint is guaranteed to fail. Furthermore, checking a centralized database doesn't prove that the timeline wasn't edited by a corrupt admin. 
+**The Problem:** Asking a villager to install MetaMask to track a complaint is guaranteed to fail. Furthermore, checking a centralized database doesn't prove that the timeline wasn't edited by a corrupt admin.
 **The Solution:**
 1. **The Audit Trail:** Every time an agent changes a complaint's status (e.g., `REGISTERED` → `ASSIGNED` → `COMPLETED`), your backend worker calls `updateComplaintStatusWithReason` on the Sepolia Smart Contract.
 2. **Immutable History:** The Smart Contract maintains a permanent `StatusAuditEntry[]` array and emits a `ComplaintStatusAudited` event. No database admin can delete this history.

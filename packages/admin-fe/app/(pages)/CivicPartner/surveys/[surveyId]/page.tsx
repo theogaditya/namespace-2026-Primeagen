@@ -641,7 +641,7 @@ export default function SurveyDetailPage({ params }: { params: Promise<{ surveyI
                     <div className="p-8 border-b border-gray-50 flex justify-between items-center">
                       <div>
                         <h3 className="text-lg font-black text-black">Citizen Interaction Heatmap</h3>
-                        <p className="text-xs text-emerald-500 font-black uppercase tracking-widest mt-1">Live — Google Maps API</p>
+                        <p className="text-xs text-emerald-500 font-black uppercase tracking-widest mt-1">Live -Google Maps API</p>
                       </div>
                       <div className="flex items-center gap-2 text-gray-300">
                         <span className="material-symbols-outlined text-sm">info</span>
@@ -690,7 +690,7 @@ export default function SurveyDetailPage({ params }: { params: Promise<{ surveyI
                   <p className="text-[10px] text-gray-400 mt-0.5">
                     {isDraft      && "Not yet visible to citizens."}
                     {isPublished  && "Visible and accepting responses."}
-                    {isClosed     && "Closed — no new responses."}
+                    {isClosed     && "Closed -no new responses."}
                     {survey.status === "ARCHIVED" && "Archived and removed from all views."}
                   </p>
                 </div>

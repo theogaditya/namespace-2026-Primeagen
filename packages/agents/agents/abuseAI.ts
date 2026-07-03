@@ -67,7 +67,7 @@ export function createAbuseAI() {
     } catch (error) {
       console.error("[AbuseAI] Error during moderation:", error);
 
-      // On failure, return safe default — don't block the complaint
+      // On failure, return safe default -don't block the complaint
       return {
         has_abuse: false,
         clean_text: text,

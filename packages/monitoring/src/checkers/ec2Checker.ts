@@ -4,7 +4,7 @@ import { exec } from 'child_process';
 import * as path from 'path';
 
 /**
- * EC2 checks using only direct SSH — no AWS SDK / no AWS credentials needed.
+ * EC2 checks using only direct SSH -no AWS SDK / no AWS credentials needed.
  * Instance IPs are read from EC2_INSTANCE_IPS in .env (comma-separated).
  */
 export async function runEc2Checks(): Promise<CheckResult[]> {
@@ -16,7 +16,7 @@ export async function runEc2Checks(): Promise<CheckResult[]> {
     results.push({
       id: 'ec2-status', name: 'EC2 Instance Status', group: 'ec2',
       status: 'WARNING', responseTimeMs: 0,
-      message: 'EC2_INSTANCE_IPS not set in .env — skipping EC2 checks',
+      message: 'EC2_INSTANCE_IPS not set in .env -skipping EC2 checks',
       timestamp: now, severity: 'WARNING',
     });
     results.push({
@@ -56,7 +56,7 @@ export async function runEc2Checks(): Promise<CheckResult[]> {
     status: sshResult.ok ? 'UP' : 'DOWN',
     responseTimeMs: sshResult.elapsed,
     message: sshResult.ok
-      ? `SSH handshake OK — instance healthy`
+      ? `SSH handshake OK -instance healthy`
       : `SSH failed: ${sshResult.error}`,
     timestamp: new Date().toISOString(), severity: 'CRITICAL',
     details: { publicIp: primaryIp },

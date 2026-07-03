@@ -70,7 +70,7 @@ function bindUserId(tool: DynamicStructuredTool, userId: string): DynamicStructu
 export function createSentientAI(db: PrismaClient) {
   const model = getChatModel("chat");
 
-  // Tool factories — actual tools are created per-request with userId bound
+  // Tool factories -actual tools are created per-request with userId bound
   const toolFactories = (userId: string) => [
     createFindComplaintsTool(db),
     createFindMyComplaintsTool(db),

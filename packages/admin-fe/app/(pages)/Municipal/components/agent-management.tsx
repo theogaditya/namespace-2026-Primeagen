@@ -212,7 +212,7 @@ export function AgentManagement() {
                       const displayName = agent.name || agent.fullName
                       return (
                         <tr key={agent.id} className="hover:bg-[#f3f4f5] transition-colors group">
-                          {/* Administrator — avatar + name + email */}
+                          {/* Administrator -avatar + name + email */}
                           <td className="px-6 py-5">
                             <div className="flex items-center gap-3">
                               <div

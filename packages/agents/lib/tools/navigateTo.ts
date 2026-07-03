@@ -19,7 +19,7 @@ export function createNavigateToTool() {
   return new DynamicStructuredTool({
     name: "navigateTo",
     description:
-      "Navigate the user to a specific page on SwarajDesk. Use when the user wants to go somewhere or when you need them to use a feature that requires the UI. Don't tell users to go to a page — navigate them there.",
+      "Navigate the user to a specific page on SwarajDesk. Use when the user wants to go somewhere or when you need them to use a feature that requires the UI. Don't tell users to go to a page -navigate them there.",
     schema: z.object({
       page: z
         .enum([

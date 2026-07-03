@@ -38,7 +38,7 @@ export default function SettingsLoading() {
           {/* Main content grid: 5-col left + 7-col right */}
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
 
-            {/* Left col — Organisation Profile + Session */}
+            {/* Left col -Organisation Profile + Session */}
             <div className="lg:col-span-5 space-y-6">
 
               {/* Organisation Profile card */}
@@ -54,7 +54,7 @@ export default function SettingsLoading() {
                     <div className="h-3 w-52 bg-[#e6f6ff] rounded" />
                   </div>
                 </div>
-                {/* Field grid — 2 columns, 6 fields */}
+                {/* Field grid -2 columns, 6 fields */}
                 <div className="grid grid-cols-2 gap-6">
                   {[1, 2, 3, 4, 5, 6].map((i) => (
                     <div key={i} className="space-y-1.5">
@@ -78,7 +78,7 @@ export default function SettingsLoading() {
               </div>
             </div>
 
-            {/* Right col — Survey Management table */}
+            {/* Right col -Survey Management table */}
             <div className="lg:col-span-7">
               <div
                 className="bg-white rounded-xl overflow-hidden"

@@ -3,7 +3,7 @@ import { httpCheck, aliveValidator, okValidator } from './httpChecker';
 import type { CheckResult } from '../types';
 
 /**
- * 14 frontend API probes — Next.js /api route handlers for user-fe and admin-fe.
+ * 14 frontend API probes -Next.js /api route handlers for user-fe and admin-fe.
  */
 export async function runFrontendProbes(): Promise<CheckResult[]> {
   const { userFe, adminFe } = config.urls;

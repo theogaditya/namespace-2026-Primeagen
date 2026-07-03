@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 
 /**
- * Tests for inputSanitizer — verifying the LLM skip logic,
+ * Tests for inputSanitizer -verifying the LLM skip logic,
  * regex detection, and length limits.
  *
  * We mock the LLM provider so no real API calls are made.
@@ -61,7 +61,7 @@ describe("sanitizeInput", () => {
     });
   });
 
-  describe("LLM skip logic — normal civic complaints", () => {
+  describe("LLM skip logic -normal civic complaints", () => {
     it("skips LLM for short normal messages like 'track my complaint'", async () => {
       mockInvoke.mockClear();
 

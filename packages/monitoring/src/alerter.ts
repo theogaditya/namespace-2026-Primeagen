@@ -59,7 +59,7 @@ export async function processResults(results: CheckResult[]): Promise<void> {
     const now = new Date().toISOString();
 
     if (!prevState) {
-      // First time seeing this check — initialize state
+      // First time seeing this check -initialize state
       const newState: CheckState = {
         id: result.id,
         currentStatus: result.status,
@@ -71,12 +71,12 @@ export async function processResults(results: CheckResult[]): Promise<void> {
       };
       checkStates[result.id] = newState;
 
-      // BUG FIX: Don't just `continue` — alert immediately if DOWN on first sight
+      // BUG FIX: Don't just `continue` -alert immediately if DOWN on first sight
       if (result.status === 'DOWN') {
         if (FAILURE_THRESHOLD_BEFORE_ALERT > 1) {
           // Dampen to WARNING, hold off alerting
           result.status = 'WARNING';
-          result.message = `[1st failure — watching] ${result.message}`;
+          result.message = `[1st failure -watching] ${result.message}`;
           newState.currentStatus = 'WARNING';
         } else if (result.severity === 'CRITICAL') {
           // Threshold = 1: alert right away on first confirmed DOWN
@@ -100,7 +100,7 @@ export async function processResults(results: CheckResult[]): Promise<void> {
     // ── Status Dampening ──────────────────────────────────────
     if (result.status === 'DOWN' && prevState.consecutiveFailures < FAILURE_THRESHOLD_BEFORE_ALERT) {
       result.status = 'WARNING';
-      result.message = `[Failure ${prevState.consecutiveFailures}/${FAILURE_THRESHOLD_BEFORE_ALERT} — watching] ${result.message}`;
+      result.message = `[Failure ${prevState.consecutiveFailures}/${FAILURE_THRESHOLD_BEFORE_ALERT} -watching] ${result.message}`;
     }
 
     prevState.currentStatus = result.status;
@@ -126,7 +126,7 @@ export async function processResults(results: CheckResult[]): Promise<void> {
 
     // ── BUG FIX: Persistent DOWN that was never alerted ───────
     // Catches: service was DOWN in cycle 1 (init, no alert), still DOWN in cycle 2+.
-    // Since there's no transition, the block above is skipped — so we catch it here.
+    // Since there's no transition, the block above is skipped -so we catch it here.
     if (
       result.status === 'DOWN' &&
       result.severity === 'CRITICAL' &&
@@ -226,7 +226,7 @@ async function sendCombinedAlerts(alerts: Array<{ result: CheckResult; type: 'FA
       checkId: result.id,
       checkName: result.name,
       severity: result.severity,
-      subject: `${type === 'FAILURE' ? '🔴' : '🟢'} [${type}] ${result.name} — ${result.status}`,
+      subject: `${type === 'FAILURE' ? '🔴' : '🟢'} [${type}] ${result.name} -${result.status}`,
       timestamp: result.timestamp,
       type,
       emailStatus,

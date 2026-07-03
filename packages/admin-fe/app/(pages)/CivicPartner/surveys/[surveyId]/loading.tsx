@@ -63,7 +63,7 @@ export default function SurveyDetailLoading() {
           </div>
 
           {/* Overview tab content */}
-          {/* KPI cards — 4 columns */}
+          {/* KPI cards -4 columns */}
           <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
             {[1, 2, 3, 4].map((i) => (
               <div

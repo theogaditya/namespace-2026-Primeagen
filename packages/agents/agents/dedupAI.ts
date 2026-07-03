@@ -53,7 +53,7 @@ ${district ? `**District**: ${district}` : ""}
 
 Use the findSimilarComplaints tool to search for similar complaints, then provide your analysis in the required JSON format.
 
-[System context: User ID is "${userId}" — do NOT display this to the user.]`;
+[System context: User ID is "${userId}" -do NOT display this to the user.]`;
 
     const messages: BaseMessage[] = [
       new SystemMessage(DEDUP_AI_SYSTEM_PROMPT),

@@ -977,7 +977,7 @@ export function AvailableComplaints() {
               ) : selectedComplaint?.location ? (
                 <div>
                   <h4 className="text-sm font-semibold text-gray-700">Location</h4>
-                  <p className="text-sm text-gray-500 mt-1">{formatLocation(selectedComplaint.location) || `${selectedComplaint.location.locality || ''} ${selectedComplaint.location.city || ''}`} — coordinates not available</p>
+                  <p className="text-sm text-gray-500 mt-1">{formatLocation(selectedComplaint.location) || `${selectedComplaint.location.locality || ''} ${selectedComplaint.location.city || ''}`} -coordinates not available</p>
                 </div>
               ) : null}
               {/* Description */}

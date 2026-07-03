@@ -1,5 +1,5 @@
 /**
- * Public survey routes — no authentication required.
+ * Public survey routes -no authentication required.
  * These are consumed by the user-fe to list active surveys and submit responses.
  */
 import express from 'express';

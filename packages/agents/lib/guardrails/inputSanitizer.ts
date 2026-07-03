@@ -82,10 +82,10 @@ Respond with ONLY "SAFE" or "UNSAFE: <one-line reason>". Nothing else.`
  * Full input sanitization pipeline:
  * 1. Length check
  * 2. Regex pattern matching (fast, no API call)
- * 3. LLM classification (only for suspicious messages — saves API calls)
+ * 3. LLM classification (only for suspicious messages -saves API calls)
  */
 export async function sanitizeInput(message: string): Promise<SanitizationResult> {
-  // Length limit — 500 chars for text input (prevents abuse + keeps LLM context lean)
+  // Length limit -500 chars for text input (prevents abuse + keeps LLM context lean)
   if (message.length > 500) {
     return {
       safe: false,

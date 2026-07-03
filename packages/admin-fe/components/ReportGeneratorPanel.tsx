@@ -327,7 +327,7 @@ export default function ReportGeneratorPanel({ onReportComplete }: ReportGenerat
 
       if (!completedRef.current) {
         // Stream closed without a 'complete' event = the agent errored or disconnected
-        const errMsg = "Stream ended without a report — check the agents server logs."
+        const errMsg = "Stream ended without a report -check the agents server logs."
         setReportError(errMsg)
         setReportStatus("error")
         stopElapsed()
@@ -582,7 +582,7 @@ export default function ReportGeneratorPanel({ onReportComplete }: ReportGenerat
                     <div className="w-3 h-3 rounded-full bg-[#28ca41]/60" />
                   </div>
                   <span className="text-[10px] text-[#58a6ff]/60 font-bold uppercase tracking-widest ml-3">
-                    Stream — intelligence_report
+                    Stream -intelligence_report
                   </span>
                   <div className="ml-auto flex items-center gap-2">
                     <button

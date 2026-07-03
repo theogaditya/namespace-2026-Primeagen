@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server"
 
 /**
- * Server-side image proxy — fetches a remote image and re-serves it from our
+ * Server-side image proxy -fetches a remote image and re-serves it from our
  * origin so the browser never makes a cross-origin request and CORP/CORS
  * headers on the remote host don't block rendering.
  *
@@ -20,7 +20,7 @@ export async function GET(request: NextRequest) {
     return new NextResponse("Invalid URL", { status: 400 })
   }
 
-  // Only allow http(s) — block file:// etc.
+  // Only allow http(s) -block file:// etc.
   if (url.protocol !== "http:" && url.protocol !== "https:") {
     return new NextResponse("Only http/https allowed", { status: 400 })
   }
@@ -31,7 +31,7 @@ export async function GET(request: NextRequest) {
         // Identify as a server fetch so the remote host treats it as same-origin
         "User-Agent": "SwarajDesk-Proxy/1.0",
       },
-      // Node 18+ fetch doesn't follow CORP — this is a plain server fetch
+      // Node 18+ fetch doesn't follow CORP -this is a plain server fetch
     })
 
     if (!upstream.ok) {

@@ -4,7 +4,7 @@ import 'leaflet/dist/leaflet.css';
 import { MapContainer, Marker, Popup, useMap, Circle } from "react-leaflet";
 import L from "leaflet";
 
-// Default center (India) — used only when no complaints are available
+// Default center (India) -used only when no complaints are available
 const DEFAULT_CENTER: [number, number] = [22.9734, 78.6569];
 const DEFAULT_ZOOM = 5;
 
@@ -241,7 +241,7 @@ export default function Hotmap() {
           return;
         }
 
-        // Map backend response to our type (no filtering — show all locations)
+        // Map backend response to our type (no filtering -show all locations)
         const locations: ComplaintLocation[] = (data.locations || [])
           .filter((loc: any) => loc.latitude != null && loc.longitude != null)
           .map((loc: any) => ({
@@ -372,7 +372,7 @@ export default function Hotmap() {
               />
             ))}
 
-            {/* Individual complaint markers — REGISTERED get orange icon + mini popup */}
+            {/* Individual complaint markers -REGISTERED get orange icon + mini popup */}
             {complaints.map((c) => {
               const isRegistered = c.status === 'REGISTERED';
               return (
@@ -384,7 +384,7 @@ export default function Hotmap() {
                   {isRegistered && (
                     <Popup>
                       <div style={{ minWidth: 200, maxWidth: 260, fontSize: 12 }}>
-                        <div style={{ fontWeight: 700, marginBottom: 2 }}>#{c.seq} — {c.subCategory}</div>
+                        <div style={{ fontWeight: 700, marginBottom: 2 }}>#{c.seq} -{c.subCategory}</div>
                         <div style={{ color: '#6b7280', marginBottom: 4 }}>
                           {c.description.length > 80 ? c.description.slice(0, 80) + '…' : c.description}
                         </div>
@@ -527,7 +527,7 @@ export default function Hotmap() {
                       <Popup>
                         <div style={{ minWidth: 220, maxWidth: 300 }}>
                           <div style={{ fontWeight: 700, marginBottom: 4 }}>
-                            #{c.seq} — {c.category || 'N/A'}
+                            #{c.seq} -{c.category || 'N/A'}
                           </div>
                           <div style={{ fontSize: 13, marginBottom: 6 }}>{c.subCategory}</div>
                           <div

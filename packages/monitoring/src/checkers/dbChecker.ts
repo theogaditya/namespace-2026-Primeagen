@@ -3,7 +3,7 @@ import { config } from '../config';
 import type { CheckResult } from '../types';
 
 /**
- * Database health checks — parsed from backend /api/health endpoints + direct TCP probe.
+ * Database health checks -parsed from backend /api/health endpoints + direct TCP probe.
  */
 export async function runDbChecks(): Promise<CheckResult[]> {
   const results: CheckResult[] = [];
@@ -108,7 +108,7 @@ async function tcpProbeDb(): Promise<CheckResult> {
     socket.on('timeout', () => done('WARNING', 'TCP connection timed out (SNI proxy drop)', 'NOTICE'));
     socket.on('error', (err) => done('WARNING', `TCP probe failed: ${err.message || 'Connection abruptly closed by SNI proxy'}`, 'NOTICE'));
 
-    // NeonDB hosts — try connecting to the standard postgres port
+    // NeonDB hosts -try connecting to the standard postgres port
     let host = 'ep-curly-recipe-a10u19h8.ap-southeast-1.aws.neon.tech';
     if (config.neonDbUrl) {
       try {

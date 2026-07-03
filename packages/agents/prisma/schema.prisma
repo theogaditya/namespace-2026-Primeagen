@@ -8,7 +8,7 @@ datasource db {
 }
 
 // ──────────────────────────────────────────────
-// Copied from user-be schema — agents service
+// Copied from user-be schema -agents service
 // uses READ-ONLY access to these models
 // ──────────────────────────────────────────────
 

@@ -104,7 +104,7 @@ export function createVoiceRoutes(db: PrismaClient) {
         audioResponse = ttsBuffer.toString("base64");
       } catch (ttsError) {
         console.error("[VoiceRoute] TTS error:", ttsError);
-        // Non-fatal — return text response even if TTS fails
+        // Non-fatal -return text response even if TTS fails
       }
 
       return res.json({

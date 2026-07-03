@@ -2,7 +2,7 @@ import { describe, it, expect } from "vitest";
 
 /**
  * Tests for createComplaintDraft tool.
- * This is a pure function that returns structured JSON — no DB needed.
+ * This is a pure function that returns structured JSON -no DB needed.
  */
 
 import { createComplaintDraftTool } from "../../lib/tools/createComplaintDraft";

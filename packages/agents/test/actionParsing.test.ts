@@ -102,7 +102,7 @@ describe("cleanResponse", () => {
   it("strips COMPLAINT_DRAFT_READY JSON from response text", () => {
     const text = 'I\'ll file that for you. {"action":"COMPLAINT_DRAFT_READY","draft":{"category":"Water"}} Done!';
     const result = cleanResponse(text);
-    // The nested JSON may not be fully stripped by simple regex — just verify no action key remains
+    // The nested JSON may not be fully stripped by simple regex -just verify no action key remains
     expect(result).not.toContain('"action"');
     expect(result).toContain("I'll file that for you.");
     expect(result).toContain("Done!");

@@ -47,7 +47,7 @@ export function createAgentRouter(db: PrismaClient) {
   return async function routeChat(input: ChatInput): Promise<ChatOutput> {
     const { message, userId, sessionId, imageBase64 } = input;
 
-    // Pre-process image if attached — call self service before LLM
+    // Pre-process image if attached -call self service before LLM
     let enrichedMessage = message;
     if (imageBase64) {
       try {
@@ -69,7 +69,7 @@ export function createAgentRouter(db: PrismaClient) {
             urgency?: string;
           };
           if (imgData.success) {
-            enrichedMessage += `\n\n[Image analysis result — category: ${imgData.category}, subCategory: ${imgData.subCategory}, description: ${imgData.complaint}, urgency: ${imgData.urgency}]`;
+            enrichedMessage += `\n\n[Image analysis result -category: ${imgData.category}, subCategory: ${imgData.subCategory}, description: ${imgData.complaint}, urgency: ${imgData.urgency}]`;
           }
         }
       } catch (imgErr) {
@@ -82,7 +82,7 @@ export function createAgentRouter(db: PrismaClient) {
     if (!sanitized.safe) {
       return {
         response:
-          "I can't process that request. I'm here to help you with SwarajDesk — filing complaints, tracking issues, getting information about civic services, and more. What can I help you with?",
+          "I can't process that request. I'm here to help you with SwarajDesk -filing complaints, tracking issues, getting information about civic services, and more. What can I help you with?",
         sessionId,
         escalated: false,
         complaintFlowStarted: false,

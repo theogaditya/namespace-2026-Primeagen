@@ -9,7 +9,7 @@ export function createGetTrendingTool(db: PrismaClient) {
   return new DynamicStructuredTool({
     name: "getTrending",
     description:
-      "Get trending complaints — the most upvoted public complaints from the last 7 days. Use when a user asks about trending issues, popular complaints, or what's happening in their area.",
+      "Get trending complaints -the most upvoted public complaints from the last 7 days. Use when a user asks about trending issues, popular complaints, or what's happening in their area.",
     schema: z.object({
       district: z.string().optional().nullable().describe("Filter by district"),
       category: z.string().optional().nullable().describe("Filter by category"),

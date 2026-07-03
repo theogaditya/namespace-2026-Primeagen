@@ -7,7 +7,7 @@ import { AuthGuard } from "@/components/auth-guard"
 import { ChatModal } from "@/components/chat-modal"
 import { UavIntelligence } from "@/components/UavIntelligence"
 
-// Complaint heatmap — loaded client-side only
+// Complaint heatmap -loaded client-side only
 const ComplaintGoogleHeatmap = dynamic(() => import("@/components/ComplaintGoogleHeatmap"), {
   ssr: false,
   loading: () => (
@@ -155,7 +155,7 @@ export default function AgentRevampedDashboard() {
     setSlideoverImgError(false)
   }, [selectedComplaint?.attachmentUrl])
 
-  // Fetch agent workload — /api/agent/workload returns the data directly (no .agent wrapper)
+  // Fetch agent workload -/api/agent/workload returns the data directly (no .agent wrapper)
   useEffect(() => {
     const fetchWorkloadData = async () => {
       try {
@@ -186,7 +186,7 @@ export default function AgentRevampedDashboard() {
           } catch {}
         }
       } catch {
-        // Network error — workload data from localStorage is already set above
+        // Network error -workload data from localStorage is already set above
       }
     }
     fetchWorkloadData()

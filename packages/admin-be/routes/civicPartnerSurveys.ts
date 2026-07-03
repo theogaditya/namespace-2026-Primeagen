@@ -347,7 +347,7 @@ export default function (prisma: PrismaClient) {
   });
 
   // ─── POST /api/civic-partner/surveys/:surveyId/respond ──────────────────
-  // Public endpoint — no civicPartner auth needed — accepts a user's response.
+  // Public endpoint -no civicPartner auth needed -accepts a user's response.
   // Mounted without the router-level authenticateCivicPartner guard above
   // because this must be callable from user-fe (anonymous users included).
   return router;

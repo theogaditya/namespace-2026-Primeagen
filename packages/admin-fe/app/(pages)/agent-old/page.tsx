@@ -1,5 +1,5 @@
 // REVAMPED: This page now redirects to the new Tactical Intel design.
-// Old implementation commented out below — see app/(pages)/Agent/page.tsx for the revamped version.
+// Old implementation commented out below -see app/(pages)/Agent/page.tsx for the revamped version.
 //
 // "use client"
 // import dynamic from 'next/dynamic'

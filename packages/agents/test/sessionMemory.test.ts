@@ -2,7 +2,7 @@ import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 
 /**
  * Tests for SessionMemoryStore in-memory fallback.
- * 
+ *
  * We can't easily import the singleton because it auto-connects to Redis.
  * Instead we test the in-memory fallback logic by patching the module.
  * We mock @redis/client so Redis is never actually used.
@@ -26,9 +26,9 @@ vi.mock("@redis/client", () => ({
 // Now import after mocking
 const { sessionMemory } = await import("../lib/memory/sessionMemory");
 
-describe("SessionMemoryStore — in-memory fallback", () => {
+describe("SessionMemoryStore -in-memory fallback", () => {
   beforeEach(async () => {
-    // Connect with Redis unavailable — should fall back to in-memory
+    // Connect with Redis unavailable -should fall back to in-memory
     await sessionMemory.connect();
   });
 

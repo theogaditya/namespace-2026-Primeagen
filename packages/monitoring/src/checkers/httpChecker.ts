@@ -12,7 +12,7 @@ interface HttpCheckOptions {
   body?: any;
   timeout?: number;
   severity?: Severity;
-  /** If true, skip retries — used for bulk feature probes to keep cycles fast */
+  /** If true, skip retries -used for bulk feature probes to keep cycles fast */
   noRetry?: boolean;
   /** Mark UP responses slower than this as "⚠️ Slow" without failing them */
   slowThresholdMs?: number;
@@ -22,7 +22,7 @@ interface HttpCheckOptions {
 const HTTP_RETRY_COUNT = 2;       // retries for critical health checks
 const HTTP_RETRY_DELAY_MS = 1500;
 const DEFAULT_TIMEOUT = 10_000;
-const DEFAULT_SLOW_THRESHOLD = 8_000; // 8s — responses above this get a ⚠️ Slow tag
+const DEFAULT_SLOW_THRESHOLD = 8_000; // 8s -responses above this get a ⚠️ Slow tag
 
 function sleep(ms: number) {
   return new Promise<void>((resolve) => setTimeout(resolve, ms));
@@ -65,7 +65,7 @@ export async function httpCheck(opts: HttpCheckOptions): Promise<CheckResult> {
         const retryNote = attempt > 0
           ? ` (recovered after ${attempt} retr${attempt === 1 ? 'y' : 'ies'})`
           : '';
-        const slowNote = isSlow ? `⚠️ Slow (${elapsed}ms) — ` : '';
+        const slowNote = isSlow ? `⚠️ Slow (${elapsed}ms) -` : '';
 
         return {
           id: opts.id,
@@ -85,12 +85,12 @@ export async function httpCheck(opts: HttpCheckOptions): Promise<CheckResult> {
     } catch (err: any) {
       const elapsed = Date.now() - start;
       totalElapsed += elapsed;
-      
+
       if (err.code === 'ECONNABORTED') {
         lastError = `Timeout after ${timeout}ms`;
       } else if (err.code === 'ECONNRESET') {
         lastError = 'Connection reset by peer (ECONNRESET)';
-        // Force a retry on ECONNRESET even if noRetry is set to true, 
+        // Force a retry on ECONNRESET even if noRetry is set to true,
         // as this usually indicates a server-side TCP timeout on a slow DB query.
         if (opts.noRetry && attempt === 0) {
           maxAttempts = 2; // Allow one more try just for this error

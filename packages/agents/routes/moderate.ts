@@ -11,7 +11,7 @@ function internalAuth(req: any, res: any, next: any) {
 
   if (!expectedKey) {
     // If no key configured, allow (dev mode) but warn
-    console.warn("[ModerateRoute] INTERNAL_API_KEY not set — allowing request in dev mode");
+    console.warn("[ModerateRoute] INTERNAL_API_KEY not set -allowing request in dev mode");
     return next();
   }
 

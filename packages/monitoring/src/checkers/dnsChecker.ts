@@ -59,7 +59,7 @@ export async function runDnsChecks(): Promise<CheckResult[]> {
     status: nonEmpty.length === 0 ? 'WARNING' : consistent ? 'UP' : 'WARNING',
     responseTimeMs: 0,
     message: nonEmpty.length === 0
-      ? 'No domains resolved — cannot cross-check IPs'
+      ? 'No domains resolved -cannot cross-check IPs'
       : consistent
         ? `All backends resolve to consistent IPs via Cloudflare`
         : `Inconsistent IPs detected: ${JSON.stringify(Object.fromEntries(BACKEND_DOMAINS.map((d) => [d, cfIps[d] || []])))}`,

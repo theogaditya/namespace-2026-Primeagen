@@ -1,6 +1,6 @@
 /**
  * WebSocket Message Types and Handlers
- * 
+ *
  * Defines the protocol for WebSocket communication and handles
  * authentication and message processing.
  */

@@ -11,7 +11,7 @@ services:
     container_name: comp-queue
     ports:
       - "${COMP_QUEUE_PORT:-3005}:3005"
-    # Explicit environment entries (no env_file) — matches admin-be pattern
+    # Explicit environment entries (no env_file) -matches admin-be pattern
     environment:
       # App Config
       NODE_ENV: ${NODE_ENV:-development}

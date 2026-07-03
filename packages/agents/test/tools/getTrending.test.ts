@@ -108,7 +108,7 @@ describe("getTrending fallback", () => {
 
     await tool.invoke({});
 
-    // 4th call is all-time (days=0) — should only have isPublic
+    // 4th call is all-time (days=0) -should only have isPublic
     const fourthCallArgs = findMany.mock.calls[3]![0];
     expect(fourthCallArgs.where.isPublic).toBe(true);
     expect(fourthCallArgs.where.submissionDate).toBeUndefined();

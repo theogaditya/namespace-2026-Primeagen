@@ -136,7 +136,7 @@ export default function NewSurveyPage() {
     setError("")
     setSaving(true)
     try {
-      // Client-side validation with per-step error tracking — only when publishing
+      // Client-side validation with per-step error tracking -only when publishing
       if (publish) {
         const errs: Record<number, string[]> = {}
         const dupTargets: Record<number, number[]> = {}

@@ -36,7 +36,7 @@ export default function (prisma: PrismaClient) {
   }
 
   // ─────────────────────────────────────────────────────────────────────────
-  // PORTFOLIO METRICS  (across all surveys — dashboard home)
+  // PORTFOLIO METRICS  (across all surveys -dashboard home)
   // GET /api/civic-partner/analytics/portfolio
   // ─────────────────────────────────────────────────────────────────────────
   router.get('/portfolio', async (req, res: any) => {
@@ -169,7 +169,7 @@ export default function (prisma: PrismaClient) {
         prisma.surveyResponse.count({ where: { surveyId, submittedAt: { gte: minus(24 * 30) } } }),
       ]);
 
-      // Average time to complete (seconds) — requires startedAt to be populated
+      // Average time to complete (seconds) -requires startedAt to be populated
       const timedResponses = await prisma.surveyResponse.findMany({
         where: { surveyId, isComplete: true, startedAt: { not: null } },
         select: { startedAt: true, submittedAt: true },
@@ -311,7 +311,7 @@ export default function (prisma: PrismaClient) {
         }
 
         case 'TEXT': {
-          // Word frequency (stop-words stripped client-side or via AI pipeline — we return raw texts here)
+          // Word frequency (stop-words stripped client-side or via AI pipeline -we return raw texts here)
           const texts = answers.map((a) => a.answerText).filter(Boolean) as string[];
           const wordFreq = computeWordFrequency(texts);
           breakdown = {

@@ -163,7 +163,7 @@ export function Step1CategoryWithAutofill({
       try {
         const response = await fetch("/api/complaint/categories");
         const data = await response.json();
-        
+
         if (data.success && data.data) {
           setCategories(data.data);
         } else {

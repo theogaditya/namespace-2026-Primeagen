@@ -32,7 +32,7 @@ const MODERATION_ENDPOINT = `${AGENTS_URL}/api/moderate`
 const INTERNAL_API_KEY = process.env.INTERNAL_API_KEY || ''
 
 /**
- * Call agents service moderation endpoint (Abuse AI — Agent 4).
+ * Call agents service moderation endpoint (Abuse AI -Agent 4).
  * @param body Object containing `text` and optional `complaint_id` and `user_id` fields
  * @returns ModerationResult parsed from the agents service
  * @throws Error on network / parsing failures

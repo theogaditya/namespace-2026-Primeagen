@@ -2,7 +2,7 @@ import type { PrismaClient } from "../../prisma/generated/client/client";
 
 /**
  * Raw complaint data shape returned by the bulk fetch.
- * Every field is safe for read-only analytics — no PII beyond description.
+ * Every field is safe for read-only analytics -no PII beyond description.
  */
 export interface RawComplaintData {
   id: string;

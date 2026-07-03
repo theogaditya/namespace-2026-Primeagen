@@ -173,7 +173,7 @@ export default function RegisterComplaintPage() {
   const [showPopup, setShowPopup] = useState(false);
   const [complaintId, setComplaintId] = useState<string | null>(null);
   const [imageValidationStatus, setImageValidationStatus] = useState<ImageValidationStatus>("idle");
-  
+
   // Autofill mode state
   const [useAutofill, setUseAutofill] = useState(false);
   const [autoFillState, setAutoFillState] = useState<
@@ -185,16 +185,16 @@ export default function RegisterComplaintPage() {
   const [categories, setCategories] = useState<{ id: string; name: string; assignedDepartment: string }[]>([]);
   const [operatingDistricts, setOperatingDistricts] = useState<{ id: string; name: string }[]>([]);
   const [unserviceableLocation, setUnserviceableLocation] = useState<{ detectedDistrict: string; availableDistricts: string[] } | null>(null);
-  
+
   // Network state from unified hook (works in both browser and Capacitor)
   const { isOnline } = useNetwork();
-  
+
   // Offline sync state
   const [showOfflineSync, setShowOfflineSync] = useState(false);
   const [syncStatus, setSyncStatus] = useState<"waiting" | "syncing" | "success" | "error">("waiting");
   const [pendingSubmitData, setPendingSubmitData] = useState<FormData | null>(null);
   const [retryCount, setRetryCount] = useState(0);
-  
+
   // Get the appropriate steps based on autofill mode
   const STEPS = useAutofill ? STEPS_AUTOFILL : STEPS_STANDARD;
 
@@ -403,7 +403,7 @@ export default function RegisterComplaintPage() {
       });
 
       console.log("[submitComplaintWithData] Response status:", response.status);
-      
+
       let responseData;
       try {
         responseData = await response.json();
@@ -419,7 +419,7 @@ export default function RegisterComplaintPage() {
       // Success
       setSyncStatus("success");
       setComplaintId(responseData.complaint?.id || responseData.id || null);
-      
+
       // Close offline sync modal after short delay
       setTimeout(() => {
         setShowOfflineSync(false);
@@ -435,7 +435,7 @@ export default function RegisterComplaintPage() {
     } catch (error) {
       console.error("Submit error:", error);
       setSyncStatus("error");
-      
+
       // If still online, retry after a delay
       if (isOnline) {
         setTimeout(() => {
@@ -528,7 +528,7 @@ export default function RegisterComplaintPage() {
       });
 
       console.log("[handleSubmit] Response status:", response.status);
-      
+
       let responseData;
       try {
         responseData = await response.json();
@@ -553,15 +553,15 @@ export default function RegisterComplaintPage() {
       resetForm();
     } catch (error) {
       console.error("[handleSubmit] Submit error:", error);
-      
+
       // Check if it's a network error (fetch failed)
       const isNetworkError = error instanceof TypeError && error.message.includes('fetch');
-      
+
       setShowPopup(true);
       setSubmitStatus("error");
       setSubmitMessage({
         title: "Submission Failed",
-        description: isNetworkError 
+        description: isNetworkError
           ? "Network error. Please check your internet connection and try again."
           : (error instanceof Error ? error.message : "An unexpected error occurred. Please try again."),
       });
@@ -642,11 +642,11 @@ export default function RegisterComplaintPage() {
 
   // Check if current step has errors
   const hasStepErrors = Object.keys(errors).filter((k) => errors[k]).length > 0;
-  
+
   // Check if Next button should be disabled
   // Disable during auto-fill or while image validation is in progress
   const isNextDisabled = isAutoFilling || (currentStep === 2 && (
-    imageValidationStatus === "validating" || 
+    imageValidationStatus === "validating" ||
     imageValidationStatus === "invalid" ||
     imageValidationStatus === "error"
   ));
@@ -768,10 +768,10 @@ export default function RegisterComplaintPage() {
                       isNextDisabled && "opacity-50 cursor-not-allowed"
                     )}
                   >
-                    {imageValidationStatus === "validating" 
-                      ? "Validating..." 
-                      : imageValidationStatus === "invalid" 
-                        ? "Invalid Image" 
+                    {imageValidationStatus === "validating"
+                      ? "Validating..."
+                      : imageValidationStatus === "invalid"
+                        ? "Invalid Image"
                         : `Next: ${getNextStepLabel()}`}
                     <ArrowRight className="h-4 w-4" />
                   </Button>

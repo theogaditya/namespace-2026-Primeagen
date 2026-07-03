@@ -65,7 +65,7 @@ Score the complaint across 4 dimensions (0-25 each, total 0-100):
    - 0-5: Vague, single sentence, no details
    - 6-12: Some details but missing key context (what, where, when, impact)
    - 13-18: Good description with most relevant details
-   - 19-25: Excellent — specific, structured, includes timeline and impact
+   - 19-25: Excellent -specific, structured, includes timeline and impact
 
 2. **Evidence (0-25)**: Does the complaint have supporting evidence?
    - 0: No attachment
@@ -87,7 +87,7 @@ Score the complaint across 4 dimensions (0-25 each, total 0-100):
    - +5: Description is longer than 150 characters
 
 Provide suggestions in the SAME language as the complaint description (Hindi or English).
-Be encouraging — highlight what's good and suggest specific improvements.`;
+Be encouraging -highlight what's good and suggest specific improvements.`;
 
 export function createQualityScorer() {
   const model = getChatModel("fast");

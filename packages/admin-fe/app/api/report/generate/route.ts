@@ -31,7 +31,7 @@ export async function POST(req: NextRequest) {
 
     if (!upstream.ok || !upstream.body) {
       const errText = await upstream.text().catch(() => "unknown");
-      console.error(`[proxy:${requestId}] upstream error: ${upstream.status} — ${errText}`);
+      console.error(`[proxy:${requestId}] upstream error: ${upstream.status} -${errText}`);
       return new Response(JSON.stringify({ error: `Upstream ${upstream.status}: ${errText}` }), {
         status: upstream.status,
         headers: { "Content-Type": "application/json" },
@@ -50,11 +50,11 @@ export async function POST(req: NextRequest) {
         while (true) {
           const { done, value } = await reader.read();
           if (done) {
-            console.log(`[proxy:${requestId}] stream done — ${chunkCount} chunks forwarded`);
+            console.log(`[proxy:${requestId}] stream done -${chunkCount} chunks forwarded`);
             break;
           }
           chunkCount++;
-          console.log(`[proxy:${requestId}] chunk #${chunkCount}: ${value.length} bytes — ${new TextDecoder().decode(value).slice(0, 80).replace(/\n/g, "\\n")}`);
+          console.log(`[proxy:${requestId}] chunk #${chunkCount}: ${value.length} bytes -${new TextDecoder().decode(value).slice(0, 80).replace(/\n/g, "\\n")}`);
           await writer.write(value);
         }
       } catch (e) {

@@ -4,7 +4,7 @@ import { config } from '../config';
 import { httpCheck, aliveValidator } from './httpChecker';
 import type { CheckResult } from '../types';
 
-// Credentials for monitoring probes — read from env or fall back to hardcoded test values
+// Credentials for monitoring probes -read from env or fall back to hardcoded test values
 const AGENT_EMAIL = process.env.MONITOR_AGENT_EMAIL || 'ankita@gmail.com';
 const AGENT_PASSWORD = process.env.MONITOR_AGENT_PASSWORD || '123123123';
 const MUNI_EMAIL = process.env.MONITOR_MUNI_EMAIL || 'sourab@gmail.com';
@@ -65,7 +65,7 @@ async function loginAdmin(adminBeUrl: string, email: string, password: string, a
     if (resp.status === 200 && resp.data?.token) {
       return resp.data.token as string;
     }
-    console.warn(`[monitor] admin-be login (${adminType}) failed: HTTP ${resp.status} — ${JSON.stringify(resp.data)}`);
+    console.warn(`[monitor] admin-be login (${adminType}) failed: HTTP ${resp.status} -${JSON.stringify(resp.data)}`);
     return null;
   } catch (err: any) {
     console.warn(`[monitor] admin-be login (${adminType}) error:`, err.message);

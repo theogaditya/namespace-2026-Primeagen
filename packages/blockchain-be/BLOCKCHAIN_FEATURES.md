@@ -1,4 +1,4 @@
-# Blockchain Features — Suggestions for iit-test
+# Blockchain Features -Suggestions for iit-test
 
 This document contains a curated list of blockchain features that make sense for the civic complaint system in the repository. Use this to brief your blockchain engineer or to plan implementation.
 
@@ -10,7 +10,7 @@ These features are prioritized by business value and implementation effort. They
 
 ---
 
-## Tier 1 — High Impact, Directly Solves Problems
+## Tier 1 -High Impact, Directly Solves Problems
 
 1. On-Chain Status Audit Trail
    - Problem: Admins can change complaint status without an immutable record.
@@ -34,7 +34,7 @@ These features are prioritized by business value and implementation effort. They
 
 ---
 
-## Tier 2 — Strong Features, Moderate Effort
+## Tier 2 -Strong Features, Moderate Effort
 
 5. Upvote Integrity via Blockchain
    - Problem: `upvoteCount` is in DB and subject to manipulation.
@@ -58,7 +58,7 @@ These features are prioritized by business value and implementation effort. They
 
 ---
 
-## Tier 3 — Interesting, Lower Priority
+## Tier 3 -Interesting, Lower Priority
 
 9. Decentralized Voting on Civic Priorities
    - How: Citizens stake or use tokens to vote on priority issues.

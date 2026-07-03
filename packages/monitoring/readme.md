@@ -1,6 +1,6 @@
 # Monitoring Package
 
-A self-hosted, real-time health monitoring system for the IIT BBSR Swaraj platform. It monitors backend APIs, databases, DNS/TLS, EC2, Redis, S3, and more — with a built-in dashboard, per-cycle log files, smart alerting, and false-positive suppression.
+A self-hosted, real-time health monitoring system for the IIT BBSR Swaraj platform. It monitors backend APIs, databases, DNS/TLS, EC2, Redis, S3, and more -with a built-in dashboard, per-cycle log files, smart alerting, and false-positive suppression.
 
 ---
 
@@ -89,9 +89,9 @@ dashboard.ts         ← Express API + static dashboard UI
 
 ## False Positive Suppression
 
-Production endpoints — especially heavy DB queries and auto-assign blockchain ops — can be legitimately slow or transiently unavailable. Three mechanisms work together to prevent false alerts:
+Production endpoints -especially heavy DB queries and auto-assign blockchain ops -can be legitimately slow or transiently unavailable. Three mechanisms work together to prevent false alerts:
 
-### Layer 1 — Immediate Retries (in `httpChecker.ts`)
+### Layer 1 -Immediate Retries (in `httpChecker.ts`)
 
 Every standard HTTP check automatically retries **up to 2 times** with a **1.5 s delay** between attempts before recording a failure.
 
@@ -99,19 +99,19 @@ Every standard HTTP check automatically retries **up to 2 times** with a **1.5 s
 - If all attempts fail → recorded as `DOWN` with `(failed after 3 attempts)` in the message
 - Feature probes use `noRetry: true` (see below) since they rely on dampening instead
 
-### Layer 2 — Status Dampening + Consecutive Failure Threshold (in `alerter.ts`)
+### Layer 2 -Status Dampening + Consecutive Failure Threshold (in `alerter.ts`)
 
 A state machine tracks each check across cycles. The dashboard and email behave differently:
 
 | Consecutive failures | Dashboard status | Email sent? |
 |---|---|---|
-| 1st failure | `⚠️ WARNING — watching` | ❌ No |
+| 1st failure | `⚠️ WARNING -watching` | ❌ No |
 | 2nd+ failure | `❌ DOWN` | ✅ Yes (batched) |
 | Recovery | `✅ UP` | ✅ Yes (only if was truly DOWN) |
 
 This means a transient glitch that resolves on the next cycle **never sends an email and never shows as DOWN**.
 
-### Layer 3 — Response Time Grading (in `httpChecker.ts`)
+### Layer 3 -Response Time Grading (in `httpChecker.ts`)
 
 Slow-but-alive endpoints no longer fail. Responses are graded:
 
@@ -141,9 +141,9 @@ All 52 feature probes have explicit timeouts matched to their workload, defined 
 
 Firing all 52 probes simultaneously with Node's default HTTPS agent causes **socket queue exhaustion** (Node's default is 5 sockets per host). Requests queue up and time out even when the server is healthy. Two fixes are applied in `featureProber.ts`:
 
-1. **Shared keep-alive HTTPS agent** with `maxSockets: 30` and `maxFreeSockets: 10` — eliminates the 5-socket bottleneck and reuses TCP connections across requests.
+1. **Shared keep-alive HTTPS agent** with `maxSockets: 30` and `maxFreeSockets: 10` -eliminates the 5-socket bottleneck and reuses TCP connections across requests.
 
-2. **Concurrency limiter** (`runWithConcurrency`) — probes are run in **batches of 10** rather than all 52 at once. This prevents socket storms while maintaining good cycle performance.
+2. **Concurrency limiter** (`runWithConcurrency`) -probes are run in **batches of 10** rather than all 52 at once. This prevents socket storms while maintaining good cycle performance.
 
 ---
 
@@ -203,7 +203,7 @@ Clicking any check card opens a detail modal that fetches the latest run log ent
 GET /api/check-log/:checkId
 ```
 
-This shows the full message, response time, severity, and raw JSON log entry — making it easy to debug failures without SSHing into the server.
+This shows the full message, response time, severity, and raw JSON log entry -making it easy to debug failures without SSHing into the server.
 
 ---
 

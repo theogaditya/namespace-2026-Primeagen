@@ -9,11 +9,11 @@ import { z } from "zod";
 const GUIDES: Record<string, string> = {
   register_complaint: `**How to Register a Complaint:**
 1. Go to the Dashboard and tap the AI Chat or click "Register Complaint"
-2. You can describe your issue in text or voice — the AI will guide you
+2. You can describe your issue in text or voice -the AI will guide you
 3. Upload a photo of the issue if you have one (this improves quality score)
 4. Confirm the category, location, and description
 5. Review the complaint preview, check for similar complaints
-6. Submit — you'll get a complaint number for tracking`,
+6. Submit -you'll get a complaint number for tracking`,
 
   track_complaint: `**How to Track a Complaint:**
 1. Go to Dashboard → "My Complaints" section
@@ -47,7 +47,7 @@ When you see "AI Moderated" on a complaint, it means:
 - The AI detected inappropriate language (slurs, threats, obscenity)
 - Offensive words were replaced with ****** to keep the community respectful
 - The complaint's core issue is preserved and still being addressed
-- This is automated and not a punishment — it helps maintain respectful discourse`,
+- This is automated and not a punishment -it helps maintain respectful discourse`,
 
   similar_complaints: `**Understanding "Similar Complaints":**
 When you see "📋 X similar complaints" on a complaint:
@@ -58,7 +58,7 @@ When you see "📋 X similar complaints" on a complaint:
 
   language: `**Language Support:**
 - The AI auto-detects your language (Hindi, English, or Hinglish)
-- You can mix languages freely — the AI understands code-switching
+- You can mix languages freely -the AI understands code-switching
 - Voice chat supports all three languages natively
 - Responses come in the same language you use`,
 

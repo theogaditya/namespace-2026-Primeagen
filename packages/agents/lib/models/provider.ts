@@ -96,7 +96,7 @@ export function getEmbeddingModel() {
 
   switch (provider) {
     case "openai":
-      // Use dynamic import pattern — embedding model
+      // Use dynamic import pattern -embedding model
       const { OpenAIEmbeddings } = require("@langchain/openai");
       return new OpenAIEmbeddings({
         modelName: "text-embedding-3-small",

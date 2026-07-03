@@ -2,7 +2,7 @@ import { describe, it, expect } from "vitest";
 
 /**
  * Tests for navigateTo tool.
- * Pure function — returns structured NAVIGATE action.
+ * Pure function -returns structured NAVIGATE action.
  */
 
 import { createNavigateToTool } from "../../lib/tools/navigateTo";

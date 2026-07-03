@@ -313,7 +313,7 @@ export default function aiAgentCTARoutes(prisma: PrismaClient) {
   });
 
   // ══════════════════════════════════════════════════════════════════════════
-  // 7. UNIFIED EXECUTE — dispatches any AI agent action object in one call
+  // 7. UNIFIED EXECUTE -dispatches any AI agent action object in one call
   //    POST /api/agent-cta/execute
   //    Body: <SuggestedAction> (any of the above action shapes)
   // ══════════════════════════════════════════════════════════════════════════
@@ -343,7 +343,7 @@ export default function aiAgentCTARoutes(prisma: PrismaClient) {
     }
 
     // Re-invoke the handler logic by dispatching an internal sub-request
-    // (avoids duplicating logic — we forward the body to the respective handler).
+    // (avoids duplicating logic -we forward the body to the respective handler).
     try {
       // Map action-specific field names to handler body expectations
       let body = { ...action };
@@ -375,7 +375,7 @@ export default function aiAgentCTARoutes(prisma: PrismaClient) {
   });
 
   // ══════════════════════════════════════════════════════════════════════════
-  // GET /api/agent-cta/status — health + list of supported actions
+  // GET /api/agent-cta/status -health + list of supported actions
   // ══════════════════════════════════════════════════════════════════════════
   router.get('/status', authenticateAdmin, requireAdminType('STATE_ADMIN', 'SUPER_ADMIN'), (_req: any, res: any) => {
     res.json({

@@ -1,7 +1,7 @@
 import { describe, it, expect, vi } from "vitest";
 
 /**
- * Tests for upvoteComplaint tool — tests the logic without a real DB.
+ * Tests for upvoteComplaint tool -tests the logic without a real DB.
  * We mock PrismaClient to verify query behavior.
  */
 

@@ -86,7 +86,7 @@ describe('Polling Lifecycle', () => {
         try {
             await getQueueStatus();
         } catch {
-            // OK if it throws — but document it
+            // OK if it throws -but document it
         }
     });
 });

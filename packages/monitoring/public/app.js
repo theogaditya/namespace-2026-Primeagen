@@ -107,9 +107,9 @@ function renderEmailStatusBanner(data) {
   const { status, accepted = [], rejected = [], subject, sentAt } = data;
   if (status === 'idle') { el.style.display = 'none'; return; }
   const cfgs = {
-    queued:  { bg: 'rgba(234,179,8,0.12)',  border: '#ca8a04', color: '#ca8a04', icon: 'loader-2',   cls: 'loading', label: '⏳ Alert email queued — sending...' },
+    queued:  { bg: 'rgba(234,179,8,0.12)',  border: '#ca8a04', color: '#ca8a04', icon: 'loader-2',   cls: 'loading', label: '⏳ Alert email queued -sending...' },
     sent:    { bg: 'rgba(34,197,94,0.10)',   border: '#16a34a', color: '#16a34a', icon: 'mail-check', cls: '',        label: `✅ Alert email delivered to all ${accepted.length} recipient(s)` },
-    partial: { bg: 'rgba(234,179,8,0.12)',  border: '#ca8a04', color: '#ca8a04', icon: 'mail',       cls: '',        label: `⚠️ Partial — ${accepted.length} sent, ${rejected.length} failed (${rejected.join(', ')})` },
+    partial: { bg: 'rgba(234,179,8,0.12)',  border: '#ca8a04', color: '#ca8a04', icon: 'mail',       cls: '',        label: `⚠️ Partial -${accepted.length} sent, ${rejected.length} failed (${rejected.join(', ')})` },
     failed:  { bg: 'rgba(239,68,68,0.12)',  border: '#dc2626', color: '#dc2626', icon: 'mail-x',     cls: '',        label: '❌ Alert email failed to send' },
   };
   const cfg = cfgs[status] || cfgs.failed;

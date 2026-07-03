@@ -220,7 +220,7 @@ export default function CivicPartnerReportsPage() {
   useEffect(() => {
     // Fusion report (final)
     if (stream.fusionReport) {
-      saveReportToLocal(stream.fusionReport, { title: `${selectedCategory || "Civic"} — Fusion Report`, type: "fusion", category: selectedCategory || undefined })
+      saveReportToLocal(stream.fusionReport, { title: `${selectedCategory || "Civic"} -Fusion Report`, type: "fusion", category: selectedCategory || undefined })
       setHistoryReports(loadSavedReports())
     }
     // Analyze report (global)
@@ -542,7 +542,7 @@ export default function CivicPartnerReportsPage() {
                   if (displayReport) {
                     const title = mode === "analyze"
                       ? "Global Analysis Report"
-                      : `${selectedCategory || "Civic"} — ${activeTab.charAt(0).toUpperCase() + activeTab.slice(1)} Report`
+                      : `${selectedCategory || "Civic"} -${activeTab.charAt(0).toUpperCase() + activeTab.slice(1)} Report`
                     downloadReportPDF(displayReport, title)
                   }
                 }}

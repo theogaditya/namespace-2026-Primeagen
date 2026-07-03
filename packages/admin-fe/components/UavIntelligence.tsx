@@ -108,7 +108,7 @@ export function UavIntelligence({ complaints }: { complaints: ComplaintItem[] })
       waterlogging: 'Waterlogging',
     }
     const found = tokens.map(t => map[t.toLowerCase()] || t.charAt(0).toUpperCase() + t.slice(1)).join(' ')
-    return `${found}${idx ? ` — #${idx}` : ''}`
+    return `${found}${idx ? ` -#${idx}` : ''}`
   }
 
   const handleFile = (file: File) => {
@@ -235,7 +235,7 @@ export function UavIntelligence({ complaints }: { complaints: ComplaintItem[] })
               ) : (
                 withImages.map((c) => (
                   <option key={c.id} value={c.id}>
-                    #{c.seq} — {c.title.slice(0, 60)}{c.title.length > 60 ? "…" : ""}
+                    #{c.seq} -{c.title.slice(0, 60)}{c.title.length > 60 ? "…" : ""}
                   </option>
                 ))
               )}
@@ -243,7 +243,7 @@ export function UavIntelligence({ complaints }: { complaints: ComplaintItem[] })
           </div>
 
           {/* Image panels */}
-          {/* Column headers row — kept separate so both image boxes sit at the same height */}
+          {/* Column headers row -kept separate so both image boxes sit at the same height */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-3">
             {/* Left header */}
             <div className="space-y-2">
@@ -282,7 +282,7 @@ export function UavIntelligence({ complaints }: { complaints: ComplaintItem[] })
             </div>
           </div>
 
-          {/* Images grid — both boxes start at the same level */}
+          {/* Images grid -both boxes start at the same level */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8 relative">
             {/* Left: Complaint image */}
             <div>
@@ -332,7 +332,7 @@ export function UavIntelligence({ complaints }: { complaints: ComplaintItem[] })
               </div>
             </div>
 
-            {/* Right: UAV upload — headers moved to the row above, image starts flush with left */}
+            {/* Right: UAV upload -headers moved to the row above, image starts flush with left */}
             <div>
               <div
                 className={`aspect-video bg-slate-50 rounded-xl overflow-hidden border-2 transition-all duration-200 relative group cursor-pointer min-h-[220px] flex items-center justify-center
@@ -382,7 +382,7 @@ export function UavIntelligence({ complaints }: { complaints: ComplaintItem[] })
                         {dragging ? "Drop UAV image here" : "Upload UAV Image"}
                       </p>
                       <p className="text-[10px] text-slate-400 mt-0.5">
-                        Drag & drop or click — JPG/PNG/WEBP
+                        Drag & drop or click -JPG/PNG/WEBP
                       </p>
                     </div>
                   </div>
@@ -426,7 +426,7 @@ export function UavIntelligence({ complaints }: { complaints: ComplaintItem[] })
                   </div>
                 ) : (
                   <div className="bg-white p-3 rounded-lg border border-slate-200 text-sm text-slate-600">
-                    Awaiting verification — provide a UAV image (file or URL) and click Verify.
+                    Awaiting verification -provide a UAV image (file or URL) and click Verify.
                   </div>
                 )}
               </div>

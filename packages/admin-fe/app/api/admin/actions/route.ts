@@ -49,7 +49,7 @@ export async function POST(req: NextRequest) {
         break;
 
       case "NAVIGATE":
-        // No API call — return the path for the frontend to navigate
+        // No API call -return the path for the frontend to navigate
         return NextResponse.json({ success: true, navigate: action.path });
 
       default:

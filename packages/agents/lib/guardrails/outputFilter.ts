@@ -57,7 +57,7 @@ export interface FilterResult {
 
 /**
  * Filter agent output to remove PII and sensitive data
- * Only redacts OTHER users' PII — the requesting user's own data is allowed
+ * Only redacts OTHER users' PII -the requesting user's own data is allowed
  * Allows the platform support email to pass through
  */
 export function filterOutput(output: string, requestingUserId?: string): FilterResult {

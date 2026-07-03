@@ -4,11 +4,11 @@ import type { CheckResult } from '../types';
 
 /**
  * 4 lightweight AI/ML service health probes.
- * Only hits GET / or GET /health — never triggers GPU inference.
+ * Only hits GET / or GET /health -never triggers GPU inference.
  * Runs on a separate 6h schedule to avoid overloading model servers.
  */
 export async function runAiMlChecks(): Promise<CheckResult[]> {
-    const T_SLOW = 30_000; // 30s timeout — cold-start GPU containers can be slow
+    const T_SLOW = 30_000; // 30s timeout -cold-start GPU containers can be slow
 
     const checks = await Promise.allSettled([
         httpCheck({

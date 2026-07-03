@@ -81,33 +81,33 @@ Given a JSON object of pre-computed statistics about citizen complaints, generat
 
 The report MUST include ALL of these sections:
 
-1. **executive_summary** — 3-4 sentence overview of the state of civic grievances. Include the total complaint count, resolution rate, and the most critical finding.
+1. **executive_summary** -3-4 sentence overview of the state of civic grievances. Include the total complaint count, resolution rate, and the most critical finding.
 
-2. **comprehensive_overview** — Full narrative analysis (3-6 paragraphs) covering complaint volumes, category distribution, district hotspots, resolution performance, and quality trends. Reference specific numbers.
+2. **comprehensive_overview** -Full narrative analysis (3-6 paragraphs) covering complaint volumes, category distribution, district hotspots, resolution performance, and quality trends. Reference specific numbers.
 
-3. **systemic_issues** — Array of identified systemic problems. Each must have a name, description, severity (LOW/MEDIUM/HIGH/CRITICAL), and the categories/districts it affects.
+3. **systemic_issues** -Array of identified systemic problems. Each must have a name, description, severity (LOW/MEDIUM/HIGH/CRITICAL), and the categories/districts it affects.
 
-4. **district_analysis** — Per-district insights for the top 5 districts by volume. Include complaint count, approximate resolution rate, primary issues, and a specific recommendation.
+4. **district_analysis** -Per-district insights for the top 5 districts by volume. Include complaint count, approximate resolution rate, primary issues, and a specific recommendation.
 
-5. **category_insights** — Patterns within the top categories. Include count, trend description, and a notable pattern.
+5. **category_insights** -Patterns within the top categories. Include count, trend description, and a notable pattern.
 
-6. **resolution_performance** — Analysis of resolution rates, average resolution time, SLA breach patterns. Identify specific bottlenecks.
+6. **resolution_performance** -Analysis of resolution rates, average resolution time, SLA breach patterns. Identify specific bottlenecks.
 
-7. **quality_assessment** — Observation about complaint quality scores and what it reveals about citizen engagement and platform usage.
+7. **quality_assessment** -Observation about complaint quality scores and what it reveals about citizen engagement and platform usage.
 
-8. **escalation_patterns** — Insights about what types of complaints get escalated, to which level, and potential causes.
+8. **escalation_patterns** -Insights about what types of complaints get escalated, to which level, and potential causes.
 
-9. **strategic_recommendations** — Array of 5-8 concrete, ranked action items. Each has a rank, recommendation text, rationale, priority, and timeline for implementation.
+9. **strategic_recommendations** -Array of 5-8 concrete, ranked action items. Each has a rank, recommendation text, rationale, priority, and timeline for implementation.
 
-10. **priority_alerts** — Any CRITICAL urgency patterns needing immediate attention. Include specific districts, categories, and counts.
+10. **priority_alerts** -Any CRITICAL urgency patterns needing immediate attention. Include specific districts, categories, and counts.
 
-11. **generated_at** — ISO timestamp string (use the provided timestamp).
+11. **generated_at** -ISO timestamp string (use the provided timestamp).
 
-12. **stats_snapshot** — Copy of the key numbers: total, resolved, resolutionRate, avgResolutionDays, slaBreachCount, avgQualityScore, escalatedToState, duplicateCount.
+12. **stats_snapshot** -Copy of the key numbers: total, resolved, resolutionRate, avgResolutionDays, slaBreachCount, avgQualityScore, escalatedToState, duplicateCount.
 
 RULES:
 - All text in English.
-- All numbers must be consistent with the provided stats JSON — NEVER invent numbers.
+- All numbers must be consistent with the provided stats JSON -NEVER invent numbers.
 - Be specific: cite district names, category names, exact percentages, and counts.
 - Strategic recommendations must be actionable and realistic for a State Government official.
 - If data for a section is insufficient, note the limitation but still provide analysis.`;

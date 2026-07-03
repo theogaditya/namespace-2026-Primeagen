@@ -4,8 +4,8 @@ import { runComplaintReportAgent } from "../agents/complaintReportAgent";
 import { runActionSuggestionAgent } from "../agents/actionSuggestionAgent";
 
 /**
- * POST /api/report/generate   — SSE stream: pipeline_start → progress → stats → token → complete
- * POST /api/report/actions    — JSON: { actions[], summary }
+ * POST /api/report/generate   -SSE stream: pipeline_start → progress → stats → token → complete
+ * POST /api/report/actions    -JSON: { actions[], summary }
  */
 export function createReportRouter(db: PrismaClient): Router {
   const router = Router();

@@ -401,7 +401,7 @@ export function Analytics() {
           mostLikedComplaints.length = 0
           mostLikedComplaints.push(c)
         } else if (likes === highestLikes && likes > 0) {
-          // tie — include alongside others
+          // tie -include alongside others
           mostLikedComplaints.push(c)
         }
       }

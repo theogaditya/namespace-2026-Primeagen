@@ -21,8 +21,8 @@ export interface ComplaintReportAgentResult {
 
 /**
  * Two-phase report agent:
- *   Phase 1 — Fetch complaints + compute stats (no LLM)
- *   Phase 2 — Stream LLM generation, then parse structured output
+ *   Phase 1 -Fetch complaints + compute stats (no LLM)
+ *   Phase 2 -Stream LLM generation, then parse structured output
  */
 export async function runComplaintReportAgent(
   options: ComplaintReportAgentOptions
@@ -61,7 +61,7 @@ export async function runComplaintReportAgent(
   onToken?.(`📊 Fetched ${rawComplaints.length} complaints across ${Object.keys(stats.byDistrict).length} districts\n`);
   onToken?.(`📈 Resolution rate: ${stats.resolutionRate.toFixed(1)}% · SLA breaches: ${stats.slaBreachCount} · Escalations: ${stats.escalatedToState}\n`);
   onToken?.(`🔍 Top category: ${stats.topCategoryByVolume} · Most urgent district: ${stats.mostUrgentDistrict}\n`);
-  onToken?.(`\n🤖 Running LLM synthesis (single structured call — ~30-60s)...\n`);
+  onToken?.(`\n🤖 Running LLM synthesis (single structured call -~30-60s)...\n`);
   const t0 = Date.now();
 
   let structured;

@@ -2,7 +2,7 @@ import { describe, it, expect } from "vitest";
 
 /**
  * Tests for stripMarkdown and router output processing.
- * stripMarkdown is a pure function — test it directly.
+ * stripMarkdown is a pure function -test it directly.
  */
 
 function stripMarkdown(text: string): string {

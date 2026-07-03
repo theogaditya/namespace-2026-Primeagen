@@ -56,7 +56,7 @@ describe("bindUserId", () => {
     const tool = makeFakeUserTool();
     const bound = bindUserId(tool, "user-abc-123");
 
-    // Calling without _userId — it should be injected
+    // Calling without _userId -it should be injected
     const result = await bound.invoke({ query: "my complaints" });
     const parsed = JSON.parse(result);
 

@@ -34,7 +34,7 @@ export const HELP_DOCUMENTS: HelpDoc[] = [
   {
     id: "faq-complaint-lifecycle",
     title: "What happens after I file a complaint?",
-    content: `After filing: 1) REGISTERED — Your complaint enters the system, 2) UNDER_PROCESSING — Assigned to the relevant department, 3) FORWARDED — May be forwarded to another department if needed, 4) RESOLVED — The department marks it resolved, 5) CLOSED — Finalized after resolution. You receive updates at each stage. Average resolution time depends on the department and urgency, typically 7-30 days. If unresolved, complaints are automatically escalated.`,
+    content: `After filing: 1) REGISTERED -Your complaint enters the system, 2) UNDER_PROCESSING -Assigned to the relevant department, 3) FORWARDED -May be forwarded to another department if needed, 4) RESOLVED -The department marks it resolved, 5) CLOSED -Finalized after resolution. You receive updates at each stage. Average resolution time depends on the department and urgency, typically 7-30 days. If unresolved, complaints are automatically escalated.`,
     category: "faq",
     language: "both",
     keywords: ["after filing", "lifecycle", "process", "what happens", "status", "stages", "kya hota hai"],
@@ -115,12 +115,12 @@ Tips for a high-quality complaint:
     title: "Using Voice Chat",
     content: `SwarajDesk supports full voice conversations in Hindi and English:
 1. Tap the microphone icon in the AI Chat
-2. Speak naturally — the AI understands Hindi, English, and Hinglish (mixed)
+2. Speak naturally -the AI understands Hindi, English, and Hinglish (mixed)
 3. Your speech is transcribed and displayed as text in the chat
 4. The AI responds with both text and audio playback
 5. You can go back and forth with voice many times in a conversation
 6. You can switch between text and voice mid-conversation
-7. Voice is great for filing complaints — just describe your issue verbally`,
+7. Voice is great for filing complaints -just describe your issue verbally`,
     category: "guide",
     language: "both",
     keywords: ["voice", "microphone", "speak", "audio", "hindi voice", "bolna", "awaaz"],
@@ -162,7 +162,7 @@ The AI can look up your specific complaint and give you a personalized status up
 - **File too large**: Photos must be under 5MB. Try taking a smaller photo or compressing the image
 - **Wrong format**: Supported formats are JPG, JPEG, PNG, and WebP. Other formats won't upload
 - **Upload stuck/spinning**: Check your internet connection. Try on WiFi if mobile data is slow
-- **Photo not appearing**: Wait a moment — photos are processed by AI for auto-fill, which takes 5-10 seconds
+- **Photo not appearing**: Wait a moment -photos are processed by AI for auto-fill, which takes 5-10 seconds
 - **Camera not working**: Make sure you've granted camera permissions in your browser/phone settings
 Tips: Use a well-lit, clear photo showing the issue directly. Close-ups work better than wide shots.`,
     category: "troubleshoot",
@@ -202,7 +202,7 @@ Tips: Use a well-lit, clear photo showing the issue directly. Close-ups work bet
     content: `If you're not receiving notifications:
 - **Browser notifications**: Allow push notifications when prompted, or enable in browser settings
 - **Email notifications**: Check your spam/junk folder. Add SwarajDesk to your email contacts
-- **In-app notifications**: Check the bell icon on the dashboard — all notifications are logged there
+- **In-app notifications**: Check the bell icon on the dashboard -all notifications are logged there
 - **Notification preferences**: You can manage notification settings in your profile page
 - **Delayed notifications**: Some notifications are batched and sent periodically, not instantly`,
     category: "troubleshoot",
@@ -222,10 +222,10 @@ Tips: Use a well-lit, clear photo showing the issue directly. Close-ups work bet
 **Completeness (0-25)**: Are all fields filled? Sub-category, urgency, description length?
 
 Score ranges:
-- 76-100 ⭐ Excellent (gold badge) — Complete with photo, exact location, detailed description
-- 51-75 ✅ Good (green badge) — Most fields filled, decent description
-- 26-50 ⚠️ Fair (orange badge) — Missing photo or vague description
-- 0-25 ❌ Poor (red badge) — Minimal information provided
+- 76-100 ⭐ Excellent (gold badge) -Complete with photo, exact location, detailed description
+- 51-75 ✅ Good (green badge) -Most fields filled, decent description
+- 26-50 ⚠️ Fair (orange badge) -Missing photo or vague description
+- 0-25 ❌ Poor (red badge) -Minimal information provided
 
 Higher quality complaints get resolved faster because departments have all the information they need. You can see your average quality score in your civic standing section.`,
     category: "ai-features",
@@ -240,7 +240,7 @@ Higher quality complaints get resolved faster because departments have all the i
 1. The offensive words are automatically replaced with ******
 2. The complaint shows a "⚠️ AI Moderated" badge
 3. The rest of your complaint remains exactly as you wrote it
-4. The core issue is preserved — only the language is cleaned
+4. The core issue is preserved -only the language is cleaned
 
 **Important**: Being passionate about your issue is fine! The AI only flags actual slurs, threats, and obscenity. Describing a problem firmly ("This road is terrible and has been ignored for months!") is NOT flagged.
 
@@ -269,7 +269,7 @@ If you believe your complaint was incorrectly moderated, contact support.`,
 - Upvoting any linked complaint helps all of them get prioritized
 - Departments can see the full scope of an issue across multiple reports
 
-**When filing**: Before you submit, the AI checks for similar complaints and may suggest upvoting an existing one instead — this concentrates civic attention and gets issues resolved faster.`,
+**When filing**: Before you submit, the AI checks for similar complaints and may suggest upvoting an existing one instead -this concentrates civic attention and gets issues resolved faster.`,
     category: "ai-features",
     language: "both",
     keywords: ["similar", "duplicate", "same complaint", "linked", "related", "already reported", "pehle se"],
@@ -279,14 +279,14 @@ If you believe your complaint was incorrectly moderated, contact support.`,
     title: "What can the AI Chat do?",
     content: `The SwarajDesk AI Chat can help you with:
 
-1. **File a complaint** — Describe your issue and the AI guides you through the process
-2. **Track complaints** — Ask "What's the status of complaint #123?"
-3. **Search complaints** — "Show me recent pothole complaints in my district"
-4. **Trending issues** — "What's trending in my area?"
-5. **Platform help** — "How do I upload a photo?", "How do I earn badges?"
-6. **Department info** — "Which department handles water supply?", "Resolution stats?"
-7. **General civic info** — Category explanations, feature guides, community tips
-8. **Voice support** — Speak in Hindi, English, or Hinglish
+1. **File a complaint** -Describe your issue and the AI guides you through the process
+2. **Track complaints** -Ask "What's the status of complaint #123?"
+3. **Search complaints** -"Show me recent pothole complaints in my district"
+4. **Trending issues** -"What's trending in my area?"
+5. **Platform help** -"How do I upload a photo?", "How do I earn badges?"
+6. **Department info** -"Which department handles water supply?", "Resolution stats?"
+7. **General civic info** -Category explanations, feature guides, community tips
+8. **Voice support** -Speak in Hindi, English, or Hinglish
 
 The AI remembers your conversation, so you can ask follow-up questions naturally.`,
     category: "ai-features",
