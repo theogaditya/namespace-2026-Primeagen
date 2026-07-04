@@ -2,6 +2,8 @@ import { Router } from 'express';
 import type { Request, Response } from 'express';
 import { PrismaClient } from '../prisma/generated/client/client';
 import { authenticateAdmin } from '../middleware/unifiedAuth';
+import { blockchainAuditService } from '../services/blockchainAudit';
+
 
 // Jharkhand district coordinates for geocoding fallback
 const JHARKHAND_DISTRICTS: Record<string, { lat: number; lng: number }> = {
@@ -667,6 +669,47 @@ export default function (prisma: PrismaClient) {
       return res.status(500).json({ success: false, message: 'Failed to fetch most-liked complaints' });
     }
   });
+
+  router.get('/verify/:id', async (req: Request, res: Response) => {
+    try {
+      const id = req.params.id;
+      if (!id) {
+        return res.status(400).json({
+          ok: false,
+          message: 'Complaint id is required',
+        });
+      }
+      console.log(`🛡️ [ComplaintRouter] Verifying Blockchain Audit for: ${id}`);
+      
+      const [dbLogs, chainLogs] = await Promise.all([
+        prisma.auditLog.findMany({
+          where: { complaintId: id },
+          orderBy: { timestamp: 'desc' }
+        }),
+        blockchainAuditService.getOnChainLogs(id)
+      ]);
+
+      return res.json({
+        ok: true,
+        complaintId: id,
+        source: {
+          database: "PostgreSQL (Prisma)",
+          blockchain: "Ethereum Sepolia (On-Chain)"
+        },
+        databaseLogs: dbLogs,
+        blockchainVerifiedLogs: chainLogs,
+        synced: chainLogs.length > 0
+      });
+    } catch (error: any) {
+      console.error('[BlockchainVerify] Error:', error);
+      return res.status(500).json({ 
+        ok: false, 
+        message: 'Failed to verify blockchain proof',
+        error: error.message 
+      });
+    }
+  });
+
 
   // Get single complaint by ID (placed last to avoid route shadowing)
   router.get('/:id', authenticateAdmin, async (req: Request, res: Response) => {

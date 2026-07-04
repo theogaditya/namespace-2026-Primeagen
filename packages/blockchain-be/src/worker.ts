@@ -26,6 +26,7 @@ const GRIEVANCE_CONTRACT_ABI = [
   "function getComplaintVerificationCode(string) view returns (bytes32)",
   "function emitComplaintVerificationCode(string) returns (bytes32)",
   "function commitMerkleBatch(bytes32,uint32,string) returns (uint256)",
+  "function createAuditLog(string,string,string,string,string)",
 ] as const;
 
 const DEFAULT_USER_QUEUE = "user:registration:queue";
@@ -578,7 +579,11 @@ class BlockchainWorker {
 
     await this.storeChainMetadata(`complaint:${id}`, cid, receipt);
 
+    // Sync to Audit Log for Verification Badge
+    await this.createAuditLog(id, "REGISTERED", complainantId || "SYSTEM", `Complaint successfully registered on-chain with ID ${id}`);
+
     if (typeof data.slaDueAt !== "undefined") {
+
       await this.recordComplaintSla(id, data);
     }
 
@@ -724,6 +729,23 @@ class BlockchainWorker {
     });
 
     await this.storeChainMetadata(`complaint:${id}`, undefined, receipt);
+    
+    // Connect to Audit Log
+    const logDetails = `Status changed to ${statusName}: ${statusReason}`;
+    await this.createAuditLog(id, "STATUS_UPDATE", data.agentId || "SYSTEM", logDetails);
+  }
+
+  private async createAuditLog(complaintId: string, action: string, userId: string, details: string) {
+    try {
+      const logId = `LOG-${uuidv4().slice(0, 8)}`;
+      const fn = this.contract.getFunction("createAuditLog");
+      await this.sendTransactionWithRetry("createAuditLog", async () => {
+        return fn(logId, action, userId, complaintId, details);
+      });
+      console.log(`[AuditLog] ${action} synced for complaint ${complaintId}`);
+    } catch (err) {
+      console.error(`[AuditLog] Failed to sync ${action}:`, err);
+    }
   }
 
   private async recordComplaintSla(id: string, data: ComplaintQueueData) {
@@ -737,6 +759,8 @@ class BlockchainWorker {
 
     await this.storeChainMetadata(`complaint:${id}`, undefined, slaReceipt);
 
+    await this.createAuditLog(id, "SLA_SET", "SYSTEM", `Resolution deadline locked to: ${new Date(Number(dueAt) * 1000).toLocaleString()}`);
+
     if (data.slaBreachNote) {
       const breachReceipt = await this.sendTransactionWithRetry("markComplaintSlaBreached", async () => {
         const fn = this.contract.getFunction("markComplaintSlaBreached");
@@ -744,6 +768,7 @@ class BlockchainWorker {
       });
 
       await this.storeChainMetadata(`complaint:${id}`, undefined, breachReceipt);
+      await this.createAuditLog(id, "SLA_BREACH", "SYSTEM_ORACLE", `SLA Breach Detected: ${data.slaBreachNote}`);
     }
   }
 
@@ -760,6 +785,7 @@ class BlockchainWorker {
     });
 
     await this.storeChainMetadata(`complaint:${id}`, undefined, receipt);
+    await this.createAuditLog(id, "ESCALATION", "SYSTEM", `Force Escalated to level ${data.escalateToStatus}: ${escalationReason}`);
   }
 
   private buildComplaintLeafHash(id: string, data: ComplaintQueueData): string {
