@@ -62,6 +62,19 @@ interface Complaint {
   isDuplicate?: boolean | null
 }
 
+interface BlockchainLogEntry {
+  action?: string
+  details?: string
+  timestamp?: string
+  transactionHash?: string
+  blockNumber?: number
+}
+
+interface BlockchainVerificationResponse {
+  databaseLogs?: BlockchainLogEntry[]
+  blockchainVerifiedLogs?: BlockchainLogEntry[]
+}
+
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3002'
 
 // ─── Utilities ────────────────────────────────────────────────────────
@@ -166,6 +179,8 @@ export function MunicipalDashboard({ onTabChange }: { onTabChange?: (tab: 'dashb
   const [selectedComplaint, setSelectedComplaint] = useState<Complaint | null>(null)
   const [selectedStatus, setSelectedStatus] = useState<string | null>(null)
   const [statusUpdating, setStatusUpdating] = useState(false)
+  const [blockchainLogs, setBlockchainLogs] = useState<BlockchainVerificationResponse | null>(null)
+  const [blockchainLoading, setBlockchainLoading] = useState(false)
   const [currentAdminId, setCurrentAdminId] = useState<string | null>(null)
   const [adminType, setAdminType] = useState<string | null>(null)
   const [overviewStats, setOverviewStats] = useState<OverviewStats>({ total: 0, registered: 0, inProgress: 0, resolved: 0, closed: 0, highPriority: 0, assigned: 0 })
@@ -234,6 +249,36 @@ export function MunicipalDashboard({ onTabChange }: { onTabChange?: (tab: 'dashb
     }, 300)
     return () => clearTimeout(debounce)
   }, [searchTerm])
+
+  useEffect(() => {
+    if (selectedComplaint) {
+      fetchBlockchainLogs(selectedComplaint.id)
+    } else {
+      setBlockchainLogs(null)
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectedComplaint])
+
+  const fetchBlockchainLogs = async (complaintId: string) => {
+    setBlockchainLoading(true)
+    try {
+      const token = localStorage.getItem("token")
+      const response = await fetch(`/api/complaints/verify/${complaintId}`, {
+        headers: token ? { Authorization: `Bearer ${token}` } : undefined,
+      })
+      if (!response.ok) {
+        setBlockchainLogs(null)
+        return
+      }
+      const data = (await response.json()) as BlockchainVerificationResponse
+      setBlockchainLogs(data)
+    } catch (error) {
+      console.error("Error fetching blockchain logs:", error)
+      setBlockchainLogs(null)
+    } finally {
+      setBlockchainLoading(false)
+    }
+  }
 
   // ── Handlers ──
   const handleAssignToMe = async (complaintId: string) => {
@@ -755,6 +800,85 @@ export function MunicipalDashboard({ onTabChange }: { onTabChange?: (tab: 'dashb
                     <MetaBlock label="Status"><StatusPill status={selectedComplaint.status} /></MetaBlock>
                     <MetaBlock label="Priority"><PriorityPill urgency={selectedComplaint.urgency} /></MetaBlock>
                   </div>
+
+                  <section className="bg-white p-6 rounded-xl space-y-3">
+                    <div className="flex items-center justify-between">
+                      <h3 className="text-sm font-black uppercase tracking-widest text-[#44474c] flex items-center gap-2">
+                        <span className="material-symbols-outlined text-[#115cb9]">shield_lock</span>
+                        On-Chain Audit Trail
+                      </h3>
+                      {blockchainLoading && (
+                        <span className="text-[10px] font-bold uppercase tracking-widest text-[#115cb9]">
+                          Syncing...
+                        </span>
+                      )}
+                    </div>
+
+                    <div className="space-y-2">
+                      {blockchainLogs?.databaseLogs?.slice(0, 5).map((log, idx) => {
+                        const proof = blockchainLogs.blockchainVerifiedLogs?.find(
+                          (entry) => entry.action === log.action
+                        )
+                        return (
+                          <div
+                            key={`db-${idx}`}
+                            className="p-3 bg-[#f3f4f5] rounded-lg border border-[#e1e3e4]"
+                          >
+                            <div className="flex items-start justify-between gap-2">
+                              <p className="text-xs font-bold text-[#041627]">
+                                {log.action || "Audit Event"}
+                              </p>
+                              <span className="text-[10px] text-[#44474c] whitespace-nowrap">
+                                {log.timestamp ? formatDate(log.timestamp) : "--"}
+                              </span>
+                            </div>
+                            <p className="text-xs text-[#44474c] mt-1">{log.details || "No details available"}</p>
+                            {proof?.transactionHash && (
+                              <a
+                                href={`https://sepolia.etherscan.io/tx/${proof.transactionHash}`}
+                                target="_blank"
+                                rel="noreferrer"
+                                className="mt-2 inline-block text-[10px] font-mono text-[#115cb9] hover:underline"
+                              >
+                                Proof: {proof.transactionHash.slice(0, 12)}...
+                              </a>
+                            )}
+                          </div>
+                        )
+                      })}
+
+                      {!blockchainLogs?.databaseLogs?.length &&
+                        blockchainLogs?.blockchainVerifiedLogs?.slice(0, 3).map((log, idx) => (
+                          <div
+                            key={`chain-${idx}`}
+                            className="p-3 bg-[#f3f4f5] rounded-lg border border-[#e1e3e4]"
+                          >
+                            <p className="text-xs font-bold text-[#041627]">
+                              {log.action || "ON_CHAIN_CONFIRMATION"}
+                            </p>
+                            <p className="text-xs text-[#44474c] mt-1">
+                              {log.details || "Confirmed on blockchain."}
+                            </p>
+                            {log.transactionHash && (
+                              <a
+                                href={`https://sepolia.etherscan.io/tx/${log.transactionHash}`}
+                                target="_blank"
+                                rel="noreferrer"
+                                className="mt-2 inline-block text-[10px] font-mono text-[#115cb9] hover:underline"
+                              >
+                                Proof: {log.transactionHash.slice(0, 12)}...
+                              </a>
+                            )}
+                          </div>
+                        ))}
+
+                      {!blockchainLoading &&
+                        !blockchainLogs?.databaseLogs?.length &&
+                        !blockchainLogs?.blockchainVerifiedLogs?.length && (
+                          <p className="text-xs italic text-[#44474c]">No blockchain proofs available.</p>
+                        )}
+                    </div>
+                  </section>
 
                   {/* Complainant Info */}
                   <section className="bg-white p-6 rounded-xl">

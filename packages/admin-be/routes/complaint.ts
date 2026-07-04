@@ -680,14 +680,57 @@ export default function (prisma: PrismaClient) {
         });
       }
       console.log(`🛡️ [ComplaintRouter] Verifying Blockchain Audit for: ${id}`);
+
+      const complaintMeta = await prisma.complaint.findUnique({
+        where: { id },
+        select: {
+          id: true,
+          blockchainHash: true,
+          blockchainBlock: true,
+          blockchainStatus: true,
+          isOnChain: true,
+          blockchainUpdatedAt: true,
+        },
+      });
+
+      if (!complaintMeta) {
+        return res.status(404).json({ ok: false, message: 'Complaint not found' });
+      }
+
+      const hintBlock = complaintMeta.blockchainBlock
+        ? Number(complaintMeta.blockchainBlock)
+        : undefined;
       
-      const [dbLogs, chainLogs] = await Promise.all([
+      const [dbLogs, rawChainLogs] = await Promise.all([
         prisma.auditLog.findMany({
           where: { complaintId: id },
           orderBy: { timestamp: 'desc' }
         }),
-        blockchainAuditService.getOnChainLogs(id)
+        blockchainAuditService.getOnChainLogs(id, hintBlock, {
+          // When tx hash exists, skip expensive deep scan and fall back to receipt proof if needed.
+          disableFallbackScan: Boolean(complaintMeta.blockchainHash),
+        })
       ]);
+
+      let chainLogs = rawChainLogs;
+
+      // If indexed log search returns nothing, verify tx hash directly on-chain as a fallback.
+      if (chainLogs.length === 0 && complaintMeta.blockchainHash) {
+        const txProof = await blockchainAuditService.getTransactionProof(complaintMeta.blockchainHash);
+        if (txProof) {
+          chainLogs = [
+            {
+              logId: `tx:${complaintMeta.blockchainHash.slice(0, 12)}`,
+              action: 'ON_CHAIN_CONFIRMATION',
+              userId: 'system',
+              details: `Complaint anchored on-chain via transaction ${complaintMeta.blockchainHash}`,
+              timestamp: txProof.timestamp,
+              transactionHash: txProof.transactionHash,
+              blockNumber: txProof.blockNumber,
+            },
+          ];
+        }
+      }
 
       return res.json({
         ok: true,
@@ -698,7 +741,16 @@ export default function (prisma: PrismaClient) {
         },
         databaseLogs: dbLogs,
         blockchainVerifiedLogs: chainLogs,
-        synced: chainLogs.length > 0
+        synced: chainLogs.length > 0,
+        chainMeta: {
+          isOnChain: complaintMeta.isOnChain,
+          blockchainStatus: complaintMeta.blockchainStatus,
+          blockchainHash: complaintMeta.blockchainHash,
+          blockchainBlock: complaintMeta.blockchainBlock
+            ? complaintMeta.blockchainBlock.toString()
+            : null,
+          blockchainUpdatedAt: complaintMeta.blockchainUpdatedAt,
+        },
       });
     } catch (error: any) {
       console.error('[BlockchainVerify] Error:', error);
