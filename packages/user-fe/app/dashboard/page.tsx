@@ -18,10 +18,8 @@ import DashboardTopBar from "@/components/dashboard/DashboardTopBar";
 import DashboardAIChatHub from "@/components/dashboard/DashboardAIChatHub";
 import CivicStandingSection from "@/components/dashboard/CivicStandingSection";
 import ActiveReportsGrid from "@/components/dashboard/ActiveReportsGrid";
-import LiveAreaMapWidget from "@/components/dashboard/LiveAreaMapWidget";
 import AnnouncementsWidget from "@/components/dashboard/AnnouncementsWidget";
 import BlockchainWidget from "@/components/dashboard/BlockchainWidget";
-import HelpfulLinksWidget from "@/components/dashboard/HelpfulLinksWidget";
 import ReportHistoryView from "@/components/dashboard/ReportHistoryView";
 import AllBadgesModal from "@/components/dashboard/AllBadgesModal";
 import ProfileSettingsModal from "@/components/dashboard/ProfileSettingsModal";
@@ -295,15 +293,11 @@ export default function DashboardPage() {
                       loading={loadingComplaints}
                     />
 
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                      <LiveAreaMapWidget />
-                      <AnnouncementsWidget />
-                    </div>
+                    <AnnouncementsWidget />
                   </div>
 
                   <div className="col-span-12 lg:col-span-4 space-y-6">
                     <BlockchainWidget />
-                    <HelpfulLinksWidget />
                   </div>
                 </div>
               </div>

@@ -9,7 +9,7 @@ class RedisClient {
   private isConnected: boolean = false;
 
   private createClient(): RedisClientType {
-    const url = 'redis://localhost:6379';
+    const url = process.env.REDIS_URL || 'redis://localhost:6379';
     console.log(`[Redis] Connecting to ${url.replace(/:\/\/.*@/, '://<redacted>@')}`);
     const client = createClient({ url });
 

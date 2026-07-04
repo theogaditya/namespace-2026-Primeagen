@@ -174,7 +174,7 @@ export default function FlowSection() {
           transition={{ duration: 0.6 }}
           className="text-center mb-16 md:mb-20"
         >
-          <h2 className="text-3xl md:text-4xl font-extrabold tracking-tight mb-4">
+          <h2 className="text-3xl md:text-4xl font-extrabold tracking-tight mb-4" style={{ fontFamily: 'var(--font-headline)' }}>
             The SwarajDesk Flow
           </h2>
           <p className="text-gray-500 max-w-2xl mx-auto text-base md:text-lg">

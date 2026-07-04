@@ -60,6 +60,7 @@ export default function LandingCTA() {
               viewport={{ once: true }}
               transition={{ delay: 0.2, duration: 0.6 }}
               className="text-3xl md:text-5xl font-extrabold tracking-tight mb-8 leading-tight"
+              style={{ fontFamily: 'var(--font-headline)' }}
             >
               Ready to see a better community?
             </motion.h2>

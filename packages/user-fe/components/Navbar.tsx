@@ -22,6 +22,7 @@ const LANGUAGES = [
   { code: 'ur', name: 'اردو (Urdu)' },
   { code: 'as', name: 'অসমীয়া (Assamese)' },
   { code: 'ne', name: 'नेपाली (Nepali)' },
+  { code: 'ne', name: 'नेपाली (Nepali)' },
 ];
 
 // Language selector component
@@ -33,15 +34,18 @@ const LanguageSelector = ({ onClose }: { onClose: () => void }) => {
     // Get current language from Google Translate cookie
     // Try multiple patterns as cookie format can vary
     const cookies = document.cookie;
-    
+
+
     // Try standard format: googtrans=/en/hi
     let match = cookies.match(/googtrans=\/en\/([a-z-]+)/i);
-    
+
+
     // If not found, try URL encoded format: googtrans=%2Fen%2Fhi
     if (!match) {
       match = cookies.match(/googtrans=%2Fen%2F([a-z-]+)/i);
     }
-    
+
+
     if (match && match[1]) {
       setCurrentLang(match[1]);
     }
@@ -51,39 +55,47 @@ const LanguageSelector = ({ onClose }: { onClose: () => void }) => {
     // Clear existing googtrans cookies first (important for production)
     const hostname = window.location.hostname;
     const expiredDate = 'Thu, 01 Jan 1970 00:00:00 UTC';
-    
+
+
     // Clear cookies with various domain configurations
     document.cookie = `googtrans=; expires=${expiredDate}; path=/`;
     document.cookie = `googtrans=; expires=${expiredDate}; path=/; domain=${hostname}`;
     document.cookie = `googtrans=; expires=${expiredDate}; path=/; domain=.${hostname}`;
-    
+
+
     // Also clear from root domain if on subdomain (e.g., app.example.com -> .example.com)
     const parts = hostname.split('.');
     if (parts.length > 2) {
       const rootDomain = parts.slice(-2).join('.');
       document.cookie = `googtrans=; expires=${expiredDate}; path=/; domain=.${rootDomain}`;
     }
-    
+
+
     // Small delay to ensure cookies are cleared
     setTimeout(() => {
       // Set new Google Translate cookie
       const newValue = `/en/${langCode}`;
-      
+
+
       // Set cookie without domain (works most reliably in production)
       document.cookie = `googtrans=${newValue}; path=/`;
-      
+
+
       // Also set with explicit domain for Google Translate to pick up
       document.cookie = `googtrans=${newValue}; path=/; domain=${hostname}`;
-      
+
+
       // For subdomains, also set on root domain
       if (parts.length > 2) {
         const rootDomain = parts.slice(-2).join('.');
         document.cookie = `googtrans=${newValue}; path=/; domain=.${rootDomain}`;
       }
-      
+
+
       setCurrentLang(langCode);
       onClose();
-      
+
+
       // Reload to apply translation
       window.location.reload();
     }, 100);
@@ -106,16 +118,90 @@ const LanguageSelector = ({ onClose }: { onClose: () => void }) => {
           <ChevronRight className={`w-4 h-4 text-gray-400 transition-transform ${showLanguages ? 'rotate-90' : ''}`} />
         </div>
       </button>
-      
+
+
       {showLanguages && (
         <div className="max-h-48 overflow-y-auto bg-gray-50 py-1">
           {LANGUAGES.map((lang) => (
             <button
               key={lang.code}
               onClick={() => changeLanguage(lang.code)}
-              className={`w-full text-left px-6 py-2 text-sm hover:bg-gray-100 transition-colors ${
-                currentLang === lang.code ? 'text-blue-600 font-medium bg-blue-50' : 'text-gray-700'
-              }`}
+              className={`w-full text-left px-6 py-2 text-sm hover:bg-gray-100 transition-colors ${currentLang === lang.code ? 'text-blue-600 font-medium bg-blue-50' : 'text-gray-700'
+                }`}
+            >
+              {lang.name}
+            </button>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+};
+
+// Standalone language button for logged-out navbar
+const LandingLanguageButton = () => {
+  const [open, setOpen] = useState(false);
+  const [currentLang, setCurrentLang] = useState('en');
+  const ref = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const cookies = document.cookie;
+    let match = cookies.match(/googtrans=\/en\/([a-z-]+)/i);
+    if (!match) match = cookies.match(/googtrans=%2Fen%2F([a-z-]+)/i);
+    if (match?.[1]) setCurrentLang(match[1]);
+  }, []);
+
+  useEffect(() => {
+    const handleClick = (e: MouseEvent) => {
+      if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false);
+    };
+    document.addEventListener('mousedown', handleClick);
+    return () => document.removeEventListener('mousedown', handleClick);
+  }, []);
+
+  const changeLanguage = (langCode: string) => {
+    const hostname = window.location.hostname;
+    const expiredDate = 'Thu, 01 Jan 1970 00:00:00 UTC';
+    document.cookie = `googtrans=; expires=${expiredDate}; path=/`;
+    document.cookie = `googtrans=; expires=${expiredDate}; path=/; domain=${hostname}`;
+    document.cookie = `googtrans=; expires=${expiredDate}; path=/; domain=.${hostname}`;
+    const parts = hostname.split('.');
+    if (parts.length > 2) {
+      document.cookie = `googtrans=; expires=${expiredDate}; path=/; domain=.${parts.slice(-2).join('.')}`;
+    }
+    setTimeout(() => {
+      const newValue = `/en/${langCode}`;
+      document.cookie = `googtrans=${newValue}; path=/`;
+      document.cookie = `googtrans=${newValue}; path=/; domain=${hostname}`;
+      if (parts.length > 2) {
+        document.cookie = `googtrans=${newValue}; path=/; domain=.${parts.slice(-2).join('.')}`;
+      }
+      setCurrentLang(langCode);
+      setOpen(false);
+      window.location.reload();
+    }, 100);
+  };
+
+  const currentLanguage = LANGUAGES.find(l => l.code === currentLang) || LANGUAGES[0];
+
+  return (
+    <div className="relative" ref={ref}>
+      <button
+        onClick={() => setOpen(!open)}
+        className="flex items-center gap-1.5 px-2.5 py-1.5 text-sm text-gray-600 hover:text-gray-900 transition-colors rounded-lg hover:bg-gray-50"
+        title={currentLanguage.name}
+      >
+        <Globe className="w-4 h-4" />
+        <span className="hidden sm:inline text-xs font-medium">{currentLanguage.name.split(' ')[0]}</span>
+        <ChevronDown className={`w-3 h-3 transition-transform ${open ? 'rotate-180' : ''}`} />
+      </button>
+      {open && (
+        <div className="absolute right-0 mt-2 w-52 bg-white rounded-xl shadow-lg border border-gray-100 py-1 z-50 max-h-64 overflow-y-auto animate-in fade-in slide-in-from-top-2 duration-200">
+          {LANGUAGES.map((lang) => (
+            <button
+              key={lang.code}
+              onClick={() => changeLanguage(lang.code)}
+              className={`w-full text-left px-4 py-2 text-sm hover:bg-gray-50 transition-colors ${currentLang === lang.code ? 'text-violet-600 font-medium bg-violet-50' : 'text-gray-700'}`}
             >
               {lang.name}
             </button>
@@ -156,10 +242,12 @@ const Navbar = () => {
 
     // Listen for storage changes (in case of login/logout in another tab)
     window.addEventListener('storage', checkAuth);
-    
+
+
     // Listen for auth changes within the same tab
     window.addEventListener('authChange', checkAuth);
-    
+
+
     return () => {
       window.removeEventListener('storage', checkAuth);
       window.removeEventListener('authChange', checkAuth);
@@ -221,7 +309,8 @@ const Navbar = () => {
                   </span>
                   <ChevronDown className={`w-4 h-4 transition-transform ${isDropdownOpen ? 'rotate-180' : ''}`} />
                 </button>
-                
+
+
                 {/* Dropdown Menu */}
                 {isDropdownOpen && (
                   <div className="absolute right-0 mt-2 w-52 sm:w-56 bg-white rounded-xl shadow-lg border border-gray-100 py-1 z-50 animate-in fade-in slide-in-from-top-2 duration-200">
@@ -242,6 +331,8 @@ const Navbar = () => {
               </div>
             ) : (
               <>
+                {/* Language selector for logged-out users */}
+                <LandingLanguageButton />
                 <Link
                   href='/loginUser'
                   className='px-3 py-1.5 text-sm font-medium text-gray-600 hover:text-gray-900 transition-colors'

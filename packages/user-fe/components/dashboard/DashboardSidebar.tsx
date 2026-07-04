@@ -111,10 +111,6 @@ export default function DashboardSidebar({
 
       {/* Bottom Links */}
       <div className="mt-auto space-y-1">
-        <button className="flex items-center gap-3 px-4 py-3 w-full text-slate-600 hover:bg-slate-100 rounded-lg transition-all text-sm font-medium">
-          <HelpCircle className="w-5 h-5" />
-          <span>Support</span>
-        </button>
         <button
           onClick={handleSignOut}
           className="flex items-center gap-3 px-4 py-3 w-full text-[var(--dash-error)] hover:bg-red-50 rounded-lg transition-all text-sm font-medium"

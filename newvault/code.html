@@ -1,0 +1,699 @@
+<!DOCTYPE html>
+
+<html class="scroll-smooth" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>SwarajDesk | Empower Your Community</title>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&amp;family=Plus+Jakarta+Sans:wght@700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "on-tertiary-container": "#8afcb3",
+              "primary": "#7C3AED",
+              "surface-dim": "#d4daea",
+              "tertiary": "#005b31",
+              "on-secondary-container": "#00477f",
+              "background": "#f9f9ff",
+              "on-primary-fixed-variant": "#5a00c6",
+              "error": "#ba1a1a",
+              "surface-container": "#e8eeff",
+              "tertiary-fixed-dim": "#6bdc96",
+              "secondary-fixed-dim": "#a2c9ff",
+              "primary-container": "#7c3aed",
+              "primary-fixed-dim": "#d2bbff",
+              "surface-container-high": "#e3e8f9",
+              "outline-variant": "#ccc3d8",
+              "inverse-primary": "#d2bbff",
+              "on-primary-fixed": "#25005a",
+              "surface-container-low": "#f1f3ff",
+              "on-background": "#161c27",
+              "surface-tint": "#732ee4",
+              "on-error": "#ffffff",
+              "surface-bright": "#f9f9ff",
+              "on-primary-container": "#ede0ff",
+              "outline": "#7b7487",
+              "on-secondary-fixed": "#001c38",
+              "inverse-on-surface": "#ecf0ff",
+              "surface-variant": "#dde2f3",
+              "on-error-container": "#93000a",
+              "on-tertiary": "#ffffff",
+              "on-primary": "#ffffff",
+              "inverse-surface": "#2a303d",
+              "on-secondary-fixed-variant": "#004881",
+              "primary-fixed": "#eaddff",
+              "tertiary-container": "#007642",
+              "error-container": "#ffdad6",
+              "on-secondary": "#ffffff",
+              "on-surface-variant": "#4a4455",
+              "secondary-container": "#7db6ff",
+              "surface-container-highest": "#dde2f3",
+              "tertiary-fixed": "#88f9b0",
+              "on-tertiary-fixed-variant": "#00522c",
+              "on-tertiary-fixed": "#00210f",
+              "secondary-fixed": "#d3e4ff",
+              "surface": "#f9f9ff",
+              "surface-container-lowest": "#ffffff",
+              "secondary": "#1960a3",
+              "on-surface": "#161c27"
+            },
+            fontFamily: {
+              "headline": ["Plus Jakarta Sans"],
+              "body": ["Inter"],
+              "label": ["Inter"]
+            },
+            borderRadius: {"DEFAULT": "0.5rem", "lg": "0.5rem", "xl": "0.75rem", "2xl": "1rem", "3xl": "1.5rem", "full": "9999px"},
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            vertical-align: middle;
+        }
+        .glass-nav {
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+        }
+        @keyframes pulse-ring {
+            0% { transform: scale(.33); }
+            80%, 100% { opacity: 0; }
+        }
+        .pulse-dot::before {
+            content: '';
+            position: absolute;
+            display: block;
+            width: 300%;
+            height: 300%;
+            box-sizing: border-box;
+            margin-left: -100%;
+            margin-top: -100%;
+            border-radius: 45px;
+            background-color: #7C3AED;
+            animation: pulse-ring 1.25s cubic-bezier(0.215, 0.61, 0.355, 1) infinite;
+        }
+        .bento-card {
+            transition: all 0.5s cubic-bezier(0.2, 1, 0.3, 1);
+            border: 1px solid rgba(226, 232, 240, 0.8);
+            position: relative;
+            overflow: hidden;
+        }
+        .bento-card:hover {
+            border-color: #7C3AED;
+            box-shadow: 0 25px 50px -12px rgba(124, 58, 237, 0.25);
+            transform: translateY(-8px) scale(1.02);
+            z-index: 10;
+        }
+        .bento-card:hover .feature-visual {
+            transform: scale(1.1) rotate(2deg);
+        }
+        .technical-grid {
+            background-image: radial-gradient(circle at 1px 1px, #e2e8f0 1px, transparent 0);
+            background-size: 24px 24px;
+        }
+        .gumroad-shadow {
+            box-shadow: 8px 8px 0px 0px rgba(0,0,0,1);
+            transition: all 0.2s ease;
+        }
+        .gumroad-shadow:hover {
+            box-shadow: 12px 12px 0px 0px #7C3AED;
+            transform: translate(-4px, -4px);
+        }
+        @keyframes float {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+            100% { transform: translateY(0px); }
+        }
+        .floating { animation: float 3s ease-in-out infinite; }
+    </style>
+</head>
+<body class="bg-background text-on-background font-body selection:bg-primary-fixed selection:text-on-primary-fixed">
+<!-- TopNavBar -->
+<nav class="fixed top-0 w-full z-50 bg-white/80 dark:bg-slate-950/80 backdrop-blur-xl shadow-sm">
+<div class="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
+<div class="text-2xl font-bold tracking-tight text-primary font-headline">
+            SwarajDesk
+        </div>
+<div class="hidden md:flex items-center gap-8">
+<a class="text-primary font-semibold border-b-2 border-primary transition-colors" href="#features">Features</a>
+<a class="text-slate-600 hover:text-primary transition-colors" href="#how-it-works">How it Works</a>
+<a class="text-slate-600 hover:text-primary transition-colors" href="#">Impact</a>
+<a class="text-slate-600 hover:text-primary transition-colors" href="#">Resources</a>
+</div>
+<div class="flex items-center gap-4">
+<button class="bg-primary hover:bg-primary-container text-on-primary px-6 py-2.5 rounded-xl font-semibold transition-all active:scale-95 duration-200">
+                Start Reporting
+            </button>
+</div>
+</div>
+<div class="bg-slate-100 h-[1px]"></div>
+</nav>
+<main class="pt-20">
+<!-- Hero Section -->
+<section class="relative overflow-hidden pt-20 pb-20">
+<div class="max-w-7xl mx-auto px-6 grid md:grid-cols-2 gap-16 items-center">
+<div class="z-10">
+<span class="inline-block py-1 px-3 rounded-full bg-secondary-fixed text-on-secondary-fixed text-xs font-bold tracking-wider uppercase mb-6">
+                    Governance Reinvented
+                </span>
+<h1 class="font-headline text-5xl md:text-7xl font-extrabold text-on-background leading-[1.1] mb-8">
+                    Empower Your Community. <span class="text-primary">Bridge the Gap.</span>
+</h1>
+<p class="text-lg md:text-xl text-on-surface-variant leading-relaxed mb-10 max-w-xl">
+                    Report local issues, track progress, and see real results. SwarajDesk is your direct line to transparent government resolution.
+                </p>
+<div class="flex flex-wrap gap-4">
+<button class="bg-gradient-to-r from-primary to-primary-container text-on-primary px-8 py-4 rounded-xl font-bold text-lg shadow-lg shadow-primary/20 hover:shadow-primary/30 transition-all active:scale-95">
+                        Start a Complaint
+                    </button>
+<button class="bg-surface-container-highest text-primary px-8 py-4 rounded-xl font-bold text-lg hover:bg-surface-variant transition-all">
+                        How it Works
+                    </button>
+</div>
+</div>
+<div class="relative">
+<div class="absolute -top-20 -right-20 w-96 h-96 bg-primary/10 rounded-full blur-3xl"></div>
+<div class="relative bg-surface-container-lowest p-8 rounded-[2rem] shadow-2xl shadow-primary/5 border border-outline-variant/20">
+<img alt="City bridge at dusk" class="rounded-xl w-full object-cover aspect-video shadow-inner" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDH2iYGowqwi5WF6oXyqQ7w-oAoPS9PUENQsRNY1QVZKnRKghPsgymBryGvo8yAkOFWNpVW0m0MB46QwtLKyrThWMHz7LRI_SdiLNSEJhd-V43dkEAjj4zXZ1uToEfc4-6UT0yNExXzv8uVExoY5EZQ77Vz4IEAD7huvI0sLRdMqdOIB4Clmd5xNd-hl3KDm9b9dp9LwLw4WAyma3RVxL5gI5lSOYLTfOG2niIJDvrmLea4cKFhr81Ej4Hsrxh8PVmqAm1FpIavrWaO"/>
+<div class="mt-8 flex gap-4 overflow-x-auto pb-2 scrollbar-hide">
+<div class="flex-shrink-0 bg-surface-container-low p-4 rounded-xl w-40">
+<span class="material-symbols-outlined text-primary mb-2" data-icon="water_drop">water_drop</span>
+<div class="text-sm font-bold">Water Supply</div>
+<div class="text-[10px] text-on-surface-variant">42 Active Reports</div>
+</div>
+<div class="flex-shrink-0 bg-surface-container-low p-4 rounded-xl w-40">
+<span class="material-symbols-outlined text-primary mb-2" data-icon="construction">construction</span>
+<div class="text-sm font-bold">Road Repairs</div>
+<div class="text-[10px] text-on-surface-variant">12 Resolved Today</div>
+</div>
+<div class="flex-shrink-0 bg-surface-container-low p-4 rounded-xl w-40">
+<span class="material-symbols-outlined text-primary mb-2" data-icon="lightbulb">lightbulb</span>
+<div class="text-sm font-bold">Street Lighting</div>
+<div class="text-[10px] text-on-surface-variant">Verified by AI</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Trusted By Section -->
+<section class="py-12 border-y border-outline-variant/20 bg-white">
+<div class="max-w-7xl mx-auto px-6">
+<p class="text-center text-sm font-bold text-on-surface-variant/60 uppercase tracking-[0.2em] mb-8">Trusted by Civic Leaders</p>
+<div class="flex flex-wrap justify-center items-center gap-12 md:gap-24 opacity-60 grayscale hover:grayscale-0 transition-all duration-500">
+<div class="flex items-center gap-2 font-headline font-bold text-xl text-slate-800">
+<span class="material-symbols-outlined text-3xl">account_balance</span>
+                    BMC
+                </div>
+<div class="flex items-center gap-2 font-headline font-bold text-xl text-slate-800">
+<span class="material-symbols-outlined text-3xl">domain</span>
+                    SMC
+                </div>
+<div class="flex items-center gap-2 font-headline font-bold text-xl text-slate-800">
+<span class="material-symbols-outlined text-3xl">gavel</span>
+                    NDMC
+                </div>
+<div class="flex items-center gap-2 font-headline font-bold text-xl text-slate-800">
+<span class="material-symbols-outlined text-3xl">corporate_fare</span>
+                    Urban Affairs
+                </div>
+<div class="flex items-center gap-2 font-headline font-bold text-xl text-slate-800">
+<span class="material-symbols-outlined text-3xl">policy</span>
+                    Civic Corp
+                </div>
+</div>
+</div>
+</section>
+<!-- Section 2: Flow Tree Visualization -->
+<section class="py-24 bg-surface-container-low" id="how-it-works">
+<div class="max-w-7xl mx-auto px-6">
+<div class="text-center mb-20">
+<h2 class="font-headline text-4xl font-bold mb-4">The SwarajDesk Flow</h2>
+<p class="text-on-surface-variant max-w-2xl mx-auto">From reporting to resolution, see how our intelligent engine bridges the gap using AI and Blockchain.</p>
+</div>
+<div class="relative h-[600px] flex items-center justify-center">
+<!-- Central Node -->
+<div class="z-20 w-48 h-48 rounded-full bg-primary flex items-center justify-center shadow-[0_0_50px_rgba(124,58,237,0.3)] border-4 border-on-primary/20">
+<div class="text-center text-on-primary">
+<div class="text-xl font-extrabold font-headline">SwarajDesk</div>
+<div class="text-[10px] opacity-80 uppercase tracking-widest">Core Engine</div>
+</div>
+</div>
+<!-- Left Nodes (Inputs) -->
+<div class="absolute left-0 h-full flex flex-col justify-between py-10 w-1/3">
+<div class="flex items-center justify-end gap-4 group">
+<div class="text-right">
+<div class="font-bold">Water Issues</div>
+<div class="text-xs text-on-surface-variant">Leakage, Shortage</div>
+</div>
+<div class="w-12 h-12 rounded-lg bg-surface-container-lowest flex items-center justify-center shadow-sm group-hover:scale-110 transition-transform">
+<span class="material-symbols-outlined text-primary" data-icon="water_drop">water_drop</span>
+</div>
+</div>
+<div class="flex items-center justify-end gap-4 mr-16 group">
+<div class="text-right">
+<div class="font-bold">Road Repair</div>
+<div class="text-xs text-on-surface-variant">Potholes, Blockage</div>
+</div>
+<div class="w-12 h-12 rounded-lg bg-surface-container-lowest flex items-center justify-center shadow-sm group-hover:scale-110 transition-transform">
+<span class="material-symbols-outlined text-primary" data-icon="road">road</span>
+</div>
+</div>
+<div class="flex items-center justify-end gap-4 mr-24 group">
+<div class="text-right">
+<div class="font-bold">Municipal Services</div>
+<div class="text-xs text-on-surface-variant">Garbage, Permits</div>
+</div>
+<div class="w-12 h-12 rounded-lg bg-surface-container-lowest flex items-center justify-center shadow-sm group-hover:scale-110 transition-transform">
+<span class="material-symbols-outlined text-primary" data-icon="account_balance">account_balance</span>
+</div>
+</div>
+<div class="flex items-center justify-end gap-4 mr-16 group">
+<div class="text-right">
+<div class="font-bold">Street Lighting</div>
+<div class="text-xs text-on-surface-variant">Dark Spots, Faults</div>
+</div>
+<div class="w-12 h-12 rounded-lg bg-surface-container-lowest flex items-center justify-center shadow-sm group-hover:scale-110 transition-transform">
+<span class="material-symbols-outlined text-primary" data-icon="wb_iridescent">wb_iridescent</span>
+</div>
+</div>
+<div class="flex items-center justify-end gap-4 group">
+<div class="text-right">
+<div class="font-bold">Public Health</div>
+<div class="text-xs text-on-surface-variant">Sanitation, Clinics</div>
+</div>
+<div class="w-12 h-12 rounded-lg bg-surface-container-lowest flex items-center justify-center shadow-sm group-hover:scale-110 transition-transform">
+<span class="material-symbols-outlined text-primary" data-icon="medical_services">medical_services</span>
+</div>
+</div>
+</div>
+<!-- Right Nodes (Processes) -->
+<div class="absolute right-0 h-full flex flex-col justify-around py-20 w-1/3">
+<div class="flex items-center gap-4 group">
+<div class="w-12 h-12 rounded-lg bg-tertiary-container flex items-center justify-center shadow-sm group-hover:scale-110 transition-transform">
+<span class="material-symbols-outlined text-on-tertiary-container" data-icon="neurology">neurology</span>
+</div>
+<div>
+<div class="font-bold text-tertiary">VLM/ViT Processing</div>
+<div class="text-xs text-on-surface-variant">Image Validation</div>
+</div>
+</div>
+<div class="flex items-center gap-4 group translate-x-12">
+<div class="w-12 h-12 rounded-lg bg-primary-container flex items-center justify-center shadow-sm group-hover:scale-110 transition-transform">
+<span class="material-symbols-outlined text-on-primary-container" data-icon="alt_route">alt_route</span>
+</div>
+<div>
+<div class="font-bold text-primary">AI Routing</div>
+<div class="text-xs text-on-surface-variant">Dept. Assignment</div>
+</div>
+</div>
+<div class="flex items-center gap-4 group translate-x-12">
+<div class="w-12 h-12 rounded-lg bg-secondary-container flex items-center justify-center shadow-sm group-hover:scale-110 transition-transform">
+<span class="material-symbols-outlined text-on-secondary-container" data-icon="verified_user">verified_user</span>
+</div>
+<div>
+<div class="font-bold text-secondary">Blockchain Verification</div>
+<div class="text-xs text-on-surface-variant">Immutable Audit</div>
+</div>
+</div>
+<div class="flex items-center gap-4 group">
+<div class="w-14 h-14 rounded-full bg-tertiary flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform">
+<span class="material-symbols-outlined text-on-tertiary" data-icon="task_alt">task_alt</span>
+</div>
+<div>
+<div class="font-bold text-tertiary text-lg">Solved</div>
+<div class="text-xs text-on-surface-variant">Citizen Confirmed</div>
+</div>
+</div>
+</div>
+<svg class="absolute inset-0 w-full h-full pointer-events-none opacity-20" preserveaspectratio="none">
+<path d="M 300,100 C 450,100 450,300 640,300" fill="none" stroke="#7C3AED" stroke-width="2"></path>
+<path d="M 340,200 C 450,200 450,300 640,300" fill="none" stroke="#7C3AED" stroke-width="2"></path>
+<path d="M 360,300 C 450,300 450,300 640,300" fill="none" stroke="#7C3AED" stroke-width="2"></path>
+<path d="M 340,400 C 450,400 450,300 640,300" fill="none" stroke="#7C3AED" stroke-width="2"></path>
+<path d="M 300,500 C 450,500 450,300 640,300" fill="none" stroke="#7C3AED" stroke-width="2"></path>
+<path d="M 640,300 C 800,300 800,150 960,150" fill="none" stroke="#005b31" stroke-width="2"></path>
+<path d="M 640,300 C 800,300 800,250 960,250" fill="none" stroke="#7C3AED" stroke-width="2"></path>
+<path d="M 640,300 C 800,300 800,350 960,350" fill="none" stroke="#1960a3" stroke-width="2"></path>
+<path d="M 640,300 C 800,300 800,450 960,450" fill="none" stroke="#005b31" stroke-width="3"></path>
+</svg>
+</div>
+</div>
+</section>
+<!-- The Feature Vault: Redesigned Bento -->
+<section class="py-32 bg-[#F4F4F4] technical-grid relative" id="features">
+<div class="max-w-7xl mx-auto px-6 relative z-10">
+<div class="flex flex-col md:flex-row justify-between items-end mb-16 gap-8">
+<div class="max-w-2xl">
+<div class="flex items-center gap-3 mb-4">
+<span class="w-12 h-[3px] bg-black"></span>
+<span class="text-black font-extrabold tracking-widest text-xs uppercase font-headline">Engine Core</span>
+</div>
+<h2 class="font-headline text-6xl md:text-8xl font-extrabold text-black tracking-tighter leading-none mb-6">The Feature Vault</h2>
+<p class="text-slate-700 text-xl font-medium leading-relaxed max-w-xl">High-performance infrastructure built for sovereign communities. Playful by design, powerful by default.</p>
+</div>
+<div class="hidden lg:block relative h-24 w-24">
+<div class="absolute inset-0 bg-primary/20 rounded-full floating"></div>
+<div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-12 h-12 bg-black flex items-center justify-center rounded-xl rotate-12 shadow-xl">
+<span class="material-symbols-outlined text-white">bolt</span>
+</div>
+</div>
+</div>
+<!-- Bento Grid inspired by Gumroad's playful boxes -->
+<div class="grid grid-cols-1 md:grid-cols-4 md:grid-rows-3 gap-6">
+<!-- 1. AI Complaint Intelligence (Wide) -->
+<div class="bento-card bg-white p-8 md:col-span-2 gumroad-shadow flex flex-col group">
+<div class="w-16 h-16 bg-primary/10 rounded-2xl flex items-center justify-center mb-10 feature-visual transition-all duration-500 border-2 border-black">
+<span class="material-symbols-outlined text-black text-4xl" style="font-variation-settings: 'FILL' 1;">psychology</span>
+</div>
+<h3 class="font-headline text-3xl font-extrabold text-black mb-4">AI Complaint Intelligence</h3>
+<p class="text-slate-600 font-medium leading-relaxed mb-10">Vision AI models trained on civic datasets for instant moderation and duplicate detection.</p>
+<div class="mt-auto bg-slate-50 border-2 border-black rounded-xl p-4 flex items-center justify-between group-hover:bg-primary/5 transition-colors">
+<div class="flex items-center gap-4">
+<div class="w-3 h-3 bg-green-500 rounded-full animate-pulse"></div>
+<span class="text-xs font-black uppercase tracking-widest">Active Scan: 98.4% Acc.</span>
+</div>
+<span class="material-symbols-outlined text-black">analytics</span>
+</div>
+</div>
+<!-- 2. Sentient AI Assistant (Dark Accent) -->
+<div class="bento-card bg-slate-950 p-8 gumroad-shadow text-white flex flex-col group border-slate-800">
+<div class="w-14 h-14 bg-primary rounded-xl flex items-center justify-center mb-8 border-2 border-white feature-visual">
+<span class="material-symbols-outlined text-white text-3xl">chat_bubble</span>
+</div>
+<h3 class="font-headline text-2xl font-extrabold mb-4">Sentient Platform Assistant</h3>
+<p class="text-slate-400 text-sm font-medium mb-8">Conversational UI to file reports and track progress with zero friction.</p>
+<div class="mt-auto space-y-3 opacity-60 group-hover:opacity-100 transition-opacity">
+<div class="bg-white/10 rounded-lg p-3 text-[10px] font-bold border border-white/20">"I found a broken pipe on Park Road."</div>
+<div class="bg-primary/30 rounded-lg p-3 text-[10px] font-bold border border-primary/40 text-right">"Verified. Filing report #429..."</div>
+</div>
+</div>
+<!-- 3. Image-to-Complaint (Vertical) -->
+<div class="bento-card bg-white p-8 gumroad-shadow flex flex-col group">
+<div class="w-14 h-14 bg-[#FFD700] rounded-xl flex items-center justify-center mb-8 border-2 border-black feature-visual">
+<span class="material-symbols-outlined text-black text-3xl">photo_camera</span>
+</div>
+<h3 class="font-headline text-2xl font-extrabold text-black mb-4">Snap &amp; Go</h3>
+<p class="text-slate-600 text-sm font-medium mb-8">Upload a photo; AI extracts category and location automatically.</p>
+<div class="mt-auto relative h-32 bg-slate-100 rounded-xl overflow-hidden border-2 border-black p-2 group-hover:bg-primary/10 transition-colors">
+<div class="absolute inset-0 flex items-center justify-center opacity-20">
+<span class="material-symbols-outlined text-8xl">image</span>
+</div>
+<div class="absolute bottom-2 left-2 right-2 bg-black text-white p-2 rounded text-[10px] font-black uppercase tracking-tighter">
+                            Object: Damaged Utility Pole
+                        </div>
+</div>
+</div>
+<!-- 4. Intelligent Auto-Assignment -->
+<div class="bento-card bg-white p-8 gumroad-shadow flex flex-col group">
+<div class="w-14 h-14 bg-on-tertiary-container rounded-xl flex items-center justify-center mb-8 border-2 border-black feature-visual">
+<span class="material-symbols-outlined text-black text-3xl">alt_route</span>
+</div>
+<h3 class="font-headline text-2xl font-extrabold text-black mb-4">Auto Route</h3>
+<p class="text-slate-600 text-sm font-medium mb-8">Smart routing to correct civic departments without manual intervention.</p>
+<div class="mt-auto flex justify-between items-center py-2 px-4 bg-slate-50 border-2 border-black rounded-lg group-hover:translate-x-1 transition-transform">
+<span class="text-[10px] font-black uppercase">Citizen</span>
+<span class="material-symbols-outlined text-primary">trending_flat</span>
+<span class="text-[10px] font-black uppercase">Dept.</span>
+</div>
+</div>
+<!-- 5. Predictive SLA (Wide) -->
+<div class="bento-card bg-white p-8 md:col-span-2 gumroad-shadow flex flex-col group">
+<div class="w-14 h-14 bg-error-container rounded-xl flex items-center justify-center mb-8 border-2 border-black feature-visual">
+<span class="material-symbols-outlined text-black text-3xl">warning</span>
+</div>
+<div class="flex justify-between items-start">
+<div>
+<h3 class="font-headline text-3xl font-extrabold text-black mb-4">Predictive SLA Engine</h3>
+<p class="text-slate-600 font-medium mb-10 max-w-md">Identify risk zones and potential SLA breaches before they impact service quality.</p>
+</div>
+<div class="hidden sm:block text-5xl font-black text-primary/10 group-hover:text-primary transition-colors">99%</div>
+</div>
+<div class="mt-auto flex items-end gap-2 h-20">
+<div class="w-full bg-slate-200 h-1/4 rounded-t border-x border-t border-black group-hover:bg-primary transition-all duration-300"></div>
+<div class="w-full bg-slate-200 h-2/4 rounded-t border-x border-t border-black group-hover:bg-primary transition-all duration-500"></div>
+<div class="w-full bg-slate-200 h-3/4 rounded-t border-x border-t border-black group-hover:bg-primary transition-all duration-700"></div>
+<div class="w-full bg-slate-200 h-full rounded-t border-x border-t border-black group-hover:bg-error transition-all duration-1000"></div>
+</div>
+</div>
+<!-- 6. Immutable Blockchain -->
+<div class="bento-card bg-slate-900 p-8 gumroad-shadow text-white flex flex-col group border-slate-700">
+<div class="w-14 h-14 bg-[#32CD32] rounded-xl flex items-center justify-center mb-8 border-2 border-white feature-visual">
+<span class="material-symbols-outlined text-black text-3xl">verified_user</span>
+</div>
+<h3 class="font-headline text-2xl font-extrabold mb-4">The Ledger</h3>
+<p class="text-slate-400 text-sm font-medium mb-8">Blockchain audit trails ensure no report is ever hidden or deleted.</p>
+<div class="mt-auto font-mono text-[8px] bg-white/5 p-2 rounded border border-white/10 overflow-hidden text-primary-fixed-dim">
+                        0x82f...a12c9ff...7c3aed
+                    </div>
+</div>
+<!-- 7. Real-Time Pipeline -->
+<div class="bento-card bg-white p-8 gumroad-shadow flex flex-col group">
+<div class="w-14 h-14 bg-primary-fixed rounded-xl flex items-center justify-center mb-8 border-2 border-black feature-visual">
+<span class="material-symbols-outlined text-black text-3xl">sync_alt</span>
+</div>
+<h3 class="font-headline text-2xl font-extrabold text-black mb-4">Live Pipe</h3>
+<p class="text-slate-600 text-sm font-medium">Real-time sync between citizens and government agents.</p>
+<div class="mt-8 flex items-center gap-2">
+<div class="w-3 h-3 bg-primary rounded-full animate-ping"></div>
+<span class="text-[10px] font-black uppercase tracking-widest text-primary">Live Now</span>
+</div>
+</div>
+<!-- 8. Geographic Heatmaps (Tall/Large) -->
+<div class="bento-card bg-white p-8 md:row-span-2 gumroad-shadow flex flex-col group">
+<div class="w-14 h-14 bg-surface-container-highest rounded-xl flex items-center justify-center mb-8 border-2 border-black feature-visual">
+<span class="material-symbols-outlined text-black text-3xl">map</span>
+</div>
+<h3 class="font-headline text-3xl font-extrabold text-black mb-4">Geo Intelligence</h3>
+<p class="text-slate-600 font-medium mb-10">Map spatial patterns to reveal systemic infrastructure failures.</p>
+<div class="mt-auto relative flex-1 bg-slate-100 rounded-xl border-2 border-black overflow-hidden">
+<div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-24 h-24 bg-primary/20 rounded-full blur-3xl animate-pulse"></div>
+<div class="absolute top-1/4 left-1/4 w-12 h-12 bg-error/10 rounded-full blur-xl"></div>
+<div class="absolute bottom-8 right-8 w-16 h-16 bg-tertiary/20 rounded-full blur-2xl"></div>
+<div class="absolute inset-0 p-4 flex items-end">
+<span class="text-[10px] font-black bg-black text-white px-2 py-1 rounded">HOTSPOT DETECTED</span>
+</div>
+</div>
+</div>
+<!-- 9. Citizen-Agent Collaboration -->
+<div class="bento-card bg-white p-8 gumroad-shadow flex flex-col group">
+<div class="w-14 h-14 bg-secondary-container rounded-xl flex items-center justify-center mb-8 border-2 border-black feature-visual">
+<span class="material-symbols-outlined text-black text-3xl">groups</span>
+</div>
+<h3 class="font-headline text-2xl font-extrabold text-black mb-4">Collab Hub</h3>
+<p class="text-slate-600 text-sm font-medium mb-8">Direct line for evidence sharing and verification.</p>
+<div class="mt-auto flex -space-x-4">
+<div class="w-10 h-10 rounded-full border-2 border-black bg-slate-200 flex items-center justify-center font-black text-xs">AG</div>
+<div class="w-10 h-10 rounded-full border-2 border-black bg-primary flex items-center justify-center font-black text-xs text-white">CI</div>
+<div class="w-10 h-10 rounded-full border-2 border-black bg-white flex items-center justify-center font-black text-xs">+3</div>
+</div>
+</div>
+<!-- 10. Multilingual Access -->
+<div class="bento-card bg-white p-8 gumroad-shadow flex flex-col group">
+<div class="w-14 h-14 bg-tertiary-fixed rounded-xl flex items-center justify-center mb-8 border-2 border-black feature-visual">
+<span class="material-symbols-outlined text-black text-3xl">translate</span>
+</div>
+<h3 class="font-headline text-2xl font-extrabold text-black mb-4">Omni Language</h3>
+<p class="text-slate-600 text-sm font-medium">Standardized filing in 22 Indian regional languages.</p>
+<div class="mt-auto flex gap-2 flex-wrap">
+<span class="bg-black text-white text-[8px] font-black px-2 py-1 rounded">हिन्दी</span>
+<span class="bg-black text-white text-[8px] font-black px-2 py-1 rounded">தமிழ்</span>
+<span class="bg-black text-white text-[8px] font-black px-2 py-1 rounded">BN</span>
+<span class="bg-black text-white text-[8px] font-black px-2 py-1 rounded">EN</span>
+</div>
+</div>
+<!-- 11. Performance Analytics -->
+<div class="bento-card bg-white p-8 gumroad-shadow flex flex-col group">
+<div class="w-14 h-14 bg-[#E6E6FA] rounded-xl flex items-center justify-center mb-8 border-2 border-black feature-visual">
+<span class="material-symbols-outlined text-black text-3xl">insights</span>
+</div>
+<h3 class="font-headline text-2xl font-extrabold text-black mb-4">Scorecard</h3>
+<p class="text-slate-600 text-sm font-medium mb-8">Resolution metrics and SLA compliance dashboards.</p>
+<div class="mt-auto text-5xl font-black text-black group-hover:text-primary transition-colors">
+                        8.4<span class="text-xl">/10</span>
+</div>
+</div>
+<!-- 12. Civic Survey (Accent) -->
+<div class="bento-card bg-primary p-8 gumroad-shadow flex flex-col group text-white border-2 border-black">
+<div class="w-14 h-14 bg-white rounded-xl flex items-center justify-center mb-8 border-2 border-black feature-visual">
+<span class="material-symbols-outlined text-black text-3xl">sentiment_satisfied</span>
+</div>
+<h3 class="font-headline text-2xl font-extrabold mb-4">Sentiment Engine</h3>
+<p class="text-white/80 text-sm font-medium mb-8">Feedback-driven policy insights for smarter governance.</p>
+<div class="mt-auto flex gap-4 group-hover:translate-y-[-4px] transition-transform">
+<span class="material-symbols-outlined text-4xl">add_reaction</span>
+<span class="material-symbols-outlined text-4xl">favorite</span>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Why SwarajDesk Section -->
+<section class="py-24 bg-[#1e2330] text-white">
+<div class="max-w-6xl mx-auto px-6">
+<div class="text-center mb-16">
+<h2 class="font-headline text-4xl md:text-5xl font-extrabold mb-6">Why SwarajDesk?</h2>
+<p class="text-slate-400 text-lg max-w-2xl mx-auto">A new generation of civic technology designed to outpace and outperform legacy bureaucratic systems.</p>
+</div>
+<div class="bg-slate-900/50 rounded-[2.5rem] border border-slate-700/50 overflow-hidden shadow-2xl backdrop-blur-sm">
+<div class="grid grid-cols-1 md:grid-cols-3">
+<!-- Column Header Labels -->
+<div class="hidden md:flex flex-col border-r border-slate-800">
+<div class="p-8 text-slate-400 font-bold uppercase tracking-widest text-xs">Comparison Core</div>
+<div class="p-8 border-t border-slate-800/50 flex items-center h-24">Offline Submissions</div>
+<div class="p-8 border-t border-slate-800/50 flex items-center h-24">AI-Powered Validation</div>
+<div class="p-8 border-t border-slate-800/50 flex items-center h-24">Blockchain Immutability</div>
+<div class="p-8 border-t border-slate-800/50 flex items-center h-24">Multi-dept. Escalation</div>
+<div class="p-8 border-t border-slate-800/50 flex items-center h-24">24/7 Citizen Access</div>
+</div>
+<!-- SwarajDesk Column -->
+<div class="bg-primary/5 flex flex-col relative">
+<div class="absolute inset-x-0 top-0 h-1 bg-primary"></div>
+<div class="p-8 text-primary font-bold text-xl font-headline text-center">SwarajDesk</div>
+<div class="md:contents">
+<div class="p-8 border-t border-primary/10 flex items-center justify-center md:h-24 gap-3">
+<span class="md:hidden text-slate-400 text-sm grow">Offline Submissions</span>
+<span class="material-symbols-outlined text-tertiary-fixed text-3xl" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+</div>
+<div class="p-8 border-t border-primary/10 flex items-center justify-center md:h-24 gap-3">
+<span class="md:hidden text-slate-400 text-sm grow">AI-Powered Validation</span>
+<span class="material-symbols-outlined text-tertiary-fixed text-3xl" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+</div>
+<div class="p-8 border-t border-primary/10 flex items-center justify-center md:h-24 gap-3">
+<span class="md:hidden text-slate-400 text-sm grow">Blockchain Immutability</span>
+<span class="material-symbols-outlined text-tertiary-fixed text-3xl" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+</div>
+<div class="p-8 border-t border-primary/10 flex items-center justify-center md:h-24 gap-3">
+<span class="md:hidden text-slate-400 text-sm grow">Multi-dept. Escalation</span>
+<span class="material-symbols-outlined text-tertiary-fixed text-3xl" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+</div>
+<div class="p-8 border-t border-primary/10 flex items-center justify-center md:h-24 gap-3">
+<span class="md:hidden text-slate-400 text-sm grow">24/7 Citizen Access</span>
+<span class="material-symbols-outlined text-tertiary-fixed text-3xl" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+</div>
+</div>
+</div>
+<!-- Legacy Systems Column -->
+<div class="flex flex-col border-l border-slate-800">
+<div class="p-8 text-slate-500 font-bold text-xl font-headline text-center opacity-50">Legacy Systems</div>
+<div class="md:contents">
+<div class="p-8 border-t border-slate-800/50 flex items-center justify-center md:h-24 gap-3">
+<span class="md:hidden text-slate-400 text-sm grow">Offline Submissions</span>
+<span class="material-symbols-outlined text-slate-700 text-3xl">cancel</span>
+</div>
+<div class="p-8 border-t border-slate-800/50 flex items-center justify-center md:h-24 gap-3">
+<span class="md:hidden text-slate-400 text-sm grow">AI-Powered Validation</span>
+<span class="material-symbols-outlined text-slate-700 text-3xl">cancel</span>
+</div>
+<div class="p-8 border-t border-slate-800/50 flex items-center justify-center md:h-24 gap-3">
+<span class="md:hidden text-slate-400 text-sm grow">Blockchain Immutability</span>
+<span class="material-symbols-outlined text-slate-700 text-3xl">cancel</span>
+</div>
+<div class="p-8 border-t border-slate-800/50 flex items-center justify-center md:h-24 gap-3">
+<span class="md:hidden text-slate-400 text-sm grow">Multi-dept. Escalation</span>
+<span class="material-symbols-outlined text-slate-500 text-2xl">check_circle</span>
+</div>
+<div class="p-8 border-t border-slate-800/50 flex items-center justify-center md:h-24 gap-3">
+<span class="md:hidden text-slate-400 text-sm grow">24/7 Citizen Access</span>
+<span class="material-symbols-outlined text-slate-700 text-3xl">cancel</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- CTA Section -->
+<section class="py-24">
+<div class="max-w-7xl mx-auto px-6">
+<div class="bg-gradient-to-br from-primary to-primary-container p-12 md:p-20 rounded-[3rem] text-center text-on-primary relative overflow-hidden">
+<div class="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-10"></div>
+<div class="relative z-10 max-w-3xl mx-auto">
+<h2 class="font-headline text-4xl md:text-5xl font-extrabold mb-8 leading-tight">Ready to see a better community?</h2>
+<p class="text-xl opacity-90 mb-12">Join thousands of citizens who are already using SwarajDesk to bring direct accountability to their neighborhoods.</p>
+<div class="flex flex-col sm:flex-row gap-4 justify-center">
+<button class="bg-white text-primary px-10 py-4 rounded-xl font-bold text-lg hover:bg-opacity-90 transition-all shadow-xl">Get Started Now</button>
+<button class="bg-primary-fixed/20 border border-white/30 text-white px-10 py-4 rounded-xl font-bold text-lg hover:bg-white/10 transition-all">Request a Demo</button>
+</div>
+</div>
+</div>
+</div>
+</section>
+</main>
+<!-- Footer -->
+<footer class="bg-slate-950 text-white pt-24 pb-12">
+<div class="max-w-7xl mx-auto px-6">
+<div class="grid grid-cols-1 md:grid-cols-2 gap-12 pb-16 border-b border-slate-800">
+<div class="flex flex-col justify-center">
+<div class="text-4xl font-extrabold text-primary font-headline mb-4">SwarajDesk</div>
+<p class="text-slate-400 text-lg max-w-md">Building the technical layer for a transparent, accountable, and citizen-first governance model.</p>
+</div>
+<div class="flex flex-col justify-center">
+<h4 class="font-bold text-sm uppercase tracking-widest text-slate-300 mb-4">Sign up for our newsletter to stay up to date</h4>
+<div class="flex gap-2">
+<input class="bg-slate-900 border border-slate-700 rounded-lg px-4 py-3 text-sm focus:ring-2 focus:ring-primary w-full text-white placeholder-slate-500" placeholder="Your email" type="email"/>
+<button class="bg-white text-slate-950 px-6 py-2 rounded-lg font-bold hover:bg-slate-200 transition-colors">Subscribe</button>
+</div>
+</div>
+</div>
+<div class="grid grid-cols-2 md:grid-cols-4 gap-12 py-16">
+<div>
+<h4 class="font-bold text-slate-100 mb-6">Products</h4>
+<ul class="space-y-4">
+<li><a class="text-slate-400 hover:text-primary transition-colors text-sm" href="#">Swaraj Platform</a></li>
+<li><a class="text-slate-400 hover:text-primary transition-colors text-sm" href="#">Analytics Suite</a></li>
+<li><a class="text-slate-400 hover:text-primary transition-colors text-sm" href="#">Fleet Management</a></li>
+<li><a class="text-slate-400 hover:text-primary transition-colors text-sm" href="#">Deep Civic Agents</a></li>
+</ul>
+</div>
+<div>
+<h4 class="font-bold text-slate-100 mb-6">Resources</h4>
+<ul class="space-y-4">
+<li><a class="text-slate-400 hover:text-primary transition-colors text-sm" href="#">Civic Blog</a></li>
+<li><a class="text-slate-400 hover:text-primary transition-colors text-sm" href="#">Deployment Guides</a></li>
+<li><a class="text-slate-400 hover:text-primary transition-colors text-sm" href="#">Community Forum</a></li>
+<li><a class="text-slate-400 hover:text-primary transition-colors text-sm" href="#">Newsletter Archive</a></li>
+</ul>
+</div>
+<div>
+<h4 class="font-bold text-slate-100 mb-6">Company</h4>
+<ul class="space-y-4">
+<li><a class="text-slate-400 hover:text-primary transition-colors text-sm" href="#">About Us</a></li>
+<li><a class="text-slate-400 hover:text-primary transition-colors text-sm" href="#">Impact Report</a></li>
+<li><a class="text-slate-400 hover:text-primary transition-colors text-sm" href="#">Privacy Policy</a></li>
+<li><a class="text-slate-400 hover:text-primary transition-colors text-sm" href="#">Terms of Service</a></li>
+</ul>
+</div>
+<div class="flex flex-col gap-6">
+<h4 class="font-bold text-slate-100">Connect</h4>
+<div class="flex gap-4">
+<span class="material-symbols-outlined cursor-pointer hover:text-primary transition-colors text-slate-400" data-icon="public">public</span>
+<span class="material-symbols-outlined cursor-pointer hover:text-primary transition-colors text-slate-400" data-icon="groups">groups</span>
+<span class="material-symbols-outlined cursor-pointer hover:text-primary transition-colors text-slate-400" data-icon="terminal">terminal</span>
+</div>
+</div>
+</div>
+<div class="py-12 flex justify-center overflow-hidden pointer-events-none">
+<span class="text-[12vw] font-headline font-extrabold leading-none text-primary/10 tracking-tighter select-none">SwarajDesk</span>
+</div>
+<div class="border-t border-slate-800 pt-8 flex flex-col md:flex-row justify-between items-center text-xs text-slate-500 gap-4">
+<div class="flex items-center gap-2">
+<div class="w-2 h-2 rounded-full bg-tertiary-fixed animate-pulse"></div>
+                All systems operational <span class="ml-2 text-slate-700">|</span> V 1.4.2
+            </div>
+<div>© 2024 SwarajDesk. Built for Radical Accountability.</div>
+<div class="flex gap-6">
+<a class="hover:text-primary transition-colors" href="#">Privacy policy</a>
+<a class="hover:text-primary transition-colors" href="#">Terms of service</a>
+</div>
+</div>
+</div>
+</footer>
+</body></html>

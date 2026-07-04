@@ -5,7 +5,7 @@ import { CheckCircle2, XCircle, AlertCircle } from 'lucide-react';
 
 /* ------------------------------------------------------------------ */
 /*  Accurate comparison — SwarajDesk vs CPGRAMS vs CMO Kerala          */
-/*  Data sourced from the project's official comparison chart           */
+/*  Data sourced from xxxxxxxxxxxxxxxxx.md comparison table             */
 /* ------------------------------------------------------------------ */
 
 interface Row {
@@ -19,53 +19,77 @@ interface Row {
 
 const rows: Row[] = [
   {
-    feature: 'Community-driven prioritization / feedback & upvote-based issue ranking',
+    feature: 'AI-powered complaint drafting from images and voice',
     cpgrams: 'no',
     cmo: 'no',
     swaraj: 'yes',
   },
   {
-    feature: 'Mobile / App-based access',
+    feature: 'Conversational AI assistant for full platform navigation',
+    cpgrams: 'no',
+    cmo: 'no',
+    swaraj: 'yes',
+  },
+  {
+    feature: 'Intelligent auto-assignment by department, district, and workload',
+    cpgrams: 'no',
+    cmo: 'no',
+    swaraj: 'yes',
+  },
+  {
+    feature: 'Predictive SLA breach and escalation risk detection',
+    cpgrams: 'no',
+    cmo: 'no',
+    swaraj: 'yes',
+  },
+  {
+    feature: 'Duplicate complaint detection before submission',
+    cpgrams: 'no',
+    cmo: 'no',
+    swaraj: 'yes',
+  },
+  {
+    feature: 'Real-time citizen-agent chat and live status updates',
+    cpgrams: 'no',
+    cmo: 'no',
+    swaraj: 'yes',
+  },
+  {
+    feature: 'Blockchain-backed audit trail for assignments and escalations',
+    cpgrams: 'no',
+    cmo: 'no',
+    swaraj: 'yes',
+  },
+  {
+    feature: 'Department performance analytics and heatmaps',
     cpgrams: 'partial',
-    cpgramsNote: 'Only Web',
+    cpgramsNote: 'Basic analytics',
     cmo: 'partial',
-    cmoNote: 'Only Web',
+    cmoNote: 'Basic analytics',
     swaraj: 'yes',
   },
   {
-    feature: 'Dashboards for decision-making',
+    feature: 'Multilingual voice and text complaint filing (20+ languages)',
     cpgrams: 'partial',
-    cpgramsNote: 'Minimal standard analytics',
+    cpgramsNote: 'Limited',
     cmo: 'partial',
-    cmoNote: 'Limited to internal dashboards',
+    cmoNote: 'Limited',
     swaraj: 'yes',
   },
   {
-    feature: 'Offline / low-bandwidth submissions',
+    feature: 'Civic survey engine for NGOs and government bodies',
     cpgrams: 'no',
     cmo: 'no',
     swaraj: 'yes',
   },
   {
-    feature: 'Multilingual support (20+ languages)',
-    cpgrams: 'yes',
-    cmo: 'no',
-    swaraj: 'yes',
-  },
-  {
-    feature: 'Multilingual voice/chat support with abuse detection',
+    feature: 'Complaint quality scoring before submission',
     cpgrams: 'no',
     cmo: 'no',
     swaraj: 'yes',
   },
   {
-    feature: 'Predictive analytics, SLA tracking, and duplicate detection',
-    cpgrams: 'no',
-    cmo: 'no',
-    swaraj: 'yes',
-  },
-  {
-    feature: 'UAV On-Ground Verification',
+    feature: 'Abuse detection and content moderation',
     cpgrams: 'no',
     cmo: 'no',
     swaraj: 'yes',
@@ -99,12 +123,27 @@ function StatusCell({ status, note }: { status: 'yes' | 'no' | 'partial'; note?:
 
 const stagger = {
   hidden: {},
-  visible: { transition: { staggerChildren: 0.06 } },
+  visible: { transition: { staggerChildren: 0.07 } },
 };
 
 const rowVariant = {
-  hidden: { opacity: 0, y: 14 },
-  visible: { opacity: 1, y: 0, transition: { duration: 0.4, ease: 'easeOut' as const } },
+  hidden: { opacity: 0, x: -30, scale: 0.97 },
+  visible: {
+    opacity: 1,
+    x: 0,
+    scale: 1,
+    transition: { duration: 0.45, ease: 'easeOut' as const },
+  },
+};
+
+const headingVariant = {
+  hidden: { opacity: 0, y: 30, scale: 0.95 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    scale: 1,
+    transition: { duration: 0.7, ease: [0.22, 1, 0.36, 1] },
+  },
 };
 
 /* ------------------------------------------------------------------ */
@@ -117,13 +156,16 @@ export default function ComparisonSection() {
       <div className="max-w-6xl mx-auto px-6">
         {/* Heading */}
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
+          variants={headingVariant}
+          initial="hidden"
+          whileInView="visible"
           viewport={{ once: true }}
-          transition={{ duration: 0.6 }}
           className="text-center mb-16"
         >
-          <h2 className="text-3xl md:text-5xl font-extrabold tracking-tight mb-6">
+          <h2
+            className="text-3xl md:text-5xl font-extrabold tracking-tight mb-6"
+            style={{ fontFamily: 'var(--font-headline)' }}
+          >
             Why SwarajDesk?
           </h2>
           <p className="text-slate-400 text-base md:text-lg max-w-2xl mx-auto">
@@ -162,7 +204,7 @@ export default function ComparisonSection() {
               <motion.div
                 key={i}
                 variants={rowVariant}
-                className="grid grid-cols-[1fr_160px_160px_160px] border-b border-slate-800/40 last:border-b-0 hover:bg-white/[0.02] transition-colors"
+                className="grid grid-cols-[1fr_160px_160px_160px] border-b border-slate-800/40 last:border-b-0 hover:bg-white/4 hover:scale-[1.005] transition-all duration-200"
               >
                 <div className="px-6 py-5 text-sm text-slate-300 flex items-center">
                   {r.feature}

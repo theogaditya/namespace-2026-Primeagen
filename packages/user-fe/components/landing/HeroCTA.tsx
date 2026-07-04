@@ -37,7 +37,7 @@ export default function HeroCTA() {
 
         {/* Headline — character-stagger animation */}
         <div className="mb-8">
-          <h2 className="text-4xl md:text-6xl lg:text-7xl font-extrabold tracking-tight leading-[1.08]">
+          <h2 className="text-4xl md:text-6xl lg:text-7xl font-extrabold tracking-tight leading-[1.08]" style={{ fontFamily: 'var(--font-headline)' }}>
             {/* "Rewriting" */}
             <span className="inline-block overflow-hidden mr-4">
               {word1.map((ch, i) => (
@@ -124,28 +124,7 @@ export default function HeroCTA() {
           </motion.div>
         </motion.div>
 
-        {/* Floating stat pills */}
-        <div className="mt-16 flex flex-wrap gap-4">
-          {[
-            { label: '1.4B+', sub: 'Citizens Served' },
-            { label: '20+', sub: 'Languages Supported' },
-            { label: '99.2%', sub: 'AI Detection Accuracy' },
-            { label: '100%', sub: 'Blockchain Auditable' },
-          ].map((stat, i) => (
-            <motion.div
-              key={i}
-              initial={{ opacity: 0, scale: 0.85 }}
-              whileInView={{ opacity: 1, scale: 1 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.4, delay: 1 + i * 0.1 }}
-              whileHover={{ y: -3 }}
-              className="bg-slate-50 border border-gray-100 rounded-2xl px-5 py-3 flex flex-col"
-            >
-              <span className="text-xl font-extrabold text-slate-900">{stat.label}</span>
-              <span className="text-xs text-gray-400 font-medium">{stat.sub}</span>
-            </motion.div>
-          ))}
-        </div>
+
       </div>
     </section>
   );

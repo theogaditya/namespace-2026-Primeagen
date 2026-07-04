@@ -1,10 +1,27 @@
 "use client";
 
 import React, { useState, useCallback, useRef, useEffect } from "react";
-import { Settings, Search, Menu, Loader2, X, MapPin, Calendar, FileText } from "lucide-react";
+import { Settings, Search, Menu, Loader2, X, MapPin, Calendar, FileText, Globe, ChevronDown } from "lucide-react";
 import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
 import type { UserData } from "@/app/dashboard/customComps/types";
+
+const LANGUAGES = [
+  { code: "en", name: "English" },
+  { code: "hi", name: "हिन्दी (Hindi)" },
+  { code: "bn", name: "বাংলা (Bengali)" },
+  { code: "te", name: "తెలుగు (Telugu)" },
+  { code: "mr", name: "मराठी (Marathi)" },
+  { code: "ta", name: "தமிழ் (Tamil)" },
+  { code: "gu", name: "ગુજરાતી (Gujarati)" },
+  { code: "kn", name: "ಕನ್ನಡ (Kannada)" },
+  { code: "ml", name: "മലയാളം (Malayalam)" },
+  { code: "pa", name: "ਪੰਜਾਬੀ (Punjabi)" },
+  { code: "or", name: "ଓଡ଼ିଆ (Odia)" },
+  { code: "ur", name: "اردو (Urdu)" },
+  { code: "as", name: "অসমীয়া (Assamese)" },
+  { code: "ne", name: "नेपाली (Nepali)" },
+];
 
 interface SearchResult {
   id: string;
@@ -23,6 +40,94 @@ interface DashboardTopBarProps {
   onMenuToggle?: () => void;
   onSettingsClick?: () => void;
   onSearchResultClick?: (id: string) => void;
+}
+
+function LanguageDropdown() {
+  const [open, setOpen] = useState(false);
+  const [currentLang, setCurrentLang] = useState("en");
+  const ref = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const cookies = document.cookie;
+    let match = cookies.match(/googtrans=\/en\/([a-z-]+)/i);
+    if (!match) match = cookies.match(/googtrans=%2Fen%2F([a-z-]+)/i);
+    if (match?.[1]) setCurrentLang(match[1]);
+  }, []);
+
+  useEffect(() => {
+    function handleClickOutside(e: MouseEvent) {
+      if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false);
+    }
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  const changeLanguage = (langCode: string) => {
+    const hostname = window.location.hostname;
+    const expired = "Thu, 01 Jan 1970 00:00:00 UTC";
+
+    document.cookie = `googtrans=; expires=${expired}; path=/`;
+    document.cookie = `googtrans=; expires=${expired}; path=/; domain=${hostname}`;
+    document.cookie = `googtrans=; expires=${expired}; path=/; domain=.${hostname}`;
+
+    const parts = hostname.split(".");
+    if (parts.length > 2) {
+      const root = parts.slice(-2).join(".");
+      document.cookie = `googtrans=; expires=${expired}; path=/; domain=.${root}`;
+    }
+
+    setTimeout(() => {
+      const val = `/en/${langCode}`;
+      document.cookie = `googtrans=${val}; path=/`;
+      document.cookie = `googtrans=${val}; path=/; domain=${hostname}`;
+      if (parts.length > 2) {
+        const root = parts.slice(-2).join(".");
+        document.cookie = `googtrans=${val}; path=/; domain=.${root}`;
+      }
+      setCurrentLang(langCode);
+      setOpen(false);
+      window.location.reload();
+    }, 100);
+  };
+
+  const current = LANGUAGES.find((l) => l.code === currentLang) || LANGUAGES[0];
+
+  return (
+    <div className="relative hidden sm:block" ref={ref}>
+      <button
+        onClick={() => setOpen(!open)}
+        className="flex items-center gap-1.5 text-slate-500 hover:text-[var(--dash-primary)] transition-colors"
+      >
+        <Globe className="w-5 h-5" />
+        <span className="text-xs font-medium">{current.name.split(" ")[0]}</span>
+        <ChevronDown className={`w-3.5 h-3.5 transition-transform ${open ? "rotate-180" : ""}`} />
+      </button>
+      <AnimatePresence>
+        {open && (
+          <motion.div
+            initial={{ opacity: 0, y: -4 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -4 }}
+            className="absolute right-0 top-full mt-2 w-52 bg-white rounded-xl shadow-xl border border-slate-200/60 max-h-64 overflow-y-auto z-50"
+          >
+            {LANGUAGES.map((lang) => (
+              <button
+                key={lang.code}
+                onClick={() => changeLanguage(lang.code)}
+                className={`w-full text-left px-4 py-2.5 text-sm hover:bg-slate-50 transition-colors ${
+                  currentLang === lang.code
+                    ? "text-[var(--dash-primary)] font-medium bg-[var(--dash-primary)]/5"
+                    : "text-slate-700"
+                }`}
+              >
+                {lang.name}
+              </button>
+            ))}
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
+  );
 }
 
 export default function DashboardTopBar({
@@ -200,6 +305,8 @@ export default function DashboardTopBar({
       </div>
 
       <div className="flex items-center gap-4 lg:gap-6">
+        {/* Language Selector */}
+        <LanguageDropdown />
         <button
           onClick={onSettingsClick}
           className="text-slate-500 hover:text-[var(--dash-primary)] transition-colors hidden sm:block"
