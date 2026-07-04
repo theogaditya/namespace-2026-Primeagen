@@ -54,6 +54,21 @@ const STATUS_CONFIG: Record<string, { label: string; bg: string; text: string }>
 const formatDate = (d: string) =>
   new Date(d).toLocaleDateString("en-IN", { year: "numeric", month: "short", day: "numeric" })
 
+const formatChainDateTime = (timestamp?: string | number) => {
+  if (!timestamp) return "--"
+  const normalized = typeof timestamp === "number" && timestamp < 1e12 ? timestamp * 1000 : timestamp
+  const d = new Date(normalized)
+  if (Number.isNaN(d.getTime())) return "--"
+  return d.toLocaleString("en-IN", {
+    month: "short",
+    day: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+  })
+}
+
+const shortHash = (hash: string) => `${hash.slice(0, 12)}...${hash.slice(-8)}`
+
 const formatLocation = (loc: Complaint["location"]) => {
   if (!loc) return "N/A"
   const parts: string[] = []
@@ -138,7 +153,10 @@ export default function AgentRevampedMyComplaints() {
   const fetchBlockchainLogs = async (id: string) => {
     setBlockchainLoading(true);
     try {
-      const res = await fetch(`${API_URL}/api/complaints/verify/${id}`);
+      const token = localStorage.getItem("token");
+      const res = await fetch(`/api/complaints/verify/${id}`, {
+        headers: token ? { Authorization: `Bearer ${token}` } : undefined,
+      });
       if (res.ok) {
         setBlockchainLogs(await res.json());
       }
@@ -523,43 +541,84 @@ export default function AgentRevampedMyComplaints() {
                   <div className="pt-4 border-t border-[#c3c5d9]/20">
                     <div className="flex items-center justify-between mb-2">
                        <label className="text-[9px] font-bold uppercase text-slate-400 tracking-widest">On-Chain Audit Trail</label>
-                       {blockchainLoading && <span className="animate-spin text-[10px] text-blue-600">⌛</span>}
+                       {blockchainLoading ? (
+                        <span className="text-[10px] font-bold uppercase text-blue-600">Syncing...</span>
+                       ) : blockchainLogs?.blockchainVerifiedLogs?.length ? (
+                        <span className="text-[10px] font-bold uppercase tracking-widest text-emerald-700 bg-emerald-50 px-2 py-1 rounded">Verified</span>
+                       ) : null}
                     </div>
                     
                     <div className="space-y-2">
+                      {blockchainLoading && (
+                        <div className="space-y-2">
+                          <div className="h-14 rounded bg-[#f3f4f5] animate-pulse" />
+                          <div className="h-14 rounded bg-[#f3f4f5] animate-pulse" />
+                        </div>
+                      )}
+
                       {blockchainLogs?.databaseLogs?.slice(0, 5).map((log: any, idx: number) => {
-                        const proof = blockchainLogs.blockchainVerifiedLogs?.find((p: any) => p.action === log.action);
+                        const proof =
+                          blockchainLogs.blockchainVerifiedLogs?.find((p: any) => p.action === log.action) ||
+                          blockchainLogs.blockchainVerifiedLogs?.find((p: any) => Boolean(p.transactionHash));
                         return (
-                          <div key={idx} className="bg-[#f8faff] p-2 border border-[#eef2ff] rounded flex items-start gap-3">
-                            <div className="mt-0.5">
-                              {proof ? (
-                                <span className="text-emerald-500 text-[14px]">✅</span>
-                              ) : (
-                                <span className="text-slate-200 text-[14px]">⚪</span>
-                              )}
+                          <div key={idx} className="bg-[#f8fbff] p-3 border border-[#d7e2ff] border-l-4 border-l-[#0047cc] rounded">
+                            <div className="flex items-start justify-between gap-2">
+                              <span className="text-[10px] font-bold text-slate-800 uppercase">{log.action || "Audit Event"}</span>
+                              <span className={`text-[8px] font-bold uppercase px-2 py-1 rounded ${proof ? "bg-emerald-100 text-emerald-700" : "bg-slate-100 text-slate-500"}`}>
+                                {proof ? "Verified" : "Pending"}
+                              </span>
                             </div>
-                            <div className="flex-1">
-                              <div className="flex justify-between">
-                                <span className="text-[10px] font-bold text-slate-700">{log.action}</span>
-                                <span className="text-[8px] text-slate-400">{new Date(log.timestamp).toLocaleTimeString()}</span>
-                              </div>
-                              <p className="text-[9px] text-slate-500 truncate">{log.details}</p>
-                              {proof && (
-                                <a 
-                                  href={`https://sepolia.etherscan.io/tx/${proof.transactionHash}`}
-                                  target="_blank"
-                                  className="text-[8px] text-[#0047cc] hover:underline font-mono mt-1 block"
-                                >
-                                  Proof: {proof.transactionHash.slice(0, 12)}...
-                                </a>
-                              )}
+                            <p className="text-[10px] text-slate-600 mt-1">{log.details || "No details available"}</p>
+                            <div className="mt-2 flex flex-wrap items-center gap-3 text-[9px] text-slate-500">
+                              <span>{formatChainDateTime(log.timestamp)}</span>
+                              {proof?.blockNumber ? <span>Block #{proof.blockNumber}</span> : null}
                             </div>
+                            {proof?.transactionHash && (
+                              <a
+                                href={`https://sepolia.etherscan.io/tx/${proof.transactionHash}`}
+                                target="_blank"
+                                rel="noreferrer"
+                                className="text-[9px] text-[#0047cc] hover:underline font-mono mt-1 block"
+                              >
+                                Proof: {shortHash(proof.transactionHash)} ↗
+                              </a>
+                            )}
                           </div>
                         )
                       })}
-                      {!blockchainLoading && !blockchainLogs?.databaseLogs?.length && (
-                        <p className="text-[10px] text-slate-400 italic">No blockchain proofs available.</p>
-                      )}
+
+                      {!blockchainLoading && !blockchainLogs?.databaseLogs?.length &&
+                        blockchainLogs?.blockchainVerifiedLogs?.slice(0, 3).map((log: any, idx: number) => (
+                          <div key={`chain-${idx}`} className="bg-emerald-50 p-3 border border-emerald-200 border-l-4 border-l-emerald-500 rounded">
+                            <div className="flex items-start justify-between gap-2">
+                              <span className="text-[10px] font-bold text-emerald-900 uppercase">{log.action || "ON_CHAIN_CONFIRMATION"}</span>
+                              <span className="text-[8px] font-bold uppercase px-2 py-1 rounded bg-emerald-100 text-emerald-700">Verified</span>
+                            </div>
+                            <p className="text-[10px] text-emerald-800 mt-1">{log.details || "Confirmed on blockchain."}</p>
+                            <div className="mt-2 flex flex-wrap items-center gap-3 text-[9px] text-emerald-800">
+                              <span>{formatChainDateTime(log.timestamp)}</span>
+                              {log.blockNumber ? <span>Block #{log.blockNumber}</span> : null}
+                            </div>
+                            {log.transactionHash && (
+                              <a
+                                href={`https://sepolia.etherscan.io/tx/${log.transactionHash}`}
+                                target="_blank"
+                                rel="noreferrer"
+                                className="text-[9px] text-emerald-700 hover:underline font-mono mt-1 block"
+                              >
+                                Proof: {shortHash(log.transactionHash)} ↗
+                              </a>
+                            )}
+                          </div>
+                        ))}
+
+                      {!blockchainLoading &&
+                        !blockchainLogs?.databaseLogs?.length &&
+                        !blockchainLogs?.blockchainVerifiedLogs?.length && (
+                          <div className="rounded border border-dashed border-slate-300 p-3 bg-slate-50">
+                            <p className="text-[10px] text-slate-500 italic">No blockchain proofs available yet.</p>
+                          </div>
+                        )}
                     </div>
                   </div>
 

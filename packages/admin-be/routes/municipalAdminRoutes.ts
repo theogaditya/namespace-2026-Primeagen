@@ -9,6 +9,15 @@ import { getBadgeService } from '../lib/badges/badgeService';
 export default function(prisma: PrismaClient) {
   const router = express.Router();
 
+  // Convert Prisma BigInt fields into strings before sending JSON responses.
+  function safeJson(obj: unknown): unknown {
+    try {
+      return JSON.parse(JSON.stringify(obj, (_k, v) => (typeof v === 'bigint' ? v.toString() : v)));
+    } catch {
+      return obj;
+    }
+  }
+
 
 // Login
 router.post('/login', async (req, res: any) => {
@@ -206,7 +215,7 @@ router.get('/my-complaints', authenticateMunicipalAdminOnly, async (req: any, re
 
     return res.json({
       success: true,
-      complaints,
+      complaints: safeJson(complaints),
       pagination: {
         page,
         limit,
@@ -247,7 +256,7 @@ router.get('/complaints', async (req, res:any) => {
       complainant: User || null
     }));
 
-    res.json({ success: true, complaints });
+    res.json({ success: true, complaints: safeJson(complaints) });
   } catch (error) {
     console.error(error);
     res.status(500).json({ success: false, message: 'Failed to fetch complaints' });
@@ -330,7 +339,7 @@ router.put('/complaints/:id/status', authenticateMunicipalAdminOnly, async (req:
     return res.json({
       success: true,
       message: 'Complaint status updated successfully',
-      complaint: complaintForResponse
+      complaint: safeJson(complaintForResponse)
     });
 
   } catch (error: any) {
@@ -445,7 +454,7 @@ router.put('/complaints/:id/escalate', authenticateMunicipalAdminOnly, async (re
     return res.json({
       success: true,
       message: `Complaint escalated to state level successfully`,
-      complaint: complaintForResponse,
+      complaint: safeJson(complaintForResponse),
     });
   } catch (error: any) {
     console.error('Escalation error:', error);
