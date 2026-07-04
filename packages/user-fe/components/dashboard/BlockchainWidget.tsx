@@ -42,7 +42,7 @@ export default function BlockchainWidget() {
           href="https://sepolia.etherscan.io/address/0x522ba372e9fE6ecfEd24b773528b447bBdF823b2"
           target="_blank"
           rel="noopener noreferrer"
-          className="flex items-center justify-center gap-2 w-full py-3 bg-indigo-50 border border-indigo-200 rounded-xl text-sm font-bold text-indigo-700 hover:bg-indigo-100 transition-all"
+          className="flex items-center justify-center gap-2 w-full py-3 bg-white border border-slate-300 rounded-xl text-sm font-bold text-slate-700 hover:bg-slate-50 transition-all"
         >
           <span>Verify on Etherscan</span>
           <ExternalLink className="w-3.5 h-3.5" />

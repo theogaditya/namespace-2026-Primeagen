@@ -27,7 +27,10 @@ import {
   Building2,
   Landmark,
   ZoomIn,
+  CheckCircle2,
+  Loader2,
 } from "lucide-react";
+
 import type { Variants } from "framer-motion";
 
 type ChainVerificationStatus =
@@ -200,6 +203,7 @@ function ResolutionTimeline({ complaint }: { complaint: Complaint }) {
   const hasAgent = !!complaint.assignedAgent;
   const hasMunicipalAdmin = !!complaint.managedByMunicipalAdmin;
   const hasStateAdmin = !!complaint.escalatedToStateAdmin;
+  const isCompleted = complaint.status === "COMPLETED";
   const isEscalatedToMunicipal =
     complaint.status === "ESCALATED_TO_MUNICIPAL_LEVEL" ||
     complaint.escalationLevel === "MUNICIPAL_ADMIN" ||
@@ -209,7 +213,7 @@ function ResolutionTimeline({ complaint }: { complaint: Complaint }) {
     complaint.escalationLevel === "STATE_ADMIN" ||
     hasStateAdmin;
 
-  if (!hasAgent && !hasMunicipalAdmin && !hasStateAdmin) {
+  if (!hasAgent && !hasMunicipalAdmin && !hasStateAdmin && !isCompleted) {
     return (
       <div className="flex items-center gap-3 p-4 bg-gray-50 rounded-xl">
         <div className="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center">
@@ -270,6 +274,27 @@ function ResolutionTimeline({ complaint }: { complaint: Complaint }) {
       date: formatDate(complaint.escalatedToStateAdmin!.dateOfCreation),
       badge: "Priority",
       badgeClass: "bg-rose-50 text-rose-700 border-rose-200",
+    });
+  }
+
+  if (isCompleted) {
+    const resolvedBy = hasStateAdmin
+      ? complaint.escalatedToStateAdmin!.fullName
+      : hasMunicipalAdmin
+        ? complaint.managedByMunicipalAdmin!.fullName
+        : hasAgent
+          ? complaint.assignedAgent!.fullName
+          : "Swaraj Resolution Team";
+
+    items.push({
+      icon: <CheckCircle2 className="w-3.5 h-3.5 text-white" />,
+      bg: "bg-emerald-500",
+      label: "Resolution",
+      name: resolvedBy,
+      subtitle: "Complaint marked as completed in the system",
+      date: formatDate(complaint.dateOfResolution || complaint.lastUpdated),
+      badge: "Completed",
+      badgeClass: "bg-emerald-50 text-emerald-700 border-emerald-200",
     });
   }
 
@@ -387,7 +412,7 @@ export function ComplaintDetailModal({
 
     const controller = new AbortController();
 
-    const fetchBlockchainLive = async () => {
+    const fetchBlockchainProof = async () => {
       setBlockchainLoading(true);
       setBlockchainError(null);
 
@@ -401,35 +426,23 @@ export function ComplaintDetailModal({
           }
         );
 
+
         const data = await response.json();
 
         if (!response.ok) {
-          throw new Error(data?.error || "Failed to load blockchain verification status");
+          throw new Error(data?.error || "Failed to load audit proof");
         }
 
-        setBlockchainLive(data as BlockchainLiveResponse);
+        setBlockchainLive(data);
       } catch (error) {
-        if (controller.signal.aborted) {
-          return;
-        }
-
-        const message =
-          error instanceof Error
-            ? error.message
-            : "Failed to load blockchain verification status";
-
-        setBlockchainLive(null);
-        setBlockchainError(
-          message ? "Could not load blockchain details right now." : "Could not load blockchain details."
-        );
+        if (controller.signal.aborted) return;
+        setBlockchainError("Could not load blockchain proofs.");
       } finally {
-        if (!controller.signal.aborted) {
-          setBlockchainLoading(false);
-        }
+        if (!controller.signal.aborted) setBlockchainLoading(false);
       }
     };
 
-    fetchBlockchainLive();
+    fetchBlockchainProof();
 
     return () => {
       controller.abort();
@@ -640,6 +653,95 @@ export function ComplaintDetailModal({
                           <ResolutionTimeline complaint={complaint} />
                         </section>
                       )}
+
+                      {/* NEW: On-Chain Audit Trail Section */}
+                      <section className="space-y-6 pt-6 border-t border-slate-100">
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center gap-2 text-[var(--dash-on-surface)]">
+                            <Sparkles className="w-5 h-5 text-indigo-500" />
+                            <h2 className="font-[var(--font-headline)] font-bold text-lg">
+                              On-Chain Verifiable History
+                            </h2>
+                            {(blockchainLive as any)?.syncedByFallback && (
+                              <span className="text-[9px] bg-indigo-50 text-indigo-600 px-2 py-0.5 rounded-full border border-indigo-100 font-bold uppercase tracking-tighter animate-pulse">
+                                Decentralized Mode
+                              </span>
+                            )}
+                          </div>
+                          {blockchainLoading && <Loader2 className="w-4 h-4 animate-spin text-indigo-500" />}
+                        </div>
+
+                        <div className="space-y-4">
+                          {/* 1. Main Verifiable Loop (Side-by-Side) */}
+                          {(blockchainLive as any)?.databaseLogs?.length > 0 ? (
+                            (blockchainLive as any)?.databaseLogs?.map((log: any, idx: number) => {
+                              const proof = (blockchainLive as any)?.blockchainVerifiedLogs?.find(
+                                (v: any) => v.action === log.action || v.details?.includes(log.action)
+                              );
+                              return (
+                                <div key={idx} className="flex gap-4 items-start p-4 rounded-xl bg-slate-50 border border-slate-100 group hover:border-indigo-200 transition-colors">
+                                  <div className="mt-1">
+                                    {proof ? (
+                                      <div className="w-6 h-6 rounded-full bg-emerald-500 flex items-center justify-center shadow-lg shadow-emerald-200">
+                                        <CheckCircle2 className="w-3.5 h-3.5 text-white" />
+                                      </div>
+                                    ) : (
+                                      <div className="w-6 h-6 rounded-full bg-slate-200 flex items-center justify-center">
+                                        <div className="w-2 h-2 rounded-full bg-slate-400" />
+                                      </div>
+                                    )}
+                                  </div>
+                                  <div className="flex-1">
+                                    <div className="flex items-center justify-between">
+                                      <h4 className="text-sm font-bold text-slate-800">{log.action || "System Action"}</h4>
+                                      <span className="text-[10px] text-slate-400 font-medium">{new Date(log.timestamp).toLocaleString()}</span>
+                                    </div>
+                                    <p className="text-xs text-slate-500 mt-1">{log.details}</p>
+                                    {proof && (
+                                      <div className="mt-3 flex items-center gap-2">
+                                        <a href={`https://sepolia.etherscan.io/tx/${proof.transactionHash}`} target="_blank" className="text-[10px] flex items-center gap-1 bg-white border border-emerald-200 text-emerald-700 px-2 py-1 rounded-md hover:bg-emerald-50 transition-colors font-mono">
+                                          <ExternalLink className="w-3 h-3" />
+                                          Verified: {proof.transactionHash.slice(0, 10)}...
+                                        </a>
+                                      </div>
+                                    )}
+                                  </div>
+                                </div>
+                              );
+                            })
+                          ) : (
+                            /* 2. Fallback Loop (Blockchain Only) */
+                            (blockchainLive as any)?.blockchainVerifiedLogs?.map((proof: any, idx: number) => (
+                              <div key={idx} className="flex gap-4 items-start p-4 rounded-xl bg-indigo-50/50 border border-indigo-100 group hover:border-indigo-300 transition-colors">
+                                <div className="mt-1">
+                                  <div className="w-6 h-6 rounded-full bg-indigo-500 flex items-center justify-center shadow-lg shadow-indigo-200">
+                                    <Sparkles className="w-3.5 h-3.5 text-white" />
+                                  </div>
+                                </div>
+                                <div className="flex-1">
+                                  <div className="flex items-center justify-between">
+                                    <h4 className="text-sm font-bold text-indigo-900">{proof.action || "On-Chain Event"}</h4>
+                                    <span className="text-[10px] text-indigo-400 font-medium whitespace-nowrap">Immutable Record</span>
+                                  </div>
+                                  <p className="text-xs text-indigo-700/70 mt-1">{proof.details || "This event is permanently recorded on Ethereum Sepolia."}</p>
+                                  <div className="mt-3 flex items-center gap-2">
+                                    <a href={`https://sepolia.etherscan.io/tx/${proof.transactionHash}`} target="_blank" className="text-[10px] flex items-center gap-1 bg-white border border-indigo-200 text-indigo-700 px-2 py-1 rounded-md hover:bg-indigo-50 transition-colors font-mono">
+                                      <ExternalLink className="w-3 h-3" />
+                                      View Transaction: {proof.transactionHash.slice(0, 10)}...
+                                    </a>
+                                  </div>
+                                </div>
+                              </div>
+                            ))
+                          )}
+
+                          {!(blockchainLive as any)?.databaseLogs?.length && !(blockchainLive as any)?.blockchainVerifiedLogs?.length && (
+                            <p className="text-sm text-slate-400 italic text-center py-4">No audit logs available for this report yet.</p>
+                          )}
+                        </div>
+
+                      </section>
+
                     </div>
 
                     {/* Right Column */}

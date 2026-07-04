@@ -21,6 +21,8 @@ import autoAssignRouter, { startAutoAssignPolling } from './routes/autoAssign';
 import { startSlaCron } from './lib/slaCron';
 import publicAnnouncementRoutes from './routes/publicAnnouncementRoutes';
 import aiAgentCTARoutes from './routes/aiAgentCTARoutes';
+import blockchainRoutes from './routes/blockchainRoutes';
+
 
 export class Server {
   private app: Express;
@@ -49,9 +51,13 @@ export class Server {
   }
 
   private setupRoutes() {
+    // Blockchain Verification Route (High Priority)
+    this.app.use('/api/blockchain', blockchainRoutes(this.db));
+
     this.app.use('/api/auth', authRoutes(this.db));
     this.app.use('/api/super-admin', superAdminRoutes(this.db));
     this.app.use('/api/state-admin', stateAdminRoutes(this.db));
+
 
     // CivicPartner feature
     this.app.use('/api/civic-partner/auth', civicPartnerAuthRoutes(this.db));
@@ -72,6 +78,9 @@ export class Server {
 
     // AI Agent CTA routes — accessible by State Admin & Super Admin
     this.app.use('/api/agent-cta', aiAgentCTARoutes(this.db));
+
+
+
 
     this.app.use('/api', healthPoint(this.db));
     this.app.get('/health', (req, res) => {

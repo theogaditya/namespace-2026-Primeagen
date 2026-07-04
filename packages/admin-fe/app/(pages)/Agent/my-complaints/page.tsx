@@ -124,8 +124,34 @@ export default function AgentRevampedMyComplaints() {
   const [statusUpdating, setStatusUpdating] = useState(false)
   const [chatComplaint, setChatComplaint] = useState<Complaint | null>(null)
   const [pagination, setPagination] = useState({ currentPage: 1, totalPages: 1, totalItems: 0, itemsPerPage: 20 })
+  const [blockchainLogs, setBlockchainLogs] = useState<any>(null)
+  const [blockchainLoading, setBlockchainLoading] = useState(false)
 
   useEffect(() => {
+    if (selectedComplaint) {
+      fetchBlockchainLogs(selectedComplaint.id);
+    } else {
+      setBlockchainLogs(null);
+    }
+  }, [selectedComplaint])
+
+  const fetchBlockchainLogs = async (id: string) => {
+    setBlockchainLoading(true);
+    try {
+      const res = await fetch(`${API_URL}/api/complaints/verify/${id}`);
+      if (res.ok) {
+        setBlockchainLogs(await res.json());
+      }
+    } catch (e) {
+      console.error("Error fetching blockchain logs:", e);
+    } finally {
+      setBlockchainLoading(false);
+    }
+  };
+
+
+  useEffect(() => {
+
     try {
       const raw = localStorage.getItem("admin")
       if (raw) {
@@ -492,6 +518,51 @@ export default function AgentRevampedMyComplaints() {
                       <p className="text-xs font-mono mt-0.5">{formatDate(selectedComplaint.lastUpdated)}</p>
                     </div>
                   </div>
+
+                  {/* Blockchain Audit Section */}
+                  <div className="pt-4 border-t border-[#c3c5d9]/20">
+                    <div className="flex items-center justify-between mb-2">
+                       <label className="text-[9px] font-bold uppercase text-slate-400 tracking-widest">On-Chain Audit Trail</label>
+                       {blockchainLoading && <span className="animate-spin text-[10px] text-blue-600">⌛</span>}
+                    </div>
+                    
+                    <div className="space-y-2">
+                      {blockchainLogs?.databaseLogs?.slice(0, 5).map((log: any, idx: number) => {
+                        const proof = blockchainLogs.blockchainVerifiedLogs?.find((p: any) => p.action === log.action);
+                        return (
+                          <div key={idx} className="bg-[#f8faff] p-2 border border-[#eef2ff] rounded flex items-start gap-3">
+                            <div className="mt-0.5">
+                              {proof ? (
+                                <span className="text-emerald-500 text-[14px]">✅</span>
+                              ) : (
+                                <span className="text-slate-200 text-[14px]">⚪</span>
+                              )}
+                            </div>
+                            <div className="flex-1">
+                              <div className="flex justify-between">
+                                <span className="text-[10px] font-bold text-slate-700">{log.action}</span>
+                                <span className="text-[8px] text-slate-400">{new Date(log.timestamp).toLocaleTimeString()}</span>
+                              </div>
+                              <p className="text-[9px] text-slate-500 truncate">{log.details}</p>
+                              {proof && (
+                                <a 
+                                  href={`https://sepolia.etherscan.io/tx/${proof.transactionHash}`}
+                                  target="_blank"
+                                  className="text-[8px] text-[#0047cc] hover:underline font-mono mt-1 block"
+                                >
+                                  Proof: {proof.transactionHash.slice(0, 12)}...
+                                </a>
+                              )}
+                            </div>
+                          </div>
+                        )
+                      })}
+                      {!blockchainLoading && !blockchainLogs?.databaseLogs?.length && (
+                        <p className="text-[10px] text-slate-400 italic">No blockchain proofs available.</p>
+                      )}
+                    </div>
+                  </div>
+
 
                   {/* Status update */}
                   {(() => {

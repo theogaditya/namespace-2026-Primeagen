@@ -206,8 +206,10 @@ export const DEPARTMENT_CONFIG: Record<Department, { label: string; icon: string
 };
 
 // Helper functions
-export function formatDate(dateString: string): string {
+export function formatDate(dateString?: string | null): string {
+  if (!dateString) return '--';
   const date = new Date(dateString);
+  if (Number.isNaN(date.getTime())) return '--';
   return date.toLocaleDateString('en-IN', {
     day: 'numeric',
     month: 'short',
@@ -215,8 +217,10 @@ export function formatDate(dateString: string): string {
   });
 }
 
-export function formatDateTime(dateString: string): string {
+export function formatDateTime(dateString?: string | null): string {
+  if (!dateString) return '--';
   const date = new Date(dateString);
+  if (Number.isNaN(date.getTime())) return '--';
   return date.toLocaleDateString('en-IN', {
     day: 'numeric',
     month: 'short',
@@ -226,8 +230,10 @@ export function formatDateTime(dateString: string): string {
   });
 }
 
-export function getRelativeTime(dateString: string): string {
+export function getRelativeTime(dateString?: string | null): string {
+  if (!dateString) return '--';
   const date = new Date(dateString);
+  if (Number.isNaN(date.getTime())) return '--';
   const now = new Date();
   const diffInSeconds = Math.floor((now.getTime() - date.getTime()) / 1000);
 
