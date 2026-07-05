@@ -7,25 +7,25 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Checkbox } from "@/components/ui/checkbox";
 import { validateImage, type ImageValidationResult } from "@/lib/api/imageValidation";
-import { 
-  URGENCY_OPTIONS, 
-  ComplaintUrgency, 
+import {
+  URGENCY_OPTIONS,
+  ComplaintUrgency,
   countWords,
   CATEGORY_DEPARTMENT_MAP,
   Department,
 } from "../../regComplaint/customComps/types";
-import { 
-  MAX_SUBCATEGORY_WORDS, 
+import {
+  MAX_SUBCATEGORY_WORDS,
   MAX_DESCRIPTION_WORDS,
   MAX_PHOTO_SIZE_BYTES,
   MAX_PHOTO_SIZE_MB,
 } from "../../regComplaint/customComps/validation";
-import { 
-  FileText, 
-  AlertCircle, 
-  CheckCircle, 
-  ImagePlus, 
-  X, 
+import {
+  FileText,
+  AlertCircle,
+  CheckCircle,
+  ImagePlus,
+  X,
   Globe,
   Lock,
   Sparkles,
@@ -382,7 +382,7 @@ export function Step2DetailsAI({
       const formData = new FormData();
       formData.append("image", file);
 
-      const response = await fetch("http://52.0.236.148:3030/api/image", {
+      const response = await fetch(process.env.NEXT_PUBLIC_IMAGE_ANALYSIS_API_URL || "http://localhost:3040/api/image", {
         method: "POST",
         body: formData,
       });
@@ -394,7 +394,7 @@ export function Step2DetailsAI({
         updateField("categoryName", data.category);
         updateField("subCategory", data.subCategory || data.category);
         updateField("description", data.complaint);
-        
+
         // Set the department based on category
         const department = CATEGORY_DEPARTMENT_MAP[data.category];
         if (department) {
@@ -429,7 +429,7 @@ export function Step2DetailsAI({
     try {
       const result = await validateImage(file);
       setValidationResult(result);
-      
+
       if (result.is_valid) {
         setValidationStatus("valid");
       } else {
@@ -467,10 +467,10 @@ export function Step2DetailsAI({
     }
 
     setPhoto(file);
-    
+
     // Trigger AI analysis
     await analyzeImage(file);
-    
+
     // Uncomment the following line to also validate the image for relevance
     // await performImageValidation(file);
   };
@@ -482,7 +482,7 @@ export function Step2DetailsAI({
     setValidationResult(null);
     setAnalysisStatus("idle");
     setFieldsUnlocked(false);
-    
+
     const file = e.dataTransfer.files?.[0];
     if (!file) return;
 
@@ -497,10 +497,10 @@ export function Step2DetailsAI({
     }
 
     setPhoto(file);
-    
+
     // Trigger AI analysis
     await analyzeImage(file);
-    
+
     // Uncomment the following line to also validate the image for relevance
     // await performImageValidation(file);
   };
@@ -524,7 +524,7 @@ export function Step2DetailsAI({
   const handleSubCategoryChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     const value = e.target.value;
     updateField("subCategory", value);
-    
+
     // Real-time validation
     if (countWords(value) > MAX_SUBCATEGORY_WORDS) {
       setErrors((prev) => ({
@@ -544,7 +544,7 @@ export function Step2DetailsAI({
   const handleDescriptionChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     const value = e.target.value;
     updateField("description", value);
-    
+
     // Real-time validation
     if (countWords(value) > MAX_DESCRIPTION_WORDS) {
       setErrors((prev) => ({
@@ -670,7 +670,7 @@ export function Step2DetailsAI({
               {photoError}
             </motion.p>
           )}
-          
+
           {/* Image Analysis Badge */}
           <AnimatePresence mode="wait">
             {formData.photo && (
@@ -681,9 +681,9 @@ export function Step2DetailsAI({
           {/* Image Validation Badge - Only shows when validation is enabled */}
           <AnimatePresence mode="wait">
             {formData.photo && validationStatus !== "idle" && (
-              <ImageValidationBadge 
-                status={validationStatus} 
-                validationResult={validationResult} 
+              <ImageValidationBadge
+                status={validationStatus}
+                validationResult={validationResult}
               />
             )}
           </AnimatePresence>
@@ -706,8 +706,8 @@ export function Step2DetailsAI({
 
       {/* Auto-filled Category Display */}
       {formData.categoryName && fieldsUnlocked && (
-        <motion.div 
-          className="space-y-2" 
+        <motion.div
+          className="space-y-2"
           variants={itemVariants}
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -726,8 +726,8 @@ export function Step2DetailsAI({
       )}
 
       {/* Sub-category */}
-      <motion.div 
-        className={cn("space-y-2 transition-all duration-300", (isFieldsDisabled || isAnalyzing) && "opacity-50 pointer-events-none")} 
+      <motion.div
+        className={cn("space-y-2 transition-all duration-300", (isFieldsDisabled || isAnalyzing) && "opacity-50 pointer-events-none")}
         variants={itemVariants}
       >
         <div className="flex items-center justify-between">
@@ -749,8 +749,8 @@ export function Step2DetailsAI({
             disabled={isFieldsDisabled || isAnalyzing}
             className={cn(
               "min-h-20 resize-none rounded-xl border-2 transition-all focus:ring-2 focus:ring-blue-100",
-              touched.subCategory && errors.subCategory 
-                ? "border-red-300 focus:border-red-500" 
+              touched.subCategory && errors.subCategory
+                ? "border-red-300 focus:border-red-500"
                 : "border-gray-200 focus:border-blue-500",
               (isFieldsDisabled || isAnalyzing) && "bg-gray-100 cursor-not-allowed"
             )}
@@ -769,8 +769,8 @@ export function Step2DetailsAI({
       </motion.div>
 
       {/* Description */}
-      <motion.div 
-        className={cn("space-y-2 transition-all duration-300", (isFieldsDisabled || isAnalyzing) && "opacity-50 pointer-events-none")} 
+      <motion.div
+        className={cn("space-y-2 transition-all duration-300", (isFieldsDisabled || isAnalyzing) && "opacity-50 pointer-events-none")}
         variants={itemVariants}
       >
         <div className="flex items-center justify-between">
@@ -791,8 +791,8 @@ export function Step2DetailsAI({
           disabled={isFieldsDisabled || isAnalyzing}
           className={cn(
             "min-h-[150px] resize-none rounded-xl border-2 transition-all focus:ring-2 focus:ring-blue-100",
-            touched.description && errors.description 
-              ? "border-red-300 focus:border-red-500" 
+            touched.description && errors.description
+              ? "border-red-300 focus:border-red-500"
               : "border-gray-200 focus:border-blue-500",
             (isFieldsDisabled || isAnalyzing) && "bg-gray-100 cursor-not-allowed"
           )}
@@ -810,8 +810,8 @@ export function Step2DetailsAI({
       </motion.div>
 
       {/* Urgency */}
-      <motion.div 
-        className={cn("space-y-3 transition-all duration-300", (isFieldsDisabled || isAnalyzing) && "opacity-50 pointer-events-none")} 
+      <motion.div
+        className={cn("space-y-3 transition-all duration-300", (isFieldsDisabled || isAnalyzing) && "opacity-50 pointer-events-none")}
         variants={itemVariants}
       >
         <Label className="text-sm font-semibold">

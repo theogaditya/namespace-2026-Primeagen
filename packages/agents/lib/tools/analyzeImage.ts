@@ -1,11 +1,14 @@
 import { DynamicStructuredTool } from "@langchain/core/tools";
 import { z } from "zod";
+import { createImageAnalysisAI } from "../../agents/imageAnalysisAI";
 
 /**
- * Analyzes an uploaded image via the self service (GPT-4o-mini Vision).
- * Returns detected category, description, urgency, and location suggestion.
+ * Analyzes an uploaded image via the local Image Analysis AI agent (LangChain).
+ * Returns detected category, description, urgency, and sub-category.
  */
 export function createAnalyzeImageTool() {
+  const imageAI = createImageAnalysisAI();
+
   return new DynamicStructuredTool({
     name: "analyzeImage",
     description:
@@ -14,26 +17,23 @@ export function createAnalyzeImageTool() {
       imageBase64: z.string().describe("Base64-encoded image data from the user upload"),
     }),
     func: async ({ imageBase64 }) => {
-      const selfUrl = process.env.SELF_SERVICE_URL || "http://localhost:3030";
-
-      // Self service expects either multipart 'image' file or JSON 'imageUrl'.
-      // Use data-URL approach for base64 input.
       const dataUrl = imageBase64.startsWith("data:")
         ? imageBase64
         : `data:image/jpeg;base64,${imageBase64}`;
 
-      const res = await fetch(`${selfUrl}/api/image`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ imageUrl: dataUrl }),
-      });
-
-      if (!res.ok) {
-        return JSON.stringify({ error: "Image analysis failed", status: res.status });
+      try {
+        const result = await imageAI({ imageContent: dataUrl });
+        return JSON.stringify({
+          success: true,
+          category: result.category,
+          subCategory: result.subCategory,
+          complaint: result.complaint,
+          urgency: result.urgency,
+        });
+      } catch (error) {
+        console.error("[AnalyzeImageTool] Error:", error);
+        return JSON.stringify({ success: false, error: "Image analysis failed" });
       }
-
-      const data = await res.json();
-      return JSON.stringify(data);
     },
   });
 }

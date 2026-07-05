@@ -24,7 +24,7 @@ const MapContainer = dynamic(() => import("react-leaflet").then((m) => m.MapCont
 const TileLayer = dynamic(() => import("react-leaflet").then((m) => m.TileLayer), { ssr: false })
 const Marker = dynamic(() => import("react-leaflet").then((m) => m.Marker), { ssr: false })
 
-const AI_API_URL = process.env.NEXT_PUBLIC_API_URL_SELF_MATCH || "http://localhost:3030/api/match"
+const AI_API_URL = process.env.NEXT_PUBLIC_API_URL_SELF_MATCH || "http://localhost:3040/api/match"
 
 /** Route external image URLs through our server proxy to avoid CORP blocks */
 const proxyImg = (url: string | null | undefined) =>

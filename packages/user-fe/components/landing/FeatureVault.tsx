@@ -828,13 +828,6 @@ export default function FeatureVault() {
           viewport={{ once: true }}
           transition={{ duration: 0.7 }}
         >
-          {/* Label row */}
-          <div className="flex items-center gap-3 mb-4">
-            <span className="w-12 h-0.5 bg-black" />
-            <span className="text-black font-extrabold tracking-widest text-xs uppercase" style={HEADLINE}>
-              Engine Core
-            </span>
-          </div>
 
           {/* Headline + decorative bolt */}
           <div className="flex flex-col md:flex-row md:items-end justify-between gap-8">

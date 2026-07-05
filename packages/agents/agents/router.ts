@@ -2,6 +2,7 @@ import type { PrismaClient } from "../prisma/generated/client/client";
 import type { BaseMessage } from "@langchain/core/messages";
 import { createSentientAI, type SentientAIOutput } from "./sentientAI";
 import { createHelpAI } from "./helpAI";
+import { createImageAnalysisAI } from "./imageAnalysisAI";
 import { sanitizeInput } from "../lib/guardrails/inputSanitizer";
 import { filterOutput } from "../lib/guardrails/outputFilter";
 import { sessionMemory } from "../lib/memory/sessionMemory";
@@ -43,35 +44,20 @@ export interface ChatOutput {
 export function createAgentRouter(db: PrismaClient) {
   const sentientAI = createSentientAI(db);
   const helpAI = createHelpAI(db);
+  const imageAI = createImageAnalysisAI();
 
   return async function routeChat(input: ChatInput): Promise<ChatOutput> {
     const { message, userId, sessionId, imageBase64 } = input;
 
-    // Pre-process image if attached -call self service before LLM
+    // Pre-process image if attached — call local Image Analysis AI agent
     let enrichedMessage = message;
     if (imageBase64) {
       try {
-        const selfUrl = process.env.SELF_SERVICE_URL || "http://localhost:3030";
         const dataUrl = imageBase64.startsWith("data:")
           ? imageBase64
           : `data:image/jpeg;base64,${imageBase64}`;
-        const imgRes = await fetch(`${selfUrl}/api/image`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ imageUrl: dataUrl }),
-        });
-        if (imgRes.ok) {
-          const imgData = (await imgRes.json()) as {
-            success?: boolean;
-            category?: string;
-            subCategory?: string;
-            complaint?: string;
-            urgency?: string;
-          };
-          if (imgData.success) {
-            enrichedMessage += `\n\n[Image analysis result -category: ${imgData.category}, subCategory: ${imgData.subCategory}, description: ${imgData.complaint}, urgency: ${imgData.urgency}]`;
-          }
-        }
+        const imgData = await imageAI({ imageContent: dataUrl });
+        enrichedMessage += `\n\n[Image analysis result — category: ${imgData.category}, subCategory: ${imgData.subCategory}, description: ${imgData.complaint}, urgency: ${imgData.urgency}]`;
       } catch (imgErr) {
         console.error("[AgentRouter] Image pre-processing failed:", imgErr);
       }

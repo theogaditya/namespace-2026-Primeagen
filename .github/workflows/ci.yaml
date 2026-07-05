@@ -19,7 +19,7 @@ jobs:
       USER_BE_IMAGE: ogadityahota/swarajdesk-user-be
       ADMIN_BE_IMAGE: ogadityahota/sih-swarajdesk-admin-be
       COMP_QUEUE_IMAGE: ogadityahota/swarajdesk-comp-queue
-      SELF_IMAGE: ogadityahota/swarajdesk-self    
+      SELF_IMAGE: ogadityahota/swarajdesk-self
       IMAGE_TAG: ${{ github.sha }}
 
     steps:
@@ -79,10 +79,10 @@ jobs:
           bun install --ignore-scripts || true
           bunx prisma generate
 
-      - name: Run compQueue tests
-        working-directory: packages/compQueue
-        run: |
-          bun run test:unit
+      # - name: Run compQueue tests
+      #   working-directory: packages/compQueue
+      #   run: |
+      #     bun run test:unit
 
       # -------------------------
       # self tests

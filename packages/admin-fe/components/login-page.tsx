@@ -1,6 +1,7 @@
 "use client"
 
 import * as React from "react"
+import { motion, AnimatePresence } from "framer-motion"
 import {
   ClipboardList,
   RefreshCw,
@@ -26,8 +27,24 @@ import {
   LineChart,
   ShieldCheck,
   Download,
+  ChevronRight,
 } from 'lucide-react'
 import { LoginForm } from "./login-form"
+
+/* ------------------------------------------------------------------ */
+/*  Gumroad / newvault shared constants                                 */
+/* ------------------------------------------------------------------ */
+const GRID_BG: React.CSSProperties = {
+  backgroundColor: "#F4F4F4",
+  backgroundImage:
+    "radial-gradient(circle at 1px 1px, #e2e8f0 1px, transparent 0)",
+  backgroundSize: "24px 24px",
+}
+const SHADOW_BASE = "8px 8px 0px 0px rgba(0,0,0,1)"
+const SHADOW_HOVER = "12px 12px 0px 0px #7C3AED"
+const HEADLINE: React.CSSProperties = {
+  fontFamily: "'Plus Jakarta Sans', sans-serif",
+}
 
 type RoleKey = "CIVIC_PARTNER" | "STATE_ADMIN" | "MUNICIPAL_ADMIN" | "AGENT"
 
@@ -114,21 +131,18 @@ const ROLE_INFO: Record<
   {
     title: string;
     subtitle: string;
-    capabilities: RoleCapability[];
-    color: string;
-    bg: string;
-    border: string;
-    accentFrom: string;
-    accentTo: string;
     tag: string;
+    iconBg: string;
+    accentHex: string;
+    capabilities: RoleCapability[];
   }
 > = {
   AGENT: {
     title: "Field Agent",
     subtitle: "On-ground complaint resolution & verification",
-    tag: "SKY · TEAL",
-    accentFrom: "from-sky-500",
-    accentTo: "to-cyan-400",
+    tag: "FIELD · AGENT",
+    iconBg: "#e0f2fe",
+    accentHex: "#0284c7",
     capabilities: [
       { icon: ClipboardList, title: "Smart Complaint Queue", desc: "Urgency-sorted dashboard of all assigned complaints with one-click filters." },
       { icon: RefreshCw, title: "Status Lifecycle Engine", desc: "Move complaints through Under Processing → Completed / Rejected with auto citizen notifications." },
@@ -137,34 +151,28 @@ const ROLE_INFO: Record<
       { icon: ArrowUpCircle, title: "One-Click Escalation", desc: "Escalate to Municipal Admin with a structured reason note in seconds." },
       { icon: FileText, title: "Immutable Audit Trail", desc: "Every action hashed and timestamped for tamper-proof accountability." },
     ],
-    color: "text-sky-700",
-    bg: "bg-sky-50",
-    border: "border-sky-300",
   },
   MUNICIPAL_ADMIN: {
     title: "Municipal Admin",
     subtitle: "Complaint operations, agents & governance",
-    tag: "EMERALD · TEAL",
-    accentFrom: "from-emerald-500",
-    accentTo: "to-teal-400",
+    tag: "MUNICIPAL · ADMIN",
+    iconBg: "#d1fae5",
+    accentHex: "#059669",
     capabilities: [
       { icon: Cpu, title: "AI Report Generator", desc: "One-click executive summaries, district analysis, SLA breach reports—written by AI from live data." },
       { icon: Zap, title: "AI Action Suggestions", desc: "LLM tells you exactly what to do next: escalate, reassign, trigger auto-assign, or broadcast an announcement." },
       { icon: Users, title: "Agent Management Hub", desc: "Create/deactivate agents, set workload caps, monitor individual resolution rates." },
       { icon: Globe2, title: "Complaint Heatmap", desc: "Google-powered density heatmap across districts reveals pressure zones for proactive deployment." },
-      { icon: Megaphone, title: "Public Announcements", desc: "Broadcast priority-flagged notices to citizens -municipality-scoped or city-wide." },
+      { icon: Megaphone, title: "Public Announcements", desc: "Broadcast priority-flagged notices to citizens — municipality-scoped or city-wide." },
       { icon: ShieldAlert, title: "State Escalation Workflow", desc: "Escalate unresolvable complaints upward with structured reason tagging and live status tracking." },
     ],
-    color: "text-emerald-700",
-    bg: "bg-emerald-50",
-    border: "border-emerald-300",
   },
   STATE_ADMIN: {
     title: "State Admin",
     subtitle: "State-wide oversight, analytics & governance",
-    tag: "VIOLET · PURPLE",
-    accentFrom: "from-violet-500",
-    accentTo: "to-purple-400",
+    tag: "STATE · ADMIN",
+    iconBg: "#ede9fe",
+    accentHex: "#7C3AED",
     capabilities: [
       { icon: Globe, title: "District Intelligence Command", desc: "Cross-municipality complaint volumes, resolution rates & SLA breaches—aggregated in real-time." },
       { icon: UserCog, title: "Municipal Admin Management", desc: "Create, provision and deactivate Municipal Admin accounts with full jurisdiction assignment." },
@@ -173,28 +181,21 @@ const ROLE_INFO: Record<
       { icon: Download, title: "Data Export Engine", desc: "Download municipality-scoped or state-wide complaint data and AI reports as JSON/PDF." },
       { icon: Zap, title: "AI Action Executor", desc: "Execute AI-suggested actions—escalate, update status, publish announcement—directly from the report panel." },
     ],
-    color: "text-violet-700",
-    bg: "bg-violet-50",
-    border: "border-violet-300",
   },
   CIVIC_PARTNER: {
     title: "Civic Partner",
-    subtitle: "NGOs & government bodies -citizen engagement at scale",
-    tag: "ROSE · PINK",
-    accentFrom: "from-rose-500",
-    accentTo: "to-pink-400",
-      capabilities: [
+    subtitle: "NGOs & government bodies — citizen engagement at scale",
+    tag: "CIVIC · PARTNER",
+    iconBg: "#ffe4e6",
+    accentHex: "#e11d48",
+    capabilities: [
       { icon: ClipboardList, title: "Survey Templates Library", desc: "Pre-built, customizable survey templates (health, sanitation, civic feedback) to launch quickly with role-based defaults." },
       { icon: FileDown, title: "Offline Mobile Collection", desc: "Field teams can collect responses offline on mobile devices; submissions sync automatically when connectivity is restored." },
-      { icon: Activity, title: "Real-Time Response Stream", desc: "Watch responses arrive live -total submissions, completion rate, and velocity updated every few seconds." },
+      { icon: Activity, title: "Real-Time Response Stream", desc: "Watch responses arrive live — total submissions, completion rate, and velocity updated every few seconds." },
       { icon: MapPin, title: "Geographic Participation Heatmap", desc: "See which wards and districts are responding to enable targeted outreach in low-participation zones." },
       { icon: PieChart, title: "Per-Question Analytics", desc: "Option distribution for MCQs, average ratings, text responses with turnout breakdown per question." },
       { icon: FileDown, title: "One-Click Data Export", desc: "Download full response datasets in CSV or JSON for offline analysis or donor reporting." },
-      { icon: Sparkles, title: "AI Sentiment Engine", desc: "Open-ended responses auto-scored for positive / neutral / negative sentiment at scale." },
     ],
-    color: "text-rose-700",
-    bg: "bg-rose-50",
-    border: "border-rose-300",
   },
 }
 
@@ -203,125 +204,163 @@ export default function LoginPage() {
   const info = ROLE_INFO[selected]
 
   return (
-    <div className="bg-white flex items-start justify-center py-16 px-6 sm:px-8 lg:px-12">
+    <div
+      className="flex items-start justify-center py-16 px-6 sm:px-8 lg:px-12"
+      style={GRID_BG}
+    >
       <div className="w-full max-w-7xl grid grid-cols-1 lg:grid-cols-12 gap-10">
 
-        {/* ── Left -role capabilities ── */}
+        {/* ── Left — role capabilities ── */}
         <aside className="lg:col-span-7">
+
           {/* Hero headline */}
-          <div className="mb-8">
-            <p className="text-xs font-bold tracking-[0.2em] text-gray-400 uppercase mb-2">
-              SwarajDesk · Unified Admin Portal
+          <motion.div
+            className="mb-10"
+            initial={{ opacity: 0, y: 24 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6 }}
+          >
+            <p
+              className="text-xs font-black tracking-[0.2em] text-slate-500 uppercase mb-3"
+              style={HEADLINE}
+            >
+              SwarajDesk &middot; Unified Admin Portal
             </p>
-            <h2 className="text-4xl md:text-5xl font-extrabold text-gray-900 leading-tight mb-3">
+            <h2
+              className="text-4xl md:text-5xl font-extrabold text-black leading-tight mb-4"
+              style={HEADLINE}
+            >
               Governance,<br />
               <span className="inline-block">
                 <Typewriter
                   phrases={["purpose-built.", "field-ready.", "citizen-centered."]}
-                  accentFrom={info.accentFrom}
-                  accentTo={info.accentTo}
-                  accentText={info.color}
+                  accentFrom="from-violet-500"
+                  accentTo="to-purple-400"
+                  accentText="text-violet-700"
                 />
               </span>
             </h2>
-            <p className="text-gray-500 text-base max-w-lg leading-relaxed">
+            <p className="text-slate-600 text-base max-w-lg leading-relaxed">
               Select your role to explore the tools available to you. Each tier is designed for precise,
               high-impact action.
             </p>
-          </div>
+          </motion.div>
 
-          {/* Role selector pills */}
-          <div className="flex flex-wrap gap-2 mb-8">
+          {/* Role selector pills — gumroad style */}
+          <div className="flex flex-wrap gap-3 mb-8">
             {(Object.keys(ROLE_INFO) as RoleKey[]).map((r) => {
-              const ri = ROLE_INFO[r]
               const isActive = r === selected
               return (
                 <button
                   key={r}
                   onClick={() => setSelected(r)}
-                  className={`px-4 py-1.5 rounded-lg text-sm font-semibold border transition-all duration-150
+                  className={`px-5 py-2.5 rounded-xl text-sm font-extrabold border-2 transition-all duration-200 whitespace-nowrap
                     ${isActive
-                      ? `${ri.bg} ${ri.color} ${ri.border} shadow-sm`
-                      : 'bg-white text-gray-500 border-gray-200 hover:border-gray-300 hover:text-gray-800'
+                      ? "bg-black text-white border-black"
+                      : "bg-white text-slate-600 border-black hover:text-black"
                     }`}
+                  style={isActive ? { boxShadow: "4px 4px 0px 0px #7C3AED" } : undefined}
                 >
-                  {ri.title}
+                  <span className="flex items-center gap-2">
+                    {ROLE_INFO[r].title}
+                    {isActive && <ChevronRight className="w-4 h-4" />}
+                  </span>
                 </button>
               )
             })}
           </div>
 
-          {/* Role header */}
-          <div className={`flex items-center gap-3 mb-5 pb-4 border-b ${info.border}`}>
-            <div className={`${info.bg} rounded-xl px-3 py-1`}>
-              <span className={`text-xs font-bold tracking-widest uppercase ${info.color}`}>
+          {/* Role header — gumroad divider */}
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={selected + "-header"}
+              initial={{ opacity: 0, y: 8 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -8 }}
+              transition={{ duration: 0.22 }}
+              className="flex items-center gap-3 mb-6 pb-4 border-b-2 border-black"
+            >
+              <span
+                className="inline-block bg-black text-white px-3 py-1 rounded-lg text-xs font-black tracking-widest uppercase shrink-0"
+                style={{ boxShadow: "3px 3px 0px 0px #7C3AED" }}
+              >
                 {info.tag}
               </span>
-            </div>
-            <div>
-              <p className="font-bold text-gray-900 text-sm">{info.title}</p>
-              <p className="text-gray-400 text-xs">{info.subtitle}</p>
-            </div>
-          </div>
+              <div>
+                <p className="font-extrabold text-black text-sm" style={HEADLINE}>{info.title}</p>
+                <p className="text-slate-500 text-xs">{info.subtitle}</p>
+              </div>
+            </motion.div>
+          </AnimatePresence>
 
-          {/* Capability grid -2 cols */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-6">
-            {info.capabilities.map((cap, i) => {
-              if (typeof cap.icon === 'string') {
+          {/* Capability grid — gumroad cards */}
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={selected + "-caps"}
+              initial={{ opacity: 0, y: 16 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -16 }}
+              transition={{ duration: 0.25 }}
+              className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6"
+            >
+              {info.capabilities.map((cap, i) => {
+                const Icon = cap.icon as React.ComponentType<{ className?: string; style?: React.CSSProperties }>
                 return (
-                  <div
+                  <motion.div
                     key={i}
-                    className={`${info.bg} rounded-2xl p-4 border ${info.border} border-opacity-40 hover:border-opacity-100 transition-all`}
+                    className="bg-white rounded-2xl p-4 border-2 border-black cursor-default"
+                    style={{ boxShadow: SHADOW_BASE }}
+                    whileHover={{ x: -4, y: -4, boxShadow: SHADOW_HOVER }}
+                    transition={{ type: "spring", stiffness: 300, damping: 20 }}
                   >
                     <div className="flex items-start gap-3">
-                      <div className="w-9 h-9 flex items-center justify-center rounded-md bg-white/0">
-                        <span className="text-xl mt-0.5 select-none">{cap.icon}</span>
+                      <div
+                        className="w-9 h-9 flex items-center justify-center rounded-lg border-2 border-black shrink-0"
+                        style={{ backgroundColor: info.iconBg }}
+                      >
+                        <Icon
+                          className="w-4 h-4"
+                          style={{ color: info.accentHex }}
+                        />
                       </div>
                       <div>
-                        <p className={`text-sm font-bold ${info.color} mb-0.5`}>{cap.title}</p>
-                        <p className="text-xs text-gray-500 leading-relaxed">{cap.desc}</p>
+                        <p className="text-sm font-extrabold text-black mb-0.5" style={HEADLINE}>
+                          {cap.title}
+                        </p>
+                        <p className="text-xs text-slate-600 leading-relaxed">{cap.desc}</p>
                       </div>
                     </div>
-                  </div>
+                  </motion.div>
                 )
-              }
+              })}
+            </motion.div>
+          </AnimatePresence>
 
-              const Icon = cap.icon as React.ComponentType<any>
-              return (
-                <div
-                  key={i}
-                  className={`${info.bg} rounded-2xl p-4 border ${info.border} border-opacity-40 hover:border-opacity-100 transition-all`}
-                >
-                  <div className="flex items-start gap-3">
-                    <div className="w-9 h-9 flex items-center justify-center rounded-md bg-white/0">
-                      <Icon className={`${info.color.replace('text-', 'text-')} w-5 h-5`} />
-                    </div>
-                    <div>
-                      <p className={`text-sm font-bold ${info.color} mb-0.5`}>{cap.title}</p>
-                      <p className="text-xs text-gray-500 leading-relaxed">{cap.desc}</p>
-                    </div>
-                  </div>
-                </div>
-              )
-            })}
-          </div>
-
-          {/* Access note */}
-          <div className="bg-amber-50 border border-amber-200 rounded-2xl p-4 flex items-start gap-3">
-            <div className="p-2 rounded-md bg-amber-100">
-              <ShieldAlert className="w-5 h-5 text-amber-700" />
+          {/* Access note — gumroad card w/ amber offset */}
+          <div
+            className="bg-white rounded-2xl p-4 border-2 border-black flex items-start gap-3"
+            style={{ boxShadow: "6px 6px 0px 0px #d97706" }}
+          >
+            <div
+              className="w-9 h-9 flex items-center justify-center rounded-lg border-2 border-black shrink-0"
+              style={{ backgroundColor: "#fef3c7" }}
+            >
+              <ShieldAlert className="w-4 h-4 text-amber-700" />
             </div>
             <div>
-              <p className="text-sm font-semibold text-amber-800 mb-0.5">Verified access only</p>
-              <p className="text-xs text-amber-700 leading-relaxed">
+              <p className="text-sm font-extrabold text-black mb-0.5" style={HEADLINE}>
+                Verified access only
+              </p>
+              <p className="text-xs text-slate-600 leading-relaxed">
                 Only users with an assigned role can access this portal.
                 Contact your State Admin for registration or role assignment.
               </p>
             </div>
           </div>
+
         </aside>
 
-        {/* ── Right -login card ── */}
+        {/* ── Right — login card ── */}
         <main className="lg:col-span-5 flex items-start justify-center">
           <div className="w-full max-w-md">
             <LoginForm

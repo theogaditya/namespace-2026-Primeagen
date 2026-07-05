@@ -214,7 +214,7 @@ export function Step1CategoryWithAutofill({
       const formDataToSend = new FormData();
       formDataToSend.append("image", file);
 
-      const apiUrl = process.env.NEXT_PUBLIC_IMAGE_ANALYSIS_API_URL || "http://localhost:3030/api/image";
+      const apiUrl = process.env.NEXT_PUBLIC_IMAGE_ANALYSIS_API_URL || "http://localhost:3040/api/image";
       const controller = new AbortController();
       const timeoutId = setTimeout(() => controller.abort(), 30000);
 
