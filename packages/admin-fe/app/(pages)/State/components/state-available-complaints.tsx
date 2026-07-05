@@ -4,6 +4,7 @@ import { useState, useEffect, useMemo } from "react"
 import 'leaflet/dist/leaflet.css'
 import { MapContainer, Marker, TileLayer } from 'react-leaflet'
 import L from 'leaflet'
+import { BlockchainAuditModal } from "@/components/BlockchainAuditModal"
 
 // ─── Types ────────────────────────────────────────────────────────────
 interface OverviewStats {
@@ -187,6 +188,7 @@ export function StateAvailableComplaints({ onTabChange }: { onTabChange?: (tab: 
   const [statusUpdating, setStatusUpdating] = useState(false)
   const [blockchainLogs, setBlockchainLogs] = useState<BlockchainVerificationResponse | null>(null)
   const [blockchainLoading, setBlockchainLoading] = useState(false)
+  const [isBlockchainModalOpen, setIsBlockchainModalOpen] = useState(false)
   const [currentAdminId, setCurrentAdminId] = useState<string | null>(null)
   const [adminType, setAdminType] = useState<string | null>(null)
   const [overviewStats, setOverviewStats] = useState<OverviewStats>({ total: 0, registered: 0, inProgress: 0, resolved: 0, closed: 0, highPriority: 0, assigned: 0 })
@@ -826,83 +828,42 @@ export function StateAvailableComplaints({ onTabChange }: { onTabChange?: (tab: 
                     </div>
                   </div>
 
-                  <section className="bg-white p-6 rounded-xl space-y-3">
-                    <div className="flex items-center justify-between">
-                      <h3 className="text-sm font-black uppercase tracking-widest text-[#44474c] flex items-center gap-2">
-                        <span className="material-symbols-outlined text-[#115cb9]">shield_lock</span>
-                        On-Chain Audit Trail
-                      </h3>
-                      {blockchainLoading && (
-                        <span className="text-[10px] font-bold uppercase tracking-widest text-[#115cb9]">
-                          Syncing...
-                        </span>
-                      )}
+                  <section className="bg-white p-6 rounded-xl space-y-4">
+                    <div className="flex items-center gap-2">
+                      <span className="material-symbols-outlined text-[#115cb9]" style={{ fontVariationSettings: "'FILL' 1" }}>verified_user</span>
+                      <h3 className="text-sm font-black uppercase tracking-widest text-[#44474c]">Blockchain Verification</h3>
                     </div>
 
-                    <div className="space-y-2">
-                      {blockchainLogs?.databaseLogs?.slice(0, 5).map((log, idx) => {
-                        const proof = blockchainLogs.blockchainVerifiedLogs?.find(
-                          (entry) => entry.action === log.action
-                        )
-                        return (
-                          <div
-                            key={`db-${idx}`}
-                            className="p-3 bg-[#f3f4f5] rounded-lg border border-[#e1e3e4]"
-                          >
-                            <div className="flex items-start justify-between gap-2">
-                              <p className="text-xs font-bold text-[#041627]">
-                                {log.action || "Audit Event"}
-                              </p>
-                              <span className="text-[10px] text-[#44474c] whitespace-nowrap">
-                                {log.timestamp ? formatDate(log.timestamp) : "--"}
-                              </span>
-                            </div>
-                            <p className="text-xs text-[#44474c] mt-1">{log.details || "No details available"}</p>
-                            {proof?.transactionHash && (
-                              <a
-                                href={`https://sepolia.etherscan.io/tx/${proof.transactionHash}`}
-                                target="_blank"
-                                rel="noreferrer"
-                                className="mt-2 inline-block text-[10px] font-mono text-[#115cb9] hover:underline"
-                              >
-                                Proof: {proof.transactionHash.slice(0, 12)}...
-                              </a>
-                            )}
+                    {/* Quick status indicator */}
+                    <div className="p-3 rounded-lg border border-[#e1e3e4] bg-[#f3f4f5] flex items-center gap-3">
+                      <div className="relative">
+                        <div className="w-10 h-10 rounded-xl flex items-center justify-center" style={{ background: 'linear-gradient(135deg, #006c49, #34d399)' }}>
+                          <span className="material-symbols-outlined text-white" style={{ fontSize: 18, fontVariationSettings: "'FILL' 1" }}>shield_lock</span>
+                        </div>
+                        {blockchainLogs && (blockchainLogs.databaseLogs?.length || blockchainLogs.blockchainVerifiedLogs?.length) && (
+                          <div className="absolute -top-1 -right-1 w-4 h-4 bg-emerald-500 rounded-full flex items-center justify-center">
+                            <span className="material-symbols-outlined text-white" style={{ fontSize: 10 }}>check</span>
                           </div>
-                        )
-                      })}
-
-                      {!blockchainLogs?.databaseLogs?.length &&
-                        blockchainLogs?.blockchainVerifiedLogs?.slice(0, 3).map((log, idx) => (
-                          <div
-                            key={`chain-${idx}`}
-                            className="p-3 bg-[#f3f4f5] rounded-lg border border-[#e1e3e4]"
-                          >
-                            <p className="text-xs font-bold text-[#041627]">
-                              {log.action || "ON_CHAIN_CONFIRMATION"}
-                            </p>
-                            <p className="text-xs text-[#44474c] mt-1">
-                              {log.details || "Confirmed on blockchain."}
-                            </p>
-                            {log.transactionHash && (
-                              <a
-                                href={`https://sepolia.etherscan.io/tx/${log.transactionHash}`}
-                                target="_blank"
-                                rel="noreferrer"
-                                className="mt-2 inline-block text-[10px] font-mono text-[#115cb9] hover:underline"
-                              >
-                                Proof: {log.transactionHash.slice(0, 12)}...
-                              </a>
-                            )}
-                          </div>
-                        ))}
-
-                      {!blockchainLoading &&
-                        !blockchainLogs?.databaseLogs?.length &&
-                        !blockchainLogs?.blockchainVerifiedLogs?.length && (
-                          <p className="text-xs italic text-[#44474c]">No blockchain proofs available.</p>
                         )}
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-xs font-bold text-[#041627]">
+                          {blockchainLoading ? 'Syncing with blockchain...' : blockchainLogs?.blockchainVerifiedLogs?.length ? 'On-chain proofs available' : 'Check audit trail'}
+                        </p>
+                        <p className="text-[10px] text-[#44474c] mt-0.5">
+                          Sepolia Testnet · Immutable ledger
+                        </p>
+                      </div>
                     </div>
+
+                    {/* Open Modal Button */}
+                    <button
+                      onClick={() => setIsBlockchainModalOpen(true)}
+                      className="w-full px-4 py-3 rounded-xl font-bold text-xs text-[#115cb9] flex items-center justify-center gap-2 transition-all hover:bg-[#f0f4ff] active:scale-[0.98] border border-[#115cb9]/30 bg-white"
+                    >
+                      <span className="material-symbols-outlined" style={{ fontSize: 16, fontVariationSettings: "'FILL' 1" }}>open_in_new</span>
+                      <span className="uppercase tracking-widest">View Full Audit Trail</span>
+                    </button>
                   </section>
 
                   {/* Complainant Info */}
@@ -980,6 +941,25 @@ export function StateAvailableComplaints({ onTabChange }: { onTabChange?: (tab: 
           </div>
         </div>
       )}
+
+      {/* Blockchain Audit Modal */}
+      <BlockchainAuditModal
+        isOpen={isBlockchainModalOpen}
+        onClose={() => setIsBlockchainModalOpen(false)}
+        complaintId={selectedComplaint?.id || ''}
+        complaintSeq={selectedComplaint?.seq}
+        complaint={selectedComplaint ? {
+          title: selectedComplaint.title || selectedComplaint.subCategory,
+          description: selectedComplaint.description,
+          category: selectedComplaint.category,
+          subCategory: selectedComplaint.subCategory,
+          department: selectedComplaint.department,
+          status: selectedComplaint.status,
+          urgency: selectedComplaint.urgency,
+          submissionDate: selectedComplaint.submissionDate,
+          complainantName: selectedComplaint.complainant?.name,
+        } : undefined}
+      />
     </div>
   )
 }

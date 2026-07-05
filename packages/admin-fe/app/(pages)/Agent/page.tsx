@@ -6,6 +6,7 @@ import { AgentRevampedLayout } from "./_layout"
 import { AuthGuard } from "@/components/auth-guard"
 import { ChatModal } from "@/components/chat-modal"
 import { UavIntelligence } from "@/components/UavIntelligence"
+import { BlockchainAuditModal } from "@/components/BlockchainAuditModal"
 
 // Complaint heatmap -loaded client-side only
 const ComplaintGoogleHeatmap = dynamic(() => import("@/components/ComplaintGoogleHeatmap"), {
@@ -131,6 +132,7 @@ export default function AgentRevampedDashboard() {
   const [chatComplaint, setChatComplaint] = useState<Complaint | null>(null)
   const [slideoverImgError, setSlideoverImgError] = useState(false)
   const [workloadData, setWorkloadData] = useState<{ currentWorkload: number; workloadLimit: number; availabilityStatus?: string } | null>(null)
+  const [isBlockchainModalOpen, setIsBlockchainModalOpen] = useState(false)
 
   useEffect(() => {
     try {
@@ -860,6 +862,19 @@ export default function AgentRevampedDashboard() {
                   )}
                 </div>
 
+                {/* Blockchain Audit Trail */}
+                <div className="mt-5 pt-4 border-t border-[#c3c5d9]/20">
+                  <p className="text-[9px] font-bold uppercase text-slate-400 tracking-widest mb-3">Blockchain Verification</p>
+                  <button
+                    onClick={() => setIsBlockchainModalOpen(true)}
+                    className="w-full group relative overflow-hidden py-3 font-bold text-[10px] text-white flex items-center justify-center gap-2 transition-all hover:brightness-110 active:scale-95 uppercase tracking-widest"
+                    style={{ background: 'linear-gradient(135deg, #041627 0%, #0047cc 100%)' }}
+                  >
+                    <span className="material-symbols-outlined" style={{ fontSize: 14, fontVariationSettings: "'FILL' 1" }}>verified_user</span>
+                    View On-Chain Audit Trail
+                  </button>
+                </div>
+
                 {/* Status update */}
                 {canUpdateStatus(selectedComplaint) && (
                   <div className="mt-6 pt-4 border-t border-[#c3c5d9]/20">
@@ -934,6 +949,25 @@ export default function AgentRevampedDashboard() {
           onClose={() => setChatComplaint(null)}
           complaintId={chatComplaint?.id || ""}
           complaintTitle={chatComplaint?.title || chatComplaint?.subCategory || `Complaint #${chatComplaint?.seq}`}
+        />
+
+        {/* Blockchain Audit Modal */}
+        <BlockchainAuditModal
+          isOpen={isBlockchainModalOpen}
+          onClose={() => setIsBlockchainModalOpen(false)}
+          complaintId={selectedComplaint?.id || ''}
+          complaintSeq={selectedComplaint?.seq}
+          complaint={selectedComplaint ? {
+            title: selectedComplaint.title || selectedComplaint.subCategory,
+            description: selectedComplaint.description,
+            category: selectedComplaint.category,
+            subCategory: selectedComplaint.subCategory,
+            department: selectedComplaint.department,
+            status: selectedComplaint.status,
+            urgency: selectedComplaint.urgency,
+            submissionDate: selectedComplaint.submissionDate,
+            complainantName: selectedComplaint.complainant?.name,
+          } : undefined}
         />
       </AgentRevampedLayout>
     </AuthGuard>
