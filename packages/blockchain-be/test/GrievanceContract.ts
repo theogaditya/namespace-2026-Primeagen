@@ -3,6 +3,40 @@ import { ethers } from "hardhat";
 import { GrievanceContractOptimized } from "../typechain-types";
 import { HardhatEthersSigner } from "@nomicfoundation/hardhat-ethers/signers";
 
+// Helper: assert a tx reverts with a specific error message.
+// Works without hardhat-chai-matchers (which needs chai v4 but workspace has chai v5).
+async function expectRevert(promise: Promise<any>, expectedMessage: string) {
+  try {
+    await promise;
+    expect.fail("Expected transaction to revert but it succeeded");
+  } catch (error: any) {
+    const msg = error?.message || String(error);
+    expect(msg).to.include(expectedMessage,
+      `Expected revert with "${expectedMessage}" but got: ${msg.slice(0, 200)}`);
+  }
+}
+
+// Helper: assert a tx does NOT revert.
+async function expectNoRevert(promise: Promise<any>) {
+  try {
+    await promise;
+  } catch (error: any) {
+    expect.fail(`Expected transaction to succeed but it reverted: ${error?.message || error}`);
+  }
+}
+
+// Helper: assert a tx emits a given event name.
+async function expectEvent(txPromise: Promise<any>, contract: any, eventName: string) {
+  const tx = await txPromise;
+  const receipt = await tx.wait();
+  const iface = contract.interface;
+  const eventFragment = iface.getEvent(eventName);
+  expect(eventFragment, `Event ${eventName} not found in ABI`).to.not.be.null;
+  const topicHash = iface.getEvent(eventName)!.topicHash;
+  const found = receipt.logs.some((log: any) => log.topics[0] === topicHash);
+  expect(found, `Expected event "${eventName}" to be emitted`).to.be.true;
+}
+
 describe("GrievanceContractOptimized", function () {
   let contract: GrievanceContractOptimized;
   let owner: HardhatEthersSigner;
@@ -52,8 +86,9 @@ describe("GrievanceContractOptimized", function () {
       );
 
       const complaint = await contract.getComplaint(complaintId);
-      expect(complaint.urgencyLevel).to.equal(urgency);
-      expect(complaint.statusCode).to.equal(1); // REGISTERED
+      // ethers v6 returns Solidity uint as BigInt — compare with BigInt literals
+      expect(complaint.urgencyLevel).to.equal(BigInt(urgency)); // 2n
+      expect(complaint.statusCode).to.equal(1n); // REGISTERED
       expect(complaint.isPublic).to.be.true;
     });
 
@@ -79,15 +114,16 @@ describe("GrievanceContractOptimized", function () {
 
       await contract.registerComplaint(...baseParams);
 
-      await expect(
-        contract.registerComplaint(...baseParams)
-      ).to.be.revertedWith("Complaint already exists");
+      await expectRevert(
+        contract.registerComplaint(...baseParams),
+        "Complaint already exists"
+      );
     });
 
     it("Should reject invalid urgency levels", async function () {
       const complaintId = "COMP-003";
       
-      await expect(
+      await expectRevert(
         contract.registerComplaint(
           complaintId,
           citizen.address,
@@ -104,8 +140,9 @@ describe("GrievanceContractOptimized", function () {
           "Bangalore",
           "MG Road",
           "Karnataka"
-        )
-      ).to.be.revertedWith("Invalid urgency");
+        ),
+        "Invalid urgency"
+      );
     });
   });
 
@@ -132,8 +169,8 @@ describe("GrievanceContractOptimized", function () {
       );
 
       const complaint = await contract.getComplaint(complaintId);
-      expect(complaint.urgencyLevel).to.equal(2);
-      expect(complaint.statusCode).to.equal(1); // REGISTERED
+      expect(complaint.urgencyLevel).to.equal(2n);
+      expect(complaint.statusCode).to.equal(1n); // REGISTERED
       expect(complaint.isPublic).to.be.false;
     });
 
@@ -158,7 +195,7 @@ describe("GrievanceContractOptimized", function () {
         "Karnataka"
       );
 
-      await expect(
+      await expectRevert(
         contract.registerAnonymousComplaint(
           complaintId,
           identityCommitment,
@@ -174,8 +211,9 @@ describe("GrievanceContractOptimized", function () {
           "Bangalore",
           "MG Road",
           "Karnataka"
-        )
-      ).to.be.revertedWith("Complaint already exists");
+        ),
+        "Complaint already exists"
+      );
     });
 
     it("Should require anonymous proof verification when verifier is configured", async function () {
@@ -187,7 +225,7 @@ describe("GrievanceContractOptimized", function () {
 
       await contract.setAnonymousProofVerifier(await verifier.getAddress());
 
-      await expect(
+      await expectRevert(
         contract.registerAnonymousComplaint(
           complaintId,
           identityCommitment,
@@ -203,14 +241,15 @@ describe("GrievanceContractOptimized", function () {
           "Bangalore",
           "MG Road",
           "Karnataka"
-        )
-      ).to.be.revertedWith("Anonymous proof not verified");
+        ),
+        "Anonymous proof not verified"
+      );
 
-      await expect(
+      await expectNoRevert(
         contract.verifyAnonymousIdentityProof(identityCommitment, "0x1234")
-      ).to.not.be.reverted;
+      );
 
-      await expect(
+      await expectNoRevert(
         contract.registerAnonymousComplaint(
           complaintId,
           identityCommitment,
@@ -227,7 +266,7 @@ describe("GrievanceContractOptimized", function () {
           "MG Road",
           "Karnataka"
         )
-      ).to.not.be.reverted;
+      );
     });
 
     it("Should reject invalid anonymous proof when verifier returns false", async function () {
@@ -239,9 +278,10 @@ describe("GrievanceContractOptimized", function () {
       await contract.setAnonymousProofVerifier(await verifier.getAddress());
       await verifier.setShouldVerify(false);
 
-      await expect(
-        contract.verifyAnonymousIdentityProof(identityCommitment, "0x1234")
-      ).to.be.revertedWith("Invalid anonymous proof");
+      await expectRevert(
+        contract.verifyAnonymousIdentityProof(identityCommitment, "0x1234"),
+        "Invalid anonymous proof"
+      );
     });
   });
 
@@ -272,18 +312,22 @@ describe("GrievanceContractOptimized", function () {
       await contract.assignComplaint("COMP-005", departmentId);
       
       const complaint = await contract.getComplaint("COMP-005");
-      expect(complaint.statusCode).to.equal(2); // PROCESSING
+      expect(complaint.statusCode).to.equal(2n); // PROCESSING
     });
 
     it("Should emit ComplaintAssigned event", async function () {
-      await expect(contract.assignComplaint("COMP-005", "DEPT-HEALTH"))
-        .to.emit(contract, "ComplaintAssigned");
+      await expectEvent(
+        contract.assignComplaint("COMP-005", "DEPT-HEALTH"),
+        contract,
+        "ComplaintAssigned"
+      );
     });
 
     it("Should revert for non-existent complaint", async function () {
-      await expect(
-        contract.assignComplaint("COMP-NONEXISTENT", "DEPT-PWD")
-      ).to.be.revertedWith("Complaint does not exist");
+      await expectRevert(
+        contract.assignComplaint("COMP-NONEXISTENT", "DEPT-PWD"),
+        "Complaint does not exist"
+      );
     });
   });
 
@@ -315,18 +359,22 @@ describe("GrievanceContractOptimized", function () {
       await contract.resolveComplaint("COMP-006");
       
       const complaint = await contract.getComplaint("COMP-006");
-      expect(complaint.statusCode).to.equal(5); // COMPLETED
+      expect(complaint.statusCode).to.equal(5n); // COMPLETED
     });
 
     it("Should emit ComplaintResolved event", async function () {
-      await expect(contract.resolveComplaint("COMP-006"))
-        .to.emit(contract, "ComplaintResolved");
+      await expectEvent(
+        contract.resolveComplaint("COMP-006"),
+        contract,
+        "ComplaintResolved"
+      );
     });
 
     it("Should revert for non-existent complaint", async function () {
-      await expect(
-        contract.resolveComplaint("COMP-NONEXISTENT")
-      ).to.be.revertedWith("Complaint does not exist");
+      await expectRevert(
+        contract.resolveComplaint("COMP-NONEXISTENT"),
+        "Complaint does not exist"
+      );
     });
   });
 
@@ -356,7 +404,7 @@ describe("GrievanceContractOptimized", function () {
       await contract.recordComplaintSla(complaintId, dueTimestamp, "7-day SLA");
 
       const complaint = await contract.getComplaint(complaintId);
-      expect(complaint.statusCode).to.equal(1); // Status unchanged
+      expect(complaint.statusCode).to.equal(1n); // Status unchanged
     });
 
     it("Should escalate complaint with new status", async function () {
@@ -384,7 +432,7 @@ describe("GrievanceContractOptimized", function () {
       await contract.escalateComplaint(complaintId, 7, "SLA breach");
 
       const complaint = await contract.getComplaint(complaintId);
-      expect(complaint.statusCode).to.equal(7);
+      expect(complaint.statusCode).to.equal(7n);
     });
 
     it("Should mark SLA as breached", async function () {
@@ -443,7 +491,7 @@ describe("GrievanceContractOptimized", function () {
       await contract.upvoteComplaint(complaintId);
 
       const complaint = await contract.getComplaint(complaintId);
-      expect(complaint.upvoteCount).to.equal(1);
+      expect(complaint.upvoteCount).to.equal(1n);
     });
 
     it("Should prevent duplicate upvotes from same address", async function () {
@@ -469,9 +517,10 @@ describe("GrievanceContractOptimized", function () {
 
       await contract.upvoteComplaint(complaintId);
 
-      await expect(
-        contract.upvoteComplaint(complaintId)
-      ).to.be.revertedWith("Already upvoted");
+      await expectRevert(
+        contract.upvoteComplaint(complaintId),
+        "Already upvoted"
+      );
     });
 
     it("Should track upvote count correctly", async function () {
@@ -501,7 +550,7 @@ describe("GrievanceContractOptimized", function () {
       await contract.connect(addr2).upvoteComplaint(complaintId);
 
       const complaint = await contract.getComplaint(complaintId);
-      expect(complaint.upvoteCount).to.equal(3);
+      expect(complaint.upvoteCount).to.equal(3n);
     });
   });
 
@@ -541,7 +590,7 @@ describe("GrievanceContractOptimized", function () {
       );
 
       const complaint = await contract.getComplaint(complaintId);
-      expect(complaint.statusCode).to.equal(1); // Status unchanged
+      expect(complaint.statusCode).to.equal(1n); // Status unchanged
     });
 
     it("Should record agent performance on complaint", async function () {
@@ -575,7 +624,7 @@ describe("GrievanceContractOptimized", function () {
       await contract.recordAgentPerformance(agentId, complaintId, 5, 10);
 
       const complaint = await contract.getComplaint(complaintId);
-      expect(complaint.statusCode).to.equal(5); // COMPLETED
+      expect(complaint.statusCode).to.equal(5n); // COMPLETED
     });
   });
 
@@ -618,7 +667,7 @@ describe("GrievanceContractOptimized", function () {
       );
       
       const count = await contract.totalComplaints();
-      expect(count).to.equal(2);
+      expect(count).to.equal(2n);
     });
 
     it("Should verify complaint hash", async function () {
@@ -746,9 +795,10 @@ describe("GrievanceContractOptimized", function () {
 
       await contract.registerUser(...params);
 
-      await expect(
-        contract.registerUser(...params)
-      ).to.be.revertedWith("User already exists");
+      await expectRevert(
+        contract.registerUser(...params),
+        "User already exists"
+      );
     });
   });
 
@@ -774,9 +824,10 @@ describe("GrievanceContractOptimized", function () {
         "Karnataka"
       );
 
-      await expect(
-        contract.connect(citizen).recordComplaintSla(complaintId, Math.floor(Date.now() / 1000) + 3600, "SLA")
-      ).to.be.revertedWith("Not authorized operator");
+      await expectRevert(
+        contract.connect(citizen).recordComplaintSla(complaintId, Math.floor(Date.now() / 1000) + 3600, "SLA"),
+        "Not authorized operator"
+      );
     });
 
     it("Should allow owner to authorize another operator", async function () {
@@ -802,9 +853,9 @@ describe("GrievanceContractOptimized", function () {
 
       await contract.setAuthorizedOperator(citizen.address, true);
 
-      await expect(
+      await expectNoRevert(
         contract.connect(citizen).recordComplaintSla(complaintId, Math.floor(Date.now() / 1000) + 3600, "SLA")
-      ).to.not.be.reverted;
+      );
     });
   });
 
@@ -830,8 +881,11 @@ describe("GrievanceContractOptimized", function () {
         "Karnataka"
       );
 
-      await expect(contract.emitComplaintVerificationCode(complaintId))
-        .to.emit(contract, "ComplaintVerificationCodeCreated");
+      await expectEvent(
+        contract.emitComplaintVerificationCode(complaintId),
+        contract,
+        "ComplaintVerificationCodeCreated"
+      );
     });
 
     it("Should mint and expose resolution certificate token record", async function () {
@@ -866,7 +920,7 @@ describe("GrievanceContractOptimized", function () {
       );
 
       const tokenId = await contract.getResolutionCertificateTokenByComplaint(complaintId);
-      expect(tokenId).to.equal(1);
+      expect(tokenId).to.equal(1n); // ethers v6: BigInt
 
       const cert = await contract.getResolutionCertificate(tokenId);
       expect(cert.recipientWallet).to.equal(citizen.address);

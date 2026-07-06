@@ -1,203 +1,148 @@
-# name: CI/CD
+name: CI/CD — Build, Test, Scan, Deploy
 
-# on:
-#   push:
-#     branches: [main]
-#   pull_request:
+on:
+  push:
+    branches: [main]
 
-# # allow PR creation
-# permissions:
-#   contents: write
-#   pull-requests: write
+env:
+  USER_BE_IMAGE: ogadityahota/swarajdesk-user-be
+  ADMIN_BE_IMAGE: ogadityahota/sih-swarajdesk-admin-be
+  COMP_QUEUE_IMAGE: ogadityahota/swarajdesk-comp-queue
+  AGENTS_IMAGE: ogadityahota/swarajdesk-agents
+  BLOCKCHAIN_BE_IMAGE: ogadityahota/swarajdesk-blockchain-be
+  IMAGE_TAG: ${{ github.sha }}
 
+jobs:
+  # ─── Job 1: Test all services ───
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: oven-sh/setup-bun@v2
 
-# jobs:
-#   build-test-push:
-#     runs-on: ubuntu-latest
+      - name: Test user-be
+        run: cd packages/user-be && bun install --ignore-scripts && bunx prisma generate && bun run test:unit
 
-#     env:
-#       USER_BE_IMAGE: ogadityahota/swarajdesk-user-be
-#       ADMIN_BE_IMAGE: ogadityahota/sih-swarajdesk-admin-be
-#       COMP_QUEUE_IMAGE: ogadityahota/swarajdesk-comp-queue
-#       # SELF_IMAGE: ogadityahota/swarajdesk-self
-#       IMAGE_TAG: ${{ github.sha }}
+      - name: Test admin-be
+        run: cd packages/admin-be && bun install --ignore-scripts && bunx prisma generate && bun run test:unit
 
-#     steps:
-#       - name: Checkout code
-#         uses: actions/checkout@v4
+      - name: Test compQueue
+        run: cd packages/compQueue && bun install --ignore-scripts && bunx prisma generate && bun run test:unit
 
-#       - name: Set up Node.js
-#         uses: actions/setup-node@v4
-#         with:
-#           node-version: '20'
+      - name: Test agents
+        run: cd packages/agents && bun install && bun run test:unit
 
-#       - name: Install Bun
-#         uses: oven-sh/setup-bun@v2
-#         with:
-#           bun-version: latest
+      - name: Test blockchain-be
+        run: cd packages/blockchain-be && bun install && bun run test
 
-#       # -------------------------
-#       # user-be tests
-#       # -------------------------
-#       - name: Install deps (user-be)
-#         working-directory: packages/user-be
-#         env:
-#           DATABASE_URL: "postgresql://dummy:dummy@localhost:5432/dummy"
-#         run: |
-#           bun install --ignore-scripts || true
-#           bunx prisma generate
+  # ─── Job 2: Build, scan, push images ───
+  build-push:
+    needs: test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
 
-#       - name: Run user-be tests
-#         working-directory: packages/user-be
-#         run: |
-#           bun run test:unit
+      - name: Login to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_PASSWORD }}
 
-#       # -------------------------
-#       # admin-be tests
-#       # -------------------------
-#       - name: Install deps (admin-be)
-#         working-directory: packages/admin-be
-#         env:
-#           DATABASE_URL: "postgresql://dummy:dummy@localhost:5432/dummy"
-#         run: |
-#           bun install --ignore-scripts || true
-#           bunx prisma generate
+      # ── user-be ──
+      - name: Build user-be
+        run: docker build -t $USER_BE_IMAGE:$IMAGE_TAG -t $USER_BE_IMAGE:latest packages/user-be
 
-#       - name: Run admin-be tests
-#         working-directory: packages/admin-be
-#         run: |
-#           bun run test:unit
+      - name: Trivy scan user-be
+        uses: aquasecurity/trivy-action@master
+        with:
+          image-ref: ${{ env.USER_BE_IMAGE }}:${{ env.IMAGE_TAG }}
+          severity: CRITICAL,HIGH
+          exit-code: 1
 
-#       # -------------------------
-#       # Complaint-Queue tests
-#       # -------------------------
-#       - name: Install deps (admin-be)
-#         working-directory: packages/compQueue
-#         env:
-#           DATABASE_URL: "postgresql://dummy:dummy@localhost:5432/dummy"
-#         run: |
-#           bun install --ignore-scripts || true
-#           bunx prisma generate
+      - name: Push user-be
+        run: docker push $USER_BE_IMAGE --all-tags
 
-#       # - name: Run compQueue tests
-#       #   working-directory: packages/compQueue
-#       #   run: |
-#       #     bun run test:unit
+      # ── admin-be ──
+      - name: Build admin-be
+        run: docker build -t $ADMIN_BE_IMAGE:$IMAGE_TAG -t $ADMIN_BE_IMAGE:latest packages/admin-be
 
-#       # # -------------------------
-#       # # self tests
-#       # # -------------------------
-#       # - name: Install deps (self)
-#       #   working-directory: packages/self
-#       #   run: |
-#       #     bun install --ignore-scripts || true
-#       # - name: Run self tests
-#       #   working-directory: packages/self
-#       #   run: |
-#       #     bun run test:unit
+      - name: Trivy scan admin-be
+        uses: aquasecurity/trivy-action@master
+        with:
+          image-ref: ${{ env.ADMIN_BE_IMAGE }}:${{ env.IMAGE_TAG }}
+          severity: CRITICAL,HIGH
+          exit-code: 1
 
-#       # -------------------------
-#       # Build & push docker images
-#       # -------------------------
-#       - name: Set up Docker Buildx
-#         uses: docker/setup-buildx-action@v3
+      - name: Push admin-be
+        run: docker push $ADMIN_BE_IMAGE --all-tags
 
-#       - name: Log in to Docker Hub
-#         uses: docker/login-action@v3
-#         with:
-#           username: ${{ secrets.DOCKERHUB_USERNAME }}
-#           password: ${{ secrets.DOCKERHUB_PASSWORD }}
+      # ── compQueue ──
+      - name: Build compQueue
+        run: docker build -t $COMP_QUEUE_IMAGE:$IMAGE_TAG -t $COMP_QUEUE_IMAGE:latest packages/compQueue
 
-#       - name: Build and push user-be image
-#         if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-#         uses: docker/build-push-action@v6
-#         with:
-#           context: packages/user-be
-#           file: packages/user-be/Dockerfile
-#           push: true
-#           tags: |
-#             ${{ env.USER_BE_IMAGE }}:latest
-#             ${{ env.USER_BE_IMAGE }}:${{ env.IMAGE_TAG }}
-#           build-args: |
-#             DATABASE_URL=postgresql://dummy:dummy@localhost:5432/dummy
-#           no-cache: true
-#           pull: true
-#           cache-from: type=inline
-#           cache-to: type=inline
+      - name: Trivy scan compQueue
+        uses: aquasecurity/trivy-action@master
+        with:
+          image-ref: ${{ env.COMP_QUEUE_IMAGE }}:${{ env.IMAGE_TAG }}
+          severity: CRITICAL,HIGH
+          exit-code: 1
 
-#       - name: Build and push admin-be image
-#         if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-#         uses: docker/build-push-action@v6
-#         with:
-#           context: packages/admin-be
-#           file: packages/admin-be/Dockerfile
-#           push: true
-#           tags: |
-#             ${{ env.ADMIN_BE_IMAGE }}:latest
-#             ${{ env.ADMIN_BE_IMAGE }}:${{ env.IMAGE_TAG }}
-#           build-args: |
-#             DATABASE_URL=postgresql://dummy:dummy@localhost:5432/dummy
-#           no-cache: true
-#           pull: true
-#           cache-from: type=inline
-#           cache-to: type=inline
+      - name: Push compQueue
+        run: docker push $COMP_QUEUE_IMAGE --all-tags
 
-#       - name: Build and push compQueue image
-#         if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-#         uses: docker/build-push-action@v6
-#         with:
-#           context: packages/compQueue
-#           file: packages/compQueue/Dockerfile
-#           push: true
-#           tags: |
-#             ${{ env.COMP_QUEUE_IMAGE }}:latest
-#             ${{ env.COMP_QUEUE_IMAGE }}:${{ env.IMAGE_TAG }}
-#           build-args: |
-#             DATABASE_URL=postgresql://dummy:dummy@localhost:5432/dummy
-#           no-cache: true
-#           pull: true
-#           cache-from: type=inline
-#           cache-to: type=inline
+      # ── agents ──
+      - name: Build agents
+        run: docker build -t $AGENTS_IMAGE:$IMAGE_TAG -t $AGENTS_IMAGE:latest packages/agents
 
-#       # - name: Build and push self image
-#       #   if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-#       #   uses: docker/build-push-action@v6
-#       #   with:
-#       #     context: packages/self
-#       #     file: packages/self/Dockerfile
-#       #     push: true
-#       #     tags: |
-#       #       ${{ env.SELF_IMAGE }}:latest
-#       #       ${{ env.SELF_IMAGE }}:${{ env.IMAGE_TAG }}
-#       #     no-cache: true
-#       #     pull: true
-#       #     cache-from: type=inline
-#       #     cache-to: type=inline
+      - name: Trivy scan agents
+        uses: aquasecurity/trivy-action@master
+        with:
+          image-ref: ${{ env.AGENTS_IMAGE }}:${{ env.IMAGE_TAG }}
+          severity: CRITICAL,HIGH
+          exit-code: 1
 
-#       # -------------------------
-#       # Open PR main -> deploy (skip if one already open)
-#       # -------------------------
-#       # - name: Open PR to deploy
-#       #   uses: actions/github-script@v7
-#       #   with:
-#       #     script: |
-#       #       const owner = context.repo.owner;
-#       #       const repo = context.repo.repo;
-#       #       const base = 'deploy';
-#       #       const head = 'main';
-#       #       // Check if an open PR from main->deploy already exists
-#       #       const prs = await github.rest.pulls.list({ owner, repo, state: 'open', base });
-#       #       const exists = prs.data.find(pr => pr.head.ref === head);
-#       #       if (exists) {
-#       #         core.info('PR already open: #' + exists.number + ' ' + exists.title);
-#       #         return;
-#       #       }
-#       #       const title = 'Deploy latest from main';
-#       #       const body = [
-#       #         'This PR merges main -> deploy to trigger Argo CD.',
-#       #         '',
-#       #         '- Images pushed: latest, ' + process.env.IMAGE_TAG,
-#       #         '- Merge when ready; Argo will sync on merge.'
-#       #       ].join('\n');
-#       #       const res = await github.rest.pulls.create({ owner, repo, title, head, base, body });
-#       #       core.info('Opened PR #' + res.data.number);
+      - name: Push agents
+        run: docker push $AGENTS_IMAGE --all-tags
+
+      # ── blockchain-be ──
+      - name: Build blockchain-be
+        run: docker build -t $BLOCKCHAIN_BE_IMAGE:$IMAGE_TAG -t $BLOCKCHAIN_BE_IMAGE:latest -f packages/deployment\ /images/blockchain-be/Dockerfile packages/blockchain-be
+
+      - name: Trivy scan blockchain-be
+        uses: aquasecurity/trivy-action@master
+        with:
+          image-ref: ${{ env.BLOCKCHAIN_BE_IMAGE }}:${{ env.IMAGE_TAG }}
+          severity: CRITICAL,HIGH
+          exit-code: 1
+
+      - name: Push blockchain-be
+        run: docker push $BLOCKCHAIN_BE_IMAGE --all-tags
+
+  # ─── Job 3: Deploy to VM ───
+  deploy:
+    needs: build-push
+    runs-on: ubuntu-latest
+    steps:
+      - name: Deploy to VM via SSH
+        uses: appleboy/ssh-action@v1
+        with:
+          host: ${{ secrets.VM_HOST }}
+          username: ubuntu
+          key: ${{ secrets.VM_SSH_KEY }}
+          script: |
+            cd /opt/swarajdesk
+            export IMAGE_TAG=${{ github.sha }}
+            docker stack deploy -c swarm/stack.yaml swarajdesk
+            echo "Waiting 30s for rolling update..."
+            sleep 30
+            echo "=== Service Status ==="
+            docker service ls
+            echo ""
+            echo "=== Check for failed services ==="
+            FAILED=$(docker service ls --format "{{.Replicas}}" | grep -v "1/1" | wc -l)
+            if [ "$FAILED" -gt "0" ]; then
+              echo "⚠️  WARNING: Some services not at 1/1 replicas"
+              docker service ls
+              exit 1
+            fi
+            echo "✅ All services deployed successfully"

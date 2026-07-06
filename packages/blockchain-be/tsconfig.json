@@ -1,15 +1,17 @@
 {
   "compilerOptions": {
-    "rootDir": "./src",
     "target": "es2020",
-    "module": "Node16",
+    "module": "commonjs",
     "strict": true,
     "esModuleInterop": true,
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
-    "moduleResolution": "Node16", 
     "resolveJsonModule": true,
-    "outDir": "dist"
+    "outDir": "dist",
+    "typeRoots": [
+      "../../node_modules/@types",
+      "../../node_modules"
+    ]
   },
-  "include": ["./src"]
+  "include": ["./src", "./test", "./scripts", "hardhat.config.ts", "typechain-types"]
 }
