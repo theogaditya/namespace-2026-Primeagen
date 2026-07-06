@@ -8,14 +8,13 @@ COPY artifacts ./artifacts
 COPY src ./src
 COPY tsconfig.json ./
 
-RUN ls -la artifacts/contracts/GrievanceContract.sol/ && \
-    test -f artifacts/contracts/GrievanceContract.sol/GrievanceContractOptimized.json || \
+RUN test -f artifacts/contracts/GrievanceContract.sol/GrievanceContractOptimized.json || \
     (echo "Error: Artifacts not found!" && exit 1)
 
 RUN ./node_modules/.bin/tsc -p tsconfig.json
 
 FROM oven/bun:1-slim
-RUN apt-get update && apt-get install -y curl nginx && rm -rf /var/lib/apt/lists/*
+RUN apt-get update && apt-get install -y curl && rm -rf /var/lib/apt/lists/*
 WORKDIR /app
 
 COPY --from=builder /app/dist ./dist
@@ -24,10 +23,10 @@ COPY --from=builder /app/package.json ./
 
 RUN bun install --production
 
-COPY nginx.conf /etc/nginx/nginx.conf
-COPY start.sh ./start.sh
-RUN chmod +x start.sh
+ENV PORT=4100
+EXPOSE 4100
 
-EXPOSE 80
+HEALTHCHECK --interval=30s --timeout=5s --start-period=10s --retries=3 \
+  CMD curl -f http://localhost:4100/health || exit 1
 
-CMD ["./start.sh"]
+CMD ["bun", "run", "dist/server.js"]
