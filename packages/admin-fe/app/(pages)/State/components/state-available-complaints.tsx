@@ -958,6 +958,7 @@ export function StateAvailableComplaints({ onTabChange }: { onTabChange?: (tab: 
           urgency: selectedComplaint.urgency,
           submissionDate: selectedComplaint.submissionDate,
           complainantName: selectedComplaint.complainant?.name,
+          location: selectedComplaint.location,
         } : undefined}
       />
     </div>
