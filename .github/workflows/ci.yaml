@@ -19,7 +19,7 @@ jobs:
       USER_BE_IMAGE: ogadityahota/swarajdesk-user-be
       ADMIN_BE_IMAGE: ogadityahota/sih-swarajdesk-admin-be
       COMP_QUEUE_IMAGE: ogadityahota/swarajdesk-comp-queue
-      SELF_IMAGE: ogadityahota/swarajdesk-self
+      # SELF_IMAGE: ogadityahota/swarajdesk-self
       IMAGE_TAG: ${{ github.sha }}
 
     steps:
@@ -84,17 +84,17 @@ jobs:
       #   run: |
       #     bun run test:unit
 
-      # -------------------------
-      # self tests
-      # -------------------------
-      - name: Install deps (self)
-        working-directory: packages/self
-        run: |
-          bun install --ignore-scripts || true
-      - name: Run self tests
-        working-directory: packages/self
-        run: |
-          bun run test:unit
+      # # -------------------------
+      # # self tests
+      # # -------------------------
+      # - name: Install deps (self)
+      #   working-directory: packages/self
+      #   run: |
+      #     bun install --ignore-scripts || true
+      # - name: Run self tests
+      #   working-directory: packages/self
+      #   run: |
+      #     bun run test:unit
 
       # -------------------------
       # Build & push docker images
@@ -159,20 +159,20 @@ jobs:
           cache-from: type=inline
           cache-to: type=inline
 
-      - name: Build and push self image
-        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-        uses: docker/build-push-action@v6
-        with:
-          context: packages/self
-          file: packages/self/Dockerfile
-          push: true
-          tags: |
-            ${{ env.SELF_IMAGE }}:latest
-            ${{ env.SELF_IMAGE }}:${{ env.IMAGE_TAG }}
-          no-cache: true
-          pull: true
-          cache-from: type=inline
-          cache-to: type=inline
+      # - name: Build and push self image
+      #   if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+      #   uses: docker/build-push-action@v6
+      #   with:
+      #     context: packages/self
+      #     file: packages/self/Dockerfile
+      #     push: true
+      #     tags: |
+      #       ${{ env.SELF_IMAGE }}:latest
+      #       ${{ env.SELF_IMAGE }}:${{ env.IMAGE_TAG }}
+      #     no-cache: true
+      #     pull: true
+      #     cache-from: type=inline
+      #     cache-to: type=inline
 
       # -------------------------
       # Open PR main -> deploy (skip if one already open)
