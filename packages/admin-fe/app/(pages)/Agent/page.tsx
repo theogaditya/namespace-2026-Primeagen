@@ -967,6 +967,7 @@ export default function AgentRevampedDashboard() {
             urgency: selectedComplaint.urgency,
             submissionDate: selectedComplaint.submissionDate,
             complainantName: selectedComplaint.complainant?.name,
+            location: selectedComplaint.location,
           } : undefined}
         />
       </AgentRevampedLayout>

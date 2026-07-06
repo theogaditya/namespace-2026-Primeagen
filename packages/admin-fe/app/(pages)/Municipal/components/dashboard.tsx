@@ -939,6 +939,7 @@ export function MunicipalDashboard({ onTabChange }: { onTabChange?: (tab: 'dashb
           urgency: selectedComplaint.urgency,
           submissionDate: selectedComplaint.submissionDate,
           complainantName: selectedComplaint.complainant?.name,
+          location: selectedComplaint.location,
         } : undefined}
       />
     </div>

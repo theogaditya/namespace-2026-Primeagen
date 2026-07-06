@@ -31,6 +31,13 @@ interface ComplaintInfo {
   urgency?: string
   submissionDate?: string
   complainantName?: string
+  location?: {
+    district?: string
+    city?: string
+    locality?: string
+    street?: string | null
+    pin?: string
+  } | null
 }
 
 interface Props {
@@ -71,6 +78,16 @@ const formatTimestamp = (ts?: string) => {
 const toTitle = (s?: string) => {
   if (!s) return ''
   return s.toLowerCase().split(/_|\s+/).map((w) => w.charAt(0).toUpperCase() + w.slice(1)).join(' ')
+}
+
+const formatLocation = (loc?: ComplaintInfo['location']) => {
+  if (!loc) return ''
+  const parts: string[] = []
+  if (loc.street) parts.push(loc.street)
+  if (loc.locality) parts.push(loc.locality)
+  if (loc.city) parts.push(loc.city)
+  if (loc.district) parts.push(loc.district)
+  return parts.join(', ')
 }
 
 // Status color map
@@ -229,7 +246,7 @@ export function BlockchainAuditModal({ isOpen, onClose, complaintId, complaintSe
               </div>
 
               {/* Title & Description */}
-              <div className="mb-3">
+              <div className="mb-3 border-b border-[#e1e3e4] pb-3">
                 <p className="text-sm font-bold text-[#041627] leading-snug">
                   {complaint.title || complaint.subCategory || `Complaint #${complaintSeq}`}
                 </p>
@@ -239,6 +256,24 @@ export function BlockchainAuditModal({ isOpen, onClose, complaintId, complaintSe
                   </p>
                 )}
               </div>
+
+              {/* Added Full Location and Pincode Display here */}
+              {complaint.location && (
+                <div className="mb-3 border-b border-[#e1e3e4] pb-3 flex items-start gap-2.5">
+                  <span className="material-symbols-outlined text-[#115cb9] mt-0.5" style={{ fontSize: 18, fontVariationSettings: "'FILL' 1" }}>
+                    location_on
+                  </span>
+                  <div className="flex-1">
+                    <p className="text-[10px] font-bold text-[#74777d] uppercase tracking-widest">Location</p>
+                    <p className="text-xs font-semibold text-[#041627] mt-0.5">{formatLocation(complaint.location)}</p>
+                    {complaint.location.pin && (
+                      <p className="text-[10px] font-mono font-medium text-[#115cb9] bg-[#e0f2fe] inline-block px-1.5 py-0.5 rounded mt-1">
+                        PIN: {complaint.location.pin}
+                      </p>
+                    )}
+                  </div>
+                </div>
+              )}
 
               {/* Details grid */}
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
