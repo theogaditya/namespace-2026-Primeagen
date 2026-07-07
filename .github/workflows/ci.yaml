@@ -58,7 +58,7 @@ jobs:
 
       # ── user-be ──
       - name: Build user-be
-        run: docker build -t $USER_BE_IMAGE:$IMAGE_TAG -t $USER_BE_IMAGE:latest packages/user-be
+        run: docker build --no-cache -t $USER_BE_IMAGE:$IMAGE_TAG -t $USER_BE_IMAGE:latest packages/user-be
 
       - name: Trivy scan user-be
         uses: aquasecurity/trivy-action@master
@@ -72,7 +72,7 @@ jobs:
 
       # ── admin-be ──
       - name: Build admin-be
-        run: docker build -t $ADMIN_BE_IMAGE:$IMAGE_TAG -t $ADMIN_BE_IMAGE:latest packages/admin-be
+        run: docker build --no-cache -t $ADMIN_BE_IMAGE:$IMAGE_TAG -t $ADMIN_BE_IMAGE:latest packages/admin-be
 
       - name: Trivy scan admin-be
         uses: aquasecurity/trivy-action@master
@@ -86,7 +86,7 @@ jobs:
 
       # ── compQueue ──
       - name: Build compQueue
-        run: docker build -t $COMP_QUEUE_IMAGE:$IMAGE_TAG -t $COMP_QUEUE_IMAGE:latest packages/compQueue
+        run: docker build --no-cache -t $COMP_QUEUE_IMAGE:$IMAGE_TAG -t $COMP_QUEUE_IMAGE:latest packages/compQueue
 
       - name: Trivy scan compQueue
         uses: aquasecurity/trivy-action@master
@@ -100,7 +100,7 @@ jobs:
 
       # ── agents ──
       - name: Build agents
-        run: docker build -t $AGENTS_IMAGE:$IMAGE_TAG -t $AGENTS_IMAGE:latest packages/agents
+        run: docker build --no-cache -t $AGENTS_IMAGE:$IMAGE_TAG -t $AGENTS_IMAGE:latest packages/agents
 
       - name: Trivy scan agents
         uses: aquasecurity/trivy-action@master
@@ -114,7 +114,7 @@ jobs:
 
       # ── blockchain-be ──
       - name: Build blockchain-be
-        run: docker build -t $BLOCKCHAIN_BE_IMAGE:$IMAGE_TAG -t $BLOCKCHAIN_BE_IMAGE:latest packages/blockchain-be
+        run: docker build --no-cache -t $BLOCKCHAIN_BE_IMAGE:$IMAGE_TAG -t $BLOCKCHAIN_BE_IMAGE:latest packages/blockchain-be
 
       - name: Trivy scan blockchain-be
         uses: aquasecurity/trivy-action@master

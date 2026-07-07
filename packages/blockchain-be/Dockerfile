@@ -1,4 +1,8 @@
 FROM oven/bun:1 AS builder
+
+RUN apk update && apk upgrade --no-cache && \
+    apk add --no-cache openssl curl
+
 WORKDIR /app
 
 COPY package.json bun.lock* ./

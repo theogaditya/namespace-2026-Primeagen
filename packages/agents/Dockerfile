@@ -1,5 +1,8 @@
 FROM oven/bun:1-alpine
 
+RUN apk update && apk upgrade --no-cache && \
+    apk add --no-cache openssl curl
+
 WORKDIR /app
 
 RUN apk add --no-cache openssl

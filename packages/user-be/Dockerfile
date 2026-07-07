@@ -1,8 +1,9 @@
 FROM oven/bun:1-alpine
 
-WORKDIR /app
+RUN apk update && apk upgrade --no-cache && \
+    apk add --no-cache openssl curl
 
-RUN apk add --no-cache openssl
+WORKDIR /app
 
 COPY package.json ./
 COPY bun.lock* ./
