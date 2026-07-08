@@ -47,6 +47,8 @@ jobs:
   build-push:
     needs: test
     runs-on: ubuntu-latest
+    env:
+      TRIVY_DISABLE_VEX_NOTICE: "true"
     steps:
       - uses: actions/checkout@v4
 
