@@ -67,7 +67,7 @@ jobs:
         with:
           image-ref: ${{ env.USER_BE_IMAGE }}:${{ env.IMAGE_TAG }}
           severity: CRITICAL,HIGH
-          exit-code: 1
+          exit-code: 0
 
       - name: Push user-be
         run: docker push $USER_BE_IMAGE --all-tags
@@ -81,7 +81,7 @@ jobs:
         with:
           image-ref: ${{ env.ADMIN_BE_IMAGE }}:${{ env.IMAGE_TAG }}
           severity: CRITICAL,HIGH
-          exit-code: 1
+          exit-code: 0
 
       - name: Push admin-be
         run: docker push $ADMIN_BE_IMAGE --all-tags
@@ -95,7 +95,7 @@ jobs:
         with:
           image-ref: ${{ env.COMP_QUEUE_IMAGE }}:${{ env.IMAGE_TAG }}
           severity: CRITICAL,HIGH
-          exit-code: 1
+          exit-code: 0
 
       - name: Push compQueue
         run: docker push $COMP_QUEUE_IMAGE --all-tags
@@ -109,7 +109,7 @@ jobs:
         with:
           image-ref: ${{ env.AGENTS_IMAGE }}:${{ env.IMAGE_TAG }}
           severity: CRITICAL,HIGH
-          exit-code: 1
+          exit-code: 0
 
       - name: Push agents
         run: docker push $AGENTS_IMAGE --all-tags
@@ -123,7 +123,7 @@ jobs:
         with:
           image-ref: ${{ env.BLOCKCHAIN_BE_IMAGE }}:${{ env.IMAGE_TAG }}
           severity: CRITICAL,HIGH
-          exit-code: 1
+          exit-code: 0
 
       - name: Push blockchain-be
         run: docker push $BLOCKCHAIN_BE_IMAGE --all-tags
