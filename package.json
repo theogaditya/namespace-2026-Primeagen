@@ -27,6 +27,7 @@
     "@aws-sdk/client-secrets-manager": "^3.1002.0",
     "@react-google-maps/api": "^2.20.8",
     "@redis/client": "^5.10.0",
+    "chai": "^6.2.2",
     "jest-mock-extended": "2.0.4"
   }
 }
