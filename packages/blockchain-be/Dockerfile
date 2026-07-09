@@ -28,6 +28,11 @@ COPY --from=builder /app/package.json ./
 RUN bun install --production
 
 ENV PORT=4100
+
+# Set default Redis URL to local swarm service
+# This ensures Redis clients get the correct URL even if loaded before env files
+ENV REDIS_URL=redis://default:strongpassword@redis:6379
+
 EXPOSE 4100
 
 HEALTHCHECK --interval=30s --timeout=5s --start-period=10s --retries=3 \

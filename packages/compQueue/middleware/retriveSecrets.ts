@@ -49,8 +49,25 @@ interface SecretValues {
 /**
  * Retrieves secrets from AWS Secrets Manager and injects them into process.env
  * Should be called before any other initialization that depends on env variables
+ * 
+ * DISABLED: AWS Secrets Manager retrieval is disabled to prevent conflicts with local env files.
+ * All configuration should come from env files or Docker ENV variables.
  */
 export async function retrieveAndInjectSecrets(): Promise<void> {
+  // ============================================================================
+  // AWS SECRETS MANAGER DISABLED - Using local env files and Docker ENV instead
+  // ============================================================================
+  // This prevents timing issues where Redis clients are instantiated before
+  // AWS secrets are loaded. Now REDIS_URL is set in Dockerfile and env files.
+  // ============================================================================
+  
+  console.log("[AWS Secrets] DISABLED - Using local env files and Docker ENV variables");
+  console.log("[AWS Secrets] REDIS_URL from env:", process.env.REDIS_URL);
+  
+  // Skip AWS Secrets Manager retrieval entirely
+  return Promise.resolve();
+  
+  /* COMMENTED OUT - Original AWS Secrets Manager code
   try {
     console.log("[AWS Secrets] Retrieving secrets from AWS Secrets Manager...");
     
@@ -105,6 +122,7 @@ export async function retrieveAndInjectSecrets(): Promise<void> {
       "[AWS Secrets] Continuing with local .env variables (development mode)"
     );
   }
+  */
 }
 
 /**
