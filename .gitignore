@@ -64,3 +64,4 @@ packages/blockchain-be/cache/
 
 
 ai-report-docker-compose.yml
+.env

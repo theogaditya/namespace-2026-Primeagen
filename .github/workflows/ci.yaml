@@ -51,6 +51,7 @@ jobs:
       TRIVY_DISABLE_VEX_NOTICE: "true"
     steps:
       - uses: actions/checkout@v4
+      - uses: oven-sh/setup-bun@v2
 
       - name: Login to Docker Hub
         uses: docker/login-action@v3
@@ -116,7 +117,12 @@ jobs:
 
       # ── blockchain-be ──
       - name: Build blockchain-be
-        run: docker build --no-cache -t $BLOCKCHAIN_BE_IMAGE:$IMAGE_TAG -t $BLOCKCHAIN_BE_IMAGE:latest packages/blockchain-be
+        run: |
+          cd packages/blockchain-be
+          bun install --ignore-scripts
+          bun run compile
+          cd ../..
+          docker build --no-cache -t $BLOCKCHAIN_BE_IMAGE:$IMAGE_TAG -t $BLOCKCHAIN_BE_IMAGE:latest packages/blockchain-be
 
       - name: Trivy scan blockchain-be
         uses: aquasecurity/trivy-action@master
