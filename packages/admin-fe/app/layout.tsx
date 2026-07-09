@@ -16,8 +16,8 @@ export const metadata: Metadata = {
   title: "SwarajDesk Admin Portal",
   description: "Admin dashboards for SwarajDesk complaint management system",
   icons: {
-    icon: 'https://swarajdesk.adityahota.online/logo.png',
-    shortcut: 'https://swarajdesk.adityahota.online/logo.png',
+    icon: 'https://pub-6c77e16531784985b618e038085ecd96.r2.dev/logo.png',
+    shortcut: 'https://pub-6c77e16531784985b618e038085ecd96.r2.dev/logo.png',
   },
 };
 

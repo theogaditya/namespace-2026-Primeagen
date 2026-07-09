@@ -572,7 +572,7 @@ export function Step4Review({ formData, goToStep, updateField }: Step4Props) {
           onUpvoteInstead={async (id) => {
             setLoadingComplaint(true);
             setIsModalOpen(true);
-            
+
             try {
               const token = localStorage.getItem("authToken");
               const res = await fetch(`/api/complaint/${id}`, {
@@ -582,7 +582,7 @@ export function Step4Review({ formData, goToStep, updateField }: Step4Props) {
               if (res.ok) {
                 const data = await res.json();
                 console.log("[Step4Review] Fetched complaint data:", data);
-                
+
                 // The API might return { success: true, data: {...} } or just the complaint
                 const complaint = data.data || data;
                 console.log("[Step4Review] Setting complaint:", complaint);
@@ -784,7 +784,7 @@ export function Step4Review({ formData, goToStep, updateField }: Step4Props) {
       </motion.div>
 
       {/* Complaint Detail Modal */}
-      <LikeProvider>
+      <LikeProvider authToken={authToken || null}>
         <ComplaintDetailModal
           complaint={selectedComplaint}
           isOpen={isModalOpen}

@@ -56,7 +56,7 @@ const defaultLegalLinks = [{ name: "Terms and Conditions", href: "/tc" }];
 export const Footer7 = ({
   logo = {
     url: "#",
-    src: "https://swarajdesk.adityahota.online/logo.png",
+    src: "https://pub-6c77e16531784985b618e038085ecd96.r2.dev/logo.png",
     alt: "SwarajDesk Logo",
     title: "SwarajDesk.co.in",
   },

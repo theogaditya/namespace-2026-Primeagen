@@ -20,7 +20,7 @@ export default function Home() {
         <div className="w-full px-0 sm:px-4 md:px-6 lg:px-8">
           <div className="flex items-center h-16">
             <img
-              src="https://swarajdesk.adityahota.online/logo.png"
+              src="https://pub-6c77e16531784985b618e038085ecd96.r2.dev/logo.png"
               alt="SwarajDesk Logo"
               className="h-12 w-auto block"
             />

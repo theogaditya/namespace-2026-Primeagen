@@ -111,7 +111,7 @@ export function AdminLayout({ children }: AdminLayoutProps) {
             <div className="flex h-full flex-col">
               <div className="flex h-16 items-center justify-between border-b bg-white px-4">
                 <div className="flex items-center">
-                  <img src="https://swarajdesk.adityahota.online/logo.png" alt="SwarajDesk logo" className="h-12 w-12 mr-2 object-contain" />
+                  <img src="https://pub-6c77e16531784985b618e038085ecd96.r2.dev/logo.png" alt="SwarajDesk logo" className="h-12 w-12 mr-2 object-contain" />
                   <h1 className="text-xl font-bold text-blue-600">SwarajDesK Agent</h1>
                 </div>
                 <Button variant="ghost" size="icon" onClick={() => setSidebarOpen(false)}>
@@ -211,7 +211,7 @@ export function AdminLayout({ children }: AdminLayoutProps) {
         <div className="flex min-h-0 flex-1 flex-col bg-white border-r border-gray-200">
           <div className="flex h-16 items-center justify-center border-b bg-white px-4">
               <div className="flex items-center">
-              <img src="https://swarajdesk.adityahota.online/logo.png" alt="SwarajDesk logo" className="h-12 w-12 mr-2 object-contain" />
+              <img src="https://pub-6c77e16531784985b618e038085ecd96.r2.dev/logo.png" alt="SwarajDesk logo" className="h-12 w-12 mr-2 object-contain" />
               <h1 className="text-xl font-bold text-blue-600">Agent Dashboard</h1>
             </div>
           </div>

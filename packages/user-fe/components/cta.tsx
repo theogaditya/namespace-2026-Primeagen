@@ -262,7 +262,7 @@ export function CTASection({
       <div className="relative z-10 text-center px-5 sm:px-6 max-w-3xl mx-auto">
         <div className="mx-auto mb-6 sm:mb-8 w-20 h-20 sm:w-24 sm:h-24 rounded-2xl shadow-2xl flex items-center justify-center animate-fade-in overflow-hidden">
           <img
-            src="https://swarajdesk.adityahota.online/logo.png"
+            src="https://pub-6c77e16531784985b618e038085ecd96.r2.dev/logo.png"
             alt="SwarajDesk Logo"
             className="w-full h-full object-contain"
           />

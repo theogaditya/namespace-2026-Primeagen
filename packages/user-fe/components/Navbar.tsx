@@ -281,15 +281,15 @@ const Navbar = () => {
   return (
     <nav className='fixed top-0 left-0 right-0 z-99999 bg-white/80 backdrop-blur-md border-b border-gray-100/80'>
       <div className='max-w-7xl mx-auto px-4 sm:px-6 lg:px-8'>
-        <div className='flex items-center justify-between h-14'>
+        <div className='flex items-center justify-between h-20'>
           {/* Logo */}
-          <Link href='/' className='flex items-center gap-2 shrink-0'>
+          <Link href='/' className='flex items-center gap-2 shrink-0 h-full'>
             <Image
-              src='https://swarajdesk.adityahota.online/logo.png'
+              src='https://pub-6c77e16531784985b618e038085ecd96.r2.dev/logo.png'
               alt='SwarajDesk Logo'
-              width={200}
-              height={140}
-              className='object-contain h-100 w-100'
+              width={320}
+              height={80}
+              className='object-contain h-12 sm:h-14 md:h-16 lg:h-20 w-auto'
             />
           </Link>
 

@@ -246,7 +246,7 @@ export function CivicPartnerLayout({ children }: { children: ReactNode }) {
           isCollapsed ? "flex flex-col items-center py-4 px-1" : "flex items-center gap-3 p-5"
         )}>
           <div className="flex h-14 w-14 min-w-[56px] items-center justify-center rounded-xl bg-white shadow-md border border-slate-100">
-              <img src="https://swarajdesk.adityahota.online/logo.png" alt="Logo" className="h-12 w-12 object-contain" />
+              <img src="https://pub-6c77e16531784985b618e038085ecd96.r2.dev/logo.png" alt="Logo" className="h-12 w-12 object-contain" />
             </div>
           {!isCollapsed && (
             <div className="flex flex-col">
