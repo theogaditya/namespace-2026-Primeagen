@@ -66,6 +66,7 @@ export class LikeSyncWorker {
     try {
       // Deduplicate events - keep only the latest action per user-complaint pair
       const latestEvents = this.deduplicateEvents(events);
+      const affectedComplaintIds = latestEvents.map((event) => event.complaintId);
       
       // Separate likes and unlikes
       const likes = latestEvents.filter(e => e.liked);
@@ -76,6 +77,8 @@ export class LikeSyncWorker {
         this.processLikes(likes),
         this.processUnlikes(unlikes),
       ]);
+
+      await this.syncComplaintCounts(affectedComplaintIds);
       
       console.log(`✅ Synced ${likes.length} likes and ${unlikes.length} unlikes to DB`);
     } catch (error) {
@@ -122,9 +125,6 @@ export class LikeSyncWorker {
         data,
         skipDuplicates: true,
       });
-      
-      // Update complaint upvote counts
-      await this.updateComplaintCounts(events.map(e => e.complaintId), 'increment');
     } catch (error) {
       console.error("Error processing likes:", error);
       throw error;
@@ -149,36 +149,43 @@ export class LikeSyncWorker {
           OR: conditions,
         },
       });
-      
-      // Update complaint upvote counts
-      await this.updateComplaintCounts(events.map(e => e.complaintId), 'decrement');
     } catch (error) {
       console.error("Error processing unlikes:", error);
       throw error;
     }
   }
-  
+
   /**
-   * Update complaint upvote counts in batch
+   * Sync complaint upvote counts from the authoritative upvotes table.
    */
-  private async updateComplaintCounts(
-    complaintIds: string[],
-    operation: 'increment' | 'decrement'
-  ): Promise<void> {
-    // Count occurrences of each complaint
-    const countMap = new Map<string, number>();
-    for (const id of complaintIds) {
-      countMap.set(id, (countMap.get(id) ?? 0) + 1);
+  private async syncComplaintCounts(complaintIds: string[]): Promise<void> {
+    const uniqueComplaintIds = Array.from(new Set(complaintIds));
+    if (uniqueComplaintIds.length === 0) {
+      return;
     }
-    
-    // Update each complaint's count
-    const updates = Array.from(countMap.entries()).map(([complaintId, count]) =>
+
+    const groupedCounts = await this.db.upvote.groupBy({
+      by: ['complaintId'],
+      where: {
+        complaintId: {
+          in: uniqueComplaintIds,
+        },
+      },
+      _count: {
+        complaintId: true,
+      },
+    });
+
+    const countMap = new Map<string, number>();
+    for (const row of groupedCounts) {
+      countMap.set(row.complaintId, row._count.complaintId);
+    }
+
+    const updates = uniqueComplaintIds.map((complaintId) =>
       this.db.complaint.update({
         where: { id: complaintId },
         data: {
-          upvoteCount: operation === 'increment'
-            ? { increment: count }
-            : { decrement: count },
+          upvoteCount: countMap.get(complaintId) ?? 0,
         },
       }).catch(err => {
         // Complaint might not exist, log and continue

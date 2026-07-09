@@ -87,6 +87,18 @@ export interface CreateComplaint {
   assignedDepartment: Department;
   isPublic: boolean;
   location: ComplaintLocation;
+  isDuplicate?: boolean;
+  qualityScore?: number;
+  qualityBreakdown?: {
+    clarity: number;
+    evidence: number;
+    location: number;
+    completeness: number;
+  };
+  hasSimilarComplaints?: boolean;
+  similarComplaintIds?: string[];
+  AIabusedFlag?: boolean;
+  abuseMetadata?: Record<string, unknown>;
 }
 
 // Response types for complaint queries

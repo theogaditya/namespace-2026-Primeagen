@@ -1,11 +1,21 @@
 import { NextRequest, NextResponse } from "next/server";
 
-const BLOCKCHAIN_BACKEND_URL =
-  process.env.BLOCKCHAIN_BE_URL ||
-  process.env.NEXT_PUBLIC_BLOCKCHAIN_BE_URL ||
-  "http://localhost:4100";
+function uniqueUrls(values: Array<string | undefined>) {
+  return [...new Set(values.filter((value): value is string => Boolean(value)))];
+}
 
-const ADMIN_BE_URL = process.env.NEXT_PUBLIC_ADMIN_BE_URL || "http://localhost:3002";
+const BLOCKCHAIN_BACKEND_URLS = uniqueUrls([
+  process.env.BLOCKCHAIN_BE_URL,
+  process.env.NEXT_PUBLIC_BLOCKCHAIN_BE_URL,
+  "http://localhost:4000",
+  "http://localhost:4100",
+]);
+
+const ADMIN_BE_URLS = uniqueUrls([
+  process.env.ADMIN_BE_URL,
+  process.env.NEXT_PUBLIC_ADMIN_BE_URL,
+  "http://localhost:3002",
+]);
 
 async function fetchJson(url: string) {
   try {
@@ -22,29 +32,71 @@ async function fetchJson(url: string) {
   }
 }
 
+async function fetchFirstReachable(
+  baseUrls: string[],
+  path: string
+) {
+  const attempts: Array<{
+    baseUrl: string;
+    ok: boolean;
+    status: number;
+    data: unknown;
+  }> = [];
+
+  for (const baseUrl of baseUrls) {
+    const result = await fetchJson(`${baseUrl}${path}`);
+    const attempt = { ...result, baseUrl };
+    attempts.push(attempt);
+
+    if (attempt.ok) {
+      return {
+        success: attempt,
+        attempts,
+      };
+    }
+  }
+
+  return {
+    success: null,
+    attempts,
+  };
+}
+
 export async function GET(
   _request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const { id } = await params;
+    const complaintPath = `/api/complaints/${encodeURIComponent(id)}/blockchain/live`;
+    const adminPath = `/api/complaints/verify/${encodeURIComponent(id)}`;
 
     // Fetch both sources so UI gets live chain status + verifiable logs together.
     const [adminVerify, blockchainLive] = await Promise.all([
-      fetchJson(`${ADMIN_BE_URL}/api/complaints/verify/${encodeURIComponent(id)}`),
-      fetchJson(`${BLOCKCHAIN_BACKEND_URL}/api/complaints/${encodeURIComponent(id)}/blockchain/live`),
+      fetchFirstReachable(ADMIN_BE_URLS, adminPath),
+      fetchFirstReachable(BLOCKCHAIN_BACKEND_URLS, complaintPath),
     ]);
 
-    const adminData = adminVerify.ok ? adminVerify.data : null;
-    const liveData = blockchainLive.ok ? blockchainLive.data : null;
+    const adminData = adminVerify.success?.data ?? null;
+    const liveData = blockchainLive.success?.data ?? null;
 
     if (!adminData && !liveData) {
+      const allAttempts = [...adminVerify.attempts, ...blockchainLive.attempts];
+      const allNotFound =
+        allAttempts.length > 0 && allAttempts.every((attempt) => attempt.status === 404);
+
       return NextResponse.json(
         {
           ok: false,
-          error: "Verification services are unavailable.",
+          error: allNotFound
+            ? "Complaint was not found in verification services."
+            : "Verification services are unavailable.",
+          upstream: {
+            admin: adminVerify.attempts.map(({ baseUrl, status }) => ({ baseUrl, status })),
+            blockchain: blockchainLive.attempts.map(({ baseUrl, status }) => ({ baseUrl, status })),
+          },
         },
-        { status: 502 }
+        { status: allNotFound ? 404 : 502 }
       );
     }
 
@@ -111,11 +163,9 @@ export async function GET(
       syncedByFallback: !adminData && !!liveData,
     });
 
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Blockchain Verification Final Error:", error);
     return NextResponse.json({ ok: false, error: "Both verification services are down." }, { status: 500 });
   }
 }
-
-
 

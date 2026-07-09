@@ -1,5 +1,11 @@
 import { z } from 'zod';
-import { complaintUrgencyEnum, departmentEnum, complaintLocationSchema } from './validation.complaint';
+import {
+  complaintUrgencyEnum,
+  departmentEnum,
+  complaintLocationSchema,
+  qualityBreakdownSchema,
+  abuseMetadataSchema,
+} from './validation.complaint';
 
 export const complaintProcessingSchema = z.object({
   userId: z.string().uuid('Invalid user ID'),
@@ -11,6 +17,13 @@ export const complaintProcessingSchema = z.object({
   assignedDepartment: departmentEnum,
   isPublic: z.boolean(),
   location: complaintLocationSchema,
+  isDuplicate: z.boolean().optional(),
+  qualityScore: z.number().int().min(0).max(100).optional(),
+  qualityBreakdown: qualityBreakdownSchema.optional(),
+  hasSimilarComplaints: z.boolean().optional(),
+  similarComplaintIds: z.array(z.string().uuid('Invalid similar complaint ID')).optional(),
+  AIabusedFlag: z.boolean().optional(),
+  abuseMetadata: abuseMetadataSchema.optional(),
   submissionDate: z.string().datetime().optional(),
 });
 

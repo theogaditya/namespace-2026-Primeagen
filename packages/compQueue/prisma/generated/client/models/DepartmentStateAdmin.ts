@@ -276,7 +276,7 @@ export type DepartmentStateAdminGroupByOutputType = {
   _max: DepartmentStateAdminMaxAggregateOutputType | null
 }
 
-type GetDepartmentStateAdminGroupByPayload<T extends DepartmentStateAdminGroupByArgs> = Prisma.PrismaPromise<
+export type GetDepartmentStateAdminGroupByPayload<T extends DepartmentStateAdminGroupByArgs> = Prisma.PrismaPromise<
   Array<
     Prisma.PickEnumerable<DepartmentStateAdminGroupByOutputType, T['by']> &
       {
@@ -2225,6 +2225,11 @@ export type DepartmentStateAdminFindManyArgs<ExtArgs extends runtime.Types.Exten
    * Skip the first `n` DepartmentStateAdmins.
    */
   skip?: number
+  /**
+   * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+   * 
+   * Filter by unique combinations of DepartmentStateAdmins.
+   */
   distinct?: Prisma.DepartmentStateAdminScalarFieldEnum | Prisma.DepartmentStateAdminScalarFieldEnum[]
 }
 

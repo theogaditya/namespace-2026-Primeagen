@@ -122,3 +122,21 @@ export const BadgeRarity = {
 } as const
 
 export type BadgeRarity = (typeof BadgeRarity)[keyof typeof BadgeRarity]
+
+
+export const BlockchainStatus = {
+  PENDING: 'PENDING',
+  CONFIRMED: 'CONFIRMED',
+  FAILED: 'FAILED'
+} as const
+
+export type BlockchainStatus = (typeof BlockchainStatus)[keyof typeof BlockchainStatus]
+
+
+export const SyncEventStatus = {
+  PROCESSED: 'PROCESSED',
+  DUPLICATE: 'DUPLICATE',
+  FAILED: 'FAILED'
+} as const
+
+export type SyncEventStatus = (typeof SyncEventStatus)[keyof typeof SyncEventStatus]

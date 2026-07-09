@@ -28,6 +28,15 @@ export const complaintLocationSchema = z.object({
   longitude: z.number().min(-180).max(180).optional(),
 });
 
+export const qualityBreakdownSchema = z.object({
+  clarity: z.number().int().min(0).max(25),
+  evidence: z.number().int().min(0).max(25),
+  location: z.number().int().min(0).max(25),
+  completeness: z.number().int().min(0).max(25),
+});
+
+export const abuseMetadataSchema = z.object({}).passthrough();
+
 export const createComplaintSchema = z.object({
   categoryId: z.string().uuid('Invalid category ID'),
   subCategory: z.string().min(1, 'Sub-category is required'),
@@ -37,4 +46,11 @@ export const createComplaintSchema = z.object({
   assignedDepartment: departmentEnum,
   isPublic: z.boolean(),
   location: complaintLocationSchema,
+  isDuplicate: z.boolean().optional(),
+  qualityScore: z.number().int().min(0).max(100).optional(),
+  qualityBreakdown: qualityBreakdownSchema.optional(),
+  hasSimilarComplaints: z.boolean().optional(),
+  similarComplaintIds: z.array(z.string().uuid('Invalid similar complaint ID')).optional(),
+  AIabusedFlag: z.boolean().optional(),
+  abuseMetadata: abuseMetadataSchema.optional(),
 });

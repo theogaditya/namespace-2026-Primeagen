@@ -27,6 +27,22 @@ const initialFormState: ComplaintFormState = {
   street: "",
   latitude: "",
   longitude: "",
+  dedupStatus: "idle",
+  dedupMatches: [],
+  dedupSuggestion: "",
+  dedupConfidence: null,
+  hasSimilarComplaints: false,
+  isDuplicate: false,
+  qualityStatus: "idle",
+  qualityScore: null,
+  qualityBreakdown: null,
+  qualitySuggestions: [],
+  qualityRating: null,
+  abuseStatus: "idle",
+  abuseDetected: false,
+  abuseSeverity: null,
+  abuseSanitizedText: "",
+  abuseMetadata: null,
 };
 
 interface TouchedState {

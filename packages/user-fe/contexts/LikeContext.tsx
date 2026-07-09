@@ -49,6 +49,7 @@ export function LikeProvider({ children, authToken }: LikeProviderProps) {
 
   // Set of complaintIds currently being toggled (for optimistic UI)
   const [pendingLikes, setPendingLikes] = useState<Set<string>>(new Set());
+  const pendingLikesRef = useRef<Set<string>>(new Set());
 
   // Snapshots for rollback on disconnect
   const optimisticSnapshotsRef = useRef<Map<string, LikeState>>(new Map());
@@ -67,12 +68,13 @@ export function LikeProvider({ children, authToken }: LikeProviderProps) {
 
       next.set(update.complaintId, {
         liked: newLiked,
-        count: update.count,
+        count: Math.max(0, update.count ?? 0),
       });
       return next;
     });
 
     // Remove from pending & clear rollback snapshot
+    pendingLikesRef.current.delete(update.complaintId);
     setPendingLikes((prev) => {
       const next = new Set(prev);
       next.delete(update.complaintId);
@@ -105,8 +107,18 @@ export function LikeProvider({ children, authToken }: LikeProviderProps) {
       return;
     }
 
+    if (pendingLikesRef.current.has(complaintId)) {
+      return;
+    }
+
+    pendingLikesRef.current.add(complaintId);
+
     // Mark as pending
-    setPendingLikes((prev) => new Set(prev).add(complaintId));
+    setPendingLikes((prev) => {
+      const next = new Set(prev);
+      next.add(complaintId);
+      return next;
+    });
 
     // Save snapshot for rollback before mutating
     setLikeStates((prev) => {
@@ -120,7 +132,9 @@ export function LikeProvider({ children, authToken }: LikeProviderProps) {
       const newLiked = !current.liked;
       next.set(complaintId, {
         liked: newLiked,
-        count: newLiked ? current.count + 1 : Math.max(0, current.count - 1),
+        count: newLiked
+          ? Math.max(0, current.count) + 1
+          : Math.max(0, current.count - 1),
       });
       return next;
     });
@@ -139,7 +153,7 @@ export function LikeProvider({ children, authToken }: LikeProviderProps) {
         // This prevents stale optimistic state from persisting across re-fetches.
         next.set(complaint.id, {
           liked: complaint.hasLiked ?? false,
-          count: complaint.upvoteCount,
+          count: Math.max(0, complaint.upvoteCount ?? 0),
         });
       }
       return next;
@@ -156,6 +170,7 @@ export function LikeProvider({ children, authToken }: LikeProviderProps) {
         }
         return next;
       });
+      pendingLikesRef.current.clear();
       setPendingLikes(new Set());
       optimisticSnapshotsRef.current.clear();
     }

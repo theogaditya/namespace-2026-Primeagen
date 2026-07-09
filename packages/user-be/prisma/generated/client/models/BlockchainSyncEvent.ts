@@ -230,7 +230,7 @@ export type BlockchainSyncEventGroupByOutputType = {
   _max: BlockchainSyncEventMaxAggregateOutputType | null
 }
 
-type GetBlockchainSyncEventGroupByPayload<T extends BlockchainSyncEventGroupByArgs> = Prisma.PrismaPromise<
+export type GetBlockchainSyncEventGroupByPayload<T extends BlockchainSyncEventGroupByArgs> = Prisma.PrismaPromise<
   Array<
     Prisma.PickEnumerable<BlockchainSyncEventGroupByOutputType, T['by']> &
       {
@@ -1170,6 +1170,11 @@ export type BlockchainSyncEventFindManyArgs<ExtArgs extends runtime.Types.Extens
    * Skip the first `n` BlockchainSyncEvents.
    */
   skip?: number
+  /**
+   * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+   * 
+   * Filter by unique combinations of BlockchainSyncEvents.
+   */
   distinct?: Prisma.BlockchainSyncEventScalarFieldEnum | Prisma.BlockchainSyncEventScalarFieldEnum[]
 }
 

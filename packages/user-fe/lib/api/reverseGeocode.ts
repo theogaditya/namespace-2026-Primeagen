@@ -1,3 +1,5 @@
+import { normalizeDistrictName } from "@/lib/location/normalizeDistrict";
+
 export interface ReverseGeocodeResult {
   district: string;
   city: string;
@@ -56,9 +58,7 @@ export async function reverseGeocode(
     const districtRaw =
       extractComponent(allComponents, "administrative_area_level_3") ||
       extractComponent(allComponents, "administrative_area_level_2");
-    const district = /^khordha$/i.test(districtRaw.trim())
-      ? "Khorda"
-      : districtRaw;
+    const district = normalizeDistrictName(districtRaw);
 
     // Use the most detailed result (first one) for the remaining fields
     const result = response.results[0];
@@ -91,23 +91,27 @@ export function matchDistrict(
   geocodedDistrict: string,
   operatingDistricts: { id: string; name: string }[]
 ): string | null {
-  if (!geocodedDistrict) return null;
+  const normalized = normalizeDistrictName(geocodedDistrict).toLowerCase();
+  if (!normalized) return null;
 
-  const normalized = geocodedDistrict.toLowerCase().trim();
+  const normalizedDistricts = operatingDistricts.map((district) => ({
+    original: district,
+    normalizedName: normalizeDistrictName(district.name).toLowerCase(),
+  }));
 
   // Exact match
-  const exact = operatingDistricts.find(
-    (d) => d.name.toLowerCase().trim() === normalized
+  const exact = normalizedDistricts.find(
+    (district) => district.normalizedName === normalized
   );
-  if (exact) return exact.name;
+  if (exact) return exact.original.name;
 
   // Partial match (geocoded name contains district name or vice versa)
-  const partial = operatingDistricts.find(
-    (d) =>
-      normalized.includes(d.name.toLowerCase().trim()) ||
-      d.name.toLowerCase().trim().includes(normalized)
+  const partial = normalizedDistricts.find(
+    (district) =>
+      normalized.includes(district.normalizedName) ||
+      district.normalizedName.includes(normalized)
   );
-  if (partial) return partial.name;
+  if (partial) return partial.original.name;
 
   return null;
 }

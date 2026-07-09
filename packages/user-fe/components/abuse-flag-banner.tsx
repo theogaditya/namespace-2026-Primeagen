@@ -9,7 +9,16 @@ interface AbuseFlagBannerProps {
     severity?: string;
     explanation_en?: string;
     explanation_hi?: string;
-    flagged_phrases?: string[];
+    flagged_phrases?: Array<
+      | string
+      | {
+          original?: string;
+          masked?: string;
+          language?: string;
+          category?: string;
+          severity?: string;
+        }
+    >;
   } | null;
   preferredLanguage?: string;
   compact?: boolean;

@@ -6,10 +6,13 @@
       "name": "sih",
       "dependencies": {
         "@aws-sdk/client-secrets-manager": "^3.1002.0",
+        "@prisma/adapter-pg": "^7.7.0",
+        "@prisma/client": "^7.7.0",
         "@react-google-maps/api": "^2.20.8",
         "@redis/client": "^5.10.0",
         "chai": "^6.2.2",
         "jest-mock-extended": "2.0.4",
+        "prisma": "^7.7.0",
       },
       "devDependencies": {
         "@types/bun": "latest",
@@ -102,6 +105,7 @@
       "name": "agents",
       "version": "1.0.0",
       "dependencies": {
+        "@huggingface/inference": "^2.8.1",
         "@langchain/core": "^0.3.0",
         "@langchain/google-genai": "^0.1.0",
         "@langchain/langgraph": "^0.2.0",
@@ -170,8 +174,8 @@
         "@aws-sdk/client-secrets-manager": "^3.946.0",
         "@google-cloud/vertexai": "^1.11.0",
         "@hono/node-server": "^1.19.14",
-        "@prisma/adapter-pg": "^7.0.1",
-        "@prisma/client": "^7.0.1",
+        "@prisma/adapter-pg": "^7.7.0",
+        "@prisma/client": "^7.7.0",
         "@redis/client": "^5.10.0",
         "axios": "^1.15.0",
         "cors": "^2.8.5",
@@ -192,7 +196,7 @@
         "@types/express": "^5.0.5",
         "@types/node": "^24.10.1",
         "@vitest/coverage-v8": "^2.1.4",
-        "prisma": "^7.0.1",
+        "prisma": "^7.7.0",
         "ts-node": "^10.9.2",
         "typescript": "^5.9.3",
         "vitest": "^2.1.4",
@@ -256,8 +260,8 @@
         "@google-cloud/vertexai": "^1.11.0",
         "@grpc/grpc-js": "^1.14.1",
         "@grpc/proto-loader": "^0.8.0",
-        "@prisma/adapter-pg": "^7.0.1",
-        "@prisma/client": "7",
+        "@prisma/adapter-pg": "^7.7.0",
+        "@prisma/client": "^7.7.0",
         "@redis/client": "^5.10.0",
         "bcrypt": "^6.0.0",
         "compression": "^1.8.1",
@@ -739,6 +743,10 @@
     "@grpc/proto-loader": ["@grpc/proto-loader@0.8.0", "", { "dependencies": { "lodash.camelcase": "^4.3.0", "long": "^5.0.0", "protobufjs": "^7.5.3", "yargs": "^17.7.2" }, "bin": { "proto-loader-gen-types": "build/bin/proto-loader-gen-types.js" } }, "sha512-rc1hOQtjIWGxcxpb9aHAfLpIctjEnsDehj0DAiVfBlmT84uvR0uUtN2hEi/ecvWVjXUGf5qPF4qEgiLOx1YIMQ=="],
 
     "@hono/node-server": ["@hono/node-server@1.19.14", "", { "peerDependencies": { "hono": "^4" } }, "sha512-GwtvgtXxnWsucXvbQXkRgqksiH2Qed37H9xHZocE5sA3N8O8O8/8FA3uclQXxXVzc9XBZuEOMK7+r02FmSpHtw=="],
+
+    "@huggingface/inference": ["@huggingface/inference@2.8.1", "", { "dependencies": { "@huggingface/tasks": "^0.12.9" } }, "sha512-EfsNtY9OR6JCNaUa5bZu2mrs48iqeTz0Gutwf+fU0Kypx33xFQB4DKMhp8u4Ee6qVbLbNWvTHuWwlppLQl4p4Q=="],
+
+    "@huggingface/tasks": ["@huggingface/tasks@0.12.30", "", {}, "sha512-A1ITdxbEzx9L8wKR8pF7swyrTLxWNDFIGDLUWInxvks2ruQ8PLRBZe8r0EcjC3CDdtlj9jV1V4cgV35K/iy3GQ=="],
 
     "@humanfs/core": ["@humanfs/core@0.19.1", "", {}, "sha512-5DyQ4+1JEUzejeK1JGICcideyfUbGixgS9jNgex5nqkW+cY7WZhxBigmieN5Qnw9ZosSNVC9KQKyb+GUaGyKUA=="],
 

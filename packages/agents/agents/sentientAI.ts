@@ -26,11 +26,14 @@ import { createAnalyzeImageTool } from "../lib/tools/analyzeImage";
 import { createNavigateToTool } from "../lib/tools/navigateTo";
 import { createUpvoteComplaintTool } from "../lib/tools/upvoteComplaint";
 import { createDetectLocationTool } from "../lib/tools/detectLocation";
+import type { ComplaintFlowState } from "../lib/complaintFlow/state";
+import { buildComplaintStateSystemContext } from "../lib/complaintFlow/state";
 
 export interface SentientAIInput {
   message: string;
   userId: string;
   conversationHistory: BaseMessage[];
+  complaintState?: ComplaintFlowState | null;
 }
 
 export interface SentientAIOutput {
@@ -93,7 +96,7 @@ export function createSentientAI(db: PrismaClient) {
   ].map((t) => bindUserId(t, userId));
 
   return async function invokeSentientAI(input: SentientAIInput): Promise<SentientAIOutput> {
-    const { message, userId, conversationHistory } = input;
+    const { message, userId, conversationHistory, complaintState } = input;
 
     // Create tools with userId auto-injected
     const tools = toolFactories(userId);
@@ -104,8 +107,10 @@ export function createSentientAI(db: PrismaClient) {
       tools,
     });
 
+    const complaintStateContext = buildComplaintStateSystemContext(complaintState || null);
     const messages: BaseMessage[] = [
       new SystemMessage(SENTIENT_AI_SYSTEM_PROMPT),
+      ...(complaintStateContext ? [new SystemMessage(complaintStateContext)] : []),
       ...conversationHistory,
       new HumanMessage(message),
     ];

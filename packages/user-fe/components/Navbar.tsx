@@ -289,7 +289,7 @@ const Navbar = () => {
               alt='SwarajDesk Logo'
               width={200}
               height={140}
-              className='object-contain h-20 w-auto'
+              className='object-contain h-100 w-100'
             />
           </Link>
 

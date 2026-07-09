@@ -14,7 +14,10 @@ import { createQualityScorer } from "../agents/qualityScorer";
  *   subCategory?: string,
  *   urgency?: string,
  *   hasAttachment: boolean,
- *   locationDetails?: { district?, city?, pincode?, latitude?, longitude?, locality?, street? }
+ *   locationDetails?: { district?, city?, pincode?, latitude?, longitude?, locality?, street? },
+ *   hasSimilarComplaints?: boolean,
+ *   isDuplicate?: boolean,
+ *   abuseDetected?: boolean
  * }
  *
  * Returns: { score, breakdown: { clarity, evidence, location, completeness }, suggestions[], rating }
@@ -25,7 +28,17 @@ export function createQualityRouter(): Router {
 
   router.post("/", async (req, res) => {
     try {
-      const { description, category, subCategory, urgency, hasAttachment, locationDetails } = req.body;
+      const {
+        description,
+        category,
+        subCategory,
+        urgency,
+        hasAttachment,
+        locationDetails,
+        hasSimilarComplaints,
+        isDuplicate,
+        abuseDetected,
+      } = req.body;
 
       if (!description || typeof description !== "string" || description.trim().length < 5) {
         res.status(400).json({
@@ -41,6 +54,9 @@ export function createQualityRouter(): Router {
         urgency: urgency || undefined,
         hasAttachment: Boolean(hasAttachment),
         locationDetails: locationDetails || undefined,
+        hasSimilarComplaints: hasSimilarComplaints === true,
+        isDuplicate: isDuplicate === true,
+        abuseDetected: abuseDetected === true,
       });
 
       res.json(result);

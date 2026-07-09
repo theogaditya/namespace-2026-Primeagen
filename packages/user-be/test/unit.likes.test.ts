@@ -77,6 +77,16 @@ describe('InMemoryLikeStore', () => {
       
       expect(store.getPendingSyncCount()).toBe(2);
     });
+
+    it('should apply authoritative results without going negative', () => {
+      const result = store.applyResolvedToggle('user-1', 'complaint-1', false, -3);
+
+      expect(result.liked).toBe(false);
+      expect(result.count).toBe(0);
+      expect(store.hasLiked('user-1', 'complaint-1')).toBe(false);
+      expect(store.getLikeCount('complaint-1')).toBe(0);
+      expect(store.getPendingSyncCount()).toBe(1);
+    });
   });
 
   describe('getLikeCount', () => {

@@ -6,6 +6,13 @@ import { createImageAnalysisAI } from "./imageAnalysisAI";
 import { sanitizeInput } from "../lib/guardrails/inputSanitizer";
 import { filterOutput } from "../lib/guardrails/outputFilter";
 import { sessionMemory } from "../lib/memory/sessionMemory";
+import {
+  applyComplaintDraftToState,
+  looksLikeComplaintIntent,
+  normalizeComplaintFlowState,
+  updateComplaintStateFromUserMessage,
+  type ComplaintCategoryCatalog,
+} from "../lib/complaintFlow/state";
 
 /** Strip markdown formatting for clean chat display */
 function stripMarkdown(text: string): string {
@@ -45,6 +52,30 @@ export function createAgentRouter(db: PrismaClient) {
   const sentientAI = createSentientAI(db);
   const helpAI = createHelpAI(db);
   const imageAI = createImageAnalysisAI();
+  let categoryCatalogCache: ComplaintCategoryCatalog[] | null = null;
+  let categoryCatalogLoadedAt = 0;
+
+  async function getComplaintCategoryCatalog(): Promise<ComplaintCategoryCatalog[]> {
+    const cacheFresh = categoryCatalogCache && Date.now() - categoryCatalogLoadedAt < 5 * 60_000;
+    if (cacheFresh) return categoryCatalogCache!;
+
+    const categories = await db.category.findMany({
+      select: {
+        name: true,
+        subCategories: true,
+        learnedSubCategories: true,
+      },
+      orderBy: { name: "asc" },
+    });
+
+    categoryCatalogCache = categories.map((category) => ({
+      name: category.name,
+      subCategories: category.subCategories,
+      learnedSubCategories: category.learnedSubCategories,
+    }));
+    categoryCatalogLoadedAt = Date.now();
+    return categoryCatalogCache;
+  }
 
   return async function routeChat(input: ChatInput): Promise<ChatOutput> {
     const { message, userId, sessionId, imageBase64 } = input;
@@ -75,8 +106,22 @@ export function createAgentRouter(db: PrismaClient) {
       };
     }
 
-    // 2. Get conversation history from session memory
+    // 2. Get conversation history + structured complaint state from session memory
     const history = await sessionMemory.getHistory(userId, sessionId);
+    let complaintState = normalizeComplaintFlowState(
+      await sessionMemory.getComplaintState(userId, sessionId)
+    );
+
+    const shouldTrackComplaintState =
+      complaintState?.active || looksLikeComplaintIntent(enrichedMessage) || Boolean(imageBase64);
+    if (shouldTrackComplaintState) {
+      const categoryCatalog = await getComplaintCategoryCatalog();
+      complaintState = updateComplaintStateFromUserMessage(complaintState, enrichedMessage, {
+        categoryCatalog,
+        imageAttached: Boolean(imageBase64),
+      });
+      await sessionMemory.setComplaintState(userId, sessionId, complaintState);
+    }
 
     // 3. Add user message to history
     await sessionMemory.addMessage(userId, sessionId, "human", message);
@@ -88,6 +133,7 @@ export function createAgentRouter(db: PrismaClient) {
         message: enrichedMessage,
         userId,
         conversationHistory: history,
+        complaintState,
       });
     } catch (error) {
       console.error("[AgentRouter] Sentient AI error:", error);
@@ -106,6 +152,21 @@ export function createAgentRouter(db: PrismaClient) {
 
     // 6. Save AI response to history
     await sessionMemory.addMessage(userId, sessionId, "ai", filtered.output);
+
+    // 6b. Update structured complaint state from the latest agent outcome
+    if (result.complaintDraft) {
+      complaintState = applyComplaintDraftToState(complaintState, result.complaintDraft);
+      await sessionMemory.clearComplaintState(userId, sessionId);
+    } else if (complaintState?.active || result.shouldStartComplaint || result.detectLocation) {
+      const nextComplaintState = normalizeComplaintFlowState({
+        ...complaintState,
+        active: complaintState?.active || result.shouldStartComplaint,
+        detectLocationRequested: result.detectLocation || complaintState?.detectLocationRequested,
+        photoAttached: complaintState?.photoAttached || Boolean(imageBase64),
+        lastUpdatedAt: Date.now(),
+      });
+      await sessionMemory.setComplaintState(userId, sessionId, nextComplaintState);
+    }
 
     // 7. Handle escalation to Help AI
     if (result.shouldEscalate) {

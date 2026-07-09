@@ -266,7 +266,7 @@ export type SuperMunicipalAdminGroupByOutputType = {
   _max: SuperMunicipalAdminMaxAggregateOutputType | null
 }
 
-type GetSuperMunicipalAdminGroupByPayload<T extends SuperMunicipalAdminGroupByArgs> = Prisma.PrismaPromise<
+export type GetSuperMunicipalAdminGroupByPayload<T extends SuperMunicipalAdminGroupByArgs> = Prisma.PrismaPromise<
   Array<
     Prisma.PickEnumerable<SuperMunicipalAdminGroupByOutputType, T['by']> &
       {
@@ -1813,6 +1813,11 @@ export type SuperMunicipalAdminFindManyArgs<ExtArgs extends runtime.Types.Extens
    * Skip the first `n` SuperMunicipalAdmins.
    */
   skip?: number
+  /**
+   * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+   * 
+   * Filter by unique combinations of SuperMunicipalAdmins.
+   */
   distinct?: Prisma.SuperMunicipalAdminScalarFieldEnum | Prisma.SuperMunicipalAdminScalarFieldEnum[]
 }
 

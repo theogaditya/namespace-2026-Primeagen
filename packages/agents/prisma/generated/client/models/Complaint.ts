@@ -29,12 +29,14 @@ export type AggregateComplaint = {
 export type ComplaintAvgAggregateOutputType = {
   upvoteCount: number | null
   seq: number | null
+  blockchainBlock: number | null
   qualityScore: number | null
 }
 
 export type ComplaintSumAggregateOutputType = {
   upvoteCount: number | null
   seq: number | null
+  blockchainBlock: bigint | null
   qualityScore: number | null
 }
 
@@ -61,6 +63,12 @@ export type ComplaintMinAggregateOutputType = {
   managedBySuperAdminId: string | null
   moderatedByMunicipalAdminId: string | null
   seq: number | null
+  blockchainHash: string | null
+  blockchainBlock: bigint | null
+  ipfsHash: string | null
+  isOnChain: boolean | null
+  blockchainStatus: $Enums.BlockchainStatus | null
+  blockchainUpdatedAt: Date | null
   sla: string | null
   AIabusedFlag: boolean | null
   AIimageVarificationStatus: boolean | null
@@ -94,6 +102,12 @@ export type ComplaintMaxAggregateOutputType = {
   managedBySuperAdminId: string | null
   moderatedByMunicipalAdminId: string | null
   seq: number | null
+  blockchainHash: string | null
+  blockchainBlock: bigint | null
+  ipfsHash: string | null
+  isOnChain: boolean | null
+  blockchainStatus: $Enums.BlockchainStatus | null
+  blockchainUpdatedAt: Date | null
   sla: string | null
   AIabusedFlag: boolean | null
   AIimageVarificationStatus: boolean | null
@@ -127,6 +141,12 @@ export type ComplaintCountAggregateOutputType = {
   managedBySuperAdminId: number
   moderatedByMunicipalAdminId: number
   seq: number
+  blockchainHash: number
+  blockchainBlock: number
+  ipfsHash: number
+  isOnChain: number
+  blockchainStatus: number
+  blockchainUpdatedAt: number
   sla: number
   AIabusedFlag: number
   AIimageVarificationStatus: number
@@ -145,12 +165,14 @@ export type ComplaintCountAggregateOutputType = {
 export type ComplaintAvgAggregateInputType = {
   upvoteCount?: true
   seq?: true
+  blockchainBlock?: true
   qualityScore?: true
 }
 
 export type ComplaintSumAggregateInputType = {
   upvoteCount?: true
   seq?: true
+  blockchainBlock?: true
   qualityScore?: true
 }
 
@@ -177,6 +199,12 @@ export type ComplaintMinAggregateInputType = {
   managedBySuperAdminId?: true
   moderatedByMunicipalAdminId?: true
   seq?: true
+  blockchainHash?: true
+  blockchainBlock?: true
+  ipfsHash?: true
+  isOnChain?: true
+  blockchainStatus?: true
+  blockchainUpdatedAt?: true
   sla?: true
   AIabusedFlag?: true
   AIimageVarificationStatus?: true
@@ -210,6 +238,12 @@ export type ComplaintMaxAggregateInputType = {
   managedBySuperAdminId?: true
   moderatedByMunicipalAdminId?: true
   seq?: true
+  blockchainHash?: true
+  blockchainBlock?: true
+  ipfsHash?: true
+  isOnChain?: true
+  blockchainStatus?: true
+  blockchainUpdatedAt?: true
   sla?: true
   AIabusedFlag?: true
   AIimageVarificationStatus?: true
@@ -243,6 +277,12 @@ export type ComplaintCountAggregateInputType = {
   managedBySuperAdminId?: true
   moderatedByMunicipalAdminId?: true
   seq?: true
+  blockchainHash?: true
+  blockchainBlock?: true
+  ipfsHash?: true
+  isOnChain?: true
+  blockchainStatus?: true
+  blockchainUpdatedAt?: true
   sla?: true
   AIabusedFlag?: true
   AIimageVarificationStatus?: true
@@ -366,6 +406,12 @@ export type ComplaintGroupByOutputType = {
   managedBySuperAdminId: string | null
   moderatedByMunicipalAdminId: string | null
   seq: number
+  blockchainHash: string | null
+  blockchainBlock: bigint | null
+  ipfsHash: string | null
+  isOnChain: boolean
+  blockchainStatus: $Enums.BlockchainStatus
+  blockchainUpdatedAt: Date | null
   sla: string | null
   AIabusedFlag: boolean | null
   AIimageVarificationStatus: boolean | null
@@ -384,7 +430,7 @@ export type ComplaintGroupByOutputType = {
   _max: ComplaintMaxAggregateOutputType | null
 }
 
-type GetComplaintGroupByPayload<T extends ComplaintGroupByArgs> = Prisma.PrismaPromise<
+export type GetComplaintGroupByPayload<T extends ComplaintGroupByArgs> = Prisma.PrismaPromise<
   Array<
     Prisma.PickEnumerable<ComplaintGroupByOutputType, T['by']> &
       {
@@ -425,6 +471,12 @@ export type ComplaintWhereInput = {
   managedBySuperAdminId?: Prisma.StringNullableFilter<"Complaint"> | string | null
   moderatedByMunicipalAdminId?: Prisma.StringNullableFilter<"Complaint"> | string | null
   seq?: Prisma.IntFilter<"Complaint"> | number
+  blockchainHash?: Prisma.StringNullableFilter<"Complaint"> | string | null
+  blockchainBlock?: Prisma.BigIntNullableFilter<"Complaint"> | bigint | number | null
+  ipfsHash?: Prisma.StringNullableFilter<"Complaint"> | string | null
+  isOnChain?: Prisma.BoolFilter<"Complaint"> | boolean
+  blockchainStatus?: Prisma.EnumBlockchainStatusFilter<"Complaint"> | $Enums.BlockchainStatus
+  blockchainUpdatedAt?: Prisma.DateTimeNullableFilter<"Complaint"> | Date | string | null
   sla?: Prisma.StringNullableFilter<"Complaint"> | string | null
   AIabusedFlag?: Prisma.BoolNullableFilter<"Complaint"> | boolean | null
   AIimageVarificationStatus?: Prisma.BoolNullableFilter<"Complaint"> | boolean | null
@@ -475,6 +527,12 @@ export type ComplaintOrderByWithRelationInput = {
   managedBySuperAdminId?: Prisma.SortOrderInput | Prisma.SortOrder
   moderatedByMunicipalAdminId?: Prisma.SortOrderInput | Prisma.SortOrder
   seq?: Prisma.SortOrder
+  blockchainHash?: Prisma.SortOrderInput | Prisma.SortOrder
+  blockchainBlock?: Prisma.SortOrderInput | Prisma.SortOrder
+  ipfsHash?: Prisma.SortOrderInput | Prisma.SortOrder
+  isOnChain?: Prisma.SortOrder
+  blockchainStatus?: Prisma.SortOrder
+  blockchainUpdatedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   sla?: Prisma.SortOrderInput | Prisma.SortOrder
   AIabusedFlag?: Prisma.SortOrderInput | Prisma.SortOrder
   AIimageVarificationStatus?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -528,6 +586,12 @@ export type ComplaintWhereUniqueInput = Prisma.AtLeast<{
   managedByMunicipalAdminId?: Prisma.StringNullableFilter<"Complaint"> | string | null
   managedBySuperAdminId?: Prisma.StringNullableFilter<"Complaint"> | string | null
   moderatedByMunicipalAdminId?: Prisma.StringNullableFilter<"Complaint"> | string | null
+  blockchainHash?: Prisma.StringNullableFilter<"Complaint"> | string | null
+  blockchainBlock?: Prisma.BigIntNullableFilter<"Complaint"> | bigint | number | null
+  ipfsHash?: Prisma.StringNullableFilter<"Complaint"> | string | null
+  isOnChain?: Prisma.BoolFilter<"Complaint"> | boolean
+  blockchainStatus?: Prisma.EnumBlockchainStatusFilter<"Complaint"> | $Enums.BlockchainStatus
+  blockchainUpdatedAt?: Prisma.DateTimeNullableFilter<"Complaint"> | Date | string | null
   sla?: Prisma.StringNullableFilter<"Complaint"> | string | null
   AIabusedFlag?: Prisma.BoolNullableFilter<"Complaint"> | boolean | null
   AIimageVarificationStatus?: Prisma.BoolNullableFilter<"Complaint"> | boolean | null
@@ -578,6 +642,12 @@ export type ComplaintOrderByWithAggregationInput = {
   managedBySuperAdminId?: Prisma.SortOrderInput | Prisma.SortOrder
   moderatedByMunicipalAdminId?: Prisma.SortOrderInput | Prisma.SortOrder
   seq?: Prisma.SortOrder
+  blockchainHash?: Prisma.SortOrderInput | Prisma.SortOrder
+  blockchainBlock?: Prisma.SortOrderInput | Prisma.SortOrder
+  ipfsHash?: Prisma.SortOrderInput | Prisma.SortOrder
+  isOnChain?: Prisma.SortOrder
+  blockchainStatus?: Prisma.SortOrder
+  blockchainUpdatedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   sla?: Prisma.SortOrderInput | Prisma.SortOrder
   AIabusedFlag?: Prisma.SortOrderInput | Prisma.SortOrder
   AIimageVarificationStatus?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -622,6 +692,12 @@ export type ComplaintScalarWhereWithAggregatesInput = {
   managedBySuperAdminId?: Prisma.StringNullableWithAggregatesFilter<"Complaint"> | string | null
   moderatedByMunicipalAdminId?: Prisma.StringNullableWithAggregatesFilter<"Complaint"> | string | null
   seq?: Prisma.IntWithAggregatesFilter<"Complaint"> | number
+  blockchainHash?: Prisma.StringNullableWithAggregatesFilter<"Complaint"> | string | null
+  blockchainBlock?: Prisma.BigIntNullableWithAggregatesFilter<"Complaint"> | bigint | number | null
+  ipfsHash?: Prisma.StringNullableWithAggregatesFilter<"Complaint"> | string | null
+  isOnChain?: Prisma.BoolWithAggregatesFilter<"Complaint"> | boolean
+  blockchainStatus?: Prisma.EnumBlockchainStatusWithAggregatesFilter<"Complaint"> | $Enums.BlockchainStatus
+  blockchainUpdatedAt?: Prisma.DateTimeNullableWithAggregatesFilter<"Complaint"> | Date | string | null
   sla?: Prisma.StringNullableWithAggregatesFilter<"Complaint"> | string | null
   AIabusedFlag?: Prisma.BoolNullableWithAggregatesFilter<"Complaint"> | boolean | null
   AIimageVarificationStatus?: Prisma.BoolNullableWithAggregatesFilter<"Complaint"> | boolean | null
@@ -649,6 +725,12 @@ export type ComplaintCreateInput = {
   dateOfResolution?: Date | string | null
   escalationLevel?: string | null
   seq?: number
+  blockchainHash?: string | null
+  blockchainBlock?: bigint | number | null
+  ipfsHash?: string | null
+  isOnChain?: boolean
+  blockchainStatus?: $Enums.BlockchainStatus
+  blockchainUpdatedAt?: Date | string | null
   sla?: string | null
   AIabusedFlag?: boolean | null
   AIimageVarificationStatus?: boolean | null
@@ -699,6 +781,12 @@ export type ComplaintUncheckedCreateInput = {
   managedBySuperAdminId?: string | null
   moderatedByMunicipalAdminId?: string | null
   seq?: number
+  blockchainHash?: string | null
+  blockchainBlock?: bigint | number | null
+  ipfsHash?: string | null
+  isOnChain?: boolean
+  blockchainStatus?: $Enums.BlockchainStatus
+  blockchainUpdatedAt?: Date | string | null
   sla?: string | null
   AIabusedFlag?: boolean | null
   AIimageVarificationStatus?: boolean | null
@@ -730,6 +818,12 @@ export type ComplaintUpdateInput = {
   assignedDepartment?: Prisma.StringFieldUpdateOperationsInput | string
   dateOfResolution?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   escalationLevel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  blockchainHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  blockchainBlock?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
+  ipfsHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isOnChain?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  blockchainStatus?: Prisma.EnumBlockchainStatusFieldUpdateOperationsInput | $Enums.BlockchainStatus
+  blockchainUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   sla?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   AIabusedFlag?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   AIimageVarificationStatus?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
@@ -780,6 +874,12 @@ export type ComplaintUncheckedUpdateInput = {
   managedBySuperAdminId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   moderatedByMunicipalAdminId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   seq?: Prisma.IntFieldUpdateOperationsInput | number
+  blockchainHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  blockchainBlock?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
+  ipfsHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isOnChain?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  blockchainStatus?: Prisma.EnumBlockchainStatusFieldUpdateOperationsInput | $Enums.BlockchainStatus
+  blockchainUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   sla?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   AIabusedFlag?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   AIimageVarificationStatus?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
@@ -821,6 +921,12 @@ export type ComplaintCreateManyInput = {
   managedBySuperAdminId?: string | null
   moderatedByMunicipalAdminId?: string | null
   seq?: number
+  blockchainHash?: string | null
+  blockchainBlock?: bigint | number | null
+  ipfsHash?: string | null
+  isOnChain?: boolean
+  blockchainStatus?: $Enums.BlockchainStatus
+  blockchainUpdatedAt?: Date | string | null
   sla?: string | null
   AIabusedFlag?: boolean | null
   AIimageVarificationStatus?: boolean | null
@@ -847,6 +953,12 @@ export type ComplaintUpdateManyMutationInput = {
   assignedDepartment?: Prisma.StringFieldUpdateOperationsInput | string
   dateOfResolution?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   escalationLevel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  blockchainHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  blockchainBlock?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
+  ipfsHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isOnChain?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  blockchainStatus?: Prisma.EnumBlockchainStatusFieldUpdateOperationsInput | $Enums.BlockchainStatus
+  blockchainUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   sla?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   AIabusedFlag?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   AIimageVarificationStatus?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
@@ -883,6 +995,12 @@ export type ComplaintUncheckedUpdateManyInput = {
   managedBySuperAdminId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   moderatedByMunicipalAdminId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   seq?: Prisma.IntFieldUpdateOperationsInput | number
+  blockchainHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  blockchainBlock?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
+  ipfsHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isOnChain?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  blockchainStatus?: Prisma.EnumBlockchainStatusFieldUpdateOperationsInput | $Enums.BlockchainStatus
+  blockchainUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   sla?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   AIabusedFlag?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   AIimageVarificationStatus?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
@@ -929,6 +1047,12 @@ export type ComplaintCountOrderByAggregateInput = {
   managedBySuperAdminId?: Prisma.SortOrder
   moderatedByMunicipalAdminId?: Prisma.SortOrder
   seq?: Prisma.SortOrder
+  blockchainHash?: Prisma.SortOrder
+  blockchainBlock?: Prisma.SortOrder
+  ipfsHash?: Prisma.SortOrder
+  isOnChain?: Prisma.SortOrder
+  blockchainStatus?: Prisma.SortOrder
+  blockchainUpdatedAt?: Prisma.SortOrder
   sla?: Prisma.SortOrder
   AIabusedFlag?: Prisma.SortOrder
   AIimageVarificationStatus?: Prisma.SortOrder
@@ -945,6 +1069,7 @@ export type ComplaintCountOrderByAggregateInput = {
 export type ComplaintAvgOrderByAggregateInput = {
   upvoteCount?: Prisma.SortOrder
   seq?: Prisma.SortOrder
+  blockchainBlock?: Prisma.SortOrder
   qualityScore?: Prisma.SortOrder
 }
 
@@ -971,6 +1096,12 @@ export type ComplaintMaxOrderByAggregateInput = {
   managedBySuperAdminId?: Prisma.SortOrder
   moderatedByMunicipalAdminId?: Prisma.SortOrder
   seq?: Prisma.SortOrder
+  blockchainHash?: Prisma.SortOrder
+  blockchainBlock?: Prisma.SortOrder
+  ipfsHash?: Prisma.SortOrder
+  isOnChain?: Prisma.SortOrder
+  blockchainStatus?: Prisma.SortOrder
+  blockchainUpdatedAt?: Prisma.SortOrder
   sla?: Prisma.SortOrder
   AIabusedFlag?: Prisma.SortOrder
   AIimageVarificationStatus?: Prisma.SortOrder
@@ -1004,6 +1135,12 @@ export type ComplaintMinOrderByAggregateInput = {
   managedBySuperAdminId?: Prisma.SortOrder
   moderatedByMunicipalAdminId?: Prisma.SortOrder
   seq?: Prisma.SortOrder
+  blockchainHash?: Prisma.SortOrder
+  blockchainBlock?: Prisma.SortOrder
+  ipfsHash?: Prisma.SortOrder
+  isOnChain?: Prisma.SortOrder
+  blockchainStatus?: Prisma.SortOrder
+  blockchainUpdatedAt?: Prisma.SortOrder
   sla?: Prisma.SortOrder
   AIabusedFlag?: Prisma.SortOrder
   AIimageVarificationStatus?: Prisma.SortOrder
@@ -1017,6 +1154,7 @@ export type ComplaintMinOrderByAggregateInput = {
 export type ComplaintSumOrderByAggregateInput = {
   upvoteCount?: Prisma.SortOrder
   seq?: Prisma.SortOrder
+  blockchainBlock?: Prisma.SortOrder
   qualityScore?: Prisma.SortOrder
 }
 
@@ -1458,6 +1596,18 @@ export type EnumComplaintStatusFieldUpdateOperationsInput = {
   set?: $Enums.ComplaintStatus
 }
 
+export type NullableBigIntFieldUpdateOperationsInput = {
+  set?: bigint | number | null
+  increment?: bigint | number
+  decrement?: bigint | number
+  multiply?: bigint | number
+  divide?: bigint | number
+}
+
+export type EnumBlockchainStatusFieldUpdateOperationsInput = {
+  set?: $Enums.BlockchainStatus
+}
+
 export type NullableBoolFieldUpdateOperationsInput = {
   set?: boolean | null
 }
@@ -1547,6 +1697,12 @@ export type ComplaintCreateWithoutUserInput = {
   dateOfResolution?: Date | string | null
   escalationLevel?: string | null
   seq?: number
+  blockchainHash?: string | null
+  blockchainBlock?: bigint | number | null
+  ipfsHash?: string | null
+  isOnChain?: boolean
+  blockchainStatus?: $Enums.BlockchainStatus
+  blockchainUpdatedAt?: Date | string | null
   sla?: string | null
   AIabusedFlag?: boolean | null
   AIimageVarificationStatus?: boolean | null
@@ -1595,6 +1751,12 @@ export type ComplaintUncheckedCreateWithoutUserInput = {
   managedBySuperAdminId?: string | null
   moderatedByMunicipalAdminId?: string | null
   seq?: number
+  blockchainHash?: string | null
+  blockchainBlock?: bigint | number | null
+  ipfsHash?: string | null
+  isOnChain?: boolean
+  blockchainStatus?: $Enums.BlockchainStatus
+  blockchainUpdatedAt?: Date | string | null
   sla?: string | null
   AIabusedFlag?: boolean | null
   AIimageVarificationStatus?: boolean | null
@@ -1665,6 +1827,12 @@ export type ComplaintScalarWhereInput = {
   managedBySuperAdminId?: Prisma.StringNullableFilter<"Complaint"> | string | null
   moderatedByMunicipalAdminId?: Prisma.StringNullableFilter<"Complaint"> | string | null
   seq?: Prisma.IntFilter<"Complaint"> | number
+  blockchainHash?: Prisma.StringNullableFilter<"Complaint"> | string | null
+  blockchainBlock?: Prisma.BigIntNullableFilter<"Complaint"> | bigint | number | null
+  ipfsHash?: Prisma.StringNullableFilter<"Complaint"> | string | null
+  isOnChain?: Prisma.BoolFilter<"Complaint"> | boolean
+  blockchainStatus?: Prisma.EnumBlockchainStatusFilter<"Complaint"> | $Enums.BlockchainStatus
+  blockchainUpdatedAt?: Prisma.DateTimeNullableFilter<"Complaint"> | Date | string | null
   sla?: Prisma.StringNullableFilter<"Complaint"> | string | null
   AIabusedFlag?: Prisma.BoolNullableFilter<"Complaint"> | boolean | null
   AIimageVarificationStatus?: Prisma.BoolNullableFilter<"Complaint"> | boolean | null
@@ -1692,6 +1860,12 @@ export type ComplaintCreateWithoutAssignedAgentInput = {
   dateOfResolution?: Date | string | null
   escalationLevel?: string | null
   seq?: number
+  blockchainHash?: string | null
+  blockchainBlock?: bigint | number | null
+  ipfsHash?: string | null
+  isOnChain?: boolean
+  blockchainStatus?: $Enums.BlockchainStatus
+  blockchainUpdatedAt?: Date | string | null
   sla?: string | null
   AIabusedFlag?: boolean | null
   AIimageVarificationStatus?: boolean | null
@@ -1740,6 +1914,12 @@ export type ComplaintUncheckedCreateWithoutAssignedAgentInput = {
   managedBySuperAdminId?: string | null
   moderatedByMunicipalAdminId?: string | null
   seq?: number
+  blockchainHash?: string | null
+  blockchainBlock?: bigint | number | null
+  ipfsHash?: string | null
+  isOnChain?: boolean
+  blockchainStatus?: $Enums.BlockchainStatus
+  blockchainUpdatedAt?: Date | string | null
   sla?: string | null
   AIabusedFlag?: boolean | null
   AIimageVarificationStatus?: boolean | null
@@ -1782,6 +1962,12 @@ export type ComplaintCreateWithoutCoAssignedAgentsInput = {
   dateOfResolution?: Date | string | null
   escalationLevel?: string | null
   seq?: number
+  blockchainHash?: string | null
+  blockchainBlock?: bigint | number | null
+  ipfsHash?: string | null
+  isOnChain?: boolean
+  blockchainStatus?: $Enums.BlockchainStatus
+  blockchainUpdatedAt?: Date | string | null
   sla?: string | null
   AIabusedFlag?: boolean | null
   AIimageVarificationStatus?: boolean | null
@@ -1831,6 +2017,12 @@ export type ComplaintUncheckedCreateWithoutCoAssignedAgentsInput = {
   managedBySuperAdminId?: string | null
   moderatedByMunicipalAdminId?: string | null
   seq?: number
+  blockchainHash?: string | null
+  blockchainBlock?: bigint | number | null
+  ipfsHash?: string | null
+  isOnChain?: boolean
+  blockchainStatus?: $Enums.BlockchainStatus
+  blockchainUpdatedAt?: Date | string | null
   sla?: string | null
   AIabusedFlag?: boolean | null
   AIimageVarificationStatus?: boolean | null
@@ -1899,6 +2091,12 @@ export type ComplaintCreateWithoutManagedByMunicipalAdminInput = {
   dateOfResolution?: Date | string | null
   escalationLevel?: string | null
   seq?: number
+  blockchainHash?: string | null
+  blockchainBlock?: bigint | number | null
+  ipfsHash?: string | null
+  isOnChain?: boolean
+  blockchainStatus?: $Enums.BlockchainStatus
+  blockchainUpdatedAt?: Date | string | null
   sla?: string | null
   AIabusedFlag?: boolean | null
   AIimageVarificationStatus?: boolean | null
@@ -1947,6 +2145,12 @@ export type ComplaintUncheckedCreateWithoutManagedByMunicipalAdminInput = {
   managedBySuperAdminId?: string | null
   moderatedByMunicipalAdminId?: string | null
   seq?: number
+  blockchainHash?: string | null
+  blockchainBlock?: bigint | number | null
+  ipfsHash?: string | null
+  isOnChain?: boolean
+  blockchainStatus?: $Enums.BlockchainStatus
+  blockchainUpdatedAt?: Date | string | null
   sla?: string | null
   AIabusedFlag?: boolean | null
   AIimageVarificationStatus?: boolean | null
@@ -1989,6 +2193,12 @@ export type ComplaintCreateWithoutModeratedByMunicipalAdminInput = {
   dateOfResolution?: Date | string | null
   escalationLevel?: string | null
   seq?: number
+  blockchainHash?: string | null
+  blockchainBlock?: bigint | number | null
+  ipfsHash?: string | null
+  isOnChain?: boolean
+  blockchainStatus?: $Enums.BlockchainStatus
+  blockchainUpdatedAt?: Date | string | null
   sla?: string | null
   AIabusedFlag?: boolean | null
   AIimageVarificationStatus?: boolean | null
@@ -2037,6 +2247,12 @@ export type ComplaintUncheckedCreateWithoutModeratedByMunicipalAdminInput = {
   managedByMunicipalAdminId?: string | null
   managedBySuperAdminId?: string | null
   seq?: number
+  blockchainHash?: string | null
+  blockchainBlock?: bigint | number | null
+  ipfsHash?: string | null
+  isOnChain?: boolean
+  blockchainStatus?: $Enums.BlockchainStatus
+  blockchainUpdatedAt?: Date | string | null
   sla?: string | null
   AIabusedFlag?: boolean | null
   AIimageVarificationStatus?: boolean | null
@@ -2111,6 +2327,12 @@ export type ComplaintCreateWithoutCrossDeptIssueSuperMunicipalInput = {
   dateOfResolution?: Date | string | null
   escalationLevel?: string | null
   seq?: number
+  blockchainHash?: string | null
+  blockchainBlock?: bigint | number | null
+  ipfsHash?: string | null
+  isOnChain?: boolean
+  blockchainStatus?: $Enums.BlockchainStatus
+  blockchainUpdatedAt?: Date | string | null
   sla?: string | null
   AIabusedFlag?: boolean | null
   AIimageVarificationStatus?: boolean | null
@@ -2159,6 +2381,12 @@ export type ComplaintUncheckedCreateWithoutCrossDeptIssueSuperMunicipalInput = {
   managedBySuperAdminId?: string | null
   moderatedByMunicipalAdminId?: string | null
   seq?: number
+  blockchainHash?: string | null
+  blockchainBlock?: bigint | number | null
+  ipfsHash?: string | null
+  isOnChain?: boolean
+  blockchainStatus?: $Enums.BlockchainStatus
+  blockchainUpdatedAt?: Date | string | null
   sla?: string | null
   AIabusedFlag?: boolean | null
   AIimageVarificationStatus?: boolean | null
@@ -2217,6 +2445,12 @@ export type ComplaintCreateWithoutEscalatedToStateAdminInput = {
   dateOfResolution?: Date | string | null
   escalationLevel?: string | null
   seq?: number
+  blockchainHash?: string | null
+  blockchainBlock?: bigint | number | null
+  ipfsHash?: string | null
+  isOnChain?: boolean
+  blockchainStatus?: $Enums.BlockchainStatus
+  blockchainUpdatedAt?: Date | string | null
   sla?: string | null
   AIabusedFlag?: boolean | null
   AIimageVarificationStatus?: boolean | null
@@ -2265,6 +2499,12 @@ export type ComplaintUncheckedCreateWithoutEscalatedToStateAdminInput = {
   managedBySuperAdminId?: string | null
   moderatedByMunicipalAdminId?: string | null
   seq?: number
+  blockchainHash?: string | null
+  blockchainBlock?: bigint | number | null
+  ipfsHash?: string | null
+  isOnChain?: boolean
+  blockchainStatus?: $Enums.BlockchainStatus
+  blockchainUpdatedAt?: Date | string | null
   sla?: string | null
   AIabusedFlag?: boolean | null
   AIimageVarificationStatus?: boolean | null
@@ -2323,6 +2563,12 @@ export type ComplaintCreateWithoutEscalatedToSuperStateAdminInput = {
   dateOfResolution?: Date | string | null
   escalationLevel?: string | null
   seq?: number
+  blockchainHash?: string | null
+  blockchainBlock?: bigint | number | null
+  ipfsHash?: string | null
+  isOnChain?: boolean
+  blockchainStatus?: $Enums.BlockchainStatus
+  blockchainUpdatedAt?: Date | string | null
   sla?: string | null
   AIabusedFlag?: boolean | null
   AIimageVarificationStatus?: boolean | null
@@ -2371,6 +2617,12 @@ export type ComplaintUncheckedCreateWithoutEscalatedToSuperStateAdminInput = {
   managedBySuperAdminId?: string | null
   moderatedByMunicipalAdminId?: string | null
   seq?: number
+  blockchainHash?: string | null
+  blockchainBlock?: bigint | number | null
+  ipfsHash?: string | null
+  isOnChain?: boolean
+  blockchainStatus?: $Enums.BlockchainStatus
+  blockchainUpdatedAt?: Date | string | null
   sla?: string | null
   AIabusedFlag?: boolean | null
   AIimageVarificationStatus?: boolean | null
@@ -2429,6 +2681,12 @@ export type ComplaintCreateWithoutManagedBySuperAdminInput = {
   dateOfResolution?: Date | string | null
   escalationLevel?: string | null
   seq?: number
+  blockchainHash?: string | null
+  blockchainBlock?: bigint | number | null
+  ipfsHash?: string | null
+  isOnChain?: boolean
+  blockchainStatus?: $Enums.BlockchainStatus
+  blockchainUpdatedAt?: Date | string | null
   sla?: string | null
   AIabusedFlag?: boolean | null
   AIimageVarificationStatus?: boolean | null
@@ -2477,6 +2735,12 @@ export type ComplaintUncheckedCreateWithoutManagedBySuperAdminInput = {
   managedByMunicipalAdminId?: string | null
   moderatedByMunicipalAdminId?: string | null
   seq?: number
+  blockchainHash?: string | null
+  blockchainBlock?: bigint | number | null
+  ipfsHash?: string | null
+  isOnChain?: boolean
+  blockchainStatus?: $Enums.BlockchainStatus
+  blockchainUpdatedAt?: Date | string | null
   sla?: string | null
   AIabusedFlag?: boolean | null
   AIimageVarificationStatus?: boolean | null
@@ -2535,6 +2799,12 @@ export type ComplaintCreateWithoutCategoryInput = {
   dateOfResolution?: Date | string | null
   escalationLevel?: string | null
   seq?: number
+  blockchainHash?: string | null
+  blockchainBlock?: bigint | number | null
+  ipfsHash?: string | null
+  isOnChain?: boolean
+  blockchainStatus?: $Enums.BlockchainStatus
+  blockchainUpdatedAt?: Date | string | null
   sla?: string | null
   AIabusedFlag?: boolean | null
   AIimageVarificationStatus?: boolean | null
@@ -2583,6 +2853,12 @@ export type ComplaintUncheckedCreateWithoutCategoryInput = {
   managedBySuperAdminId?: string | null
   moderatedByMunicipalAdminId?: string | null
   seq?: number
+  blockchainHash?: string | null
+  blockchainBlock?: bigint | number | null
+  ipfsHash?: string | null
+  isOnChain?: boolean
+  blockchainStatus?: $Enums.BlockchainStatus
+  blockchainUpdatedAt?: Date | string | null
   sla?: string | null
   AIabusedFlag?: boolean | null
   AIimageVarificationStatus?: boolean | null
@@ -2641,6 +2917,12 @@ export type ComplaintCreateWithoutLocationInput = {
   dateOfResolution?: Date | string | null
   escalationLevel?: string | null
   seq?: number
+  blockchainHash?: string | null
+  blockchainBlock?: bigint | number | null
+  ipfsHash?: string | null
+  isOnChain?: boolean
+  blockchainStatus?: $Enums.BlockchainStatus
+  blockchainUpdatedAt?: Date | string | null
   sla?: string | null
   AIabusedFlag?: boolean | null
   AIimageVarificationStatus?: boolean | null
@@ -2690,6 +2972,12 @@ export type ComplaintUncheckedCreateWithoutLocationInput = {
   managedBySuperAdminId?: string | null
   moderatedByMunicipalAdminId?: string | null
   seq?: number
+  blockchainHash?: string | null
+  blockchainBlock?: bigint | number | null
+  ipfsHash?: string | null
+  isOnChain?: boolean
+  blockchainStatus?: $Enums.BlockchainStatus
+  blockchainUpdatedAt?: Date | string | null
   sla?: string | null
   AIabusedFlag?: boolean | null
   AIimageVarificationStatus?: boolean | null
@@ -2736,6 +3024,12 @@ export type ComplaintUpdateWithoutLocationInput = {
   assignedDepartment?: Prisma.StringFieldUpdateOperationsInput | string
   dateOfResolution?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   escalationLevel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  blockchainHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  blockchainBlock?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
+  ipfsHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isOnChain?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  blockchainStatus?: Prisma.EnumBlockchainStatusFieldUpdateOperationsInput | $Enums.BlockchainStatus
+  blockchainUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   sla?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   AIabusedFlag?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   AIimageVarificationStatus?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
@@ -2785,6 +3079,12 @@ export type ComplaintUncheckedUpdateWithoutLocationInput = {
   managedBySuperAdminId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   moderatedByMunicipalAdminId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   seq?: Prisma.IntFieldUpdateOperationsInput | number
+  blockchainHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  blockchainBlock?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
+  ipfsHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isOnChain?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  blockchainStatus?: Prisma.EnumBlockchainStatusFieldUpdateOperationsInput | $Enums.BlockchainStatus
+  blockchainUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   sla?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   AIabusedFlag?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   AIimageVarificationStatus?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
@@ -2816,6 +3116,12 @@ export type ComplaintCreateWithoutUpvotesInput = {
   dateOfResolution?: Date | string | null
   escalationLevel?: string | null
   seq?: number
+  blockchainHash?: string | null
+  blockchainBlock?: bigint | number | null
+  ipfsHash?: string | null
+  isOnChain?: boolean
+  blockchainStatus?: $Enums.BlockchainStatus
+  blockchainUpdatedAt?: Date | string | null
   sla?: string | null
   AIabusedFlag?: boolean | null
   AIimageVarificationStatus?: boolean | null
@@ -2865,6 +3171,12 @@ export type ComplaintUncheckedCreateWithoutUpvotesInput = {
   managedBySuperAdminId?: string | null
   moderatedByMunicipalAdminId?: string | null
   seq?: number
+  blockchainHash?: string | null
+  blockchainBlock?: bigint | number | null
+  ipfsHash?: string | null
+  isOnChain?: boolean
+  blockchainStatus?: $Enums.BlockchainStatus
+  blockchainUpdatedAt?: Date | string | null
   sla?: string | null
   AIabusedFlag?: boolean | null
   AIimageVarificationStatus?: boolean | null
@@ -2911,6 +3223,12 @@ export type ComplaintUpdateWithoutUpvotesInput = {
   assignedDepartment?: Prisma.StringFieldUpdateOperationsInput | string
   dateOfResolution?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   escalationLevel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  blockchainHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  blockchainBlock?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
+  ipfsHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isOnChain?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  blockchainStatus?: Prisma.EnumBlockchainStatusFieldUpdateOperationsInput | $Enums.BlockchainStatus
+  blockchainUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   sla?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   AIabusedFlag?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   AIimageVarificationStatus?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
@@ -2960,6 +3278,12 @@ export type ComplaintUncheckedUpdateWithoutUpvotesInput = {
   managedBySuperAdminId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   moderatedByMunicipalAdminId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   seq?: Prisma.IntFieldUpdateOperationsInput | number
+  blockchainHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  blockchainBlock?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
+  ipfsHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isOnChain?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  blockchainStatus?: Prisma.EnumBlockchainStatusFieldUpdateOperationsInput | $Enums.BlockchainStatus
+  blockchainUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   sla?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   AIabusedFlag?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   AIimageVarificationStatus?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
@@ -2991,6 +3315,12 @@ export type ComplaintCreateWithoutAuditLogsInput = {
   dateOfResolution?: Date | string | null
   escalationLevel?: string | null
   seq?: number
+  blockchainHash?: string | null
+  blockchainBlock?: bigint | number | null
+  ipfsHash?: string | null
+  isOnChain?: boolean
+  blockchainStatus?: $Enums.BlockchainStatus
+  blockchainUpdatedAt?: Date | string | null
   sla?: string | null
   AIabusedFlag?: boolean | null
   AIimageVarificationStatus?: boolean | null
@@ -3040,6 +3370,12 @@ export type ComplaintUncheckedCreateWithoutAuditLogsInput = {
   managedBySuperAdminId?: string | null
   moderatedByMunicipalAdminId?: string | null
   seq?: number
+  blockchainHash?: string | null
+  blockchainBlock?: bigint | number | null
+  ipfsHash?: string | null
+  isOnChain?: boolean
+  blockchainStatus?: $Enums.BlockchainStatus
+  blockchainUpdatedAt?: Date | string | null
   sla?: string | null
   AIabusedFlag?: boolean | null
   AIimageVarificationStatus?: boolean | null
@@ -3086,6 +3422,12 @@ export type ComplaintUpdateWithoutAuditLogsInput = {
   assignedDepartment?: Prisma.StringFieldUpdateOperationsInput | string
   dateOfResolution?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   escalationLevel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  blockchainHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  blockchainBlock?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
+  ipfsHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isOnChain?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  blockchainStatus?: Prisma.EnumBlockchainStatusFieldUpdateOperationsInput | $Enums.BlockchainStatus
+  blockchainUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   sla?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   AIabusedFlag?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   AIimageVarificationStatus?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
@@ -3135,6 +3477,12 @@ export type ComplaintUncheckedUpdateWithoutAuditLogsInput = {
   managedBySuperAdminId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   moderatedByMunicipalAdminId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   seq?: Prisma.IntFieldUpdateOperationsInput | number
+  blockchainHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  blockchainBlock?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
+  ipfsHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isOnChain?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  blockchainStatus?: Prisma.EnumBlockchainStatusFieldUpdateOperationsInput | $Enums.BlockchainStatus
+  blockchainUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   sla?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   AIabusedFlag?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   AIimageVarificationStatus?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
@@ -3166,6 +3514,12 @@ export type ComplaintCreateWithoutChatsInput = {
   dateOfResolution?: Date | string | null
   escalationLevel?: string | null
   seq?: number
+  blockchainHash?: string | null
+  blockchainBlock?: bigint | number | null
+  ipfsHash?: string | null
+  isOnChain?: boolean
+  blockchainStatus?: $Enums.BlockchainStatus
+  blockchainUpdatedAt?: Date | string | null
   sla?: string | null
   AIabusedFlag?: boolean | null
   AIimageVarificationStatus?: boolean | null
@@ -3215,6 +3569,12 @@ export type ComplaintUncheckedCreateWithoutChatsInput = {
   managedBySuperAdminId?: string | null
   moderatedByMunicipalAdminId?: string | null
   seq?: number
+  blockchainHash?: string | null
+  blockchainBlock?: bigint | number | null
+  ipfsHash?: string | null
+  isOnChain?: boolean
+  blockchainStatus?: $Enums.BlockchainStatus
+  blockchainUpdatedAt?: Date | string | null
   sla?: string | null
   AIabusedFlag?: boolean | null
   AIimageVarificationStatus?: boolean | null
@@ -3261,6 +3621,12 @@ export type ComplaintUpdateWithoutChatsInput = {
   assignedDepartment?: Prisma.StringFieldUpdateOperationsInput | string
   dateOfResolution?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   escalationLevel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  blockchainHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  blockchainBlock?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
+  ipfsHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isOnChain?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  blockchainStatus?: Prisma.EnumBlockchainStatusFieldUpdateOperationsInput | $Enums.BlockchainStatus
+  blockchainUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   sla?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   AIabusedFlag?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   AIimageVarificationStatus?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
@@ -3310,6 +3676,12 @@ export type ComplaintUncheckedUpdateWithoutChatsInput = {
   managedBySuperAdminId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   moderatedByMunicipalAdminId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   seq?: Prisma.IntFieldUpdateOperationsInput | number
+  blockchainHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  blockchainBlock?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
+  ipfsHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isOnChain?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  blockchainStatus?: Prisma.EnumBlockchainStatusFieldUpdateOperationsInput | $Enums.BlockchainStatus
+  blockchainUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   sla?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   AIabusedFlag?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   AIimageVarificationStatus?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
@@ -3349,6 +3721,12 @@ export type ComplaintCreateManyUserInput = {
   managedBySuperAdminId?: string | null
   moderatedByMunicipalAdminId?: string | null
   seq?: number
+  blockchainHash?: string | null
+  blockchainBlock?: bigint | number | null
+  ipfsHash?: string | null
+  isOnChain?: boolean
+  blockchainStatus?: $Enums.BlockchainStatus
+  blockchainUpdatedAt?: Date | string | null
   sla?: string | null
   AIabusedFlag?: boolean | null
   AIimageVarificationStatus?: boolean | null
@@ -3375,6 +3753,12 @@ export type ComplaintUpdateWithoutUserInput = {
   assignedDepartment?: Prisma.StringFieldUpdateOperationsInput | string
   dateOfResolution?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   escalationLevel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  blockchainHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  blockchainBlock?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
+  ipfsHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isOnChain?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  blockchainStatus?: Prisma.EnumBlockchainStatusFieldUpdateOperationsInput | $Enums.BlockchainStatus
+  blockchainUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   sla?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   AIabusedFlag?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   AIimageVarificationStatus?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
@@ -3423,6 +3807,12 @@ export type ComplaintUncheckedUpdateWithoutUserInput = {
   managedBySuperAdminId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   moderatedByMunicipalAdminId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   seq?: Prisma.IntFieldUpdateOperationsInput | number
+  blockchainHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  blockchainBlock?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
+  ipfsHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isOnChain?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  blockchainStatus?: Prisma.EnumBlockchainStatusFieldUpdateOperationsInput | $Enums.BlockchainStatus
+  blockchainUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   sla?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   AIabusedFlag?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   AIimageVarificationStatus?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
@@ -3463,6 +3853,12 @@ export type ComplaintUncheckedUpdateManyWithoutUserInput = {
   managedBySuperAdminId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   moderatedByMunicipalAdminId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   seq?: Prisma.IntFieldUpdateOperationsInput | number
+  blockchainHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  blockchainBlock?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
+  ipfsHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isOnChain?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  blockchainStatus?: Prisma.EnumBlockchainStatusFieldUpdateOperationsInput | $Enums.BlockchainStatus
+  blockchainUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   sla?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   AIabusedFlag?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   AIimageVarificationStatus?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
@@ -3498,6 +3894,12 @@ export type ComplaintCreateManyAssignedAgentInput = {
   managedBySuperAdminId?: string | null
   moderatedByMunicipalAdminId?: string | null
   seq?: number
+  blockchainHash?: string | null
+  blockchainBlock?: bigint | number | null
+  ipfsHash?: string | null
+  isOnChain?: boolean
+  blockchainStatus?: $Enums.BlockchainStatus
+  blockchainUpdatedAt?: Date | string | null
   sla?: string | null
   AIabusedFlag?: boolean | null
   AIimageVarificationStatus?: boolean | null
@@ -3524,6 +3926,12 @@ export type ComplaintUpdateWithoutAssignedAgentInput = {
   assignedDepartment?: Prisma.StringFieldUpdateOperationsInput | string
   dateOfResolution?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   escalationLevel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  blockchainHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  blockchainBlock?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
+  ipfsHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isOnChain?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  blockchainStatus?: Prisma.EnumBlockchainStatusFieldUpdateOperationsInput | $Enums.BlockchainStatus
+  blockchainUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   sla?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   AIabusedFlag?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   AIimageVarificationStatus?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
@@ -3572,6 +3980,12 @@ export type ComplaintUncheckedUpdateWithoutAssignedAgentInput = {
   managedBySuperAdminId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   moderatedByMunicipalAdminId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   seq?: Prisma.IntFieldUpdateOperationsInput | number
+  blockchainHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  blockchainBlock?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
+  ipfsHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isOnChain?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  blockchainStatus?: Prisma.EnumBlockchainStatusFieldUpdateOperationsInput | $Enums.BlockchainStatus
+  blockchainUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   sla?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   AIabusedFlag?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   AIimageVarificationStatus?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
@@ -3612,6 +4026,12 @@ export type ComplaintUncheckedUpdateManyWithoutAssignedAgentInput = {
   managedBySuperAdminId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   moderatedByMunicipalAdminId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   seq?: Prisma.IntFieldUpdateOperationsInput | number
+  blockchainHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  blockchainBlock?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
+  ipfsHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isOnChain?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  blockchainStatus?: Prisma.EnumBlockchainStatusFieldUpdateOperationsInput | $Enums.BlockchainStatus
+  blockchainUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   sla?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   AIabusedFlag?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   AIimageVarificationStatus?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
@@ -3638,6 +4058,12 @@ export type ComplaintUpdateWithoutCoAssignedAgentsInput = {
   assignedDepartment?: Prisma.StringFieldUpdateOperationsInput | string
   dateOfResolution?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   escalationLevel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  blockchainHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  blockchainBlock?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
+  ipfsHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isOnChain?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  blockchainStatus?: Prisma.EnumBlockchainStatusFieldUpdateOperationsInput | $Enums.BlockchainStatus
+  blockchainUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   sla?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   AIabusedFlag?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   AIimageVarificationStatus?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
@@ -3687,6 +4113,12 @@ export type ComplaintUncheckedUpdateWithoutCoAssignedAgentsInput = {
   managedBySuperAdminId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   moderatedByMunicipalAdminId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   seq?: Prisma.IntFieldUpdateOperationsInput | number
+  blockchainHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  blockchainBlock?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
+  ipfsHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isOnChain?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  blockchainStatus?: Prisma.EnumBlockchainStatusFieldUpdateOperationsInput | $Enums.BlockchainStatus
+  blockchainUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   sla?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   AIabusedFlag?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   AIimageVarificationStatus?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
@@ -3727,6 +4159,12 @@ export type ComplaintUncheckedUpdateManyWithoutCoAssignedAgentsInput = {
   managedBySuperAdminId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   moderatedByMunicipalAdminId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   seq?: Prisma.IntFieldUpdateOperationsInput | number
+  blockchainHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  blockchainBlock?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
+  ipfsHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isOnChain?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  blockchainStatus?: Prisma.EnumBlockchainStatusFieldUpdateOperationsInput | $Enums.BlockchainStatus
+  blockchainUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   sla?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   AIabusedFlag?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   AIimageVarificationStatus?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
@@ -3762,6 +4200,12 @@ export type ComplaintCreateManyManagedByMunicipalAdminInput = {
   managedBySuperAdminId?: string | null
   moderatedByMunicipalAdminId?: string | null
   seq?: number
+  blockchainHash?: string | null
+  blockchainBlock?: bigint | number | null
+  ipfsHash?: string | null
+  isOnChain?: boolean
+  blockchainStatus?: $Enums.BlockchainStatus
+  blockchainUpdatedAt?: Date | string | null
   sla?: string | null
   AIabusedFlag?: boolean | null
   AIimageVarificationStatus?: boolean | null
@@ -3797,6 +4241,12 @@ export type ComplaintCreateManyModeratedByMunicipalAdminInput = {
   managedByMunicipalAdminId?: string | null
   managedBySuperAdminId?: string | null
   seq?: number
+  blockchainHash?: string | null
+  blockchainBlock?: bigint | number | null
+  ipfsHash?: string | null
+  isOnChain?: boolean
+  blockchainStatus?: $Enums.BlockchainStatus
+  blockchainUpdatedAt?: Date | string | null
   sla?: string | null
   AIabusedFlag?: boolean | null
   AIimageVarificationStatus?: boolean | null
@@ -3823,6 +4273,12 @@ export type ComplaintUpdateWithoutManagedByMunicipalAdminInput = {
   assignedDepartment?: Prisma.StringFieldUpdateOperationsInput | string
   dateOfResolution?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   escalationLevel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  blockchainHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  blockchainBlock?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
+  ipfsHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isOnChain?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  blockchainStatus?: Prisma.EnumBlockchainStatusFieldUpdateOperationsInput | $Enums.BlockchainStatus
+  blockchainUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   sla?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   AIabusedFlag?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   AIimageVarificationStatus?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
@@ -3871,6 +4327,12 @@ export type ComplaintUncheckedUpdateWithoutManagedByMunicipalAdminInput = {
   managedBySuperAdminId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   moderatedByMunicipalAdminId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   seq?: Prisma.IntFieldUpdateOperationsInput | number
+  blockchainHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  blockchainBlock?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
+  ipfsHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isOnChain?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  blockchainStatus?: Prisma.EnumBlockchainStatusFieldUpdateOperationsInput | $Enums.BlockchainStatus
+  blockchainUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   sla?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   AIabusedFlag?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   AIimageVarificationStatus?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
@@ -3911,6 +4373,12 @@ export type ComplaintUncheckedUpdateManyWithoutManagedByMunicipalAdminInput = {
   managedBySuperAdminId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   moderatedByMunicipalAdminId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   seq?: Prisma.IntFieldUpdateOperationsInput | number
+  blockchainHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  blockchainBlock?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
+  ipfsHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isOnChain?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  blockchainStatus?: Prisma.EnumBlockchainStatusFieldUpdateOperationsInput | $Enums.BlockchainStatus
+  blockchainUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   sla?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   AIabusedFlag?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   AIimageVarificationStatus?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
@@ -3937,6 +4405,12 @@ export type ComplaintUpdateWithoutModeratedByMunicipalAdminInput = {
   assignedDepartment?: Prisma.StringFieldUpdateOperationsInput | string
   dateOfResolution?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   escalationLevel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  blockchainHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  blockchainBlock?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
+  ipfsHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isOnChain?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  blockchainStatus?: Prisma.EnumBlockchainStatusFieldUpdateOperationsInput | $Enums.BlockchainStatus
+  blockchainUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   sla?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   AIabusedFlag?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   AIimageVarificationStatus?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
@@ -3985,6 +4459,12 @@ export type ComplaintUncheckedUpdateWithoutModeratedByMunicipalAdminInput = {
   managedByMunicipalAdminId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   managedBySuperAdminId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   seq?: Prisma.IntFieldUpdateOperationsInput | number
+  blockchainHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  blockchainBlock?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
+  ipfsHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isOnChain?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  blockchainStatus?: Prisma.EnumBlockchainStatusFieldUpdateOperationsInput | $Enums.BlockchainStatus
+  blockchainUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   sla?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   AIabusedFlag?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   AIimageVarificationStatus?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
@@ -4025,6 +4505,12 @@ export type ComplaintUncheckedUpdateManyWithoutModeratedByMunicipalAdminInput = 
   managedByMunicipalAdminId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   managedBySuperAdminId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   seq?: Prisma.IntFieldUpdateOperationsInput | number
+  blockchainHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  blockchainBlock?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
+  ipfsHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isOnChain?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  blockchainStatus?: Prisma.EnumBlockchainStatusFieldUpdateOperationsInput | $Enums.BlockchainStatus
+  blockchainUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   sla?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   AIabusedFlag?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   AIimageVarificationStatus?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
@@ -4060,6 +4546,12 @@ export type ComplaintCreateManyCrossDeptIssueSuperMunicipalInput = {
   managedBySuperAdminId?: string | null
   moderatedByMunicipalAdminId?: string | null
   seq?: number
+  blockchainHash?: string | null
+  blockchainBlock?: bigint | number | null
+  ipfsHash?: string | null
+  isOnChain?: boolean
+  blockchainStatus?: $Enums.BlockchainStatus
+  blockchainUpdatedAt?: Date | string | null
   sla?: string | null
   AIabusedFlag?: boolean | null
   AIimageVarificationStatus?: boolean | null
@@ -4086,6 +4578,12 @@ export type ComplaintUpdateWithoutCrossDeptIssueSuperMunicipalInput = {
   assignedDepartment?: Prisma.StringFieldUpdateOperationsInput | string
   dateOfResolution?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   escalationLevel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  blockchainHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  blockchainBlock?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
+  ipfsHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isOnChain?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  blockchainStatus?: Prisma.EnumBlockchainStatusFieldUpdateOperationsInput | $Enums.BlockchainStatus
+  blockchainUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   sla?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   AIabusedFlag?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   AIimageVarificationStatus?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
@@ -4134,6 +4632,12 @@ export type ComplaintUncheckedUpdateWithoutCrossDeptIssueSuperMunicipalInput = {
   managedBySuperAdminId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   moderatedByMunicipalAdminId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   seq?: Prisma.IntFieldUpdateOperationsInput | number
+  blockchainHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  blockchainBlock?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
+  ipfsHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isOnChain?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  blockchainStatus?: Prisma.EnumBlockchainStatusFieldUpdateOperationsInput | $Enums.BlockchainStatus
+  blockchainUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   sla?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   AIabusedFlag?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   AIimageVarificationStatus?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
@@ -4174,6 +4678,12 @@ export type ComplaintUncheckedUpdateManyWithoutCrossDeptIssueSuperMunicipalInput
   managedBySuperAdminId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   moderatedByMunicipalAdminId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   seq?: Prisma.IntFieldUpdateOperationsInput | number
+  blockchainHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  blockchainBlock?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
+  ipfsHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isOnChain?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  blockchainStatus?: Prisma.EnumBlockchainStatusFieldUpdateOperationsInput | $Enums.BlockchainStatus
+  blockchainUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   sla?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   AIabusedFlag?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   AIimageVarificationStatus?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
@@ -4209,6 +4719,12 @@ export type ComplaintCreateManyEscalatedToStateAdminInput = {
   managedBySuperAdminId?: string | null
   moderatedByMunicipalAdminId?: string | null
   seq?: number
+  blockchainHash?: string | null
+  blockchainBlock?: bigint | number | null
+  ipfsHash?: string | null
+  isOnChain?: boolean
+  blockchainStatus?: $Enums.BlockchainStatus
+  blockchainUpdatedAt?: Date | string | null
   sla?: string | null
   AIabusedFlag?: boolean | null
   AIimageVarificationStatus?: boolean | null
@@ -4235,6 +4751,12 @@ export type ComplaintUpdateWithoutEscalatedToStateAdminInput = {
   assignedDepartment?: Prisma.StringFieldUpdateOperationsInput | string
   dateOfResolution?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   escalationLevel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  blockchainHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  blockchainBlock?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
+  ipfsHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isOnChain?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  blockchainStatus?: Prisma.EnumBlockchainStatusFieldUpdateOperationsInput | $Enums.BlockchainStatus
+  blockchainUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   sla?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   AIabusedFlag?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   AIimageVarificationStatus?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
@@ -4283,6 +4805,12 @@ export type ComplaintUncheckedUpdateWithoutEscalatedToStateAdminInput = {
   managedBySuperAdminId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   moderatedByMunicipalAdminId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   seq?: Prisma.IntFieldUpdateOperationsInput | number
+  blockchainHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  blockchainBlock?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
+  ipfsHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isOnChain?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  blockchainStatus?: Prisma.EnumBlockchainStatusFieldUpdateOperationsInput | $Enums.BlockchainStatus
+  blockchainUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   sla?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   AIabusedFlag?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   AIimageVarificationStatus?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
@@ -4323,6 +4851,12 @@ export type ComplaintUncheckedUpdateManyWithoutEscalatedToStateAdminInput = {
   managedBySuperAdminId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   moderatedByMunicipalAdminId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   seq?: Prisma.IntFieldUpdateOperationsInput | number
+  blockchainHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  blockchainBlock?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
+  ipfsHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isOnChain?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  blockchainStatus?: Prisma.EnumBlockchainStatusFieldUpdateOperationsInput | $Enums.BlockchainStatus
+  blockchainUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   sla?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   AIabusedFlag?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   AIimageVarificationStatus?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
@@ -4358,6 +4892,12 @@ export type ComplaintCreateManyEscalatedToSuperStateAdminInput = {
   managedBySuperAdminId?: string | null
   moderatedByMunicipalAdminId?: string | null
   seq?: number
+  blockchainHash?: string | null
+  blockchainBlock?: bigint | number | null
+  ipfsHash?: string | null
+  isOnChain?: boolean
+  blockchainStatus?: $Enums.BlockchainStatus
+  blockchainUpdatedAt?: Date | string | null
   sla?: string | null
   AIabusedFlag?: boolean | null
   AIimageVarificationStatus?: boolean | null
@@ -4384,6 +4924,12 @@ export type ComplaintUpdateWithoutEscalatedToSuperStateAdminInput = {
   assignedDepartment?: Prisma.StringFieldUpdateOperationsInput | string
   dateOfResolution?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   escalationLevel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  blockchainHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  blockchainBlock?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
+  ipfsHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isOnChain?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  blockchainStatus?: Prisma.EnumBlockchainStatusFieldUpdateOperationsInput | $Enums.BlockchainStatus
+  blockchainUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   sla?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   AIabusedFlag?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   AIimageVarificationStatus?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
@@ -4432,6 +4978,12 @@ export type ComplaintUncheckedUpdateWithoutEscalatedToSuperStateAdminInput = {
   managedBySuperAdminId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   moderatedByMunicipalAdminId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   seq?: Prisma.IntFieldUpdateOperationsInput | number
+  blockchainHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  blockchainBlock?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
+  ipfsHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isOnChain?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  blockchainStatus?: Prisma.EnumBlockchainStatusFieldUpdateOperationsInput | $Enums.BlockchainStatus
+  blockchainUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   sla?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   AIabusedFlag?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   AIimageVarificationStatus?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
@@ -4472,6 +5024,12 @@ export type ComplaintUncheckedUpdateManyWithoutEscalatedToSuperStateAdminInput =
   managedBySuperAdminId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   moderatedByMunicipalAdminId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   seq?: Prisma.IntFieldUpdateOperationsInput | number
+  blockchainHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  blockchainBlock?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
+  ipfsHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isOnChain?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  blockchainStatus?: Prisma.EnumBlockchainStatusFieldUpdateOperationsInput | $Enums.BlockchainStatus
+  blockchainUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   sla?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   AIabusedFlag?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   AIimageVarificationStatus?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
@@ -4507,6 +5065,12 @@ export type ComplaintCreateManyManagedBySuperAdminInput = {
   managedByMunicipalAdminId?: string | null
   moderatedByMunicipalAdminId?: string | null
   seq?: number
+  blockchainHash?: string | null
+  blockchainBlock?: bigint | number | null
+  ipfsHash?: string | null
+  isOnChain?: boolean
+  blockchainStatus?: $Enums.BlockchainStatus
+  blockchainUpdatedAt?: Date | string | null
   sla?: string | null
   AIabusedFlag?: boolean | null
   AIimageVarificationStatus?: boolean | null
@@ -4533,6 +5097,12 @@ export type ComplaintUpdateWithoutManagedBySuperAdminInput = {
   assignedDepartment?: Prisma.StringFieldUpdateOperationsInput | string
   dateOfResolution?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   escalationLevel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  blockchainHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  blockchainBlock?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
+  ipfsHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isOnChain?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  blockchainStatus?: Prisma.EnumBlockchainStatusFieldUpdateOperationsInput | $Enums.BlockchainStatus
+  blockchainUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   sla?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   AIabusedFlag?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   AIimageVarificationStatus?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
@@ -4581,6 +5151,12 @@ export type ComplaintUncheckedUpdateWithoutManagedBySuperAdminInput = {
   managedByMunicipalAdminId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   moderatedByMunicipalAdminId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   seq?: Prisma.IntFieldUpdateOperationsInput | number
+  blockchainHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  blockchainBlock?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
+  ipfsHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isOnChain?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  blockchainStatus?: Prisma.EnumBlockchainStatusFieldUpdateOperationsInput | $Enums.BlockchainStatus
+  blockchainUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   sla?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   AIabusedFlag?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   AIimageVarificationStatus?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
@@ -4621,6 +5197,12 @@ export type ComplaintUncheckedUpdateManyWithoutManagedBySuperAdminInput = {
   managedByMunicipalAdminId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   moderatedByMunicipalAdminId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   seq?: Prisma.IntFieldUpdateOperationsInput | number
+  blockchainHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  blockchainBlock?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
+  ipfsHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isOnChain?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  blockchainStatus?: Prisma.EnumBlockchainStatusFieldUpdateOperationsInput | $Enums.BlockchainStatus
+  blockchainUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   sla?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   AIabusedFlag?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   AIimageVarificationStatus?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
@@ -4656,6 +5238,12 @@ export type ComplaintCreateManyCategoryInput = {
   managedBySuperAdminId?: string | null
   moderatedByMunicipalAdminId?: string | null
   seq?: number
+  blockchainHash?: string | null
+  blockchainBlock?: bigint | number | null
+  ipfsHash?: string | null
+  isOnChain?: boolean
+  blockchainStatus?: $Enums.BlockchainStatus
+  blockchainUpdatedAt?: Date | string | null
   sla?: string | null
   AIabusedFlag?: boolean | null
   AIimageVarificationStatus?: boolean | null
@@ -4682,6 +5270,12 @@ export type ComplaintUpdateWithoutCategoryInput = {
   assignedDepartment?: Prisma.StringFieldUpdateOperationsInput | string
   dateOfResolution?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   escalationLevel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  blockchainHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  blockchainBlock?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
+  ipfsHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isOnChain?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  blockchainStatus?: Prisma.EnumBlockchainStatusFieldUpdateOperationsInput | $Enums.BlockchainStatus
+  blockchainUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   sla?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   AIabusedFlag?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   AIimageVarificationStatus?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
@@ -4730,6 +5324,12 @@ export type ComplaintUncheckedUpdateWithoutCategoryInput = {
   managedBySuperAdminId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   moderatedByMunicipalAdminId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   seq?: Prisma.IntFieldUpdateOperationsInput | number
+  blockchainHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  blockchainBlock?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
+  ipfsHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isOnChain?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  blockchainStatus?: Prisma.EnumBlockchainStatusFieldUpdateOperationsInput | $Enums.BlockchainStatus
+  blockchainUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   sla?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   AIabusedFlag?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   AIimageVarificationStatus?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
@@ -4770,6 +5370,12 @@ export type ComplaintUncheckedUpdateManyWithoutCategoryInput = {
   managedBySuperAdminId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   moderatedByMunicipalAdminId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   seq?: Prisma.IntFieldUpdateOperationsInput | number
+  blockchainHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  blockchainBlock?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
+  ipfsHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isOnChain?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  blockchainStatus?: Prisma.EnumBlockchainStatusFieldUpdateOperationsInput | $Enums.BlockchainStatus
+  blockchainUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   sla?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   AIabusedFlag?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   AIimageVarificationStatus?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
@@ -4864,6 +5470,12 @@ export type ComplaintSelect<ExtArgs extends runtime.Types.Extensions.InternalArg
   managedBySuperAdminId?: boolean
   moderatedByMunicipalAdminId?: boolean
   seq?: boolean
+  blockchainHash?: boolean
+  blockchainBlock?: boolean
+  ipfsHash?: boolean
+  isOnChain?: boolean
+  blockchainStatus?: boolean
+  blockchainUpdatedAt?: boolean
   sla?: boolean
   AIabusedFlag?: boolean
   AIimageVarificationStatus?: boolean
@@ -4915,6 +5527,12 @@ export type ComplaintSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Ext
   managedBySuperAdminId?: boolean
   moderatedByMunicipalAdminId?: boolean
   seq?: boolean
+  blockchainHash?: boolean
+  blockchainBlock?: boolean
+  ipfsHash?: boolean
+  isOnChain?: boolean
+  blockchainStatus?: boolean
+  blockchainUpdatedAt?: boolean
   sla?: boolean
   AIabusedFlag?: boolean
   AIimageVarificationStatus?: boolean
@@ -4960,6 +5578,12 @@ export type ComplaintSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Ext
   managedBySuperAdminId?: boolean
   moderatedByMunicipalAdminId?: boolean
   seq?: boolean
+  blockchainHash?: boolean
+  blockchainBlock?: boolean
+  ipfsHash?: boolean
+  isOnChain?: boolean
+  blockchainStatus?: boolean
+  blockchainUpdatedAt?: boolean
   sla?: boolean
   AIabusedFlag?: boolean
   AIimageVarificationStatus?: boolean
@@ -5005,6 +5629,12 @@ export type ComplaintSelectScalar = {
   managedBySuperAdminId?: boolean
   moderatedByMunicipalAdminId?: boolean
   seq?: boolean
+  blockchainHash?: boolean
+  blockchainBlock?: boolean
+  ipfsHash?: boolean
+  isOnChain?: boolean
+  blockchainStatus?: boolean
+  blockchainUpdatedAt?: boolean
   sla?: boolean
   AIabusedFlag?: boolean
   AIimageVarificationStatus?: boolean
@@ -5018,7 +5648,7 @@ export type ComplaintSelectScalar = {
   abuseMetadata?: boolean
 }
 
-export type ComplaintOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "submissionDate" | "complainantId" | "subCategory" | "description" | "urgency" | "attachmentUrl" | "status" | "upvoteCount" | "isPublic" | "assignedAgentId" | "assignedDepartment" | "categoryId" | "crossDeptIssueSuperMunicipalId" | "dateOfResolution" | "escalatedToStateAdminId" | "escalatedToSuperStateAdminId" | "escalationLevel" | "managedByMunicipalAdminId" | "managedBySuperAdminId" | "moderatedByMunicipalAdminId" | "seq" | "sla" | "AIabusedFlag" | "AIimageVarificationStatus" | "AIstandardizedSubCategory" | "lastUpdated" | "isDuplicate" | "qualityScore" | "qualityBreakdown" | "hasSimilarComplaints" | "similarComplaintIds" | "abuseMetadata", ExtArgs["result"]["complaint"]>
+export type ComplaintOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "submissionDate" | "complainantId" | "subCategory" | "description" | "urgency" | "attachmentUrl" | "status" | "upvoteCount" | "isPublic" | "assignedAgentId" | "assignedDepartment" | "categoryId" | "crossDeptIssueSuperMunicipalId" | "dateOfResolution" | "escalatedToStateAdminId" | "escalatedToSuperStateAdminId" | "escalationLevel" | "managedByMunicipalAdminId" | "managedBySuperAdminId" | "moderatedByMunicipalAdminId" | "seq" | "blockchainHash" | "blockchainBlock" | "ipfsHash" | "isOnChain" | "blockchainStatus" | "blockchainUpdatedAt" | "sla" | "AIabusedFlag" | "AIimageVarificationStatus" | "AIstandardizedSubCategory" | "lastUpdated" | "isDuplicate" | "qualityScore" | "qualityBreakdown" | "hasSimilarComplaints" | "similarComplaintIds" | "abuseMetadata", ExtArgs["result"]["complaint"]>
 export type ComplaintInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   assignedAgent?: boolean | Prisma.Complaint$assignedAgentArgs<ExtArgs>
   category?: boolean | Prisma.CategoryDefaultArgs<ExtArgs>
@@ -5100,6 +5730,12 @@ export type $ComplaintPayload<ExtArgs extends runtime.Types.Extensions.InternalA
     managedBySuperAdminId: string | null
     moderatedByMunicipalAdminId: string | null
     seq: number
+    blockchainHash: string | null
+    blockchainBlock: bigint | null
+    ipfsHash: string | null
+    isOnChain: boolean
+    blockchainStatus: $Enums.BlockchainStatus
+    blockchainUpdatedAt: Date | null
     sla: string | null
     AIabusedFlag: boolean | null
     AIimageVarificationStatus: boolean | null
@@ -5570,6 +6206,12 @@ export interface ComplaintFieldRefs {
   readonly managedBySuperAdminId: Prisma.FieldRef<"Complaint", 'String'>
   readonly moderatedByMunicipalAdminId: Prisma.FieldRef<"Complaint", 'String'>
   readonly seq: Prisma.FieldRef<"Complaint", 'Int'>
+  readonly blockchainHash: Prisma.FieldRef<"Complaint", 'String'>
+  readonly blockchainBlock: Prisma.FieldRef<"Complaint", 'BigInt'>
+  readonly ipfsHash: Prisma.FieldRef<"Complaint", 'String'>
+  readonly isOnChain: Prisma.FieldRef<"Complaint", 'Boolean'>
+  readonly blockchainStatus: Prisma.FieldRef<"Complaint", 'BlockchainStatus'>
+  readonly blockchainUpdatedAt: Prisma.FieldRef<"Complaint", 'DateTime'>
   readonly sla: Prisma.FieldRef<"Complaint", 'String'>
   readonly AIabusedFlag: Prisma.FieldRef<"Complaint", 'Boolean'>
   readonly AIimageVarificationStatus: Prisma.FieldRef<"Complaint", 'Boolean'>
@@ -5777,6 +6419,11 @@ export type ComplaintFindManyArgs<ExtArgs extends runtime.Types.Extensions.Inter
    * Skip the first `n` Complaints.
    */
   skip?: number
+  /**
+   * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+   * 
+   * Filter by unique combinations of Complaints.
+   */
   distinct?: Prisma.ComplaintScalarFieldEnum | Prisma.ComplaintScalarFieldEnum[]
 }
 

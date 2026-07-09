@@ -158,7 +158,7 @@ export type RegionalWorkflowGroupByOutputType = {
   _max: RegionalWorkflowMaxAggregateOutputType | null
 }
 
-type GetRegionalWorkflowGroupByPayload<T extends RegionalWorkflowGroupByArgs> = Prisma.PrismaPromise<
+export type GetRegionalWorkflowGroupByPayload<T extends RegionalWorkflowGroupByArgs> = Prisma.PrismaPromise<
   Array<
     Prisma.PickEnumerable<RegionalWorkflowGroupByOutputType, T['by']> &
       {
@@ -1122,6 +1122,11 @@ export type RegionalWorkflowFindManyArgs<ExtArgs extends runtime.Types.Extension
    * Skip the first `n` RegionalWorkflows.
    */
   skip?: number
+  /**
+   * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+   * 
+   * Filter by unique combinations of RegionalWorkflows.
+   */
   distinct?: Prisma.RegionalWorkflowScalarFieldEnum | Prisma.RegionalWorkflowScalarFieldEnum[]
 }
 

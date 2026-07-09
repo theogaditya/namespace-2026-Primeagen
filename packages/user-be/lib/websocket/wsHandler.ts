@@ -8,7 +8,7 @@
 import jwt from "jsonwebtoken";
 import { PrismaClient } from "../../prisma/generated/client/client";
 import { tokenBlacklistService } from "../redis/tokenBlacklistService";
-import { likeStore } from "../likes/inMemoryLikeStore";
+import { likeStore, LikeToggleResult } from "../likes/inMemoryLikeStore";
 import { getLikeCounterService, LikeUpdateMessage } from "../redis/likeCounterService";
 import type { ServerWebSocket } from "bun";
 
@@ -264,41 +264,20 @@ export class WsHandler {
 
     try {
       const userId = ws.data.userId;
-
-      // Toggle in memory store (O(1)) — tracks user-liked-complaint relationship
-      const result = likeStore.toggle(userId, complaintId);
-
-      // Use Redis as the authoritative source for the count.
-      // Redis has the real cumulative count; in-memory starts at 0 and is unreliable.
-      let authoritativeCount = result.count;
       const redisService = getLikeCounterService();
+      let result: LikeToggleResult;
+      let authoritativeCount: number;
 
       if (redisService.isReady()) {
         try {
-          // Ensure the Redis counter is seeded from the DB before first increment/decrement.
-          // Without this, INCR on a non-existent key starts from 0, giving wrong counts.
-          const existingCount = await redisService.getLikeCount(complaintId);
-          if (existingCount === 0) {
-            // Check if this is genuinely 0 or just uninitialized — load from DB
-            const dbComplaint = await this.db.complaint.findUnique({
-              where: { id: complaintId },
-              select: { upvoteCount: true },
-            });
-            if (dbComplaint && dbComplaint.upvoteCount > 0) {
-              await redisService.setLikeCount(complaintId, dbComplaint.upvoteCount);
-            }
-          }
-
-          if (result.liked) {
-            await redisService.addUserLike(userId, complaintId);
-            authoritativeCount = await redisService.incrementLikeCount(complaintId);
-          } else {
-            await redisService.removeUserLike(userId, complaintId);
-            authoritativeCount = await redisService.decrementLikeCount(complaintId);
-          }
-
-          // Sync in-memory count to match Redis
-          likeStore.setLikeCount(complaintId, authoritativeCount);
+          const redisResult = await redisService.toggleLike(userId, complaintId);
+          result = likeStore.applyResolvedToggle(
+            userId,
+            complaintId,
+            redisResult.liked,
+            redisResult.count
+          );
+          authoritativeCount = result.count;
 
           // Publish update for multi-instance sync
           await redisService.publishUpdate({
@@ -310,8 +289,12 @@ export class WsHandler {
           });
         } catch (err) {
           console.error('Redis update error:', err);
-          // Fall back to in-memory count if Redis fails
+          result = likeStore.toggle(userId, complaintId);
+          authoritativeCount = result.count;
         }
+      } else {
+        result = likeStore.toggle(userId, complaintId);
+        authoritativeCount = result.count;
       }
 
       // Send confirmation to the user who liked (includes `liked` field)

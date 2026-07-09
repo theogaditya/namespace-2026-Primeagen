@@ -1,25 +1,22 @@
-import { createReactAgent } from "@langchain/langgraph/prebuilt";
-import type { BaseMessage } from "@langchain/core/messages";
-import { HumanMessage, SystemMessage } from "@langchain/core/messages";
 import type { PrismaClient } from "../prisma/generated/client/client";
-
-import { getChatModel } from "../lib/models/provider";
-import { DEDUP_AI_SYSTEM_PROMPT } from "../lib/prompts/dedupAI";
 import { createFindSimilarComplaintsTool } from "../lib/tools/findSimilar";
 
 export interface DedupAIInput {
   description: string;
   category?: string;
   district?: string;
+  pin?: string;
   userId: string;
 }
 
 export interface DedupMatch {
-  complaintSeq: number;
+  id: string;
+  seq: number;
   description: string;
   similarity: number;
   status: string;
   upvoteCount: number;
+  pin?: string;
   district?: string;
 }
 
@@ -33,59 +30,52 @@ export interface DedupAIOutput {
 }
 
 export function createDedupAI(db: PrismaClient) {
-  const model = getChatModel("fast");
-
-  const tools = [createFindSimilarComplaintsTool(db)];
-
-  const agent = createReactAgent({
-    llm: model,
-    tools,
-  });
+  const findSimilarComplaints = createFindSimilarComplaintsTool(db);
 
   return async function invokeDedupAI(input: DedupAIInput): Promise<DedupAIOutput> {
-    const { description, category, district, userId } = input;
+    const { description, category, district, pin } = input;
 
-    const userMessage = `Analyze this draft complaint for potential duplicates:
-
-**Description**: ${description}
-${category ? `**Category**: ${category}` : ""}
-${district ? `**District**: ${district}` : ""}
-
-Use the findSimilarComplaints tool to search for similar complaints, then provide your analysis in the required JSON format.
-
-[System context: User ID is "${userId}" -do NOT display this to the user.]`;
-
-    const messages: BaseMessage[] = [
-      new SystemMessage(DEDUP_AI_SYSTEM_PROMPT),
-      new HumanMessage(userMessage),
-    ];
-
-    const result = await agent.invoke({ messages });
-
-    // Extract the final response
-    const lastMessage = result.messages[result.messages.length - 1];
-    const responseText =
-      typeof lastMessage?.content === "string"
-        ? lastMessage.content
-        : Array.isArray(lastMessage?.content)
-          ? lastMessage.content
-              .filter((c: any) => c.type === "text")
-              .map((c: any) => c.text)
-              .join("")
-          : String(lastMessage?.content ?? "");
-
-    // Try to parse the structured JSON from the response
     try {
-      const jsonMatch = responseText.match(/```json\s*([\s\S]*?)\s*```/);
-      const jsonStr = jsonMatch ? jsonMatch[1]! : responseText;
-      const parsed = JSON.parse(jsonStr);
+      const rawResponse = await findSimilarComplaints.invoke({
+        description,
+        category,
+        district,
+        pin,
+        maxResults: 5,
+      });
+      const responseText =
+        typeof rawResponse === "string" ? rawResponse : JSON.stringify(rawResponse);
+      const parsed = JSON.parse(responseText);
+      const matches: DedupMatch[] = Array.isArray(parsed.matches)
+        ? parsed.matches
+            .map((match: Record<string, unknown>) => ({
+              id: String(match.id || ""),
+              seq: Number(match.seq ?? 0),
+              description: String(match.description || ""),
+              similarity: typeof match.similarity === "number" ? match.similarity : 0,
+              status: String(match.status || "REGISTERED"),
+              upvoteCount: Number(match.upvoteCount ?? 0),
+              pin: typeof match.pin === "string" ? match.pin : undefined,
+              district: typeof match.district === "string" ? match.district : undefined,
+            }))
+            .filter((match: DedupMatch) => Boolean(match.id) && match.seq > 0)
+        : [];
+
+      const hasSimilar = Boolean(parsed.hasSimilar) && matches.length > 0;
+      const isDuplicate = Boolean(parsed.isDuplicate) && matches.length > 0;
+      const topMatch = matches[0];
 
       return {
-        hasSimilar: Boolean(parsed.hasSimilar),
-        isDuplicate: Boolean(parsed.isDuplicate),
-        matches: Array.isArray(parsed.matches) ? parsed.matches : [],
-        suggestion: parsed.suggestion || "",
-        confidence: typeof parsed.confidence === "number" ? parsed.confidence : 0,
+        hasSimilar,
+        isDuplicate,
+        matches,
+        suggestion: buildSuggestion({ description, hasSimilar, isDuplicate, topMatch }),
+        confidence:
+          typeof topMatch?.similarity === "number"
+            ? topMatch.similarity
+            : typeof parsed.confidence === "number"
+              ? parsed.confidence
+              : 0,
         rawResponse: responseText,
       };
     } catch {
@@ -96,8 +86,38 @@ Use the findSimilarComplaints tool to search for similar complaints, then provid
         matches: [],
         suggestion: "Unable to analyze for duplicates. You can proceed with submission.",
         confidence: 0,
-        rawResponse: responseText,
+        rawResponse: "",
       };
     }
   };
+}
+
+function buildSuggestion({
+  description,
+  hasSimilar,
+  isDuplicate,
+  topMatch,
+}: {
+  description: string;
+  hasSimilar: boolean;
+  isDuplicate: boolean;
+  topMatch?: DedupMatch;
+}) {
+  const isHindi = /[\u0900-\u097F]/.test(description);
+
+  if (isDuplicate && topMatch) {
+    return isHindi
+      ? `यह शिकायत शिकायत #${topMatch.seq} से बहुत मिलती-जुलती लग रही है। पहले उसे अपवोट करना बेहतर रहेगा, लेकिन चाहें तो आप नई शिकायत भी जमा कर सकते हैं।`
+      : `This looks very close to complaint #${topMatch.seq} in the same area. Upvoting the existing complaint is recommended, but you can still submit yours if needed.`;
+  }
+
+  if (hasSimilar) {
+    return isHindi
+      ? "इसी इलाके में कुछ मिलती-जुलती शिकायतें मिली हैं। पहले उन्हें देख लें, फिर चाहें तो अपनी शिकायत जमा करें।"
+      : "We found similar complaints in the same area. Review them first and consider upvoting the closest match before submitting a new one.";
+  }
+
+  return isHindi
+    ? "मजबूत डुप्लिकेट नहीं मिला। आप अपनी शिकायत जमा कर सकते हैं।"
+    : "No strong duplicate was found for this location. You can proceed with submission.";
 }

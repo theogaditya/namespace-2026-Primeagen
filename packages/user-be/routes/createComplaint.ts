@@ -9,6 +9,26 @@ import { uploadComplaintImage } from "../lib/s3/s3Client";
 export function createComplaintRouter(db: PrismaClient) {
   const router = Router();
 
+  const parseOptionalJson = (value: unknown) => {
+    if (typeof value !== "string" || value.trim() === "") {
+      return value;
+    }
+
+    return JSON.parse(value);
+  };
+
+  const parseOptionalBoolean = (value: unknown) => {
+    if (typeof value === "boolean") return value;
+    if (typeof value === "string") return value === "true";
+    return value;
+  };
+
+  const parseOptionalNumber = (value: unknown) => {
+    if (typeof value === "number") return value;
+    if (typeof value === "string" && value.trim() !== "") return Number(value);
+    return value;
+  };
+
   router.post("/", uploadMiddleware.single("image"), async (req, res) => {
     try {
       // Handle image upload to S3 if file is provided
@@ -33,14 +53,18 @@ export function createComplaintRouter(db: PrismaClient) {
       }
 
       // Parse JSON fields if sent as form-data
-      let bodyData = req.body;
-      if (typeof req.body.location === "string") {
-        bodyData = {
-          ...req.body,
-          location: JSON.parse(req.body.location),
-          isPublic: req.body.isPublic === "true" || req.body.isPublic === true,
-        };
-      }
+      const bodyData = {
+        ...req.body,
+        location: typeof req.body.location === "string" ? parseOptionalJson(req.body.location) : req.body.location,
+        isPublic: parseOptionalBoolean(req.body.isPublic),
+        isDuplicate: parseOptionalBoolean(req.body.isDuplicate),
+        hasSimilarComplaints: parseOptionalBoolean(req.body.hasSimilarComplaints),
+        qualityScore: parseOptionalNumber(req.body.qualityScore),
+        qualityBreakdown: parseOptionalJson(req.body.qualityBreakdown),
+        similarComplaintIds: parseOptionalJson(req.body.similarComplaintIds),
+        AIabusedFlag: parseOptionalBoolean(req.body.AIabusedFlag),
+        abuseMetadata: parseOptionalJson(req.body.abuseMetadata),
+      };
 
       // Validate input - use S3 URL if file was uploaded, otherwise use attachmentUrl from body
       const validationResult = createComplaintSchema.safeParse({

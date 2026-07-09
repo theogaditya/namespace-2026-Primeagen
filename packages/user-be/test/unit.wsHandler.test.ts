@@ -10,17 +10,18 @@ vi.mock('../lib/redis/tokenBlacklistService', () => ({
   }
 }));
 
-vi.mock('../lib/redis/likeCounterService', () => ({
-  getLikeCounterService: vi.fn().mockReturnValue({
+const { mockRedisService } = vi.hoisted(() => ({
+  mockRedisService: {
     isReady: vi.fn().mockReturnValue(false),
     connect: vi.fn().mockResolvedValue(undefined),
     getUserLikes: vi.fn().mockResolvedValue([]),
-    addUserLike: vi.fn().mockResolvedValue(undefined),
-    removeUserLike: vi.fn().mockResolvedValue(undefined),
-    incrementLikeCount: vi.fn().mockResolvedValue(1),
-    decrementLikeCount: vi.fn().mockResolvedValue(0),
+    toggleLike: vi.fn().mockResolvedValue({ liked: true, count: 1 }),
     publishUpdate: vi.fn().mockResolvedValue(undefined),
-  }),
+  },
+}));
+
+vi.mock('../lib/redis/likeCounterService', () => ({
+  getLikeCounterService: vi.fn().mockReturnValue(mockRedisService),
 }));
 
 import { WsHandler, WsMessageType, createWsHandler } from '../lib/websocket/wsHandler';
@@ -63,6 +64,8 @@ describe('WsHandler', () => {
     mockServer = createMockServer();
     likeStore.clear();
     vi.clearAllMocks();
+    mockRedisService.isReady.mockReturnValue(false);
+    mockRedisService.toggleLike.mockResolvedValue({ liked: true, count: 1 });
   });
 
   afterEach(() => {
@@ -229,6 +232,24 @@ describe('WsHandler', () => {
       expect(sentMessage.payload.count).toBe(0);
 
       expect(likeStore.hasLiked('user-123', complaintId)).toBe(false);
+    });
+
+    it('should use Redis as the authoritative source when available', async () => {
+      const complaintId = '123e4567-e89b-12d3-a456-426614174000';
+      mockRedisService.isReady.mockReturnValue(true);
+      mockRedisService.toggleLike.mockResolvedValueOnce({ liked: false, count: 0 });
+
+      likeStore.setLike('user-123', complaintId, true);
+      likeStore.setLikeCount(complaintId, 5);
+
+      await handler.handleLike(mockWs, { complaintId }, mockServer);
+
+      const sentMessage = JSON.parse(mockWs.send.mock.calls[0][0]);
+      expect(sentMessage.payload.liked).toBe(false);
+      expect(sentMessage.payload.count).toBe(0);
+      expect(mockRedisService.toggleLike).toHaveBeenCalledWith('user-123', complaintId);
+      expect(likeStore.hasLiked('user-123', complaintId)).toBe(false);
+      expect(likeStore.getLikeCount(complaintId)).toBe(0);
     });
   });
 

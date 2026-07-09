@@ -2,6 +2,7 @@
 
 import { useState, useCallback, useRef } from "react";
 import { reverseGeocode, matchDistrict } from "@/lib/api/reverseGeocode";
+import { normalizeDistrictName } from "@/lib/location/normalizeDistrict";
 import { CATEGORY_DEPARTMENT_MAP, CATEGORY_DISPLAY, type ComplaintUrgency, type Department } from "./types";
 
 export type AutoFillPhase =
@@ -49,6 +50,38 @@ export function useAutoFillSequence(options: AutoFillSequenceOptions) {
   const [unserviceableInfo, setUnserviceableInfo] = useState<{ detectedDistrict: string; availableDistricts: string[] } | null>(null);
   const cancelledRef = useRef(false);
 
+  const resolveMatchedDistrict = useCallback(
+    (...districtCandidates: Array<string | undefined>) => {
+      for (const candidate of districtCandidates) {
+        const normalizedCandidate = normalizeDistrictName(candidate);
+        if (!normalizedCandidate) continue;
+
+        const matchedDistrict = matchDistrict(
+          normalizedCandidate,
+          operatingDistricts
+        );
+
+        if (matchedDistrict) {
+          return {
+            detectedDistrict: normalizedCandidate,
+            matchedDistrict,
+          };
+        }
+      }
+
+      const detectedDistrict =
+        districtCandidates
+          .map((candidate) => normalizeDistrictName(candidate))
+          .find(Boolean) || "";
+
+      return {
+        detectedDistrict,
+        matchedDistrict: null,
+      };
+    },
+    [operatingDistricts]
+  );
+
   const delay = (ms: number) =>
     new Promise<void>((resolve) => {
       setTimeout(() => {
@@ -57,37 +90,40 @@ export function useAutoFillSequence(options: AutoFillSequenceOptions) {
       }, Math.round(ms * AUTO_FILL_SLOWDOWN_FACTOR));
     });
 
-  const typeText = (field: string, text: string, speed = 20): Promise<void> => {
-    return new Promise((resolve) => {
-      setTypingField(field);
-      let idx = 0;
+  const typeText = useCallback(
+    (field: string, text: string, speed = 20): Promise<void> => {
+      return new Promise((resolve) => {
+        setTypingField(field);
+        let idx = 0;
 
-      const tick = () => {
-        if (cancelledRef.current) {
-          updateField(field, text);
-          setTypingText("");
-          setTypingField("");
-          resolve();
-          return;
-        }
+        const tick = () => {
+          if (cancelledRef.current) {
+            updateField(field, text);
+            setTypingText("");
+            setTypingField("");
+            resolve();
+            return;
+          }
 
-        idx++;
-        const current = text.slice(0, idx);
-        setTypingText(current);
-        updateField(field, current);
+          idx++;
+          const current = text.slice(0, idx);
+          setTypingText(current);
+          updateField(field, current);
 
-        if (idx >= text.length) {
-          setTypingText("");
-          setTypingField("");
-          resolve();
-        } else {
-          setTimeout(tick, Math.round(speed * AUTO_FILL_SLOWDOWN_FACTOR));
-        }
-      };
+          if (idx >= text.length) {
+            setTypingText("");
+            setTypingField("");
+            resolve();
+          } else {
+            setTimeout(tick, Math.round(speed * AUTO_FILL_SLOWDOWN_FACTOR));
+          }
+        };
 
-      tick();
-    });
-  };
+        tick();
+      });
+    },
+    [updateField]
+  );
 
   const run = useCallback(
     async (
@@ -172,63 +208,66 @@ export function useAutoFillSequence(options: AutoFillSequenceOptions) {
 
       // --- Phase 3: Location ---
       if (draftLocation && (draftLocation.district || draftLocation.city)) {
-        // Use draft for district, but prefer GPS for pin/city/locality when available
+        // Use the same direct-fill pattern as Quick Fill: GPS is authoritative when available,
+        // with normalized draft values as a fallback.
         setLocationStatus("Filling location from AI draft...");
 
-        let matchedDistrict: string | null = null;
+        if (userLocation) {
+          setLocationStatus("Reverse geocoding your location...");
+          const geo = await reverseGeocode(userLocation.lat, userLocation.lng);
+          if (cancelledRef.current) { setPhase("stopped"); return; }
 
-        if (draftLocation.district) {
-          matchedDistrict = matchDistrict(draftLocation.district, operatingDistricts);
-          if (matchedDistrict) {
-            updateField("district", matchedDistrict);
-            await delay(400);
-          } else {
-            // District not in operating list
+          const districtResolution = resolveMatchedDistrict(
+            geo.district,
+            draftLocation.district
+          );
+
+          if (!districtResolution.matchedDistrict) {
             setLocationStatus("Location not serviceable.");
             setUnserviceableInfo({
-              detectedDistrict: draftLocation.district,
+              detectedDistrict: districtResolution.detectedDistrict || "Unknown",
               availableDistricts: operatingDistricts.map((d) => d.name),
             });
             setPhase("stopped");
             return;
           }
-        }
 
-        if (userLocation) {
-          // GPS available — use precise reverse geocoded data for pin/city/locality (same as Quick Fill)
-          setLocationStatus("Reverse geocoding your location...");
-          const geo = await reverseGeocode(userLocation.lat, userLocation.lng);
-          if (cancelledRef.current) { setPhase("stopped"); return; }
+          updateField("district", districtResolution.matchedDistrict);
+          await delay(400);
 
-          if (geo.pin) {
+          const resolvedPin = geo.pin || draftLocation.pin || "";
+          const resolvedCity = geo.city || draftLocation.city || "";
+          const resolvedLocality = geo.locality || draftLocation.locality || "";
+
+          if (/^\d{6}$/.test(resolvedPin)) {
             setLocationStatus("Validating PIN...");
-            updateField("pin", geo.pin);
+            updateField("pin", resolvedPin);
             await delay(600);
 
-            if (matchedDistrict) {
-              try {
-                const pinRes = await fetch(
-                  `/api/complaint/validate-pin?pin=${geo.pin}&district=${encodeURIComponent(matchedDistrict)}`
-                );
-                const pinData = await pinRes.json();
-                if (pinData.success && pinData.data?.valid && pinData.data.matchesSelectedDistrict) {
-                  updateField("city", pinData.data.city || geo.city);
-                } else {
-                  updateField("city", geo.city);
-                }
-              } catch {
-                updateField("city", geo.city);
+            try {
+              const pinRes = await fetch(
+                `/api/complaint/validate-pin?pin=${resolvedPin}&district=${encodeURIComponent(districtResolution.matchedDistrict)}`
+              );
+              const pinData = await pinRes.json();
+              if (pinData.success && pinData.data?.valid && pinData.data.matchesSelectedDistrict) {
+                updateField("city", pinData.data.city || resolvedCity);
+              } else if (resolvedCity) {
+                updateField("city", resolvedCity);
               }
-              await delay(300);
+            } catch {
+              if (resolvedCity) {
+                updateField("city", resolvedCity);
+              }
             }
-          } else if (geo.city) {
-            updateField("city", geo.city);
+            await delay(300);
+          } else if (resolvedCity) {
+            updateField("city", resolvedCity);
             await delay(300);
           }
 
-          if (geo.locality) {
+          if (resolvedLocality) {
             setLocationStatus("Filling locality...");
-            updateField("locality", geo.locality);
+            updateField("locality", resolvedLocality);
             await delay(300);
           }
 
@@ -238,16 +277,33 @@ export function useAutoFillSequence(options: AutoFillSequenceOptions) {
           setLocationStatus("Location filled from AI draft + GPS \u2713");
           await delay(800);
         } else {
+          const districtResolution = resolveMatchedDistrict(draftLocation.district);
+
+          if (draftLocation.district) {
+            if (!districtResolution.matchedDistrict) {
+              setLocationStatus("Location not serviceable.");
+              setUnserviceableInfo({
+                detectedDistrict: districtResolution.detectedDistrict || "Unknown",
+                availableDistricts: operatingDistricts.map((d) => d.name),
+              });
+              setPhase("stopped");
+              return;
+            }
+
+            updateField("district", districtResolution.matchedDistrict);
+            await delay(400);
+          }
+
           // No GPS — fall back to draft-only data for pin/city/locality
           if (draftLocation.pin && /^\d{6}$/.test(draftLocation.pin)) {
             setLocationStatus("Filling PIN code...");
             updateField("pin", draftLocation.pin);
             await delay(500);
 
-            if (matchedDistrict) {
+            if (districtResolution.matchedDistrict) {
               try {
                 const pinRes = await fetch(
-                  `/api/complaint/validate-pin?pin=${draftLocation.pin}&district=${encodeURIComponent(matchedDistrict)}`
+                  `/api/complaint/validate-pin?pin=${draftLocation.pin}&district=${encodeURIComponent(districtResolution.matchedDistrict)}`
                 );
                 const pinData = await pinRes.json();
                 if (pinData.success && pinData.data?.valid && pinData.data.matchesSelectedDistrict) {
@@ -356,7 +412,7 @@ export function useAutoFillSequence(options: AutoFillSequenceOptions) {
 
       setPhase("done");
     },
-    [categories, operatingDistricts, updateField, goToStep]
+    [categories, operatingDistricts, updateField, goToStep, resolveMatchedDistrict, typeText]
   );
 
   const stop = useCallback(() => {

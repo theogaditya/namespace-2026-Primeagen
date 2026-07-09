@@ -80,12 +80,12 @@ export type PrismaVersion = {
 }
 
 /**
- * Prisma Client JS version: 7.1.0
- * Query Engine version: ab635e6b9d606fa5c8fb8b1a7f909c3c3c1c98ba
+ * Prisma Client JS version: 7.7.0
+ * Query Engine version: 75cbdc1eb7150937890ad5465d861175c6624711
  */
 export const prismaVersion: PrismaVersion = {
-  client: "7.1.0",
-  engine: "ab635e6b9d606fa5c8fb8b1a7f909c3c3c1c98ba"
+  client: "7.7.0",
+  engine: "75cbdc1eb7150937890ad5465d861175c6624711"
 }
 
 /**
@@ -403,7 +403,8 @@ export const ModelName = {
   operating_states: 'operating_states',
   operating_districts: 'operating_districts',
   Badge: 'Badge',
-  UserBadge: 'UserBadge'
+  UserBadge: 'UserBadge',
+  BlockchainSyncEvent: 'BlockchainSyncEvent'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -419,7 +420,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "user" | "userLocation" | "agent" | "departmentMunicipalAdmin" | "superMunicipalAdmin" | "departmentStateAdmin" | "superStateAdmin" | "superAdmin" | "category" | "complaint" | "complaintLocation" | "upvote" | "newsUpdate" | "auditLog" | "regionalWorkflow" | "chat" | "operating_states" | "operating_districts" | "badge" | "userBadge"
+    modelProps: "user" | "userLocation" | "agent" | "departmentMunicipalAdmin" | "superMunicipalAdmin" | "departmentStateAdmin" | "superStateAdmin" | "superAdmin" | "category" | "complaint" | "complaintLocation" | "upvote" | "newsUpdate" | "auditLog" | "regionalWorkflow" | "chat" | "operating_states" | "operating_districts" | "badge" | "userBadge" | "blockchainSyncEvent"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -1903,6 +1904,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    BlockchainSyncEvent: {
+      payload: Prisma.$BlockchainSyncEventPayload<ExtArgs>
+      fields: Prisma.BlockchainSyncEventFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.BlockchainSyncEventFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$BlockchainSyncEventPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.BlockchainSyncEventFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$BlockchainSyncEventPayload>
+        }
+        findFirst: {
+          args: Prisma.BlockchainSyncEventFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$BlockchainSyncEventPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.BlockchainSyncEventFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$BlockchainSyncEventPayload>
+        }
+        findMany: {
+          args: Prisma.BlockchainSyncEventFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$BlockchainSyncEventPayload>[]
+        }
+        create: {
+          args: Prisma.BlockchainSyncEventCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$BlockchainSyncEventPayload>
+        }
+        createMany: {
+          args: Prisma.BlockchainSyncEventCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.BlockchainSyncEventCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$BlockchainSyncEventPayload>[]
+        }
+        delete: {
+          args: Prisma.BlockchainSyncEventDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$BlockchainSyncEventPayload>
+        }
+        update: {
+          args: Prisma.BlockchainSyncEventUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$BlockchainSyncEventPayload>
+        }
+        deleteMany: {
+          args: Prisma.BlockchainSyncEventDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.BlockchainSyncEventUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.BlockchainSyncEventUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$BlockchainSyncEventPayload>[]
+        }
+        upsert: {
+          args: Prisma.BlockchainSyncEventUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$BlockchainSyncEventPayload>
+        }
+        aggregate: {
+          args: Prisma.BlockchainSyncEventAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateBlockchainSyncEvent>
+        }
+        groupBy: {
+          args: Prisma.BlockchainSyncEventGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.BlockchainSyncEventGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.BlockchainSyncEventCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.BlockchainSyncEventCountAggregateOutputType> | number
+        }
+      }
+    }
   }
 } & {
   other: {
@@ -2151,6 +2226,12 @@ export const ComplaintScalarFieldEnum = {
   managedBySuperAdminId: 'managedBySuperAdminId',
   moderatedByMunicipalAdminId: 'moderatedByMunicipalAdminId',
   seq: 'seq',
+  blockchainHash: 'blockchainHash',
+  blockchainBlock: 'blockchainBlock',
+  ipfsHash: 'ipfsHash',
+  isOnChain: 'isOnChain',
+  blockchainStatus: 'blockchainStatus',
+  blockchainUpdatedAt: 'blockchainUpdatedAt',
   sla: 'sla',
   AIabusedFlag: 'AIabusedFlag',
   AIimageVarificationStatus: 'AIimageVarificationStatus',
@@ -2286,6 +2367,23 @@ export const UserBadgeScalarFieldEnum = {
 export type UserBadgeScalarFieldEnum = (typeof UserBadgeScalarFieldEnum)[keyof typeof UserBadgeScalarFieldEnum]
 
 
+export const BlockchainSyncEventScalarFieldEnum = {
+  id: 'id',
+  entityType: 'entityType',
+  entityId: 'entityId',
+  keyPrefix: 'keyPrefix',
+  blockchainHash: 'blockchainHash',
+  blockchainBlock: 'blockchainBlock',
+  ipfsHash: 'ipfsHash',
+  isOnChain: 'isOnChain',
+  payload: 'payload',
+  status: 'status',
+  processedAt: 'processedAt'
+} as const
+
+export type BlockchainSyncEventScalarFieldEnum = (typeof BlockchainSyncEventScalarFieldEnum)[keyof typeof BlockchainSyncEventScalarFieldEnum]
+
+
 export const SortOrder = {
   asc: 'asc',
   desc: 'desc'
@@ -2300,6 +2398,13 @@ export const NullableJsonNullValueInput = {
 } as const
 
 export type NullableJsonNullValueInput = (typeof NullableJsonNullValueInput)[keyof typeof NullableJsonNullValueInput]
+
+
+export const JsonNullValueInput = {
+  JsonNull: JsonNull
+} as const
+
+export type JsonNullValueInput = (typeof JsonNullValueInput)[keyof typeof JsonNullValueInput]
 
 
 export const QueryMode = {
@@ -2481,6 +2586,34 @@ export type ListEnumComplaintStatusFieldRefInput<$PrismaModel> = FieldRefInputTy
 
 
 /**
+ * Reference to a field of type 'BigInt'
+ */
+export type BigIntFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'BigInt'>
+    
+
+
+/**
+ * Reference to a field of type 'BigInt[]'
+ */
+export type ListBigIntFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'BigInt[]'>
+    
+
+
+/**
+ * Reference to a field of type 'BlockchainStatus'
+ */
+export type EnumBlockchainStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'BlockchainStatus'>
+    
+
+
+/**
+ * Reference to a field of type 'BlockchainStatus[]'
+ */
+export type ListEnumBlockchainStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'BlockchainStatus[]'>
+    
+
+
+/**
  * Reference to a field of type 'Json'
  */
 export type JsonFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Json'>
@@ -2533,6 +2666,20 @@ export type EnumBadgeRarityFieldRefInput<$PrismaModel> = FieldRefInputType<$Pris
  * Reference to a field of type 'BadgeRarity[]'
  */
 export type ListEnumBadgeRarityFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'BadgeRarity[]'>
+    
+
+
+/**
+ * Reference to a field of type 'SyncEventStatus'
+ */
+export type EnumSyncEventStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'SyncEventStatus'>
+    
+
+
+/**
+ * Reference to a field of type 'SyncEventStatus[]'
+ */
+export type ListEnumSyncEventStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'SyncEventStatus[]'>
     
 
 /**
@@ -2650,6 +2797,7 @@ export type GlobalOmitConfig = {
   operating_districts?: Prisma.operating_districtsOmit
   badge?: Prisma.BadgeOmit
   userBadge?: Prisma.UserBadgeOmit
+  blockchainSyncEvent?: Prisma.BlockchainSyncEventOmit
 }
 
 /* Types for Logging */

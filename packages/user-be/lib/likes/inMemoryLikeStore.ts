@@ -125,12 +125,44 @@ export class InMemoryLikeStore {
       userSet.delete(complaintId);
     }
   }
+
+  /**
+   * Apply an authoritative like result from Redis/DB and queue it for sync.
+   * This avoids deriving state from possibly stale in-memory data.
+   */
+  applyResolvedToggle(
+    userId: string,
+    complaintId: string,
+    liked: boolean,
+    count: number
+  ): LikeToggleResult {
+    this.setLike(userId, complaintId, liked);
+    this.setLikeCount(complaintId, Math.max(0, count));
+
+    const event: LikeEvent = {
+      userId,
+      complaintId,
+      liked,
+      timestamp: Date.now(),
+    };
+    this.pendingSyncQueue.push(event);
+
+    if (this.pendingSyncQueue.length >= this.SYNC_BATCH_SIZE) {
+      this.triggerSync();
+    }
+
+    return {
+      liked,
+      count: Math.max(0, count),
+      complaintId,
+    };
+  }
   
   /**
    * Set like count for a complaint (used for loading from DB/Redis)
    */
   setLikeCount(complaintId: string, count: number): void {
-    this.likeCounts.set(complaintId, count);
+    this.likeCounts.set(complaintId, Math.max(0, count));
   }
   
   /**

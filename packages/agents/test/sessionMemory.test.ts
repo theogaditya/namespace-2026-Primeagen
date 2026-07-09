@@ -15,6 +15,8 @@ vi.mock("@redis/client", () => ({
     connect: vi.fn().mockRejectedValue(new Error("ECONNREFUSED")),
     quit: vi.fn(),
     isOpen: false,
+    get: vi.fn(),
+    set: vi.fn(),
     lRange: vi.fn(),
     rPush: vi.fn(),
     lTrim: vi.fn(),
@@ -87,6 +89,20 @@ describe("SessionMemoryStore -in-memory fallback", () => {
     await sessionMemory.clearSession("user1", "sess1");
     const history = await sessionMemory.getHistory("user1", "sess1");
     expect(history).toEqual([]);
+  });
+
+  it("stores and retrieves complaint state in-memory when Redis is down", async () => {
+    await sessionMemory.setComplaintState("user1", "sess1", {
+      active: true,
+      description: "Overflowing drain near market",
+      urgency: "HIGH",
+      lastUpdatedAt: Date.now(),
+    });
+
+    const complaintState = await sessionMemory.getComplaintState("user1", "sess1");
+    expect(complaintState).toBeDefined();
+    expect(complaintState?.description).toBe("Overflowing drain near market");
+    expect(complaintState?.urgency).toBe("HIGH");
   });
 
   it("returns correct BaseMessage types (HumanMessage / AIMessage)", async () => {

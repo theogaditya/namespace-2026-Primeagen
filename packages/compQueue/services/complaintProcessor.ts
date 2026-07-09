@@ -57,54 +57,51 @@ export async function processNextComplaint(db: PrismaClient): Promise<{ processe
       return { processed: false, error: "Invalid categoryId removed from queue" };
     }
 
-    // Check if complaint already exists (same subCategory and description)
-    const existingComplaint = await db.complaint.findFirst({
-      where: {
-        subCategory: complaintData.subCategory,
-        description: complaintData.description,
-      },
-    });
-
-    // If a duplicate exists, do NOT remove it from the queue.
-    // Instead, mark the new complaint as duplicate and proceed with creation.
-    const isDuplicate = !!existingComplaint;
-    if (isDuplicate) {
-      console.log(`Duplicate complaint detected. Existing complaint id=${existingComplaint?.id}. New complaint will be flagged as duplicate.`);
-    }
-
     // Placeholder for AI standardized sub-category  
     // const AIstandardizedSubCategory = "dev";
 
     // AI standardized sub-category (stub for now)
     const AIstandardizedSubCategory = await standardizeSubCategory(complaintData.subCategory);
 
-    // Call moderation service to sanitize abusive text. If moderation service returns clean_text,
-    let AIabusedFlag: boolean | null = null;
-    let abuseMetadata: Record<string, any> | null = null;
-    try {
-      console.log("Testing Out The Abusive Route");
+    // Prefer review-step abuse data when abuse was detected there, otherwise fall back
+    // to server-side moderation before persisting the complaint.
+    let AIabusedFlag: boolean | null = complaintData.AIabusedFlag === true ? true : null;
+    let abuseMetadata: Record<string, any> | null =
+      complaintData.abuseMetadata && typeof complaintData.abuseMetadata === "object"
+        ? { ...complaintData.abuseMetadata }
+        : null;
+    const hasReviewModeration = AIabusedFlag === true && abuseMetadata !== null;
 
-      const mod = await moderateTextSafe({ text: complaintData.description, user_id: complaintData.userId });
-      if (mod) {
-        if (mod.has_abuse) {
-          AIabusedFlag = true;
-        }
-        // Store full moderation metadata for frontend display
-        abuseMetadata = {
-          severity: mod.severity,
-          flagged_spans: mod.flagged_spans,
-          explanation_en: mod.explanation_en || null,
-          explanation_hi: mod.explanation_hi || null,
-          flagged_phrases: mod.flagged_phrases || [],
-        };
-        // Use cleaned text if provided
-        if (mod.clean_text && typeof mod.clean_text === 'string' && mod.clean_text.trim().length > 0) {
-          complaintData.description = mod.clean_text;
-        }
-        console.log("[ComplaintProcessing] Moderation Successfull");
+    if (hasReviewModeration) {
+      const cleanText = abuseMetadata?.clean_text;
+      if (typeof cleanText === "string" && cleanText.trim().length > 0) {
+        complaintData.description = cleanText;
       }
-    } catch (mErr) {
-      console.warn('[ComplaintProcessing] moderation call failed, proceeding with original description', mErr);
+    } else {
+      try {
+        const mod = await moderateTextSafe({ text: complaintData.description, user_id: complaintData.userId });
+        if (mod) {
+          if (mod.has_abuse) {
+            AIabusedFlag = true;
+          }
+          // Store full moderation metadata for frontend display
+          abuseMetadata = {
+            severity: mod.severity,
+            clean_text: mod.clean_text || complaintData.description,
+            flagged_spans: mod.flagged_spans,
+            explanation_en: mod.explanation_en || null,
+            explanation_hi: mod.explanation_hi || null,
+            flagged_phrases: mod.flagged_phrases || [],
+          };
+          // Use cleaned text if provided
+          if (mod.clean_text && typeof mod.clean_text === 'string' && mod.clean_text.trim().length > 0) {
+            complaintData.description = mod.clean_text;
+          }
+          console.log("[ComplaintProcessing] Moderation successful");
+        }
+      } catch (mErr) {
+        console.warn('[ComplaintProcessing] moderation call failed, proceeding with original description', mErr);
+      }
     }
 
     // Testing Abuse Route Stub 
@@ -113,10 +110,34 @@ export async function processNextComplaint(db: PrismaClient): Promise<{ processe
     // Extract AI-enriched fields from complaint data (set by frontend during dedup/quality checks)
     const qualityScore = typeof complaintData.qualityScore === 'number' ? complaintData.qualityScore : null;
     const qualityBreakdown = complaintData.qualityBreakdown || null;
-    const hasSimilarComplaints = complaintData.hasSimilarComplaints === true;
-    const similarComplaintIds: string[] = Array.isArray(complaintData.similarComplaintIds)
-      ? complaintData.similarComplaintIds
+    const similarComplaintIds = Array.isArray(complaintData.similarComplaintIds)
+      ? Array.from(new Set(complaintData.similarComplaintIds.filter(Boolean)))
       : [];
+
+    // Check if complaint already exists (same subCategory and description)
+    const existingComplaint = await db.complaint.findFirst({
+      where: {
+        subCategory: complaintData.subCategory,
+        description: complaintData.description,
+      },
+      select: {
+        id: true,
+      },
+    });
+
+    if (existingComplaint && !similarComplaintIds.includes(existingComplaint.id)) {
+      similarComplaintIds.unshift(existingComplaint.id);
+    }
+
+    const hasSimilarComplaints =
+      complaintData.hasSimilarComplaints === true || similarComplaintIds.length > 0;
+    const isDuplicate = complaintData.isDuplicate === true || !!existingComplaint;
+
+    if (isDuplicate) {
+      console.log(
+        `Duplicate complaint detected. Existing complaint id=${existingComplaint?.id ?? similarComplaintIds[0] ?? "unknown"}. New complaint will be flagged as duplicate.`
+      );
+    }
 
     const result = await db.$transaction(async (tx) => {
       const complaint = await tx.complaint.create({

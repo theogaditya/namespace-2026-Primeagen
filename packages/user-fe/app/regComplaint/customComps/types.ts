@@ -17,6 +17,8 @@ export type Department =
   | "PUBLIC_GRIEVANCES";
 
 export type ComplaintUrgency = "LOW" | "MEDIUM" | "HIGH" | "CRITICAL";
+export type QualityRating = "poor" | "fair" | "good" | "excellent";
+export type ReviewAnalysisStatus = "idle" | "checking" | "ready" | "error";
 
 // Category type from database
 export interface Category {
@@ -32,6 +34,45 @@ export interface OperatingDistrict {
   name: string;
   state: string;
   stateId: string;
+}
+
+export interface DedupMatch {
+  id: string;
+  seq: number;
+  description: string;
+  similarity: number;
+  status: string;
+  upvoteCount: number;
+  pin?: string;
+  district?: string;
+}
+
+export interface QualityBreakdown {
+  clarity: number;
+  evidence: number;
+  location: number;
+  completeness: number;
+}
+
+export interface AbuseFlaggedPhrase {
+  original: string;
+  masked: string;
+  language: string;
+  category: "abuse" | "threat" | "obscenity" | "hate_speech" | "personal_attack";
+  severity: "low" | "medium" | "high";
+}
+
+export interface AbuseMetadata {
+  severity?: "none" | "low" | "medium" | "high";
+  clean_text?: string;
+  explanation_en?: string;
+  explanation_hi?: string;
+  flagged_spans?: Array<{
+    original: string;
+    category?: string;
+  }>;
+  flagged_phrases?: AbuseFlaggedPhrase[];
+  source?: string;
 }
 
 // Form state interface
@@ -58,6 +99,26 @@ export interface ComplaintFormState {
   street: string;
   latitude: string;
   longitude: string;
+
+  // Step 4 - Review AI metadata
+  dedupStatus: ReviewAnalysisStatus;
+  dedupMatches: DedupMatch[];
+  dedupSuggestion: string;
+  dedupConfidence: number | null;
+  hasSimilarComplaints: boolean;
+  isDuplicate: boolean;
+
+  qualityStatus: ReviewAnalysisStatus;
+  qualityScore: number | null;
+  qualityBreakdown: QualityBreakdown | null;
+  qualitySuggestions: string[];
+  qualityRating: QualityRating | null;
+
+  abuseStatus: ReviewAnalysisStatus;
+  abuseDetected: boolean;
+  abuseSeverity: "none" | "low" | "medium" | "high" | null;
+  abuseSanitizedText: string;
+  abuseMetadata: AbuseMetadata | null;
 }
 
 export type ComplaintFormField = keyof ComplaintFormState;

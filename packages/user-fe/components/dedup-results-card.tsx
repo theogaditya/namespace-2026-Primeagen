@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "@/lib/utils";
-import { Loader2, CheckCircle2, AlertTriangle, ThumbsUp, ExternalLink } from "lucide-react";
+import { Loader2, CheckCircle2, AlertTriangle, ThumbsUp } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 interface DedupMatch {
@@ -17,56 +17,142 @@ interface DedupMatch {
 
 interface DedupResultsCardProps {
   description: string;
-  categoryName: string;
+  category: string;
   district: string;
+  pin: string;
   onUpvoteInstead?: (complaintId: string) => void;
   onProceed?: () => void;
+  onResult?: (result: {
+    status: "idle" | "checking" | "ready" | "error";
+    hasSimilarComplaints: boolean;
+    isDuplicate: boolean;
+    matches: DedupMatch[];
+    suggestion: string;
+    confidence: number;
+  }) => void;
 }
 
 type DedupState = "idle" | "checking" | "found" | "none" | "error";
 
 export function DedupResultsCard({
   description,
-  categoryName,
+  category,
   district,
+  pin,
   onUpvoteInstead,
   onProceed,
+  onResult,
 }: DedupResultsCardProps) {
   const [state, setState] = useState<DedupState>("idle");
   const [matches, setMatches] = useState<DedupMatch[]>([]);
 
   useEffect(() => {
-    if (!description || description.length < 20) return;
+    if (!description || description.length < 20 || !pin) {
+      setState("idle");
+      setMatches([]);
+      onResult?.({
+        status: "idle",
+        hasSimilarComplaints: false,
+        isDuplicate: false,
+        matches: [],
+        suggestion: "",
+        confidence: 0,
+      });
+      return;
+    }
 
+    let cancelled = false;
     const checkDuplicates = async () => {
       setState("checking");
+      onResult?.({
+        status: "checking",
+        hasSimilarComplaints: false,
+        isDuplicate: false,
+        matches: [],
+        suggestion: "",
+        confidence: 0,
+      });
+
       try {
+        const token = localStorage.getItem("authToken");
+        if (!token) {
+          throw new Error("Missing auth token");
+        }
+
         const res = await fetch("/api/agents/dedup", {
           method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ description, categoryName, district }),
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({ description, category, district, pin }),
         });
 
         if (!res.ok) {
-          setState("none");
+          throw new Error(`Dedup request failed with status ${res.status}`);
           return;
         }
 
         const data = await res.json();
-        if (data.hasSimilar && data.matches?.length > 0) {
-          setMatches(data.matches);
+        const normalizedMatches: DedupMatch[] = Array.isArray(data.matches)
+          ? data.matches
+              .map((match: Record<string, unknown>) => ({
+                id: String(match.id || ""),
+                seq: Number(match.seq ?? match.complaintSeq ?? 0),
+                description: String(match.description || ""),
+                similarity: typeof match.similarity === "number" ? match.similarity : 0,
+                status: String(match.status || "REGISTERED"),
+                upvoteCount: Number(match.upvoteCount ?? 0),
+              }))
+              .filter((match: DedupMatch) => match.id && match.seq > 0)
+          : [];
+
+        if (cancelled) return;
+
+        if (data.hasSimilar && normalizedMatches.length > 0) {
+          setMatches(normalizedMatches);
           setState("found");
+          onResult?.({
+            status: "ready",
+            hasSimilarComplaints: true,
+            isDuplicate: Boolean(data.isDuplicate),
+            matches: normalizedMatches,
+            suggestion: String(data.suggestion || ""),
+            confidence: typeof data.confidence === "number" ? data.confidence : 0,
+          });
         } else {
           setState("none");
+          setMatches([]);
+          onResult?.({
+            status: "ready",
+            hasSimilarComplaints: false,
+            isDuplicate: false,
+            matches: [],
+            suggestion: String(data.suggestion || ""),
+            confidence: typeof data.confidence === "number" ? data.confidence : 0,
+          });
         }
       } catch {
+        if (cancelled) return;
         setState("error");
+        setMatches([]);
+        onResult?.({
+          status: "error",
+          hasSimilarComplaints: false,
+          isDuplicate: false,
+          matches: [],
+          suggestion: "Duplicate check unavailable.",
+          confidence: 0,
+        });
       }
     };
 
     const timer = setTimeout(checkDuplicates, 500);
-    return () => clearTimeout(timer);
-  }, [description, categoryName, district]);
+    return () => {
+      cancelled = true;
+      clearTimeout(timer);
+    };
+  }, [description, category, district, pin, onResult]);
 
   if (state === "idle") return null;
 
@@ -116,7 +202,9 @@ export function DedupResultsCard({
                 {matches.length} similar complaint{matches.length > 1 ? "s" : ""} found
               </p>
               <p className="text-xs text-amber-600">
-                Consider upvoting an existing one instead of creating a duplicate
+                {matches[0]?.similarity >= 0.9
+                  ? `Possible duplicate of #${matches[0].seq}. Upvoting the existing complaint is recommended.`
+                  : "Consider upvoting an existing one instead of creating a duplicate"}
               </p>
             </div>
           </div>

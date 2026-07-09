@@ -1063,16 +1063,44 @@ export function getComplaintRouter(db: PrismaClient) {
         });
       }
 
-      // Update upvote count (simple increment/decrement for now)
-      // In a full implementation, you'd track who liked what in a separate table
-      const newCount = action === 'like' 
-        ? complaint.upvoteCount + 1 
-        : Math.max(0, complaint.upvoteCount - 1);
+      const { upvoteCount } = await db.$transaction(async (tx) => {
+        const existingUpvote = await tx.upvote.findFirst({
+          where: {
+            userId,
+            complaintId: id,
+          },
+          select: { id: true },
+        });
 
-      await db.complaint.update({
-        where: { id },
-        data: { upvoteCount: newCount },
+        if (action === 'like' && !existingUpvote) {
+          await tx.upvote.create({
+            data: {
+              userId,
+              complaintId: id,
+            },
+          });
+        }
+
+        if (action === 'unlike' && existingUpvote) {
+          await tx.upvote.delete({
+            where: { id: existingUpvote.id },
+          });
+        }
+
+        const authoritativeCount = await tx.upvote.count({
+          where: { complaintId: id },
+        });
+
+        await tx.complaint.update({
+          where: { id },
+          data: { upvoteCount: authoritativeCount },
+        });
+
+        return { upvoteCount: authoritativeCount };
       });
+
+      likeStore.setLike(userId, id, action === 'like');
+      likeStore.setLikeCount(id, upvoteCount);
 
       // Invalidate caches for this complaint
       await invalidateSingleComplaintCache(id);
@@ -1085,7 +1113,7 @@ export function getComplaintRouter(db: PrismaClient) {
       return res.status(200).json({
         success: true,
         message: action === 'like' ? "Complaint liked" : "Complaint unliked",
-        data: { upvoteCount: newCount },
+        data: { upvoteCount },
       });
     } catch (error) {
       console.error("Like complaint error:", error);

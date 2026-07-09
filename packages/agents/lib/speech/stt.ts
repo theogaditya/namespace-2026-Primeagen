@@ -1,4 +1,4 @@
-import OpenAI from "openai";
+import OpenAI, { toFile } from "openai";
 
 let _openai: OpenAI | null = null;
 function getOpenAI() {
@@ -15,9 +15,16 @@ export async function transcribeAudio(
   audioBuffer: Buffer,
   mimeType: string = "audio/wav"
 ): Promise<{ text: string; language: string }> {
-  const ext = mimeType.includes("webm") ? "webm" : mimeType.includes("mp3") ? "mp3" : "wav";
+  const normalizedMimeType = mimeType.toLowerCase();
+  const ext = normalizedMimeType.includes("webm")
+    ? "webm"
+    : normalizedMimeType.includes("mp3")
+      ? "mp3"
+      : normalizedMimeType.includes("mp4") || normalizedMimeType.includes("m4a")
+        ? "m4a"
+        : "wav";
 
-  const file = new File([audioBuffer], `audio.${ext}`, { type: mimeType });
+  const file = await toFile(audioBuffer, `audio.${ext}`, { type: normalizedMimeType });
 
   const transcription = await getOpenAI().audio.transcriptions.create({
     model: "whisper-1",

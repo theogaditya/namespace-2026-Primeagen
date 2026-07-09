@@ -117,3 +117,8 @@ export type Badge = Prisma.BadgeModel
  * 
  */
 export type UserBadge = Prisma.UserBadgeModel
+/**
+ * Model BlockchainSyncEvent
+ * 
+ */
+export type BlockchainSyncEvent = Prisma.BlockchainSyncEventModel

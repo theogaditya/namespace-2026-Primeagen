@@ -193,7 +193,7 @@ export type UserLocationGroupByOutputType = {
   _max: UserLocationMaxAggregateOutputType | null
 }
 
-type GetUserLocationGroupByPayload<T extends UserLocationGroupByArgs> = Prisma.PrismaPromise<
+export type GetUserLocationGroupByPayload<T extends UserLocationGroupByArgs> = Prisma.PrismaPromise<
   Array<
     Prisma.PickEnumerable<UserLocationGroupByOutputType, T['by']> &
       {
@@ -1232,6 +1232,11 @@ export type UserLocationFindManyArgs<ExtArgs extends runtime.Types.Extensions.In
    * Skip the first `n` UserLocations.
    */
   skip?: number
+  /**
+   * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+   * 
+   * Filter by unique combinations of UserLocations.
+   */
   distinct?: Prisma.UserLocationScalarFieldEnum | Prisma.UserLocationScalarFieldEnum[]
 }
 

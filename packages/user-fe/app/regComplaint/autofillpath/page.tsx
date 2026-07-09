@@ -206,6 +206,83 @@ export default function RegisterComplaintWithAutofillPage() {
     }
   };
 
+  const buildSubmitFormData = () => {
+    const submitFormData = new FormData();
+    const moderatedDescription =
+      formData.abuseStatus === "ready" &&
+      formData.abuseDetected &&
+      formData.abuseSanitizedText.trim().length > 0
+        ? formData.abuseSanitizedText
+        : formData.description;
+
+    submitFormData.append("categoryId", formData.categoryId);
+    submitFormData.append("assignedDepartment", formData.assignedDepartment);
+    submitFormData.append("subCategory", formData.subCategory);
+    submitFormData.append("description", moderatedDescription);
+    submitFormData.append("urgency", formData.urgency);
+    submitFormData.append("isPublic", String(formData.isPublic));
+    submitFormData.append("isDuplicate", String(formData.isDuplicate));
+    submitFormData.append("hasSimilarComplaints", String(formData.hasSimilarComplaints));
+
+    if (typeof formData.qualityScore === "number") {
+      submitFormData.append("qualityScore", String(formData.qualityScore));
+    }
+
+    if (formData.qualityBreakdown) {
+      submitFormData.append("qualityBreakdown", JSON.stringify(formData.qualityBreakdown));
+    }
+
+    const similarComplaintIds = Array.from(
+      new Set(formData.dedupMatches.map((match) => match.id).filter(Boolean))
+    );
+    if (similarComplaintIds.length > 0) {
+      submitFormData.append("similarComplaintIds", JSON.stringify(similarComplaintIds));
+    }
+
+    if (formData.abuseStatus === "ready" && formData.abuseDetected) {
+      submitFormData.append("AIabusedFlag", "true");
+      submitFormData.append(
+        "abuseMetadata",
+        JSON.stringify({
+          ...(formData.abuseMetadata || {}),
+          clean_text: moderatedDescription,
+          source: "review-step",
+        })
+      );
+    }
+
+    const locationData: {
+      district: string;
+      pin: string;
+      city: string;
+      locality: string;
+      street?: string;
+      latitude?: number;
+      longitude?: number;
+    } = {
+      district: formData.district,
+      pin: formData.pin,
+      city: formData.city,
+      locality: formData.locality,
+      street: formData.street || undefined,
+    };
+
+    if (formData.latitude) {
+      locationData.latitude = parseFloat(formData.latitude);
+    }
+    if (formData.longitude) {
+      locationData.longitude = parseFloat(formData.longitude);
+    }
+
+    submitFormData.append("location", JSON.stringify(locationData));
+
+    if (formData.photo) {
+      submitFormData.append("image", formData.photo);
+    }
+
+    return submitFormData;
+  };
+
   // Handle next step with validation
   const handleNext = () => {
     const { schema, data } = getStepValidationData(currentStep);
@@ -237,41 +314,7 @@ export default function RegisterComplaintWithAutofillPage() {
       }
 
       // Prepare FormData
-      const submitFormData = new FormData();
-      submitFormData.append("categoryId", formData.categoryId);
-      submitFormData.append("assignedDepartment", formData.assignedDepartment);
-      submitFormData.append("subCategory", formData.subCategory);
-      submitFormData.append("description", formData.description);
-      submitFormData.append("urgency", formData.urgency);
-      submitFormData.append("isPublic", String(formData.isPublic));
-
-      // Build location object as expected by backend
-      const locationData: {
-        district: string;
-        pin: string;
-        city: string;
-        locality: string;
-        latitude?: number;
-        longitude?: number;
-      } = {
-        district: formData.district,
-        pin: formData.pin,
-        city: formData.city,
-        locality: formData.locality,
-      };
-
-      if (formData.latitude) {
-        locationData.latitude = parseFloat(formData.latitude);
-      }
-      if (formData.longitude) {
-        locationData.longitude = parseFloat(formData.longitude);
-      }
-
-      submitFormData.append("location", JSON.stringify(locationData));
-
-      if (formData.photo) {
-        submitFormData.append("image", formData.photo);
-      }
+      const submitFormData = buildSubmitFormData();
 
       const response = await fetch("/api/complaint/submit", {
         method: "POST",
@@ -368,7 +411,7 @@ export default function RegisterComplaintWithAutofillPage() {
           />
         );
       case 4:
-        return <Step4Review formData={formData} goToStep={goToStep} />;
+        return <Step4Review formData={formData} goToStep={goToStep} updateField={updateField} />;
       default:
         return null;
     }
@@ -380,6 +423,14 @@ export default function RegisterComplaintWithAutofillPage() {
   // Check if Next button should be disabled
   // For autofill path on step 2, disable while analyzing
   const isNextDisabled = currentStep === 2 && useAutofill && imageAnalysisStatus === "analyzing";
+  const isSubmitBlockedByQuality =
+    currentStep === 4 &&
+    formData.qualityStatus === "ready" &&
+    typeof formData.qualityScore === "number" &&
+    formData.qualityScore < 50;
+  const isSubmitPendingQualityCheck =
+    currentStep === 4 &&
+    (formData.qualityStatus === "checking" || formData.abuseStatus === "checking");
 
   // Step labels for navigation
   const stepLabels = useAutofill
@@ -511,11 +562,17 @@ export default function RegisterComplaintWithAutofillPage() {
                 ) : (
                   <Button
                     onClick={handleSubmit}
-                    disabled={isSubmitting}
+                    disabled={isSubmitting || isSubmitBlockedByQuality || isSubmitPendingQualityCheck}
                     className="flex items-center gap-2 px-8 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white shadow-md transition-all"
                   >
                     <Send className="h-4 w-4" />
-                    Submit Complaint
+                    {formData.abuseStatus === "checking"
+                      ? "Moderation Check Running..."
+                      : isSubmitPendingQualityCheck
+                      ? "Quality Check Running..."
+                      : isSubmitBlockedByQuality
+                        ? "Improve Complaint to Submit"
+                        : "Submit Complaint"}
                   </Button>
                 )}
               </div>

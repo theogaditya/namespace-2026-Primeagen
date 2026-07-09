@@ -151,7 +151,7 @@ export type UpvoteGroupByOutputType = {
   _max: UpvoteMaxAggregateOutputType | null
 }
 
-type GetUpvoteGroupByPayload<T extends UpvoteGroupByArgs> = Prisma.PrismaPromise<
+export type GetUpvoteGroupByPayload<T extends UpvoteGroupByArgs> = Prisma.PrismaPromise<
   Array<
     Prisma.PickEnumerable<UpvoteGroupByOutputType, T['by']> &
       {
@@ -1207,6 +1207,11 @@ export type UpvoteFindManyArgs<ExtArgs extends runtime.Types.Extensions.Internal
    * Skip the first `n` Upvotes.
    */
   skip?: number
+  /**
+   * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+   * 
+   * Filter by unique combinations of Upvotes.
+   */
   distinct?: Prisma.UpvoteScalarFieldEnum | Prisma.UpvoteScalarFieldEnum[]
 }
 

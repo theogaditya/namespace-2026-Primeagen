@@ -40,6 +40,8 @@ vi.mock('../lib/likes/inMemoryLikeStore', () => ({
     hasLiked: vi.fn().mockReturnValue(false),
     getUserLikes: vi.fn().mockReturnValue(new Set()),
     toggle: vi.fn().mockReturnValue({ liked: false, count: 0, complaintId: '' }),
+    setLike: vi.fn(),
+    setLikeCount: vi.fn(),
   }
 }));
 
@@ -622,6 +624,73 @@ describe('Authentication Tests for Get Complaints', () => {
 
     expect(res.status).toBe(403);
     expect(res.body.message).toBe('Account is suspended. Please contact support.');
+  });
+});
+
+describe('POST /api/complaints/get/:id/like', () => {
+  const complaintId = '550e8400-e29b-41d4-a716-446655440100';
+
+  beforeEach(() => {
+    // @ts-ignore
+    prismaMock.$transaction.mockImplementation(async (callback) => callback(prismaMock));
+  });
+
+  it('keeps the authoritative count when the user already liked the complaint', async () => {
+    const token = generateToken();
+
+    // @ts-ignore
+    prismaMock.complaint.findUnique.mockResolvedValue({
+      id: complaintId,
+      isPublic: true,
+      upvoteCount: 5,
+      complainantId: mockUser.id,
+    });
+    // @ts-ignore
+    prismaMock.upvote.findFirst.mockResolvedValue({ id: 'upvote-1' });
+    // @ts-ignore
+    prismaMock.upvote.count.mockResolvedValue(5);
+    // @ts-ignore
+    prismaMock.complaint.update.mockResolvedValue({ id: complaintId, upvoteCount: 5 });
+
+    const res = await request(app)
+      .post(`/api/complaints/get/${complaintId}/like`)
+      .set('Authorization', `Bearer ${token}`)
+      .send({ action: 'like' });
+
+    expect(res.status).toBe(200);
+    expect(res.body.data.upvoteCount).toBe(5);
+    expect(prismaMock.upvote.create).not.toHaveBeenCalled();
+  });
+
+  it('does not let unlike drive the stored count below zero', async () => {
+    const token = generateToken();
+
+    // @ts-ignore
+    prismaMock.complaint.findUnique.mockResolvedValue({
+      id: complaintId,
+      isPublic: true,
+      upvoteCount: 0,
+      complainantId: mockUser.id,
+    });
+    // @ts-ignore
+    prismaMock.upvote.findFirst.mockResolvedValue(null);
+    // @ts-ignore
+    prismaMock.upvote.count.mockResolvedValue(0);
+    // @ts-ignore
+    prismaMock.complaint.update.mockResolvedValue({ id: complaintId, upvoteCount: 0 });
+
+    const res = await request(app)
+      .post(`/api/complaints/get/${complaintId}/like`)
+      .set('Authorization', `Bearer ${token}`)
+      .send({ action: 'unlike' });
+
+    expect(res.status).toBe(200);
+    expect(res.body.data.upvoteCount).toBe(0);
+    expect(prismaMock.upvote.delete).not.toHaveBeenCalled();
+    expect(prismaMock.complaint.update).toHaveBeenCalledWith({
+      where: { id: complaintId },
+      data: { upvoteCount: 0 },
+    });
   });
 });
 

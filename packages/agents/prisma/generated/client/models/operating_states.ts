@@ -144,7 +144,7 @@ export type Operating_statesGroupByOutputType = {
   _max: Operating_statesMaxAggregateOutputType | null
 }
 
-type GetOperating_statesGroupByPayload<T extends operating_statesGroupByArgs> = Prisma.PrismaPromise<
+export type GetOperating_statesGroupByPayload<T extends operating_statesGroupByArgs> = Prisma.PrismaPromise<
   Array<
     Prisma.PickEnumerable<Operating_statesGroupByOutputType, T['by']> &
       {
@@ -1024,6 +1024,11 @@ export type operating_statesFindManyArgs<ExtArgs extends runtime.Types.Extension
    * Skip the first `n` operating_states.
    */
   skip?: number
+  /**
+   * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+   * 
+   * Filter by unique combinations of operating_states.
+   */
   distinct?: Prisma.Operating_statesScalarFieldEnum | Prisma.Operating_statesScalarFieldEnum[]
 }
 

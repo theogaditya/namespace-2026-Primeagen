@@ -1,9 +1,18 @@
 "use client";
 
-import React from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { motion, type Variants } from "framer-motion";
 import { cn } from "@/lib/utils";
-import { ComplaintFormState, URGENCY_OPTIONS, CATEGORY_DISPLAY } from "./types";
+import {
+  ComplaintFormField,
+  ComplaintFormState,
+  URGENCY_OPTIONS,
+  CATEGORY_DISPLAY,
+  type AbuseMetadata,
+  type DedupMatch,
+  type QualityBreakdown,
+  type QualityRating,
+} from "./types";
 import {
   CheckCircle,
   MapPin,
@@ -15,18 +24,24 @@ import {
   Image,
   Edit2,
   Sparkles,
-  Send,
   Clock,
   Shield,
   BarChart3,
+  Loader2,
+  CircleAlert,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { AbuseFlagBanner } from "@/components/abuse-flag-banner";
 import { DedupResultsCard } from "@/components/dedup-results-card";
 import { QualityScoreBadge, QualityBreakdownBar } from "@/components/quality-score-badge";
+import { ComplaintDetailModal } from "@/app/dashboard/customComps/ComplaintDetailModal";
+import { LikeProvider } from "@/contexts/LikeContext";
+import type { Complaint } from "@/app/dashboard/customComps/types";
 
 interface Step4Props {
   formData: ComplaintFormState;
   goToStep: (step: number) => void;
+  updateField: <K extends ComplaintFormField>(field: K, value: ComplaintFormState[K]) => void;
 }
 
 const containerVariants: Variants = {
@@ -67,7 +82,243 @@ const headerVariants: Variants = {
   },
 };
 
-export function Step4Review({ formData, goToStep }: Step4Props) {
+const MIN_QUALITY_SCORE_TO_SUBMIT = 50;
+
+const EMPTY_BREAKDOWN: QualityBreakdown = {
+  clarity: 0,
+  evidence: 0,
+  location: 0,
+  completeness: 0,
+};
+
+const EMPTY_ABUSE_METADATA: AbuseMetadata = {
+  severity: "none",
+  clean_text: "",
+  explanation_en: "",
+  explanation_hi: "",
+  flagged_spans: [],
+  flagged_phrases: [],
+};
+
+export function Step4Review({ formData, goToStep, updateField }: Step4Props) {
+  const [authToken, setAuthToken] = useState<string | null>(null);
+  const [selectedComplaint, setSelectedComplaint] = useState<Complaint | null>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [loadingComplaint, setLoadingComplaint] = useState(false);
+
+  const handleDedupResult = useCallback(
+    (result: {
+      status: "idle" | "checking" | "ready" | "error";
+      hasSimilarComplaints: boolean;
+      isDuplicate: boolean;
+      matches: DedupMatch[];
+      suggestion: string;
+      confidence: number;
+    }) => {
+      updateField(
+        "dedupStatus",
+        result.status === "checking"
+          ? "checking"
+          : result.status === "error"
+            ? "error"
+            : result.status === "ready"
+              ? "ready"
+              : "idle"
+      );
+      updateField("dedupMatches", result.matches as DedupMatch[]);
+      updateField("dedupSuggestion", result.suggestion);
+      updateField("dedupConfidence", result.confidence);
+      updateField("hasSimilarComplaints", result.hasSimilarComplaints);
+      updateField("isDuplicate", result.isDuplicate);
+    },
+    [updateField]
+  );
+
+  useEffect(() => {
+    setAuthToken(localStorage.getItem("authToken"));
+  }, []);
+
+  useEffect(() => {
+    const hasEnoughData = formData.description.trim().length >= 5 && Boolean(authToken);
+
+    if (!hasEnoughData) {
+      updateField("abuseStatus", "idle");
+      updateField("abuseDetected", false);
+      updateField("abuseSeverity", null);
+      updateField("abuseSanitizedText", "");
+      updateField("abuseMetadata", null);
+      return;
+    }
+
+    let cancelled = false;
+    updateField("abuseStatus", "checking");
+    updateField("abuseDetected", false);
+    updateField("abuseSeverity", null);
+    updateField("abuseSanitizedText", "");
+    updateField("abuseMetadata", null);
+
+    const timer = setTimeout(async () => {
+      try {
+        const response = await fetch("/api/agents/abuse", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${authToken}`,
+          },
+          body: JSON.stringify({
+            text: formData.description,
+          }),
+        });
+
+        if (!response.ok) {
+          throw new Error(`Abuse request failed with status ${response.status}`);
+        }
+
+        const data = await response.json();
+        if (cancelled) return;
+
+        const sanitizedText =
+          typeof data.clean_text === "string" && data.clean_text.trim().length > 0
+            ? data.clean_text
+            : formData.description;
+        const abuseDetected = data.has_abuse === true;
+        const metadata: AbuseMetadata = {
+          severity: data.severity || (abuseDetected ? "medium" : "none"),
+          clean_text: sanitizedText,
+          explanation_en: data.explanation_en || "",
+          explanation_hi: data.explanation_hi || "",
+          flagged_spans: Array.isArray(data.flagged_spans) ? data.flagged_spans : [],
+          flagged_phrases: Array.isArray(data.flagged_phrases) ? data.flagged_phrases : [],
+          source: "review-step",
+        };
+
+        updateField("abuseStatus", "ready");
+        updateField("abuseDetected", abuseDetected);
+        updateField("abuseSeverity", metadata.severity || "none");
+        updateField("abuseSanitizedText", sanitizedText);
+        updateField("abuseMetadata", metadata);
+      } catch (error) {
+        if (cancelled) return;
+        console.error("[Step4Review] Abuse moderation failed:", error);
+        updateField("abuseStatus", "error");
+        updateField("abuseDetected", false);
+        updateField("abuseSeverity", null);
+        updateField("abuseSanitizedText", formData.description);
+        updateField("abuseMetadata", null);
+      }
+    }, 350);
+
+    return () => {
+      cancelled = true;
+      clearTimeout(timer);
+    };
+  }, [authToken, formData.description, updateField]);
+
+  useEffect(() => {
+    const hasEnoughData =
+      formData.description.trim().length >= 20 &&
+      Boolean(formData.categoryName) &&
+      Boolean(formData.subCategory) &&
+      Boolean(formData.pin) &&
+      Boolean(formData.district) &&
+      Boolean(authToken) &&
+      formData.abuseStatus !== "checking";
+
+    if (!hasEnoughData) {
+      updateField("qualityStatus", "idle");
+      updateField("qualityScore", null);
+      updateField("qualityBreakdown", null);
+      updateField("qualitySuggestions", []);
+      updateField("qualityRating", null);
+      return;
+    }
+
+    let cancelled = false;
+
+    const timer = setTimeout(async () => {
+      updateField("qualityStatus", "checking");
+
+      try {
+        const response = await fetch("/api/agents/quality", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${authToken}`,
+          },
+          body: JSON.stringify({
+            description:
+              formData.abuseDetected && formData.abuseSanitizedText
+                ? formData.abuseSanitizedText
+                : formData.description,
+            category: formData.categoryName,
+            subCategory: formData.subCategory,
+            urgency: formData.urgency,
+            hasAttachment: Boolean(formData.photo || formData.photoPreview),
+            locationDetails: {
+              district: formData.district,
+              city: formData.city,
+              locality: formData.locality,
+              street: formData.street,
+              pincode: formData.pin,
+              latitude: formData.latitude ? Number(formData.latitude) : undefined,
+              longitude: formData.longitude ? Number(formData.longitude) : undefined,
+            },
+            hasSimilarComplaints: formData.hasSimilarComplaints,
+            isDuplicate: formData.isDuplicate,
+            abuseDetected: formData.abuseDetected,
+          }),
+        });
+
+        if (!response.ok) {
+          throw new Error(`Quality request failed with status ${response.status}`);
+        }
+
+        const data = await response.json();
+        if (cancelled) return;
+
+        updateField("qualityStatus", "ready");
+        updateField("qualityScore", typeof data.score === "number" ? data.score : 0);
+        updateField("qualityBreakdown", data.breakdown || EMPTY_BREAKDOWN);
+        updateField("qualitySuggestions", Array.isArray(data.suggestions) ? data.suggestions : []);
+        updateField("qualityRating", (data.rating as QualityRating) || "poor");
+      } catch (error) {
+        if (cancelled) return;
+        console.error("[Step4Review] Quality scoring failed:", error);
+        updateField("qualityStatus", "error");
+        updateField("qualityScore", null);
+        updateField("qualityBreakdown", null);
+        updateField("qualitySuggestions", []);
+        updateField("qualityRating", null);
+      }
+    }, 350);
+
+    return () => {
+      cancelled = true;
+      clearTimeout(timer);
+    };
+  }, [
+    authToken,
+    formData.categoryName,
+    formData.city,
+    formData.description,
+    formData.abuseDetected,
+    formData.abuseSanitizedText,
+    formData.abuseStatus,
+    formData.district,
+    formData.hasSimilarComplaints,
+    formData.isDuplicate,
+    formData.locality,
+    formData.latitude,
+    formData.longitude,
+    formData.photo,
+    formData.photoPreview,
+    formData.pin,
+    formData.street,
+    formData.subCategory,
+    formData.urgency,
+    updateField,
+  ]);
+
   const formatDepartment = (dept: string) => {
     return dept.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
   };
@@ -84,6 +335,16 @@ export function Step4Review({ formData, goToStep }: Step4Props) {
 
   const categoryDisplay = getCategoryDisplay(formData.categoryName);
   const urgencyDisplay = getUrgencyDisplay(formData.urgency);
+  const displayDescription =
+    formData.abuseDetected && formData.abuseSanitizedText
+      ? formData.abuseSanitizedText
+      : formData.description;
+  const displayQualityScore =
+    typeof formData.qualityScore === "number" ? (formData.qualityScore / 10).toFixed(1) : null;
+  const qualityNeedsImprovement =
+    typeof formData.qualityScore === "number" && formData.qualityScore < MIN_QUALITY_SCORE_TO_SUBMIT;
+  const primaryDuplicate = formData.dedupMatches[0];
+  const flaggedPhraseCount = formData.abuseMetadata?.flagged_phrases?.length || 0;
 
   return (
     <motion.div
@@ -176,8 +437,13 @@ export function Step4Review({ formData, goToStep }: Step4Props) {
           <div>
             <p className="text-xs font-medium text-gray-400 uppercase tracking-wide mb-1.5">Description</p>
             <p className="text-gray-700 whitespace-pre-wrap leading-relaxed bg-gray-50 rounded-xl p-4 border border-gray-100">
-              {formData.description}
+              {displayDescription}
             </p>
+            {formData.abuseDetected && (
+              <p className="mt-2 text-xs text-amber-700">
+                Preview shows the AI-moderated description that will be submitted.
+              </p>
+            )}
           </div>
           <div className="flex flex-wrap items-center gap-3">
             <div>
@@ -300,13 +566,103 @@ export function Step4Review({ formData, goToStep }: Step4Props) {
       <motion.div variants={itemVariants}>
         <DedupResultsCard
           description={formData.description}
-          categoryName={formData.categoryName}
+          category={formData.categoryName}
           district={formData.district}
-          onUpvoteInstead={(id) => {
-            window.open(`/dashboard?highlight=${id}`, "_blank");
+          pin={formData.pin}
+          onUpvoteInstead={async (id) => {
+            setLoadingComplaint(true);
+            setIsModalOpen(true);
+            
+            try {
+              const token = localStorage.getItem("authToken");
+              const res = await fetch(`/api/complaint/${id}`, {
+                headers: token ? { Authorization: `Bearer ${token}` } : {},
+              });
+
+              if (res.ok) {
+                const data = await res.json();
+                console.log("[Step4Review] Fetched complaint data:", data);
+                
+                // The API might return { success: true, data: {...} } or just the complaint
+                const complaint = data.data || data;
+                console.log("[Step4Review] Setting complaint:", complaint);
+                setSelectedComplaint(complaint);
+              } else {
+                console.error("[Step4Review] Failed to fetch complaint:", res.status);
+              }
+            } catch (error) {
+              console.error("[Step4Review] Error fetching complaint:", error);
+            } finally {
+              setLoadingComplaint(false);
+            }
           }}
+          onResult={handleDedupResult}
         />
       </motion.div>
+
+      {/* Abuse Moderation Preview */}
+      {formData.description && formData.description.length >= 5 && (
+        <motion.div
+          variants={itemVariants}
+          className="bg-white border-2 border-gray-100 rounded-2xl overflow-hidden shadow-sm hover:shadow-md transition-shadow"
+        >
+          <div className="flex items-center justify-between px-5 py-4 bg-linear-to-r from-rose-50 to-amber-50 border-b border-gray-100">
+            <div className="flex items-center gap-3">
+              <div className="p-2 bg-rose-100 rounded-xl">
+                <Shield className="h-5 w-5 text-rose-600" />
+              </div>
+              <span className="font-semibold text-gray-800">AI Abuse Check</span>
+            </div>
+          </div>
+          <div className="p-5">
+            {formData.abuseStatus === "checking" && (
+              <div className="flex items-center gap-3 rounded-xl border border-rose-200 bg-rose-50 px-4 py-3 text-rose-700">
+                <Loader2 className="h-4 w-4 animate-spin" />
+                <span className="text-sm font-medium">
+                  Abuse AI is checking the complaint text and preparing a safe preview.
+                </span>
+              </div>
+            )}
+
+            {formData.abuseStatus === "error" && (
+              <div className="rounded-xl border border-gray-200 bg-gray-50 px-4 py-3 text-sm text-gray-600">
+                Abuse moderation preview is unavailable right now. Server-side moderation will still run after submission.
+              </div>
+            )}
+
+            {formData.abuseStatus === "ready" && formData.abuseDetected && (
+              <div className="space-y-4">
+                <AbuseFlagBanner abuseMetadata={formData.abuseMetadata || EMPTY_ABUSE_METADATA} />
+
+                <div className="rounded-2xl border border-amber-200 bg-amber-50/70 p-4">
+                  <div className="flex items-start justify-between gap-3">
+                    <div>
+                      <p className="text-xs font-semibold uppercase tracking-wide text-amber-700">
+                        Sanitized Preview
+                      </p>
+                      <p className="mt-2 whitespace-pre-wrap text-sm leading-relaxed text-gray-800">
+                        {formData.abuseSanitizedText || formData.description}
+                      </p>
+                    </div>
+                    <span className="rounded-full bg-white px-3 py-1 text-xs font-semibold text-amber-700 border border-amber-200">
+                      {flaggedPhraseCount} flagged
+                    </span>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {formData.abuseStatus === "ready" && !formData.abuseDetected && (
+              <div className="flex gap-3 rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-emerald-700">
+                <CheckCircle className="mt-0.5 h-4 w-4 shrink-0" />
+                <div className="text-sm">
+                  No abusive language was detected in the complaint description.
+                </div>
+              </div>
+            )}
+          </div>
+        </motion.div>
+      )}
 
       {/* Quality Score Preview */}
       {formData.description && formData.description.length >= 20 && (
@@ -323,12 +679,72 @@ export function Step4Review({ formData, goToStep }: Step4Props) {
             </div>
           </div>
           <div className="p-5">
-            <p className="text-xs text-gray-400 mb-3">
-              Quality is scored after submission based on clarity, evidence, location details, and completeness.
-            </p>
-            <div className="flex items-center gap-3">
-              <div className="text-sm text-gray-600">Estimated score will appear on your complaint card.</div>
-            </div>
+            {formData.qualityStatus === "checking" && (
+              <div className="flex items-center gap-3 rounded-xl border border-violet-200 bg-violet-50 px-4 py-3 text-violet-700">
+                <Loader2 className="h-4 w-4 animate-spin" />
+                <span className="text-sm font-medium">Quality AI is evaluating clarity, evidence, location, and mismatch risk.</span>
+              </div>
+            )}
+
+            {formData.qualityStatus === "error" && (
+              <div className="rounded-xl border border-gray-200 bg-gray-50 px-4 py-3 text-sm text-gray-600">
+                Quality preview is unavailable right now. You can still continue.
+              </div>
+            )}
+
+            {formData.qualityStatus === "ready" && (
+              <div className="space-y-4">
+                <div className="flex flex-col gap-3 rounded-2xl border border-violet-100 bg-violet-50/70 p-4 sm:flex-row sm:items-center sm:justify-between">
+                  <div>
+                    <p className="text-xs font-semibold uppercase tracking-wide text-violet-500">Current Score</p>
+                    <div className="mt-1 flex items-end gap-3">
+                      <span className="text-3xl font-bold text-violet-900">{displayQualityScore}/10</span>
+                      <QualityScoreBadge score={formData.qualityScore} size="md" />
+                    </div>
+                    {primaryDuplicate && formData.isDuplicate && (
+                      <p className="mt-2 text-sm text-amber-700">
+                        This looks like a duplicate of complaint #{primaryDuplicate.seq}.
+                      </p>
+                    )}
+                  </div>
+
+                  <div className="sm:w-64">
+                    <QualityBreakdownBar breakdown={formData.qualityBreakdown || EMPTY_BREAKDOWN} />
+                  </div>
+                </div>
+
+                {qualityNeedsImprovement && (
+                  <div className="flex gap-3 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-red-700">
+                    <CircleAlert className="mt-0.5 h-4 w-4 shrink-0" />
+                    <div className="text-sm">
+                      The current score is below 5/10, so submit stays disabled until the complaint is improved.
+                    </div>
+                  </div>
+                )}
+
+                {formData.dedupSuggestion && (
+                  <div className="rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800">
+                    {formData.dedupSuggestion}
+                  </div>
+                )}
+
+                {formData.qualitySuggestions.length > 0 && (
+                  <div>
+                    <p className="mb-2 text-sm font-semibold text-gray-800">How to improve this complaint</p>
+                    <ul className="space-y-2 text-sm text-gray-600">
+                      {formData.qualitySuggestions.map((suggestion, index) => (
+                        <li
+                          key={`${suggestion}-${index}`}
+                          className="rounded-xl border border-gray-100 bg-gray-50 px-3 py-2"
+                        >
+                          {suggestion}
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+              </div>
+            )}
           </div>
         </motion.div>
       )}
@@ -366,6 +782,20 @@ export function Step4Review({ formData, goToStep }: Step4Props) {
           </div>
         </div>
       </motion.div>
+
+      {/* Complaint Detail Modal */}
+      <LikeProvider>
+        <ComplaintDetailModal
+          complaint={selectedComplaint}
+          isOpen={isModalOpen}
+          isLoading={loadingComplaint}
+          onClose={() => {
+            setIsModalOpen(false);
+            setSelectedComplaint(null);
+          }}
+          hideAssignmentTimeline={true}
+        />
+      </LikeProvider>
     </motion.div>
   );
 }

@@ -26,6 +26,7 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useNetwork } from "@/hooks/useNetwork";
+import { normalizeDistrictName } from "@/lib/location/normalizeDistrict";
 import {
   useComplaintForm,
   Step2Details,
@@ -41,6 +42,7 @@ import {
   type AIResult,
   type AutoFillPhase,
   type DraftLocation,
+  type ComplaintFormField,
 } from "./customComps";
 import {
   Step1CategoryWithAutofill,
@@ -200,7 +202,8 @@ export default function RegisterComplaintPage() {
 
   // Auto-fill sequence hook
   const autoFill = useAutoFillSequence({
-    updateField: (field, value) => updateField(field as any, value as any),
+    updateField: (field, value) =>
+      updateField(field as ComplaintFormField, value as never),
     setCurrentStep: goToStep,
     goToStep,
     categories,
@@ -255,7 +258,10 @@ export default function RegisterComplaintPage() {
       };
 
       const draftLoc: DraftLocation = {
-        district: draft.district,
+        district:
+          typeof draft.district === "string"
+            ? normalizeDistrictName(draft.district)
+            : undefined,
         city: draft.city,
         pin: draft.pin,
         locality: draft.locality,
@@ -314,6 +320,83 @@ export default function RegisterComplaintPage() {
       default:
         return { schema: step1Schema, data: {} };
     }
+  };
+
+  const buildSubmitFormData = () => {
+    const submitFormData = new FormData();
+    const moderatedDescription =
+      formData.abuseStatus === "ready" &&
+      formData.abuseDetected &&
+      formData.abuseSanitizedText.trim().length > 0
+        ? formData.abuseSanitizedText
+        : formData.description;
+
+    submitFormData.append("categoryId", formData.categoryId);
+    submitFormData.append("assignedDepartment", formData.assignedDepartment);
+    submitFormData.append("subCategory", formData.subCategory);
+    submitFormData.append("description", moderatedDescription);
+    submitFormData.append("urgency", formData.urgency);
+    submitFormData.append("isPublic", String(formData.isPublic));
+    submitFormData.append("isDuplicate", String(formData.isDuplicate));
+    submitFormData.append("hasSimilarComplaints", String(formData.hasSimilarComplaints));
+
+    if (typeof formData.qualityScore === "number") {
+      submitFormData.append("qualityScore", String(formData.qualityScore));
+    }
+
+    if (formData.qualityBreakdown) {
+      submitFormData.append("qualityBreakdown", JSON.stringify(formData.qualityBreakdown));
+    }
+
+    const similarComplaintIds = Array.from(
+      new Set(formData.dedupMatches.map((match) => match.id).filter(Boolean))
+    );
+    if (similarComplaintIds.length > 0) {
+      submitFormData.append("similarComplaintIds", JSON.stringify(similarComplaintIds));
+    }
+
+    if (formData.abuseStatus === "ready" && formData.abuseDetected) {
+      submitFormData.append("AIabusedFlag", "true");
+      submitFormData.append(
+        "abuseMetadata",
+        JSON.stringify({
+          ...(formData.abuseMetadata || {}),
+          clean_text: moderatedDescription,
+          source: "review-step",
+        })
+      );
+    }
+
+    const locationData: {
+      district: string;
+      pin: string;
+      city: string;
+      locality: string;
+      street?: string;
+      latitude?: number;
+      longitude?: number;
+    } = {
+      district: formData.district,
+      pin: formData.pin,
+      city: formData.city,
+      locality: formData.locality,
+      street: formData.street || undefined,
+    };
+
+    if (formData.latitude) {
+      locationData.latitude = parseFloat(formData.latitude);
+    }
+    if (formData.longitude) {
+      locationData.longitude = parseFloat(formData.longitude);
+    }
+
+    submitFormData.append("location", JSON.stringify(locationData));
+
+    if (formData.photo) {
+      submitFormData.append("image", formData.photo);
+    }
+
+    return submitFormData;
   };
 
   // --- AI Quick Fill Flow Handlers ---
@@ -464,41 +547,7 @@ export default function RegisterComplaintPage() {
       }
 
       // Prepare FormData
-      const submitFormData = new FormData();
-      submitFormData.append("categoryId", formData.categoryId);
-      submitFormData.append("assignedDepartment", formData.assignedDepartment);
-      submitFormData.append("subCategory", formData.subCategory);
-      submitFormData.append("description", formData.description);
-      submitFormData.append("urgency", formData.urgency);
-      submitFormData.append("isPublic", String(formData.isPublic));
-
-      // Build location object as expected by backend
-      const locationData: {
-        district: string;
-        pin: string;
-        city: string;
-        locality: string;
-        latitude?: number;
-        longitude?: number;
-      } = {
-        district: formData.district,
-        pin: formData.pin,
-        city: formData.city,
-        locality: formData.locality,
-      };
-
-      if (formData.latitude) {
-        locationData.latitude = parseFloat(formData.latitude);
-      }
-      if (formData.longitude) {
-        locationData.longitude = parseFloat(formData.longitude);
-      }
-
-      submitFormData.append("location", JSON.stringify(locationData));
-
-      if (formData.photo) {
-        submitFormData.append("image", formData.photo);
-      }
+      const submitFormData = buildSubmitFormData();
 
       // Check if online (using unified network hook)
       if (!isOnline) {
@@ -634,7 +683,7 @@ export default function RegisterComplaintPage() {
           />
         );
       case 4:
-        return <Step4Review formData={formData} goToStep={goToStep} />;
+        return <Step4Review formData={formData} goToStep={goToStep} updateField={updateField} />;
       default:
         return null;
     }
@@ -650,6 +699,14 @@ export default function RegisterComplaintPage() {
     imageValidationStatus === "invalid" ||
     imageValidationStatus === "error"
   ));
+  const isSubmitBlockedByQuality =
+    currentStep === 4 &&
+    formData.qualityStatus === "ready" &&
+    typeof formData.qualityScore === "number" &&
+    formData.qualityScore < 50;
+  const isSubmitPendingQualityCheck =
+    currentStep === 4 &&
+    (formData.qualityStatus === "checking" || formData.abuseStatus === "checking");
 
   // Get next step label for button text
   const getNextStepLabel = () => {
@@ -778,11 +835,17 @@ export default function RegisterComplaintPage() {
                 ) : (
                   <Button
                     onClick={handleSubmit}
-                    disabled={isSubmitting}
+                    disabled={isSubmitting || isSubmitBlockedByQuality || isSubmitPendingQualityCheck}
                     className="flex items-center gap-2 px-6 py-2.5 rounded-full bg-emerald-600 hover:bg-emerald-700 text-white transition-all"
                   >
                     <Send className="h-4 w-4" />
-                    Submit Complaint
+                    {formData.abuseStatus === "checking"
+                      ? "Moderation Check Running..."
+                      : isSubmitPendingQualityCheck
+                      ? "Quality Check Running..."
+                      : isSubmitBlockedByQuality
+                        ? "Improve Complaint to Submit"
+                        : "Submit Complaint"}
                   </Button>
                 )}
               </div>
@@ -870,7 +933,7 @@ export default function RegisterComplaintPage() {
                       setUnserviceableLocation(null);
                       setAutoFillState("done");
                       // Clear the invalid district so user can pick a valid one
-                      updateField("district" as any, "");
+                      updateField("district", "");
                     }}
                     className="w-full bg-[#630ed4] hover:bg-[#5108b8] text-white rounded-xl"
                   >

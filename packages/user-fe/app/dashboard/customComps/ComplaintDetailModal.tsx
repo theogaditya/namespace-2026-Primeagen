@@ -3,6 +3,7 @@
 import React, { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "@/lib/utils";
+import { AbuseFlagBanner } from "@/components/abuse-flag-banner";
 import { useComplaintLike } from "@/contexts/LikeContext";
 import {
   Complaint,
@@ -929,6 +930,12 @@ export function ComplaintDetailModal({
                                     ? "&quot;Image verified as authentic evidence. High confidence mapping to complaint category.&quot;"
                                     : "&quot;Image could not be verified. Manual review recommended.&quot;"}
                                 </p>
+                              </div>
+                            )}
+
+                            {complaint.AIabusedFlag && (
+                              <div className="pt-2 border-t border-slate-700/50">
+                                <AbuseFlagBanner abuseMetadata={complaint.abuseMetadata} />
                               </div>
                             )}
 

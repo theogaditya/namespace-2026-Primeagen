@@ -8,7 +8,7 @@ import { createDedupAI } from "../agents/dedupAI";
  * Accepts a draft complaint and returns deduplication analysis.
  * This endpoint is called in the complaint preview step, before final submission.
  *
- * Body: { description: string, category?: string, district?: string }
+ * Body: { description: string, category?: string, district?: string, pin?: string }
  * Returns: { hasSimilar, isDuplicate, matches[], suggestion, confidence }
  */
 export function createDedupRouter(db: PrismaClient): Router {
@@ -18,7 +18,7 @@ export function createDedupRouter(db: PrismaClient): Router {
   router.post("/", async (req, res) => {
     try {
       const userId = (req as any).userId as string;
-      const { description, category, district } = req.body;
+      const { description, category, district, pin } = req.body;
 
       if (!description || typeof description !== "string" || description.trim().length < 10) {
         res.status(400).json({
@@ -31,6 +31,7 @@ export function createDedupRouter(db: PrismaClient): Router {
         description: description.trim(),
         category: category || undefined,
         district: district || undefined,
+        pin: pin || undefined,
         userId,
       });
 

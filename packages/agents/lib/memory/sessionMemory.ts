@@ -1,5 +1,6 @@
 import { createClient, type RedisClientType } from "@redis/client";
 import { BaseMessage, HumanMessage, AIMessage } from "@langchain/core/messages";
+import type { ComplaintFlowState } from "../complaintFlow/state";
 
 /**
  * Redis-backed conversation memory with in-memory fallback.
@@ -13,6 +14,7 @@ const MEMORY_TTL_MS = SESSION_TTL_SECONDS * 1000;
 
 interface MemoryEntry {
   messages: { role: "human" | "ai"; content: string; timestamp: number }[];
+  complaintState?: ComplaintFlowState | null;
   lastAccess: number;
 }
 
@@ -74,6 +76,10 @@ class SessionMemoryStore {
 
   private getKey(userId: string, sessionId: string): string {
     return `agent:session:${userId}:${sessionId}`;
+  }
+
+  private getStateKey(userId: string, sessionId: string): string {
+    return `agent:session_state:${userId}:${sessionId}`;
   }
 
   async getHistory(userId: string, sessionId: string): Promise<BaseMessage[]> {
@@ -138,12 +144,72 @@ class SessionMemoryStore {
     entry.lastAccess = Date.now();
   }
 
+  async getComplaintState(userId: string, sessionId: string): Promise<ComplaintFlowState | null> {
+    const key = this.getKey(userId, sessionId);
+    const stateKey = this.getStateKey(userId, sessionId);
+
+    if (this.redisAvailable && this.client) {
+      try {
+        const raw = await this.client.get(stateKey);
+        if (raw) {
+          return JSON.parse(raw) as ComplaintFlowState;
+        }
+      } catch {
+        // Fall through to in-memory
+      }
+    }
+
+    const entry = this.memoryStore.get(key);
+    if (entry) {
+      entry.lastAccess = Date.now();
+      return entry.complaintState || null;
+    }
+
+    return null;
+  }
+
+  async setComplaintState(
+    userId: string,
+    sessionId: string,
+    complaintState: ComplaintFlowState | null
+  ): Promise<void> {
+    const key = this.getKey(userId, sessionId);
+    const stateKey = this.getStateKey(userId, sessionId);
+
+    if (this.redisAvailable && this.client) {
+      try {
+        if (complaintState) {
+          await this.client.set(stateKey, JSON.stringify(complaintState));
+          await this.client.expire(stateKey, SESSION_TTL_SECONDS);
+        } else {
+          await this.client.del(stateKey);
+        }
+      } catch {
+        // Fall through to in-memory
+      }
+    }
+
+    let entry = this.memoryStore.get(key);
+    if (!entry) {
+      entry = { messages: [], lastAccess: Date.now() };
+      this.memoryStore.set(key, entry);
+    }
+    entry.complaintState = complaintState;
+    entry.lastAccess = Date.now();
+  }
+
+  async clearComplaintState(userId: string, sessionId: string): Promise<void> {
+    await this.setComplaintState(userId, sessionId, null);
+  }
+
   async clearSession(userId: string, sessionId: string): Promise<void> {
     const key = this.getKey(userId, sessionId);
+    const stateKey = this.getStateKey(userId, sessionId);
     this.memoryStore.delete(key);
     if (this.redisAvailable && this.client) {
       try {
         await this.client.del(key);
+        await this.client.del(stateKey);
       } catch (error) {
         console.warn("[SessionMemory] Failed to clear session:", error);
       }

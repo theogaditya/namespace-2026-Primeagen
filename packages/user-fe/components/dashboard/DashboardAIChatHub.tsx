@@ -19,6 +19,7 @@ import {
 import { cn } from "@/lib/utils";
 import type { UserData } from "@/app/dashboard/customComps/types";
 import { WavRecorder } from "@/lib/utils/wav-recorder";
+import { normalizeDistrictName } from "@/lib/location/normalizeDistrict";
 import { useRouter } from "next/navigation";
 
 const SentientSphere = dynamic(() => import("./SentientSphere"), {
@@ -49,11 +50,60 @@ interface SavedSession {
   preview: string;
 }
 
+function normalizeComplaintDraftLocation(draft: unknown) {
+  if (!draft || typeof draft !== "object") return draft;
 
+  const draftRecord = draft as Record<string, unknown>;
+
+  return {
+    ...draftRecord,
+    district:
+      typeof draftRecord.district === "string"
+        ? normalizeDistrictName(draftRecord.district)
+        : draftRecord.district,
+  };
+}
 
 // Silence detection config
-const SILENCE_THRESHOLD = 0.01;
-const SILENCE_DURATION_MS = 2000;
+const SILENCE_THRESHOLD = 0.012;
+const SPEECH_START_THRESHOLD = 0.02;
+const SILENCE_DURATION_MS = 1200;
+const INITIAL_SILENCE_TIMEOUT_MS = 4000;
+const MAX_RECORDING_MS = 15000;
+const MIN_SPEECH_FRAMES = 3;
+
+function getAudioFileExtension(mimeType: string): string {
+  if (mimeType.includes("webm")) return "webm";
+  if (mimeType.includes("mp4") || mimeType.includes("m4a")) return "m4a";
+  if (mimeType.includes("mpeg") || mimeType.includes("mp3")) return "mp3";
+  return "wav";
+}
+
+function parseSseEvent(rawEvent: string): { event: string; data: any } | null {
+  const lines = rawEvent.split("\n");
+  const event = lines
+    .filter((line) => line.startsWith("event:"))
+    .map((line) => line.slice(6).trim())
+    .join("");
+  const dataText = lines
+    .filter((line) => line.startsWith("data:"))
+    .map((line) => line.slice(5).trim())
+    .join("\n");
+
+  if (!event) return null;
+
+  try {
+    return {
+      event,
+      data: dataText ? JSON.parse(dataText) : null,
+    };
+  } catch {
+    return {
+      event,
+      data: dataText,
+    };
+  }
+}
 
 export default function DashboardAIChatHub({
   user,
@@ -83,6 +133,7 @@ export default function DashboardAIChatHub({
   const analyserRef = useRef<AnalyserNode | null>(null);
   const animFrameRef = useRef<number | null>(null);
   const audioRef = useRef<HTMLAudioElement | null>(null);
+  const stoppingRecordingRef = useRef(false);
   const router = useRouter();
 
   const firstName = user?.name?.split(" ")[0] || "Citizen";
@@ -108,6 +159,7 @@ export default function DashboardAIChatHub({
       if (animFrameRef.current) cancelAnimationFrame(animFrameRef.current);
       if (silenceTimerRef.current) clearTimeout(silenceTimerRef.current);
       audioRef.current?.pause();
+      recorderRef.current?.stop().catch(() => {});
     };
   }, []);
 
@@ -158,6 +210,24 @@ export default function DashboardAIChatHub({
     setShowHistory(false);
   }, []);
 
+  const endVoiceMode = useCallback(() => {
+    voiceModeRef.current = false;
+    stoppingRecordingRef.current = false;
+    setIsVoiceMode(false);
+    setIsRecording(false);
+    setIsSpeaking(false);
+    setIsProcessingVoice(false);
+    if (audioRef.current) {
+      audioRef.current.pause();
+      audioRef.current = null;
+    }
+    if (animFrameRef.current) {
+      cancelAnimationFrame(animFrameRef.current);
+      animFrameRef.current = null;
+    }
+    recorderRef.current?.stop().catch(() => {});
+  }, []);
+
   // --- Location detection helper ---
   const handleLocationDetection = useCallback(async () => {
     if (locationDetectedRef.current) return;
@@ -177,8 +247,9 @@ export default function DashboardAIChatHub({
       );
       const geoData = await geoRes.json();
       const addr = geoData.address || {};
-      const district =
-        addr.county || addr.state_district || addr.city_district || "";
+      const district = normalizeDistrictName(
+        addr.county || addr.state_district || addr.city_district || ""
+      );
       const city = addr.city || addr.town || addr.village || "";
       const state = addr.state || "";
       const pin = addr.postcode || "unknown";
@@ -276,7 +347,7 @@ export default function DashboardAIChatHub({
           if (complaintDraft) {
             localStorage.setItem(
               "complaintDraft",
-              JSON.stringify(complaintDraft)
+              JSON.stringify(normalizeComplaintDraftLocation(complaintDraft))
             );
           }
           setTimeout(() => router.push("/regComplaint"), 500);
@@ -318,11 +389,14 @@ export default function DashboardAIChatHub({
   const startSilenceDetection = useCallback(
     (audioContext: AudioContext, source: MediaStreamAudioSourceNode) => {
       const analyser = audioContext.createAnalyser();
-      analyser.fftSize = 512;
+      analyser.fftSize = 1024;
       source.connect(analyser);
       analyserRef.current = analyser;
-      const dataArray = new Float32Array(analyser.frequencyBinCount);
+      const dataArray = new Float32Array(analyser.fftSize);
+      const recordingStartedAt = Date.now();
       let silenceStart: number | null = null;
+      let speechFrames = 0;
+      let speechStarted = false;
 
       const check = () => {
         if (!voiceModeRef.current) return;
@@ -331,10 +405,33 @@ export default function DashboardAIChatHub({
         for (let i = 0; i < dataArray.length; i++) sum += dataArray[i] * dataArray[i];
         const rms = Math.sqrt(sum / dataArray.length);
 
+        const elapsed = Date.now() - recordingStartedAt;
+        if (elapsed >= MAX_RECORDING_MS) {
+          stopRecordingAndSend();
+          return;
+        }
+
+        if (!speechStarted) {
+          if (rms >= SPEECH_START_THRESHOLD) {
+            speechFrames += 1;
+            if (speechFrames >= MIN_SPEECH_FRAMES) {
+              speechStarted = true;
+              silenceStart = null;
+            }
+          } else {
+            speechFrames = 0;
+            if (elapsed >= INITIAL_SILENCE_TIMEOUT_MS) {
+              stopRecordingAndSend();
+              return;
+            }
+          }
+          animFrameRef.current = requestAnimationFrame(check);
+          return;
+        }
+
         if (rms < SILENCE_THRESHOLD) {
           if (silenceStart === null) silenceStart = Date.now();
           else if (Date.now() - silenceStart > SILENCE_DURATION_MS) {
-            // Silence detected — stop recording
             stopRecordingAndSend();
             return;
           }
@@ -351,6 +448,7 @@ export default function DashboardAIChatHub({
   // --- Voice: start recording ---
   const startRecording = useCallback(async () => {
     try {
+      stoppingRecordingRef.current = false;
       const recorder = new WavRecorder();
       recorderRef.current = recorder;
       await recorder.start();
@@ -368,9 +466,47 @@ export default function DashboardAIChatHub({
     }
   }, [startSilenceDetection]);
 
+  const playVoiceResponse = useCallback(
+    async (audioBase64: string | null) => {
+      if (!audioBase64) {
+        if (voiceModeRef.current) startRecording();
+        return;
+      }
+
+      setIsSpeaking(true);
+      const audioBlob = new Blob(
+        [Uint8Array.from(atob(audioBase64), (char) => char.charCodeAt(0))],
+        { type: "audio/mp3" }
+      );
+      const audioUrl = URL.createObjectURL(audioBlob);
+      const audio = new Audio(audioUrl);
+      audioRef.current = audio;
+      audio.onended = () => {
+        URL.revokeObjectURL(audioUrl);
+        setIsSpeaking(false);
+        audioRef.current = null;
+        if (voiceModeRef.current) {
+          startRecording();
+        }
+      };
+
+      try {
+        await audio.play();
+      } catch {
+        setIsSpeaking(false);
+        audioRef.current = null;
+        if (voiceModeRef.current) {
+          startRecording();
+        }
+      }
+    },
+    [startRecording]
+  );
+
   // --- Voice: stop recording and send ---
   const stopRecordingAndSend = useCallback(async () => {
-    if (!recorderRef.current) return;
+    if (!recorderRef.current || stoppingRecordingRef.current) return;
+    stoppingRecordingRef.current = true;
     if (animFrameRef.current) {
       cancelAnimationFrame(animFrameRef.current);
       animFrameRef.current = null;
@@ -379,17 +515,22 @@ export default function DashboardAIChatHub({
     setIsProcessingVoice(true);
 
     try {
-      const blob = await recorderRef.current.stop();
+      const recorder = recorderRef.current;
+      recorderRef.current = null;
+      const blob = await recorder.stop();
       if (!blob || blob.size < 1000) {
-        // Too short — skip
         setIsProcessingVoice(false);
+        stoppingRecordingRef.current = false;
         if (voiceModeRef.current) startRecording();
         return;
       }
 
       const formData = new FormData();
-      formData.append("audio", blob, "recording.wav");
+      const mimeType = blob.type || recorder.mimeType || "audio/wav";
+      const fileExtension = getAudioFileExtension(mimeType);
+      formData.append("audio", blob, `recording.${fileExtension}`);
       formData.append("language", "english");
+      formData.append("mimeType", mimeType);
       if (sessionIdRef.current) formData.append("sessionId", sessionIdRef.current);
 
       // Attach image if user uploaded one during voice mode
@@ -400,10 +541,12 @@ export default function DashboardAIChatHub({
         setVoiceImagePreview(null);
       }
 
+      const userMessageId = crypto.randomUUID();
+      const assistantMessageId = crypto.randomUUID();
       setMessages((prev) => [
         ...prev,
         {
-          id: crypto.randomUUID(),
+          id: userMessageId,
           role: "user",
           content: hadVoiceImage ? "🎙️📎 Voice message with photo..." : "🎙️ Voice message...",
           timestamp: new Date(),
@@ -412,7 +555,7 @@ export default function DashboardAIChatHub({
       setIsExpanded(true);
 
       const voiceToken = localStorage.getItem("authToken");
-      const res = await fetch("/api/agents/voice", {
+      const res = await fetch("/api/agents/voice/stream", {
         method: "POST",
         headers: {
           ...(voiceToken ? { Authorization: `Bearer ${voiceToken}` } : {}),
@@ -426,92 +569,130 @@ export default function DashboardAIChatHub({
           errData?.error || errData?.message || "Voice processing failed"
         );
       }
-      const data = await res.json();
-
-      const transcription =
-        data.data?.transcript || data.data?.transcription || data.transcript;
-      const reply =
-        data.data?.response ||
-        data.data?.reply ||
-        data.response ||
-        "Couldn't process voice.";
-
-      const voiceSessionId = data.data?.sessionId || data.sessionId;
-      if (voiceSessionId) sessionIdRef.current = voiceSessionId;
-
-      // Update user message with transcription
-      if (transcription) {
-        setMessages((prev) => {
-          const updated = [...prev];
-          const lastUser = [...updated].reverse().find((m) => m.role === "user");
-          if (lastUser) lastUser.content = `🎙️ "${transcription}"`;
-          return updated;
-        });
+      const reader = res.body?.getReader();
+      if (!reader) {
+        throw new Error("Voice stream is unavailable");
       }
 
-      setMessages((prev) => [
-        ...prev,
-        {
-          id: crypto.randomUUID(),
-          role: "assistant",
-          content: reply,
-          timestamp: new Date(),
-          agent: "sentient-ai",
-        },
-      ]);
+      const decoder = new TextDecoder();
+      let buffer = "";
+      let assistantMessageCreated = false;
+      let streamedResponse = "";
+      let finalResult: any = null;
+      let audioBase64: string | null = null;
 
-      // Handle complaint flow
-      const complaintFlow =
-        data.data?.complaintFlowStarted || data.complaintFlowStarted;
-      const complaintDraft =
-        data.data?.complaintDraft || data.complaintDraft;
-      if (complaintFlow || complaintDraft) {
-        if (complaintDraft) {
-          localStorage.setItem(
-            "complaintDraft",
-            JSON.stringify(complaintDraft)
-          );
-        }
-        setIsVoiceMode(false);
-        router.push("/regComplaint");
-        return;
-      }
+      const ensureAssistantMessage = () => {
+        if (assistantMessageCreated) return;
+        assistantMessageCreated = true;
+        setMessages((prev) => [
+          ...prev,
+          {
+            id: assistantMessageId,
+            role: "assistant",
+            content: "",
+            timestamp: new Date(),
+            agent: "sentient-ai",
+          },
+        ]);
+      };
 
-      // Handle location detection from voice
-      const shouldDetectLocation =
-        data.data?.detectLocation || data.detectLocation;
-      if (shouldDetectLocation) {
-        handleLocationDetection();
-      }
-
-      // Play TTS audio, then auto-restart recording in voice mode
-      const audioBase64 = data.data?.audioResponse || data.audioResponse;
-      if (audioBase64) {
-        setIsSpeaking(true);
-        const audioBlob = new Blob(
-          [Uint8Array.from(atob(audioBase64), (c) => c.charCodeAt(0))],
-          { type: "audio/mp3" }
+      const appendAssistantChunk = (chunk: string) => {
+        if (!chunk) return;
+        ensureAssistantMessage();
+        streamedResponse += chunk;
+        setMessages((prev) =>
+          prev.map((message) =>
+            message.id === assistantMessageId
+              ? { ...message, content: `${message.content}${chunk}` }
+              : message
+          )
         );
-        const audioUrl = URL.createObjectURL(audioBlob);
-        const audio = new Audio(audioUrl);
-        audioRef.current = audio;
-        audio.onended = () => {
-          URL.revokeObjectURL(audioUrl);
-          setIsSpeaking(false);
-          audioRef.current = null;
-          // Auto-continue if still in voice mode
-          if (voiceModeRef.current) {
-            startRecording();
+      };
+
+      const setAssistantContent = (content: string) => {
+        ensureAssistantMessage();
+        streamedResponse = content;
+        setMessages((prev) =>
+          prev.map((message) =>
+            message.id === assistantMessageId
+              ? { ...message, content }
+              : message
+          )
+        );
+      };
+
+      while (true) {
+        const { value, done } = await reader.read();
+        if (done) break;
+
+        buffer += decoder.decode(value, { stream: true });
+
+        let boundaryIndex = buffer.indexOf("\n\n");
+        while (boundaryIndex >= 0) {
+          const rawEvent = buffer.slice(0, boundaryIndex).trim();
+          buffer = buffer.slice(boundaryIndex + 2);
+
+          if (rawEvent) {
+            const parsedEvent = parseSseEvent(rawEvent);
+            if (parsedEvent) {
+              const { event, data } = parsedEvent;
+
+              if (event === "transcript" && data?.text) {
+                if (data.sessionId) sessionIdRef.current = data.sessionId;
+                setMessages((prev) =>
+                  prev.map((message) =>
+                    message.id === userMessageId
+                      ? { ...message, content: `🎙️ "${data.text}"` }
+                      : message
+                  )
+                );
+              } else if (event === "text" && data?.chunk) {
+                appendAssistantChunk(data.chunk);
+              } else if (event === "result") {
+                finalResult = data;
+                if (data?.sessionId) sessionIdRef.current = data.sessionId;
+                if ((!streamedResponse || !streamedResponse.trim()) && data?.response) {
+                  setAssistantContent(data.response);
+                }
+              } else if (event === "audio") {
+                audioBase64 = data?.audioResponse || null;
+              } else if (event === "error") {
+                throw new Error(data?.message || "Voice processing failed");
+              }
+            }
           }
-        };
-        audio.play().catch(() => {
-          setIsSpeaking(false);
-          if (voiceModeRef.current) startRecording();
-        });
-      } else {
-        // No audio response — auto-continue
-        if (voiceModeRef.current) startRecording();
+
+          boundaryIndex = buffer.indexOf("\n\n");
+        }
       }
+
+      if (finalResult) {
+        const complaintFlow = Boolean(finalResult.complaintFlowStarted);
+        const complaintDraft = finalResult.complaintDraft;
+        if (complaintFlow || complaintDraft) {
+          if (complaintDraft) {
+            localStorage.setItem(
+              "complaintDraft",
+              JSON.stringify(normalizeComplaintDraftLocation(complaintDraft))
+            );
+          }
+          endVoiceMode();
+          router.push("/regComplaint");
+          return;
+        }
+
+        if (finalResult.navigationPath) {
+          endVoiceMode();
+          router.push(finalResult.navigationPath);
+          return;
+        }
+
+        if (finalResult.detectLocation) {
+          handleLocationDetection();
+        }
+      }
+
+      await playVoiceResponse(audioBase64);
     } catch (err: any) {
       setMessages((prev) => [
         ...prev,
@@ -525,38 +706,26 @@ export default function DashboardAIChatHub({
           timestamp: new Date(),
         },
       ]);
-      // Try to continue voice mode
       if (voiceModeRef.current) {
         setTimeout(() => startRecording(), 1000);
       }
     } finally {
+      stoppingRecordingRef.current = false;
       setIsProcessingVoice(false);
     }
-  }, [router, startRecording, handleLocationDetection]);
+  }, [endVoiceMode, handleLocationDetection, playVoiceResponse, router, startRecording, voiceAttachedImage]);
 
   // --- Voice mode toggle ---
   const toggleVoiceMode = useCallback(() => {
     if (isVoiceMode) {
-      // Exit voice mode
-      setIsVoiceMode(false);
-      setIsRecording(false);
-      setIsSpeaking(false);
-      if (audioRef.current) {
-        audioRef.current.pause();
-        audioRef.current = null;
-      }
-      if (animFrameRef.current) {
-        cancelAnimationFrame(animFrameRef.current);
-        animFrameRef.current = null;
-      }
-      recorderRef.current?.stop().catch(() => {});
+      endVoiceMode();
     } else {
-      // Enter voice mode
+      voiceModeRef.current = true;
       setIsVoiceMode(true);
       setIsExpanded(true);
       startRecording();
     }
-  }, [isVoiceMode, startRecording]);
+  }, [endVoiceMode, isVoiceMode, startRecording]);
 
   // --- Chip click ---
   const handleChipClick = (action: string) => {

@@ -17,6 +17,8 @@ export async function POST(request: NextRequest) {
     const language = (formData.get("language") as string) || "english";
     const sessionId = formData.get("sessionId") as string | null;
     const imageFile = formData.get("image") as File | null;
+    const mimeType =
+      (formData.get("mimeType") as string | null) || file?.type || "audio/wav";
 
     if (!file) {
       return NextResponse.json(
@@ -45,6 +47,7 @@ export async function POST(request: NextRequest) {
       body: JSON.stringify({
         audio: base64Audio,
         language,
+        mimeType,
         ...(sessionId ? { sessionId } : {}),
         ...(imageBase64 ? { imageBase64 } : {}),
       }),
