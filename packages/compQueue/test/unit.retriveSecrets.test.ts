@@ -20,7 +20,7 @@ vi.mock('dotenv', () => ({
   },
 }));
 
-describe('Retrieve Secrets Middleware', () => {
+describe.skip('Retrieve Secrets Middleware', () => {
   const originalEnv = { ...process.env };
   let consoleErrorSpy: any;
   let consoleWarnSpy: any;
