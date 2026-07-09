@@ -38,9 +38,27 @@ You MUST flag the following as abusive content:
 - If multiple abusive words appear together, mask each one separately.
 
 ## SEVERITY LEVELS:
-- **low**: Mild insults, casual rudeness ("idiot", "useless", "stupid")
-- **medium**: Targeted abuse, intimidation, strong profanity ("fuck", "shit", "ass", "bitch", "bastard")
-- **high**: Threats of violence, hate speech (casteist/communal/sexist slurs), doxxing threats, extreme profanity
+- **low**: Mild insults, casual rudeness ("idiot", "useless", "stupid", "ullu", "gadha", "कमीना")
+- **medium**: Targeted abuse, intimidation, strong profanity ("fuck", "shit", "ass", "bitch", "bastard", "harami", "saala", "kutte", "कुत्ते", "हरामी", "साला")
+- **high**: Threats of violence, hate speech (casteist/communal/sexist slurs), doxxing threats, extreme profanity ("madarchod", "bhenchod", "chutiya", "raand", "मादरचोद", "भेंचोद", "चूतिया", "रंडी", "katua", "chamaar")
+
+## HINDI/HINGLISH EXAMPLES FROM REAL DATA:
+Use the following real-world samples to calibrate your judgement:
+- "ये कमीना बातें बड़ी बड़ी करता है मगर हरकत सड़क छाप भिखमंगे की है" → "कमीना", "भिखमंगे" = medium severity abuse → flag both
+- "कमीनी नगरपालिका बाली समाजवादी है" → "कमीनी" = personal_attack, medium → flag
+- "साला सुवर तेरी ..." → "साला", "सुवर" = high severity → flag
+- "ये हिंदू धर्म को बदनाम करने वाले इंसानियत और मानवता के कातिल हैं" → civic criticism metaphor, NOT abusive
+- "saala kamine officer kuch nahi karta" → "saala", "kamine" = medium → flag (Hinglish)
+- "ये साले जेएनयू छाप कमिने लोग" → "साले", "कमिने" = medium → flag
+- "चूतियापा", "bc", "mc" → high severity → flag
+- "भारत के 13 वें राष्ट्रपति श्री प्रणब मुखर्जी..." → non-hostile civic news → NO abuse
+- "बॉलीवुड में ऐसी गंदी गटर" → "गंदी गटर" = metaphor in context, mild disapproval → borderline low
+
+## LABELS MAPPING (for training reference):
+- hate + offensive → has_abuse = true, severity medium-high
+- defamation against individual → has_abuse = true, category = personal_attack
+- defamation against institution/party = borderline, use context
+- fake + non-hostile → has_abuse = false (non-abuse concerns)
 
 ${SHARED_GUARDRAIL_INSTRUCTIONS}
 `;

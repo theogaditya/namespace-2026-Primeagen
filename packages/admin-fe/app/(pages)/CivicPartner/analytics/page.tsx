@@ -45,21 +45,26 @@ export default function AnalyticsListPage() {
       script.async = true
       script.onload = () => {
         if (mapRef.current) {
-          const map = new google.maps.Map(mapRef.current, {
-            center: { lat: 19.0760, lng: 72.8777 },
-            zoom: 11,
-            styles: [ { "featureType": "water", "elementType": "all", "stylers": [{"color": "#465FFF"}, {"opacity": 0.05}] } ],
-            mapTypeControl: true,
-            streetViewControl: true,
-            rotateControl: true,
-            zoomControl: true,
-            fullscreenControl: true,
-          });
-          const heatmapData = [
-            new google.maps.LatLng(19.0760, 72.8777), new google.maps.LatLng(19.0800, 72.8800),
-            new google.maps.LatLng(19.1200, 72.8200), new google.maps.LatLng(19.0300, 72.9200),
-          ];
-          new google.maps.visualization.HeatmapLayer({ data: heatmapData, map: map, radius: 50 });
+          const g = (globalThis as any).google;
+          if (g && g.maps) {
+            const map = new g.maps.Map(mapRef.current, {
+              center: { lat: 19.0760, lng: 72.8777 },
+              zoom: 11,
+              styles: [ { "featureType": "water", "elementType": "all", "stylers": [{"color": "#465FFF"}, {"opacity": 0.05}] } ],
+              mapTypeControl: true,
+              streetViewControl: true,
+              rotateControl: true,
+              zoomControl: true,
+              fullscreenControl: true,
+            });
+            const heatmapData = [
+              new g.maps.LatLng(19.0760, 72.8777), new g.maps.LatLng(19.0800, 72.8800),
+              new g.maps.LatLng(19.1200, 72.8200), new g.maps.LatLng(19.0300, 72.9200),
+            ];
+            new g.maps.visualization.HeatmapLayer({ data: heatmapData, map: map, radius: 50 });
+          } else {
+            console.warn("[Analytics] google maps not available after script load");
+          }
         }
       }
       document.head.appendChild(script)

@@ -3,6 +3,7 @@
 import type React from "react"
 import { useState, useEffect, useRef, useCallback } from "react"
 import { useRouter } from "next/navigation"
+import { AdminLanguageSelector } from "@/components/AdminLanguageSelector"
 import { cn } from "@/lib/utils"
 import {
   Home, ClipboardList, BarChart3, Building2,
@@ -277,6 +278,7 @@ export function StateAdminLayout({ children, activeTab = 'dashboard', onTabChang
               <span className="w-2 h-2 rounded-full bg-[#465FFF]" />
               <span className="text-xs font-bold text-[#465FFF] tracking-tight">STATE ADMIN</span>
             </div>
+            <AdminLanguageSelector />
             <div className="relative" ref={notificationRef}>
               <button
                 onClick={() => setShowNotifications(!showNotifications)}

@@ -1,4 +1,4 @@
-import express from "express";
+import express, { type RequestHandler } from "express";
 import cors from "cors";
 import helmet from "helmet";
 import type { PrismaClient } from "./prisma/generated/client/client";
@@ -8,6 +8,7 @@ import { createVoiceRoutes } from "./routes/voice";
 import { createHealthRoutes } from "./routes/health";
 import { createDedupRouter } from "./routes/dedup";
 import { createModerateRouter } from "./routes/moderate";
+import { createModerateTestRouter } from "./routes/moderateTest";
 import { createQualityRouter } from "./routes/quality";
 import { createReportRouter } from "./routes/report";
 import { createImageRouter } from "./routes/image";
@@ -18,7 +19,7 @@ export function createApp(db: PrismaClient) {
 
   // Security & parsing
   app.use(helmet());
-  app.use(cors());
+  app.use(cors() as unknown as RequestHandler);
   app.use(express.json({ limit: "10mb" })); // 10mb for voice audio payloads
 
   // Public routes
@@ -26,6 +27,9 @@ export function createApp(db: PrismaClient) {
 
   // Service-to-service routes (internal API key auth, not user JWT)
   app.use("/api/moderate", createModerateRouter());
+
+  // Public test endpoint for abuse moderation (no auth, rate-limited)
+  app.use("/api/moderate/test", createModerateTestRouter());
 
   // Vision AI routes (image analysis & matching — no user JWT, callable by other services & frontends)
   app.use("/api/image", createImageRouter());

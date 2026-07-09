@@ -129,7 +129,12 @@ export default function SurveyDetailPage({ params }: { params: Promise<{ surveyI
     script.async = true; script.defer = true
     script.onload = () => {
       if (!mapRef.current) return
-      const map = new google.maps.Map(mapRef.current, {
+      const g = (globalThis as any).google
+      if (!g || !g.maps) {
+        console.warn('[Survey] google maps not available after script load')
+        return
+      }
+      const map = new g.maps.Map(mapRef.current, {
         center: { lat: 19.076, lng: 72.8777 }, zoom: 12,
         styles: [
           { featureType: "all",   elementType: "labels.text.fill", stylers: [{ color: "#7c93a3" }] },
@@ -142,10 +147,10 @@ export default function SurveyDetailPage({ params }: { params: Promise<{ surveyI
         fullscreenControl: true,
       })
       const pts = [
-        new google.maps.LatLng(19.076, 72.878), new google.maps.LatLng(19.08, 72.88),
-        new google.maps.LatLng(19.1,   72.85),  new google.maps.LatLng(19.05, 72.9),
+        new g.maps.LatLng(19.076, 72.878), new g.maps.LatLng(19.08, 72.88),
+        new g.maps.LatLng(19.1,   72.85),  new g.maps.LatLng(19.05, 72.9),
       ]
-      new google.maps.visualization.HeatmapLayer({ data: pts, map, radius: 40 })
+      new g.maps.visualization.HeatmapLayer({ data: pts, map, radius: 40 })
     }
     document.head.appendChild(script)
     return () => { try { document.head.removeChild(script) } catch {} }

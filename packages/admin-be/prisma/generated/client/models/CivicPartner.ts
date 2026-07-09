@@ -249,7 +249,7 @@ export type CivicPartnerGroupByOutputType = {
   _max: CivicPartnerMaxAggregateOutputType | null
 }
 
-type GetCivicPartnerGroupByPayload<T extends CivicPartnerGroupByArgs> = Prisma.PrismaPromise<
+export type GetCivicPartnerGroupByPayload<T extends CivicPartnerGroupByArgs> = Prisma.PrismaPromise<
   Array<
     Prisma.PickEnumerable<CivicPartnerGroupByOutputType, T['by']> &
       {
@@ -1508,6 +1508,11 @@ export type CivicPartnerFindManyArgs<ExtArgs extends runtime.Types.Extensions.In
    * Skip the first `n` CivicPartners.
    */
   skip?: number
+  /**
+   * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+   * 
+   * Filter by unique combinations of CivicPartners.
+   */
   distinct?: Prisma.CivicPartnerScalarFieldEnum | Prisma.CivicPartnerScalarFieldEnum[]
 }
 

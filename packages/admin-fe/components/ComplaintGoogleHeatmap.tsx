@@ -86,12 +86,12 @@ function loadGoogleMapsScript(): Promise<void> {
 
 export default function ComplaintGoogleHeatmap({ height = "400px", showDensityTable = false, className = "" }: Props) {
   const mapDivRef = useRef<HTMLDivElement>(null)
-  const mapInstanceRef = useRef<google.maps.Map | null>(null)
+  const mapInstanceRef = useRef<any | null>(null)
   // Density circles replace the deprecated HeatmapLayer
-  const densityCirclesRef = useRef<google.maps.Circle[]>([])
+  const densityCirclesRef = useRef<any[]>([])
   // AdvancedMarkerElement replaces the deprecated google.maps.Marker
   const markersRef = useRef<any[]>([])
-  const infoWindowRef = useRef<google.maps.InfoWindow | null>(null)
+  const infoWindowRef = useRef<any | null>(null)
   // Points grouped by district for quick panning / centering
   const districtPointsRef = useRef<Record<string, ComplaintPoint[]>>({})
   // Ensure initial focus to top district runs only once
@@ -181,7 +181,7 @@ export default function ComplaintGoogleHeatmap({ height = "400px", showDensityTa
           // mapId is required for AdvancedMarkerElement; styles cannot coexist with mapId
           // (cloud console controls styling when a mapId is present)
           const mapId = process.env.NEXT_PUBLIC_GOOGLE_MAP_ID || "DEMO_MAP_ID"
-          mapInstanceRef.current = new window.google.maps.Map(mapDivRef.current, {
+          mapInstanceRef.current = new (globalThis as any).google.maps.Map(mapDivRef.current, {
             center,
             zoom: points.length > 0 ? 7 : DEFAULT_ZOOM,
             mapId,
@@ -240,7 +240,7 @@ export default function ComplaintGoogleHeatmap({ height = "400px", showDensityTa
             const countFactor = Math.sqrt(1 + nearby) // smooth growth
             const radiusMeters = Math.min(MAX_RADIUS, Math.max(MIN_RADIUS, Math.round(BASE_RADIUS * countFactor)))
 
-            const circle = new window.google.maps.Circle({
+            const circle = new (globalThis as any).google.maps.Circle({
               center: { lat: p.latitude, lng: p.longitude },
               radius: radiusMeters,
               strokeOpacity: 0,
@@ -267,11 +267,11 @@ export default function ComplaintGoogleHeatmap({ height = "400px", showDensityTa
                 mapInstanceRef.current.setCenter({ lat: p.latitude, lng: p.longitude })
                 mapInstanceRef.current.setZoom(Math.min(MAX_FOCUS_ZOOM, 12))
               } else {
-                const bounds = new window.google.maps.LatLngBounds()
-                ptsForDistrict.forEach((pp) => bounds.extend(new window.google.maps.LatLng(pp.latitude, pp.longitude)))
+                const bounds = new (globalThis as any).google.maps.LatLngBounds()
+                ptsForDistrict.forEach((pp) => bounds.extend(new (globalThis as any).google.maps.LatLng(pp.latitude, pp.longitude)))
                 mapInstanceRef.current.fitBounds(bounds, { left: 60, right: 60, top: 60, bottom: 60 })
                 // After fitBounds completes, ensure we are not zoomed in too far
-                window.google.maps.event.addListenerOnce(mapInstanceRef.current, 'idle', () => {
+                (globalThis as any).google.maps.event.addListenerOnce(mapInstanceRef.current, 'idle', () => {
                   const z = mapInstanceRef.current!.getZoom() || 0
                   if (z > MAX_FOCUS_ZOOM) mapInstanceRef.current!.setZoom(MAX_FOCUS_ZOOM)
                 })
@@ -292,7 +292,7 @@ export default function ComplaintGoogleHeatmap({ height = "400px", showDensityTa
 
         // One shared InfoWindow so only one popup is open at a time
         if (!infoWindowRef.current) {
-          infoWindowRef.current = new window.google.maps.InfoWindow()
+          infoWindowRef.current = new (globalThis as any).google.maps.InfoWindow()
         }
 
         // Urgency colour → coloured PinElement
@@ -303,7 +303,7 @@ export default function ComplaintGoogleHeatmap({ height = "400px", showDensityTa
           LOW:      "#1a8754",
         }
 
-        const { AdvancedMarkerElement, PinElement } = (window as any).google.maps.marker
+        const { AdvancedMarkerElement, PinElement } = (globalThis as any).google.maps.marker
 
         // Prepare counts for identical coordinates so we can spiderfy overlapping pins
         const coordCountMap: Record<string, number> = {}
@@ -480,10 +480,10 @@ export default function ComplaintGoogleHeatmap({ height = "400px", showDensityTa
                             mapInstanceRef.current.setCenter({ lat: pts[0].latitude, lng: pts[0].longitude })
                             mapInstanceRef.current.setZoom(Math.min(MAX_FOCUS_ZOOM, 12))
                           } else {
-                            const bounds = new window.google.maps.LatLngBounds()
-                            pts.forEach((pp) => bounds.extend(new window.google.maps.LatLng(pp.latitude, pp.longitude)))
+                            const bounds = new (globalThis as any).google.maps.LatLngBounds()
+                            pts.forEach((pp) => bounds.extend(new (globalThis as any).google.maps.LatLng(pp.latitude, pp.longitude)))
                             mapInstanceRef.current.fitBounds(bounds, { left: 60, right: 60, top: 60, bottom: 60 })
-                            window.google.maps.event.addListenerOnce(mapInstanceRef.current, 'idle', () => {
+                            (globalThis as any).google.maps.event.addListenerOnce(mapInstanceRef.current, 'idle', () => {
                               const z = mapInstanceRef.current!.getZoom() || 0
                               if (z > MAX_FOCUS_ZOOM) mapInstanceRef.current!.setZoom(MAX_FOCUS_ZOOM)
                             })

@@ -266,7 +266,7 @@ export type SuperStateAdminGroupByOutputType = {
   _max: SuperStateAdminMaxAggregateOutputType | null
 }
 
-type GetSuperStateAdminGroupByPayload<T extends SuperStateAdminGroupByArgs> = Prisma.PrismaPromise<
+export type GetSuperStateAdminGroupByPayload<T extends SuperStateAdminGroupByArgs> = Prisma.PrismaPromise<
   Array<
     Prisma.PickEnumerable<SuperStateAdminGroupByOutputType, T['by']> &
       {
@@ -1957,6 +1957,11 @@ export type SuperStateAdminFindManyArgs<ExtArgs extends runtime.Types.Extensions
    * Skip the first `n` SuperStateAdmins.
    */
   skip?: number
+  /**
+   * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+   * 
+   * Filter by unique combinations of SuperStateAdmins.
+   */
   distinct?: Prisma.SuperStateAdminScalarFieldEnum | Prisma.SuperStateAdminScalarFieldEnum[]
 }
 

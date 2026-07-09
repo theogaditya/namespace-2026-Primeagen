@@ -46,24 +46,29 @@ export default function CivicPartnerDashboard() {
 
   useEffect(() => {
     if (!loading && mapRef.current) {
-      const initMap = () => {
-        if (mapRef.current && window.google?.maps) {
-               const map = new google.maps.Map(mapRef.current, {
-                  center: { lat: 20.5937, lng: 78.9629 }, zoom: 4,
-                  styles: [ { "featureType": "water", "elementType": "all", "stylers": [{"color": "#465FFF"}, {"opacity": 0.05}] } ],
-                  mapTypeControl: true,
-                  streetViewControl: true,
-                  rotateControl: true,
-                  zoomControl: true,
-                  fullscreenControl: true,
-               });
-          const heatmapPoints = [ new google.maps.LatLng(19.0760, 72.8777), new google.maps.LatLng(28.6139, 77.2090) ];
-          new google.maps.visualization.HeatmapLayer({ data: heatmapPoints, map: map, radius: 40 });
-        }
-      }
+         const initMap = () => {
+            if (mapRef.current) {
+               const g = (globalThis as any).google;
+               if (g && g.maps) {
+                  const map = new g.maps.Map(mapRef.current, {
+                     center: { lat: 20.5937, lng: 78.9629 }, zoom: 4,
+                     styles: [ { "featureType": "water", "elementType": "all", "stylers": [{"color": "#465FFF"}, {"opacity": 0.05}] } ],
+                     mapTypeControl: true,
+                     streetViewControl: true,
+                     rotateControl: true,
+                     zoomControl: true,
+                     fullscreenControl: true,
+                  });
+                  const heatmapPoints = [ new g.maps.LatLng(19.0760, 72.8777), new g.maps.LatLng(28.6139, 77.2090) ];
+                  new g.maps.visualization.HeatmapLayer({ data: heatmapPoints, map: map, radius: 40 });
+               } else {
+                  console.warn("[CivicPartner] google maps not available when initializing map");
+               }
+            }
+         }
 
       // If Google Maps is already loaded, just init the map
-      if (window.google?.maps) {
+         if ((globalThis as any).google?.maps) {
         initMap()
         return
       }

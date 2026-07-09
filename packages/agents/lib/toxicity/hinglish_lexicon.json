@@ -1,0 +1,1238 @@
+[
+  {
+    "token": "maadherchod",
+    "meaning": "mother fucker",
+    "severity": 10,
+    "severityEnum": "high"
+  },
+  {
+    "token": "madarchod",
+    "meaning": "motherfucker",
+    "severity": 10,
+    "severityEnum": "high"
+  },
+  {
+    "token": "maacho",
+    "meaning": "mother fucker",
+    "severity": 10,
+    "severityEnum": "high"
+  },
+  {
+    "token": "machudi",
+    "meaning": "mother fucker",
+    "severity": 10,
+    "severityEnum": "high"
+  },
+  {
+    "token": "bc",
+    "meaning": "sister fucker",
+    "severity": 10,
+    "severityEnum": "high"
+  },
+  {
+    "token": "mc",
+    "meaning": "mother fucker",
+    "severity": 10,
+    "severityEnum": "high"
+  },
+  {
+    "token": "bahenchod",
+    "meaning": "sister fucker",
+    "severity": 9,
+    "severityEnum": "high"
+  },
+  {
+    "token": "bahanchod",
+    "meaning": "sister fucker",
+    "severity": 9,
+    "severityEnum": "high"
+  },
+  {
+    "token": "bahencho",
+    "meaning": "sister fucker",
+    "severity": 9,
+    "severityEnum": "high"
+  },
+  {
+    "token": "betichod",
+    "meaning": "daughter fucker",
+    "severity": 9,
+    "severityEnum": "high"
+  },
+  {
+    "token": "raand",
+    "meaning": "whore",
+    "severity": 9,
+    "severityEnum": "high"
+  },
+  {
+    "token": "gaandu",
+    "meaning": "asshole",
+    "severity": 9,
+    "severityEnum": "high"
+  },
+  {
+    "token": "gandu",
+    "meaning": "asshole",
+    "severity": 9,
+    "severityEnum": "high"
+  },
+  {
+    "token": "gaand",
+    "meaning": "ass",
+    "severity": 9,
+    "severityEnum": "high"
+  },
+  {
+    "token": "bhosadchod",
+    "meaning": "ass fucker",
+    "severity": 9,
+    "severityEnum": "high"
+  },
+  {
+    "token": "bumchod",
+    "meaning": "ass fucker",
+    "severity": 9,
+    "severityEnum": "high"
+  },
+  {
+    "token": "bur",
+    "meaning": "pussy",
+    "severity": 9,
+    "severityEnum": "high"
+  },
+  {
+    "token": "chudaikhana",
+    "meaning": "whore house",
+    "severity": 9,
+    "severityEnum": "high"
+  },
+  {
+    "token": "fateychu",
+    "meaning": "torn pussy",
+    "severity": 9,
+    "severityEnum": "high"
+  },
+  {
+    "token": "gaandmarau",
+    "meaning": "ass fuck",
+    "severity": 9,
+    "severityEnum": "high"
+  },
+  {
+    "token": "parichod",
+    "meaning": "angel fucker",
+    "severity": 9,
+    "severityEnum": "high"
+  },
+  {
+    "token": "bhosda",
+    "meaning": "pussy",
+    "severity": 9,
+    "severityEnum": "high"
+  },
+  {
+    "token": "baapchu",
+    "meaning": "father pussy",
+    "severity": 9,
+    "severityEnum": "high"
+  },
+  {
+    "token": "biwichod",
+    "meaning": "wife fucker",
+    "severity": 9,
+    "severityEnum": "high"
+  },
+  {
+    "token": "khandanchod",
+    "meaning": "family fucker",
+    "severity": 9,
+    "severityEnum": "high"
+  },
+  {
+    "token": "bhaichod",
+    "meaning": "brother fucker",
+    "severity": 8,
+    "severityEnum": "high"
+  },
+  {
+    "token": "randwa",
+    "meaning": "male prostitute",
+    "severity": 8,
+    "severityEnum": "high"
+  },
+  {
+    "token": "randi",
+    "meaning": "hooker",
+    "severity": 8,
+    "severityEnum": "high"
+  },
+  {
+    "token": "bachachod",
+    "meaning": "son fucker",
+    "severity": 8,
+    "severityEnum": "high"
+  },
+  {
+    "token": "bachichod",
+    "meaning": "daughter fucker",
+    "severity": 8,
+    "severityEnum": "high"
+  },
+  {
+    "token": "bachchechod",
+    "meaning": "children fucker",
+    "severity": 8,
+    "severityEnum": "high"
+  },
+  {
+    "token": "bhonsriwala",
+    "meaning": "fucker",
+    "severity": 8,
+    "severityEnum": "high"
+  },
+  {
+    "token": "bhonsdiwala",
+    "meaning": "fucker",
+    "severity": 8,
+    "severityEnum": "high"
+  },
+  {
+    "token": "ched",
+    "meaning": "pussy",
+    "severity": 8,
+    "severityEnum": "high"
+  },
+  {
+    "token": "chut",
+    "meaning": "pussy",
+    "severity": 8,
+    "severityEnum": "high"
+  },
+  {
+    "token": "choochi",
+    "meaning": "boobs",
+    "severity": 8,
+    "severityEnum": "high"
+  },
+  {
+    "token": "chuchi",
+    "meaning": "boobs",
+    "severity": 8,
+    "severityEnum": "high"
+  },
+  {
+    "token": "lavda",
+    "meaning": "dick",
+    "severity": 8,
+    "severityEnum": "high"
+  },
+  {
+    "token": "lawda",
+    "meaning": "dick",
+    "severity": 8,
+    "severityEnum": "high"
+  },
+  {
+    "token": "lauda",
+    "meaning": "dick",
+    "severity": 8,
+    "severityEnum": "high"
+  },
+  {
+    "token": "lund�",
+    "meaning": "dick",
+    "severity": 8,
+    "severityEnum": "high"
+  },
+  {
+    "token": "lavander",
+    "meaning": "dick head",
+    "severity": 8,
+    "severityEnum": "high"
+  },
+  {
+    "token": "mammey",
+    "meaning": "boobs",
+    "severity": 8,
+    "severityEnum": "high"
+  },
+  {
+    "token": "tatte",
+    "meaning": "boobs",
+    "severity": 8,
+    "severityEnum": "high"
+  },
+  {
+    "token": "toto",
+    "meaning": "penis",
+    "severity": 8,
+    "severityEnum": "high"
+  },
+  {
+    "token": "bhosad",
+    "meaning": "pussy",
+    "severity": 8,
+    "severityEnum": "high"
+  },
+  {
+    "token": "bum",
+    "meaning": "ass",
+    "severity": 8,
+    "severityEnum": "high"
+  },
+  {
+    "token": "cunt",
+    "meaning": "pussy",
+    "severity": 8,
+    "severityEnum": "high"
+  },
+  {
+    "token": "cuntmama",
+    "meaning": "pussy",
+    "severity": 8,
+    "severityEnum": "high"
+  },
+  {
+    "token": "jhaat",
+    "meaning": "cunt",
+    "severity": 8,
+    "severityEnum": "high"
+  },
+  {
+    "token": "chunni",
+    "meaning": "clit",
+    "severity": 8,
+    "severityEnum": "high"
+  },
+  {
+    "token": "choot",
+    "meaning": "pussy",
+    "severity": 8,
+    "severityEnum": "high"
+  },
+  {
+    "token": "gaandfat",
+    "meaning": "ass",
+    "severity": 8,
+    "severityEnum": "high"
+  },
+  {
+    "token": "gaandmasti",
+    "meaning": "ass",
+    "severity": 8,
+    "severityEnum": "high"
+  },
+  {
+    "token": "makhanchudai",
+    "meaning": "fucking",
+    "severity": 8,
+    "severityEnum": "high"
+  },
+  {
+    "token": "fakeerchod",
+    "meaning": "saint fucker",
+    "severity": 8,
+    "severityEnum": "high"
+  },
+  {
+    "token": "lundoos",
+    "meaning": "dick",
+    "severity": 8,
+    "severityEnum": "high"
+  },
+  {
+    "token": "pucchi",
+    "meaning": "pussy",
+    "severity": 8,
+    "severityEnum": "high"
+  },
+  {
+    "token": "baajer",
+    "meaning": "fucker",
+    "severity": 8,
+    "severityEnum": "high"
+  },
+  {
+    "token": "choud",
+    "meaning": "fuck",
+    "severity": 8,
+    "severityEnum": "high"
+  },
+  {
+    "token": "chodoonga",
+    "meaning": "fuck",
+    "severity": 8,
+    "severityEnum": "high"
+  },
+  {
+    "token": "suhaagchudai",
+    "meaning": "wedding fuck",
+    "severity": 8,
+    "severityEnum": "high"
+  },
+  {
+    "token": "chooche",
+    "meaning": "boobs",
+    "severity": 8,
+    "severityEnum": "high"
+  },
+  {
+    "token": "patichod",
+    "meaning": "husband",
+    "severity": 8,
+    "severityEnum": "high"
+  },
+  {
+    "token": "chodhunga",
+    "meaning": "fuck",
+    "severity": 8,
+    "severityEnum": "high"
+  },
+  {
+    "token": "jhanten",
+    "meaning": "pubic hair",
+    "severity": 8,
+    "severityEnum": "high"
+  },
+  {
+    "token": "katua",
+    "meaning": "dick cut",
+    "severity": 8,
+    "severityEnum": "high"
+  },
+  {
+    "token": "chutiyapa",
+    "meaning": "fuck all",
+    "severity": 8,
+    "severityEnum": "high"
+  },
+  {
+    "token": "bancho",
+    "meaning": "sister fucker",
+    "severity": 7,
+    "severityEnum": "high"
+  },
+  {
+    "token": "laude",
+    "meaning": "dick",
+    "severity": 7,
+    "severityEnum": "high"
+  },
+  {
+    "token": "takke",
+    "meaning": "balls",
+    "severity": 7,
+    "severityEnum": "high"
+  },
+  {
+    "token": "jhant",
+    "meaning": "pubic",
+    "severity": 7,
+    "severityEnum": "high"
+  },
+  {
+    "token": "banda",
+    "meaning": "semi-dick",
+    "severity": 7,
+    "severityEnum": "high"
+  },
+  {
+    "token": "booblay",
+    "meaning": "boobs",
+    "severity": 7,
+    "severityEnum": "high"
+  },
+  {
+    "token": "booby",
+    "meaning": "boobs",
+    "severity": 7,
+    "severityEnum": "high"
+  },
+  {
+    "token": "buble",
+    "meaning": "boobs",
+    "severity": 7,
+    "severityEnum": "high"
+  },
+  {
+    "token": "babla",
+    "meaning": "boobs",
+    "severity": 7,
+    "severityEnum": "high"
+  },
+  {
+    "token": "chod",
+    "meaning": "fuck",
+    "severity": 7,
+    "severityEnum": "high"
+  },
+  {
+    "token": "chodu",
+    "meaning": "fucker",
+    "severity": 7,
+    "severityEnum": "high"
+  },
+  {
+    "token": "chodra",
+    "meaning": "fucker",
+    "severity": 7,
+    "severityEnum": "high"
+  },
+  {
+    "token": "balchod",
+    "meaning": "hair fucker",
+    "severity": 7,
+    "severityEnum": "high"
+  },
+  {
+    "token": "muth",
+    "meaning": "masturbate",
+    "severity": 7,
+    "severityEnum": "high"
+  },
+  {
+    "token": "toota",
+    "meaning": "broken",
+    "severity": 7,
+    "severityEnum": "high"
+  },
+  {
+    "token": "bhandwe",
+    "meaning": "pimp",
+    "severity": 7,
+    "severityEnum": "high"
+  },
+  {
+    "token": "bhagatchod",
+    "meaning": "saint fucker",
+    "severity": 7,
+    "severityEnum": "high"
+  },
+  {
+    "token": "chhola",
+    "meaning": "clit",
+    "severity": 7,
+    "severityEnum": "high"
+  },
+  {
+    "token": "chudai",
+    "meaning": "fucking",
+    "severity": 7,
+    "severityEnum": "high"
+  },
+  {
+    "token": "choosu",
+    "meaning": "sucker",
+    "severity": 7,
+    "severityEnum": "high"
+  },
+  {
+    "token": "shorba",
+    "meaning": "semen",
+    "severity": 7,
+    "severityEnum": "high"
+  },
+  {
+    "token": "maka",
+    "meaning": "mother�s",
+    "severity": 7,
+    "severityEnum": "high"
+  },
+  {
+    "token": "gadde",
+    "meaning": "boobs",
+    "severity": 7,
+    "severityEnum": "high"
+  },
+  {
+    "token": "hazaarchu",
+    "meaning": "thousand pussy",
+    "severity": 7,
+    "severityEnum": "high"
+  },
+  {
+    "token": "raatchuda",
+    "meaning": "night fuck",
+    "severity": 7,
+    "severityEnum": "high"
+  },
+  {
+    "token": "neech",
+    "meaning": "low caste",
+    "severity": 7,
+    "severityEnum": "high"
+  },
+  {
+    "token": "rundi",
+    "meaning": "prostitute",
+    "severity": 7,
+    "severityEnum": "high"
+  },
+  {
+    "token": "raandsaala",
+    "meaning": "sister�s brother pimp",
+    "severity": 7,
+    "severityEnum": "high"
+  },
+  {
+    "token": "phudi",
+    "meaning": "pussy",
+    "severity": 7,
+    "severityEnum": "high"
+  },
+  {
+    "token": "chute",
+    "meaning": "pussy",
+    "severity": 7,
+    "severityEnum": "high"
+  },
+  {
+    "token": "kussi",
+    "meaning": "ass",
+    "severity": 7,
+    "severityEnum": "high"
+  },
+  {
+    "token": "budh",
+    "meaning": "cunt",
+    "severity": 7,
+    "severityEnum": "high"
+  },
+  {
+    "token": "chudwaya",
+    "meaning": "fuck",
+    "severity": 7,
+    "severityEnum": "high"
+  },
+  {
+    "token": "bahenke",
+    "meaning": "sister�s",
+    "severity": 6,
+    "severityEnum": "medium"
+  },
+  {
+    "token": "jhalla",
+    "meaning": "faggot",
+    "severity": 6,
+    "severityEnum": "medium"
+  },
+  {
+    "token": "padma",
+    "meaning": "fat bitch",
+    "severity": 6,
+    "severityEnum": "medium"
+  },
+  {
+    "token": "chodela",
+    "meaning": "fucked up",
+    "severity": 6,
+    "severityEnum": "medium"
+  },
+  {
+    "token": "chaatu",
+    "meaning": "licker",
+    "severity": 6,
+    "severityEnum": "medium"
+  },
+  {
+    "token": "beej",
+    "meaning": "semen",
+    "severity": 6,
+    "severityEnum": "medium"
+  },
+  {
+    "token": "bhadwe",
+    "meaning": "pimp",
+    "severity": 6,
+    "severityEnum": "medium"
+  },
+  {
+    "token": "gandkate",
+    "meaning": "ass",
+    "severity": 6,
+    "severityEnum": "medium"
+  },
+  {
+    "token": "chus",
+    "meaning": "sucker",
+    "severity": 6,
+    "severityEnum": "medium"
+  },
+  {
+    "token": "kaalu",
+    "meaning": "migga",
+    "severity": 6,
+    "severityEnum": "medium"
+  },
+  {
+    "token": "chikna",
+    "meaning": "gay",
+    "severity": 6,
+    "severityEnum": "medium"
+  },
+  {
+    "token": "meetha",
+    "meaning": "gay",
+    "severity": 6,
+    "severityEnum": "medium"
+  },
+  {
+    "token": "beechka",
+    "meaning": "gay",
+    "severity": 6,
+    "severityEnum": "medium"
+  },
+  {
+    "token": "ghussa",
+    "meaning": "fuck",
+    "severity": 6,
+    "severityEnum": "medium"
+  },
+  {
+    "token": "chode",
+    "meaning": "fuck",
+    "severity": 6,
+    "severityEnum": "medium"
+  },
+  {
+    "token": "chodho",
+    "meaning": "fuck",
+    "severity": 6,
+    "severityEnum": "medium"
+  },
+  {
+    "token": "mullekatue",
+    "meaning": "Derogatory abuse to muslims",
+    "severity": 6,
+    "severityEnum": "medium"
+  },
+  {
+    "token": "mullikatui",
+    "meaning": "Derogatory Abuse to female muslim",
+    "severity": 6,
+    "severityEnum": "medium"
+  },
+  {
+    "token": "mullekebaal",
+    "meaning": "Derogatory Abuse to muslim",
+    "severity": 6,
+    "severityEnum": "medium"
+  },
+  {
+    "token": "momedankatue",
+    "meaning": "Derogatory Abuse to muslim",
+    "severity": 6,
+    "severityEnum": "medium"
+  },
+  {
+    "token": "chutia",
+    "meaning": "fucker",
+    "severity": 5,
+    "severityEnum": "medium"
+  },
+  {
+    "token": "chutiya",
+    "meaning": "fucker",
+    "severity": 5,
+    "severityEnum": "medium"
+  },
+  {
+    "token": "haraami",
+    "meaning": "bastard",
+    "severity": 5,
+    "severityEnum": "medium"
+  },
+  {
+    "token": "haraam",
+    "meaning": "bastard",
+    "severity": 5,
+    "severityEnum": "medium"
+  },
+  {
+    "token": "jamai",
+    "meaning": "son-in-law",
+    "severity": 5,
+    "severityEnum": "medium"
+  },
+  {
+    "token": "nirodh",
+    "meaning": "condom.",
+    "severity": 5,
+    "severityEnum": "medium"
+  },
+  {
+    "token": "sadi",
+    "meaning": "stinking",
+    "severity": 5,
+    "severityEnum": "medium"
+  },
+  {
+    "token": "choos",
+    "meaning": "suck",
+    "severity": 5,
+    "severityEnum": "medium"
+  },
+  {
+    "token": "paidaishikeeda",
+    "meaning": "born bug",
+    "severity": 5,
+    "severityEnum": "medium"
+  },
+  {
+    "token": "kali",
+    "meaning": "nigger",
+    "severity": 5,
+    "severityEnum": "medium"
+  },
+  {
+    "token": "behendi",
+    "meaning": "sister",
+    "severity": 5,
+    "severityEnum": "medium"
+  },
+  {
+    "token": "laltern",
+    "meaning": "lantern",
+    "severity": 5,
+    "severityEnum": "medium"
+  },
+  {
+    "token": "chodun",
+    "meaning": "fuck",
+    "severity": 5,
+    "severityEnum": "medium"
+  },
+  {
+    "token": "ghasti",
+    "meaning": "hooker",
+    "severity": 4,
+    "severityEnum": "medium"
+  },
+  {
+    "token": "nabaal",
+    "meaning": "hairless",
+    "severity": 4,
+    "severityEnum": "medium"
+  },
+  {
+    "token": "lundtopi",
+    "meaning": "condom",
+    "severity": 4,
+    "severityEnum": "medium"
+  },
+  {
+    "token": "chullugand",
+    "meaning": "handful dirt",
+    "severity": 4,
+    "severityEnum": "medium"
+  },
+  {
+    "token": "bambu",
+    "meaning": "bamboo",
+    "severity": 4,
+    "severityEnum": "medium"
+  },
+  {
+    "token": "maarey",
+    "meaning": "dead",
+    "severity": 4,
+    "severityEnum": "medium"
+  },
+  {
+    "token": "vahiyaat",
+    "meaning": "disgusting",
+    "severity": 4,
+    "severityEnum": "medium"
+  },
+  {
+    "token": "jihadi",
+    "meaning": "terrorist",
+    "severity": 4,
+    "severityEnum": "medium"
+  },
+  {
+    "token": "atankvadi",
+    "meaning": "terrorist",
+    "severity": 4,
+    "severityEnum": "medium"
+  },
+  {
+    "token": "atankwadi",
+    "meaning": "terrorist",
+    "severity": 4,
+    "severityEnum": "medium"
+  },
+  {
+    "token": "aatanki",
+    "meaning": "terorist",
+    "severity": 4,
+    "severityEnum": "medium"
+  },
+  {
+    "token": "bhootnika",
+    "meaning": "son of a witch",
+    "severity": 3,
+    "severityEnum": "low"
+  },
+  {
+    "token": "chinaal",
+    "meaning": "whore",
+    "severity": 3,
+    "severityEnum": "low"
+  },
+  {
+    "token": "hijra",
+    "meaning": "transsexual",
+    "severity": 3,
+    "severityEnum": "low"
+  },
+  {
+    "token": "hinjda",
+    "meaning": "transsexual",
+    "severity": 3,
+    "severityEnum": "low"
+  },
+  {
+    "token": "kutiya",
+    "meaning": "bitch",
+    "severity": 3,
+    "severityEnum": "low"
+  },
+  {
+    "token": "najayaz",
+    "meaning": "illegitimate",
+    "severity": 3,
+    "severityEnum": "low"
+  },
+  {
+    "token": "soover",
+    "meaning": "swine",
+    "severity": 3,
+    "severityEnum": "low"
+  },
+  {
+    "token": "tatti",
+    "meaning": "shit",
+    "severity": 3,
+    "severityEnum": "low"
+  },
+  {
+    "token": "potty",
+    "meaning": "shit",
+    "severity": 3,
+    "severityEnum": "low"
+  },
+  {
+    "token": "pissu",
+    "meaning": "bug",
+    "severity": 3,
+    "severityEnum": "low"
+  },
+  {
+    "token": "soower",
+    "meaning": "swine",
+    "severity": 3,
+    "severityEnum": "low"
+  },
+  {
+    "token": "binbheja",
+    "meaning": "brainless",
+    "severity": 3,
+    "severityEnum": "low"
+  },
+  {
+    "token": "joon",
+    "meaning": "bug",
+    "severity": 3,
+    "severityEnum": "low"
+  },
+  {
+    "token": "kaat",
+    "meaning": "cut",
+    "severity": 3,
+    "severityEnum": "low"
+  },
+  {
+    "token": "gandi",
+    "meaning": "filthy",
+    "severity": 3,
+    "severityEnum": "low"
+  },
+  {
+    "token": "chatri",
+    "meaning": "condom",
+    "severity": 3,
+    "severityEnum": "low"
+  },
+  {
+    "token": "bhadva",
+    "meaning": "pimp",
+    "severity": 2,
+    "severityEnum": "low"
+  },
+  {
+    "token": "kutta",
+    "meaning": "dog",
+    "severity": 2,
+    "severityEnum": "low"
+  },
+  {
+    "token": "auladheen",
+    "meaning": "sonless",
+    "severity": 2,
+    "severityEnum": "low"
+  },
+  {
+    "token": "gandpaidaish",
+    "meaning": "badborn",
+    "severity": 2,
+    "severityEnum": "low"
+  },
+  {
+    "token": "saala",
+    "meaning": "sister�s husband",
+    "severity": 2,
+    "severityEnum": "low"
+  },
+  {
+    "token": "kutti",
+    "meaning": "bitch",
+    "severity": 2,
+    "severityEnum": "low"
+  },
+  {
+    "token": "kutte",
+    "meaning": "dog",
+    "severity": 2,
+    "severityEnum": "low"
+  },
+  {
+    "token": "backar",
+    "meaning": "gossip",
+    "severity": 2,
+    "severityEnum": "low"
+  },
+  {
+    "token": "gandnatije",
+    "meaning": "Bad result",
+    "severity": 2,
+    "severityEnum": "low"
+  },
+  {
+    "token": "danda",
+    "meaning": "stick",
+    "severity": 2,
+    "severityEnum": "low"
+  },
+  {
+    "token": "keera",
+    "meaning": "bug",
+    "severity": 2,
+    "severityEnum": "low"
+  },
+  {
+    "token": "keeda",
+    "meaning": "bug",
+    "severity": 2,
+    "severityEnum": "low"
+  },
+  {
+    "token": "safaid",
+    "meaning": "american",
+    "severity": 2,
+    "severityEnum": "low"
+  },
+  {
+    "token": "poot",
+    "meaning": "son",
+    "severity": 2,
+    "severityEnum": "low"
+  },
+  {
+    "token": "kute",
+    "meaning": "dog",
+    "severity": 2,
+    "severityEnum": "low"
+  },
+  {
+    "token": "bimaar",
+    "meaning": "ill",
+    "severity": 2,
+    "severityEnum": "low"
+  },
+  {
+    "token": "badboodar",
+    "meaning": "smelly",
+    "severity": 2,
+    "severityEnum": "low"
+  },
+  {
+    "token": "dum",
+    "meaning": "tail",
+    "severity": 2,
+    "severityEnum": "low"
+  },
+  {
+    "token": "kutton",
+    "meaning": "dog",
+    "severity": 2,
+    "severityEnum": "low"
+  },
+  {
+    "token": "jungli",
+    "meaning": "wild",
+    "severity": 2,
+    "severityEnum": "low"
+  },
+  {
+    "token": "badir",
+    "meaning": "idiot",
+    "severity": 1,
+    "severityEnum": "low"
+  },
+  {
+    "token": "badirchand",
+    "meaning": "idiot",
+    "severity": 1,
+    "severityEnum": "low"
+  },
+  {
+    "token": "bakland",
+    "meaning": "idiot",
+    "severity": 1,
+    "severityEnum": "low"
+  },
+  {
+    "token": "chup",
+    "meaning": "shut up",
+    "severity": 1,
+    "severityEnum": "low"
+  },
+  {
+    "token": "jaanvar",
+    "meaning": "animal",
+    "severity": 1,
+    "severityEnum": "low"
+  },
+  {
+    "token": "khota",
+    "meaning": "donkey",
+    "severity": 1,
+    "severityEnum": "low"
+  },
+  {
+    "token": "jaat",
+    "meaning": "breed",
+    "severity": 1,
+    "severityEnum": "low"
+  },
+  {
+    "token": "bhains",
+    "meaning": "buffalo",
+    "severity": 1,
+    "severityEnum": "low"
+  },
+  {
+    "token": "ullu",
+    "meaning": "idiot",
+    "severity": 1,
+    "severityEnum": "low"
+  },
+  {
+    "token": "pathe",
+    "meaning": "idiot",
+    "severity": 1,
+    "severityEnum": "low"
+  },
+  {
+    "token": "chatani",
+    "meaning": "ketchup",
+    "severity": 1,
+    "severityEnum": "low"
+  },
+  {
+    "token": "chipkali",
+    "meaning": "lizzard",
+    "severity": 1,
+    "severityEnum": "low"
+  },
+  {
+    "token": "pasine",
+    "meaning": "sweat",
+    "severity": 1,
+    "severityEnum": "low"
+  },
+  {
+    "token": "bhoot",
+    "meaning": "ghost",
+    "severity": 1,
+    "severityEnum": "low"
+  },
+  {
+    "token": "dhakkan",
+    "meaning": "idiot",
+    "severity": 1,
+    "severityEnum": "low"
+  },
+  {
+    "token": "bhajiye",
+    "meaning": "snack",
+    "severity": 1,
+    "severityEnum": "low"
+  },
+  {
+    "token": "doob",
+    "meaning": "drown",
+    "severity": 1,
+    "severityEnum": "low"
+  },
+  {
+    "token": "khatmal",
+    "meaning": "bug",
+    "severity": 1,
+    "severityEnum": "low"
+  },
+  {
+    "token": "lassan",
+    "meaning": "garlic",
+    "severity": 1,
+    "severityEnum": "low"
+  },
+  {
+    "token": "makkhi",
+    "meaning": "fly",
+    "severity": 1,
+    "severityEnum": "low"
+  },
+  {
+    "token": "haathi",
+    "meaning": "elephant",
+    "severity": 1,
+    "severityEnum": "low"
+  },
+  {
+    "token": "gadha",
+    "meaning": "donkey",
+    "severity": 1,
+    "severityEnum": "low"
+  },
+  {
+    "token": "chipkili",
+    "meaning": "lizard",
+    "severity": 1,
+    "severityEnum": "low"
+  },
+  {
+    "token": "unday",
+    "meaning": "eggs",
+    "severity": 1,
+    "severityEnum": "low"
+  },
+  {
+    "token": "chaarpai",
+    "meaning": "cot",
+    "severity": 1,
+    "severityEnum": "low"
+  }
+]

@@ -2,6 +2,7 @@
 
 import { useState, useEffect, ReactNode, useRef, useCallback } from "react"
 import { usePathname, useRouter } from "next/navigation"
+import { AdminLanguageSelector } from "@/components/AdminLanguageSelector"
 import { cn } from "@/lib/utils"
 import { useCivicPartnerAuth, CivicPartner } from "@/hooks/useCivicPartnerAuth"
 import {
@@ -278,6 +279,8 @@ export function CivicPartnerLayout({ children }: { children: ReactNode }) {
                 <div className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-1 w-1.5 h-1.5 bg-slate-800 rotate-45" />
               </div>
             </button>
+
+            <AdminLanguageSelector />
           </div>
         )}
 

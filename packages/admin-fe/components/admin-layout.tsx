@@ -2,7 +2,7 @@
 
 import type React from "react"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useRef } from "react"
 import { useRouter, usePathname } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import {
@@ -315,7 +315,8 @@ export function AdminLayout({ children }: AdminLayoutProps) {
             <div className="flex flex-1 items-center">
               <h1 className="text-xl font-semibold text-gray-900">{getPageTitle()}</h1>
             </div>
-            <div className="ml-4 flex items-center md:ml-6">
+            <div className="ml-4 flex items-center md:ml-6 gap-2">
+              <LandingLanguageButton />
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                     <Button variant="ghost" className="relative h-8 w-8 rounded-full">
@@ -389,3 +390,93 @@ export function AdminLayout({ children }: AdminLayoutProps) {
     </div>
   )
 }
+
+// Landing language button (same behavior as user FE)
+function LandingLanguageButton() {
+  const [open, setOpen] = useState(false)
+  const [currentLang, setCurrentLang] = useState('en')
+  const ref = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    const cookies = typeof document !== 'undefined' ? document.cookie : ''
+    let match = cookies.match(/googtrans=\/en\/([a-z-]+)/i)
+    if (!match) match = cookies.match(/googtrans=%2Fen%2F([a-z-]+)/i)
+    if (match?.[1]) setCurrentLang(match[1])
+  }, [])
+
+  useEffect(() => {
+    const handleClick = (e: MouseEvent) => {
+      if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false)
+    }
+    document.addEventListener('mousedown', handleClick)
+    return () => document.removeEventListener('mousedown', handleClick)
+  }, [])
+
+  const changeLanguage = (langCode: string) => {
+    const hostname = typeof window !== 'undefined' ? window.location.hostname : ''
+    const expiredDate = 'Thu, 01 Jan 1970 00:00:00 UTC'
+    try {
+      document.cookie = `googtrans=; expires=${expiredDate}; path=/`
+      document.cookie = `googtrans=; expires=${expiredDate}; path=/; domain=${hostname}`
+      document.cookie = `googtrans=; expires=${expiredDate}; path=/; domain=.${hostname}`
+      const parts = hostname.split('.')
+      if (parts.length > 2) {
+        document.cookie = `googtrans=; expires=${expiredDate}; path=/; domain=.${parts.slice(-2).join('.')}`
+      }
+    } catch (e) {}
+
+    setTimeout(() => {
+      const newValue = `/en/${langCode}`
+      try {
+        document.cookie = `googtrans=${newValue}; path=/`
+        document.cookie = `googtrans=${newValue}; path=/; domain=${hostname}`
+        const parts = hostname.split('.')
+        if (parts.length > 2) {
+          document.cookie = `googtrans=${newValue}; path=/; domain=.${parts.slice(-2).join('.')}`
+        }
+      } catch (e) {}
+      setCurrentLang(langCode)
+      setOpen(false)
+      // reload to apply
+      try { window.location.reload() } catch (e) {}
+    }, 100)
+  }
+
+  const LANGUAGES = [
+    { code: 'en', name: 'English' },
+    { code: 'hi', name: 'हिन्दी (Hindi)' },
+    { code: 'bn', name: 'বাংলা (Bengali)' },
+    { code: 'te', name: 'తెలుగు (Telugu)' },
+    { code: 'mr', name: 'मराठी (Marathi)' },
+    { code: 'ta', name: 'தமிழ் (Tamil)' },
+  ]
+
+  const currentLanguage = LANGUAGES.find(l => l.code === currentLang) || LANGUAGES[0]
+
+  return (
+    <div className="relative" ref={ref}>
+      <button
+        onClick={() => setOpen(!open)}
+        className="flex items-center gap-1.5 px-2.5 py-1.5 text-sm text-gray-600 hover:text-gray-900 transition-colors rounded-lg hover:bg-gray-50"
+        title={currentLanguage.name}
+      >
+        <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M12 2a10 10 0 100 20 10 10 0 000-20z" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
+        <span className="hidden sm:inline text-xs font-medium">{currentLanguage.name.split(' ')[0]}</span>
+      </button>
+      {open && (
+        <div className="absolute right-0 mt-2 w-52 bg-white rounded-xl shadow-lg border border-gray-100 py-1 z-50 max-h-64 overflow-y-auto">
+          {LANGUAGES.map((lang) => (
+            <button
+              key={lang.code}
+              onClick={() => changeLanguage(lang.code)}
+              className={`w-full text-left px-4 py-2 text-sm hover:bg-gray-50 transition-colors ${currentLang === lang.code ? 'text-violet-600 font-medium bg-violet-50' : 'text-gray-700'}`}
+            >
+              {lang.name}
+            </button>
+          ))}
+        </div>
+      )}
+    </div>
+  )
+}
+

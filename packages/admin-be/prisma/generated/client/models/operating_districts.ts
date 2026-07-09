@@ -151,7 +151,7 @@ export type Operating_districtsGroupByOutputType = {
   _max: Operating_districtsMaxAggregateOutputType | null
 }
 
-type GetOperating_districtsGroupByPayload<T extends operating_districtsGroupByArgs> = Prisma.PrismaPromise<
+export type GetOperating_districtsGroupByPayload<T extends operating_districtsGroupByArgs> = Prisma.PrismaPromise<
   Array<
     Prisma.PickEnumerable<Operating_districtsGroupByOutputType, T['by']> &
       {
@@ -1087,6 +1087,11 @@ export type operating_districtsFindManyArgs<ExtArgs extends runtime.Types.Extens
    * Skip the first `n` operating_districts.
    */
   skip?: number
+  /**
+   * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+   * 
+   * Filter by unique combinations of operating_districts.
+   */
   distinct?: Prisma.Operating_districtsScalarFieldEnum | Prisma.Operating_districtsScalarFieldEnum[]
 }
 

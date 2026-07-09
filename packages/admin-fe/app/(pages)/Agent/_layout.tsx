@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef } from "react"
 import { useRouter, usePathname } from "next/navigation"
+import { AdminLanguageSelector } from "@/components/AdminLanguageSelector"
 import Link from "next/link"
 import {
   Home, ClipboardList, History, BarChart3, User,
@@ -335,6 +336,7 @@ export function AgentRevampedLayout({ children }: AgentRevampedLayoutProps) {
 
           {/* Right */}
           <div className="flex items-center gap-3">
+            <AdminLanguageSelector />
             <div className="hidden md:flex items-center gap-2 bg-slate-50 border border-slate-200 rounded-xl px-3 py-2">
               <Search size={14} className="text-slate-400" />
               <input

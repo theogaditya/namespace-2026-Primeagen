@@ -3,6 +3,7 @@
 import type React from "react"
 import { useState, useEffect, useRef, useCallback } from "react"
 import { useRouter } from "next/navigation"
+import { AdminLanguageSelector } from "@/components/AdminLanguageSelector"
 import { cn } from "@/lib/utils"
 import {
   Home, ClipboardList, BarChart3, Users, Megaphone,
@@ -280,6 +281,7 @@ export function RevampedLayout({ children, activeTab = 'dashboard', onTabChange 
                 type="text"
               />
             </div>
+            <AdminLanguageSelector />
             <div className="hidden sm:flex items-center gap-2 px-3 py-1 bg-[#EEF2FF] rounded-full">
               <span className="w-2 h-2 rounded-full bg-[#465FFF]" />
               <span className="text-xs font-bold text-[#465FFF] tracking-tight">MUNICIPAL ADMIN</span>

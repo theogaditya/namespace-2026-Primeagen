@@ -158,7 +158,7 @@ export type UserBadgeGroupByOutputType = {
   _max: UserBadgeMaxAggregateOutputType | null
 }
 
-type GetUserBadgeGroupByPayload<T extends UserBadgeGroupByArgs> = Prisma.PrismaPromise<
+export type GetUserBadgeGroupByPayload<T extends UserBadgeGroupByArgs> = Prisma.PrismaPromise<
   Array<
     Prisma.PickEnumerable<UserBadgeGroupByOutputType, T['by']> &
       {
@@ -1248,6 +1248,11 @@ export type UserBadgeFindManyArgs<ExtArgs extends runtime.Types.Extensions.Inter
    * Skip the first `n` UserBadges.
    */
   skip?: number
+  /**
+   * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+   * 
+   * Filter by unique combinations of UserBadges.
+   */
   distinct?: Prisma.UserBadgeScalarFieldEnum | Prisma.UserBadgeScalarFieldEnum[]
 }
 
