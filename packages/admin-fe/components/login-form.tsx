@@ -29,13 +29,15 @@ const adminTypeRoutes: Record<AdminType, string> = {
 type LoginFormProps = {
   adminType?: AdminType
   onAdminTypeChange?: (t: AdminType) => void
+  defaultEmail?: string
+  defaultPassword?: string
 }
 
-export function LoginForm({ adminType: controlledAdminType, onAdminTypeChange }: LoginFormProps) {
+export function LoginForm({ adminType: controlledAdminType, onAdminTypeChange, defaultEmail = "", defaultPassword = "" }: LoginFormProps) {
   const router = useRouter()
   const [adminType, setAdminType] = React.useState<AdminType>((controlledAdminType as AdminType) ?? "AGENT")
-  const [email, setEmail] = React.useState("")
-  const [password, setPassword] = React.useState("")
+  const [email, setEmail] = React.useState(defaultEmail)
+  const [password, setPassword] = React.useState(defaultPassword)
   const [error, setError] = React.useState("")
   const [isLoading, setIsLoading] = React.useState(false)
   const [showPassword, setShowPassword] = React.useState(false)
@@ -51,6 +53,14 @@ export function LoginForm({ adminType: controlledAdminType, onAdminTypeChange }:
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [controlledAdminType])
+
+  React.useEffect(() => {
+    if (defaultEmail) setEmail(defaultEmail)
+  }, [defaultEmail])
+
+  React.useEffect(() => {
+    if (defaultPassword) setPassword(defaultPassword)
+  }, [defaultPassword])
 
   React.useEffect(() => {
     // global callback for Turnstile (used by rendered widget)

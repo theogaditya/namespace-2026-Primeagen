@@ -1,7 +1,7 @@
 "use client";
 
-import React, { useState, useEffect, useRef } from "react";
-import { useRouter } from "next/navigation";
+import React, { useState, useEffect, useRef, Suspense } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import {
@@ -19,8 +19,9 @@ const RECAPTCHA_SITE_KEY = process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY || "";
 
 const USER_BE_URL = process.env.NEXT_PUBLIC_USER_BE_URL || "http://localhost:4000";
 
-export default function LoginUser() {
+function LoginUserContent() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const {
     formData,
     touched,
@@ -37,15 +38,21 @@ export default function LoginUser() {
   const [captchaToken, setCaptchaToken] = useState<string | null>(null);
   const recaptchaWidgetId = useRef<number | null>(null);
 
-  // Check if user is already logged in
+  // Check if user is already logged in and prefill fields from URL
   useEffect(() => {
     if (typeof window !== "undefined") {
       const token = localStorage.getItem("authToken");
       if (token) {
         router.push("/dashboard");
       }
+
+      const emailParam = searchParams.get("email");
+      const passParam = searchParams.get("password");
+
+      if (emailParam) updateField("email", emailParam);
+      if (passParam) updateField("password", passParam);
     }
-  }, [router]);
+  }, [router, searchParams, updateField]);
   // Load reCAPTCHA script and render widget
   useEffect(() => {
     // Check if script is already loaded
@@ -270,5 +277,13 @@ export default function LoginUser() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function LoginUser() {
+  return (
+    <Suspense fallback={<div className="min-h-screen flex items-center justify-center">Loading...</div>}>
+      <LoginUserContent />
+    </Suspense>
   );
 }

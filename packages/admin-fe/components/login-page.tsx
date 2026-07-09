@@ -1,6 +1,8 @@
 "use client"
 
 import * as React from "react"
+import { Suspense } from "react"
+import { useSearchParams } from "next/navigation"
 import { motion, AnimatePresence } from "framer-motion"
 import {
   ClipboardList,
@@ -199,8 +201,24 @@ const ROLE_INFO: Record<
   },
 }
 
-export default function LoginPage() {
-  const [selected, setSelected] = React.useState<RoleKey>("AGENT")
+function LoginPageContent() {
+  const searchParams = useSearchParams()
+  const roleParam = searchParams?.get("role") as RoleKey
+  const emailParam = searchParams?.get("email") || ""
+  const passParam = searchParams?.get("password") || ""
+
+  const initialRole = (roleParam && (["AGENT", "MUNICIPAL_ADMIN", "STATE_ADMIN", "CIVIC_PARTNER"] as RoleKey[]).includes(roleParam)) 
+    ? roleParam 
+    : "AGENT"
+
+  const [selected, setSelected] = React.useState<RoleKey>(initialRole)
+
+  React.useEffect(() => {
+    if (roleParam && (["AGENT", "MUNICIPAL_ADMIN", "STATE_ADMIN", "CIVIC_PARTNER"] as RoleKey[]).includes(roleParam)) {
+      setSelected(roleParam)
+    }
+  }, [roleParam])
+
   const info = ROLE_INFO[selected]
 
   return (
@@ -370,11 +388,21 @@ export default function LoginPage() {
                   setSelected(t as RoleKey)
                 }
               }}
+              defaultEmail={emailParam}
+              defaultPassword={passParam}
             />
           </div>
         </main>
 
       </div>
     </div>
+  )
+}
+
+export default function LoginPage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen flex items-center justify-center">Loading portal...</div>}>
+      <LoginPageContent />
+    </Suspense>
   )
 }
