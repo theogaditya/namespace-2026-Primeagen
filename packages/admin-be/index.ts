@@ -38,16 +38,36 @@ export class Server {
     this.app.use(express.json());
     this.app.use(cookieParser());
 
-    this.app.use(
-      cors({
-        origin: true,
-        credentials: true,
-        methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
-        allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
-        preflightContinue: false,
-        optionsSuccessStatus: 200,
-      })
-    );
+    // Read allowed origins from env (comma-separated). If not set, reflect request origin.
+    const rawAllowed = process.env.ADMIN_ALLOWED_ORIGINS || process.env.ALLOWED_ORIGINS || '';
+    const allowedOrigins = rawAllowed
+      .split(',')
+      .map((s) => s.trim())
+      .filter(Boolean);
+
+    const corsOptions: any = {
+      credentials: true,
+      methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+      allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
+      preflightContinue: false,
+      optionsSuccessStatus: 200,
+    };
+
+    if (allowedOrigins.length > 0) {
+      // Strict whitelist: only allow listed origins
+      corsOptions.origin = function (origin: string | undefined, callback: (err: Error | null, allow?: boolean) => void) {
+        // allow requests with no origin (e.g., curl, server-to-server)
+        if (!origin) return callback(null, true);
+        if (allowedOrigins.includes(origin)) return callback(null, true);
+        console.warn('[CORS] Blocked origin:', origin);
+        return callback(new Error('Not allowed by CORS'));
+      };
+    } else {
+      // Fallback: reflect origin back (previous behavior)
+      corsOptions.origin = true;
+    }
+
+    this.app.use(cors(corsOptions));
   }
 
   private setupRoutes() {
