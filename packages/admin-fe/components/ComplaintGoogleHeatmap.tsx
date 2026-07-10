@@ -269,12 +269,26 @@ export default function ComplaintGoogleHeatmap({ height = "400px", showDensityTa
               } else {
                 const bounds = new (globalThis as any).google.maps.LatLngBounds()
                 ptsForDistrict.forEach((pp) => bounds.extend(new (globalThis as any).google.maps.LatLng(pp.latitude, pp.longitude)))
-                mapInstanceRef.current.fitBounds(bounds, { left: 60, right: 60, top: 60, bottom: 60 })
-                // After fitBounds completes, ensure we are not zoomed in too far
-                (globalThis as any).google.maps.event.addListenerOnce(mapInstanceRef.current, 'idle', () => {
-                  const z = mapInstanceRef.current!.getZoom() || 0
-                  if (z > MAX_FOCUS_ZOOM) mapInstanceRef.current!.setZoom(MAX_FOCUS_ZOOM)
-                })
+                // Some environments may provide a map-like object without fitBounds
+                // (avoid crashing). Fall back to centering + zoom if fitBounds unavailable.
+                if (typeof mapInstanceRef.current.fitBounds === "function") {
+                  mapInstanceRef.current.fitBounds(bounds, { left: 60, right: 60, top: 60, bottom: 60 })
+                  ;(globalThis as any).google.maps.event.addListenerOnce(mapInstanceRef.current, 'idle', () => {
+                    const z = mapInstanceRef.current!.getZoom() || 0
+                    if (z > MAX_FOCUS_ZOOM) mapInstanceRef.current!.setZoom(MAX_FOCUS_ZOOM)
+                  })
+                } else {
+                  try {
+                    const c = bounds.getCenter()
+                    mapInstanceRef.current.setCenter({ lat: c.lat(), lng: c.lng() })
+                    mapInstanceRef.current.setZoom(Math.min(MAX_FOCUS_ZOOM, 10))
+                  } catch (e) {
+                    // last-resort: center on first point
+                    const p = ptsForDistrict[0]
+                    mapInstanceRef.current.setCenter({ lat: p.latitude, lng: p.longitude })
+                    mapInstanceRef.current.setZoom(Math.min(MAX_FOCUS_ZOOM, 10))
+                  }
+                }
               }
             } else {
               const avgLat = points.reduce((s, p) => s + p.latitude, 0) / points.length
@@ -482,11 +496,22 @@ export default function ComplaintGoogleHeatmap({ height = "400px", showDensityTa
                           } else {
                             const bounds = new (globalThis as any).google.maps.LatLngBounds()
                             pts.forEach((pp) => bounds.extend(new (globalThis as any).google.maps.LatLng(pp.latitude, pp.longitude)))
-                            mapInstanceRef.current.fitBounds(bounds, { left: 60, right: 60, top: 60, bottom: 60 })
-                            (globalThis as any).google.maps.event.addListenerOnce(mapInstanceRef.current, 'idle', () => {
-                              const z = mapInstanceRef.current!.getZoom() || 0
-                              if (z > MAX_FOCUS_ZOOM) mapInstanceRef.current!.setZoom(MAX_FOCUS_ZOOM)
-                            })
+                            if (typeof mapInstanceRef.current.fitBounds === "function") {
+                              mapInstanceRef.current.fitBounds(bounds, { left: 60, right: 60, top: 60, bottom: 60 })
+                              ;(globalThis as any).google.maps.event.addListenerOnce(mapInstanceRef.current, 'idle', () => {
+                                const z = mapInstanceRef.current!.getZoom() || 0
+                                if (z > MAX_FOCUS_ZOOM) mapInstanceRef.current!.setZoom(MAX_FOCUS_ZOOM)
+                              })
+                            } else {
+                              try {
+                                const c = bounds.getCenter()
+                                mapInstanceRef.current.setCenter({ lat: c.lat(), lng: c.lng() })
+                                mapInstanceRef.current.setZoom(Math.min(MAX_FOCUS_ZOOM, 10))
+                              } catch (e) {
+                                mapInstanceRef.current.setCenter({ lat: pts[0].latitude, lng: pts[0].longitude })
+                                mapInstanceRef.current.setZoom(Math.min(MAX_FOCUS_ZOOM, 10))
+                              }
+                            }
                           }
                         } catch (e) { console.error('panToDistrict error', e) }
                       }}

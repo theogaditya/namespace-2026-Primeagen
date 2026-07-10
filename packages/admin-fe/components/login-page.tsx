@@ -207,8 +207,8 @@ function LoginPageContent() {
   const emailParam = searchParams?.get("email") || ""
   const passParam = searchParams?.get("password") || ""
 
-  const initialRole = (roleParam && (["AGENT", "MUNICIPAL_ADMIN", "STATE_ADMIN", "CIVIC_PARTNER"] as RoleKey[]).includes(roleParam)) 
-    ? roleParam 
+  const initialRole = (roleParam && (["AGENT", "MUNICIPAL_ADMIN", "STATE_ADMIN", "CIVIC_PARTNER"] as RoleKey[]).includes(roleParam))
+    ? roleParam
     : "AGENT"
 
   const [selected, setSelected] = React.useState<RoleKey>(initialRole)
@@ -238,12 +238,15 @@ function LoginPageContent() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6 }}
           >
-            <p
-              className="text-xs font-black tracking-[0.2em] text-slate-500 uppercase mb-3"
-              style={HEADLINE}
-            >
-              SwarajDesk &middot; Unified Admin Portal
-            </p>
+            <div className="flex items-center gap-3 mb-3">
+                  <img src="/logo.png" alt="SwarajDesk logo" className="h-40 w-40 sm:h-48 sm:w-48 object-contain" />
+              <p
+                className="text-xs font-black tracking-[0.2em] text-slate-500 uppercase mb-0"
+                style={HEADLINE}
+              >
+                SwarajDesk &middot; Unified Admin Portal
+              </p>
+            </div>
             <h2
               className="text-4xl md:text-5xl font-extrabold text-black leading-tight mb-4"
               style={HEADLINE}

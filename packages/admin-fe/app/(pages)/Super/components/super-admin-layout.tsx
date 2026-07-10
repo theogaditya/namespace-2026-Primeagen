@@ -207,10 +207,10 @@ export function SuperAdminLayout({ children, activeTab = 'dashboard', onTabChang
                   </DropdownMenuItem>
                   <DropdownMenuSeparator />
                   <DropdownMenuItem onClick={() => {
-                    // Client-only logout: clear localStorage and redirect
+                    // Client-only logout: clear localStorage and redirect with full reload
                     try { localStorage.removeItem('token'); localStorage.removeItem('admin'); localStorage.removeItem('adminType'); } catch {}
                     try { window.dispatchEvent(new Event('authChange')) } catch {}
-                    router.push('/')
+                    try { window.location.replace('/') } catch { router.push('/') }
                   }}>
                     <LogOut className="mr-2 h-4 w-4" />
                     <span>Log out</span>

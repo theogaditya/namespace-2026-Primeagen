@@ -107,3 +107,113 @@ body {
     stroke-dashoffset: 0;
   }
 }
+
+/* Google Translate: keep the hidden element but push the banner behind our header
+   so the blue translate bar does not sit on top of the page content.
+   This ensures the translate loader stays available while visually hidden. */
+.goog-te-banner-frame.skiptranslate {
+  display: block !important;
+  position: relative !important;
+  top: -64px !important; /* move up behind header (adjust if header height differs) */
+  z-index: 0 !important; /* ensure header (likely higher z-index) stays above */
+}
+
+/* Prevent the translate script from shifting page layout */
+body {
+  transform: none !important;
+  top: 0 !important;
+}
+
+/* Hide the visible translate gadget elements (we use cookie-driven switching) */
+.goog-te-gadget-icon {
+  display: none !important;
+}
+.goog-te-menu-value {
+  display: none !important;
+}
+
+/* Ensure the headless translate element is not visible in the layout */
+#google_translate_element {
+  display: none !important;
+}
+
+/* Stronger rules: completely hide any Google Translate injected UI */
+/* Banner/frame/iframe */
+.goog-te-banner-frame,
+.goog-te-banner-frame.skiptranslate,
+iframe.goog-te-banner-frame,
+iframe.goog-te-menu-frame,
+.goog-te-balloon-frame,
+iframe.goog-te-balloon-frame {
+  display: none !important;
+  visibility: hidden !important;
+  height: 0 !important;
+  width: 0 !important;
+  overflow: hidden !important;
+}
+
+/* Gadget/menu/logo elements */
+.goog-te-gadget,
+.goog-te-gadget-icon,
+.goog-te-combo,
+.goog-te-menu-value,
+.goog-logo-link,
+.goog-te-spinner,
+#goog-gt-tt {
+  display: none !important;
+  visibility: hidden !important;
+}
+
+/* Prevent translate script from altering body position/layout */
+html, body {
+  position: static !important;
+  top: 0 !important;
+  transform: none !important;
+}
+
+/* As a last resort, hide any element that looks like a translate toolbar by attribute */
+[id^="goog-"], [class*="goog-te"] {
+  display: none !important;
+}
+
+/* Mirror user-fe overrides to ensure the banner is fully hidden */
+/* Ensure Google Translate widget bar stays below our navbar (high z to avoid pushing) */
+.goog-te-banner-frame,
+#goog-gt-tt,
+.goog-te-balloon-frame {
+  z-index: 99999998 !important;
+}
+
+/* Push Google Translate bar below our navbar */
+body {
+  top: 0 !important;
+}
+
+.skiptranslate > iframe.skiptranslate {
+  z-index: 99999998 !important;
+}
+
+/* Google Translate Bar Override - Hide it and prevent body shift */
+.goog-te-banner-frame {
+  display: none !important;
+}
+
+.skiptranslate {
+  display: none !important;
+}
+
+body {
+  top: 0 !important;
+  position: static !important;
+}
+
+/* Ensure our navbar stays on top of everything */
+.goog-te-menu-frame {
+  z-index: 999999 !important;
+}
+
+/* Style the Google Translate dropdown when it appears */
+.goog-te-menu2 {
+  max-height: 300px !important;
+  overflow-y: auto !important;
+}

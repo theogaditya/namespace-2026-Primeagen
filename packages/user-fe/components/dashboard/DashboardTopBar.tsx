@@ -212,9 +212,9 @@ export default function DashboardTopBar({
         <Image
           src="https://pub-6c77e16531784985b618e038085ecd96.r2.dev/logo.png"
           alt="SwarajDesk"
-          width={140}
-          height={36}
-          className="h-9 w-auto object-contain"
+          width={250}
+          height={65}
+          className="h-15 w-auto object-contain"
           unoptimized
         />
 

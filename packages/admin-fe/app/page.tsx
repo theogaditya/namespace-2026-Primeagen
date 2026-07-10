@@ -22,7 +22,7 @@ export default function Home() {
             <img
               src="https://pub-6c77e16531784985b618e038085ecd96.r2.dev/logo.png"
               alt="SwarajDesk Logo"
-              className="h-12 w-auto block"
+              className="h-20 w-auto block"
             />
           </div>
         </div>

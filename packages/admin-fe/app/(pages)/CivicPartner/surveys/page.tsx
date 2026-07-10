@@ -154,9 +154,21 @@ export default function SurveysListPage() {
                        <th className="px-8 py-4 text-[10px] font-black text-gray-400 uppercase tracking-widest text-right">Actions</th>
                     </tr>
                  </thead>
-                 <tbody className="divide-y divide-gray-50">
-                    {loading ? [1,2,3].map(i => <tr key={i} className="animate-pulse"><td className="px-8 py-6"><div className="h-4 w-48 bg-gray-50 rounded" /></td><td className="px-8 py-6"><div className="h-5 w-20 bg-gray-50 rounded-full mx-auto" /></td><td className="px-8 py-6"><div className="h-8 w-8 bg-gray-50 rounded ml-auto" /></td></tr>) :
-                     filteredSurveys.map(sv => (
+                         <tbody className="divide-y divide-gray-50">
+                              {loading ? [1,2,3].map(i => <tr key={i} className="animate-pulse"><td className="px-8 py-6"><div className="h-4 w-48 bg-gray-50 rounded" /></td><td className="px-8 py-6"><div className="h-5 w-20 bg-gray-50 rounded-full mx-auto" /></td><td className="px-8 py-6"><div className="h-8 w-8 bg-gray-50 rounded ml-auto" /></td></tr>) :
+                               filteredSurveys.length === 0 ? (
+                                  <tr>
+                                     <td colSpan={3} className="px-8 py-12 text-center">
+                                        <div className="max-w-xl mx-auto">
+                                           <p className="text-sm font-black text-gray-800">No active campaigns found</p>
+                                           <p className="text-xs text-gray-500 mt-2">This view shows only campaigns created by the signed-in Civic Partner. It looks like you don't have any active campaigns right now.</p>
+                                           <div className="mt-4 flex items-center justify-center">
+                                              <button onClick={() => router.push('/CivicPartner/surveys/new')} className="h-9 px-6 bg-[#465FFF] text-white rounded-lg text-xs font-black">Create a campaign</button>
+                                           </div>
+                                        </div>
+                                     </td>
+                                  </tr>
+                               ) : filteredSurveys.map(sv => (
                       <tr key={sv.id} className="hover:bg-gray-50/30 cursor-pointer group transition-colors" onClick={() => router.push(`/CivicPartner/surveys/${sv.id}`)}>
                          <td className="px-8 py-5">
                             <p className="font-black text-gray-900 group-hover:text-brand-500 transition-colors uppercase tracking-tight">{sv.title}</p>

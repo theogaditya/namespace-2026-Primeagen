@@ -90,17 +90,26 @@ export default function CivicPartnerDashboard() {
 
   return (
     <CivicPartnerLayout>
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-8 gap-4">
+             <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-8 gap-4">
          <div>
             <h2 className="text-3xl font-black text-black tracking-tight">Dashboard Overview</h2>
             <p className="text-sm text-gray-400 font-medium">Welcome back to your civic command center.</p>
+            <p className="text-xs text-gray-400 mt-1">Note: metrics shown here are scoped to the currently signed-in Civic Partner (your surveys and responses).</p>
          </div>
-         <button
-           onClick={() => router.push("/CivicPartner/surveys/new")}
-           className="h-11 px-8 bg-[#465FFF] text-white rounded-xl text-xs font-black shadow-lg shadow-[#465FFF]/20 hover:bg-[#3451D1] transition-all flex items-center gap-2 uppercase tracking-tighter"
-         >
-            <span className="material-symbols-outlined text-sm font-bold">add</span> New Campaign
-         </button>
+             <div className="flex items-center gap-3">
+                <button
+                   onClick={() => router.push("/CivicPartner/reports")}
+                   className="h-11 px-6 bg-white border border-gray-200 rounded-xl text-xs font-black text-gray-600 hover:bg-gray-50 transition-all flex items-center gap-2 uppercase tracking-tighter"
+                >
+                   <span className="material-symbols-outlined text-sm font-bold">insights</span> AI Reports
+                </button>
+                <button
+                   onClick={() => router.push("/CivicPartner/surveys/new")}
+                   className="h-11 px-8 bg-[#465FFF] text-white rounded-xl text-xs font-black shadow-lg shadow-[#465FFF]/20 hover:bg-[#3451D1] transition-all flex items-center gap-2 uppercase tracking-tighter"
+                >
+                     <span className="material-symbols-outlined text-sm font-bold">add</span> New Campaign
+                </button>
+             </div>
       </div>
 
       <div className="grid grid-cols-12 gap-4 md:gap-6 pb-20">

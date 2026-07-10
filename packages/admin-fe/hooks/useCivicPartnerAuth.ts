@@ -49,10 +49,26 @@ export function useCivicPartnerAuth(): UseCivicPartnerAuthReturn {
     }
     localStorage.removeItem("civicPartner")
     localStorage.removeItem("adminType")
-    router.push("/")
+    try {
+      window.location.replace("/")
+    } catch {
+      router.push("/")
+    }
   }, [router])
 
   useEffect(() => {
+    // If a cached partner exists in localStorage, restore it immediately
+    const rawCached = typeof window !== "undefined" ? localStorage.getItem("civicPartner") : null
+    const hadCached = !!rawCached
+    if (rawCached) {
+      try {
+        setPartner(JSON.parse(rawCached))
+        setError(null)
+      } catch {
+        // ignore parse errors
+      }
+    }
+
     const verify = async () => {
       try {
         // CivicPartner auth uses httpOnly cookies. Use the local proxy so
@@ -77,9 +93,14 @@ export function useCivicPartnerAuth(): UseCivicPartnerAuthReturn {
       } catch (err) {
         console.error("[CivicPartner Auth]", err)
         setError(err instanceof Error ? err.message : "Authentication failed")
-        localStorage.removeItem("civicPartner")
-        localStorage.removeItem("adminType")
-        router.push("/")
+        // If we had a cached partner, don't immediately force navigation
+        // to the login page — keep the cached info available until a
+        // real user action/refresh decides otherwise.
+        if (!hadCached) {
+          localStorage.removeItem("civicPartner")
+          localStorage.removeItem("adminType")
+          router.push("/")
+        }
       } finally {
         setIsLoading(false)
       }

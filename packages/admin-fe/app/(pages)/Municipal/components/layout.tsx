@@ -100,7 +100,7 @@ export function RevampedLayout({ children, activeTab = 'dashboard', onTabChange 
   const handleLogout = () => {
     try { localStorage.removeItem('token'); localStorage.removeItem('admin'); localStorage.removeItem('adminType') } catch {}
     try { window.dispatchEvent(new Event('authChange')) } catch {}
-    router.push('/')
+    try { window.location.replace('/') } catch { router.push('/') }
   }
 
   const initials = adminData?.fullName
