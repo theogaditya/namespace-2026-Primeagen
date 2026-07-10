@@ -40,7 +40,7 @@ export class Server {
     this.db = db;
 
     this.frontEndUser = process.env.frontend;
-    this.frontEndUserAlt = process.env.frontend_alt;
+    this.frontEndUserAlt = process.env.frontend_alt; // Alternative frontend URL (e.g., Vercel)
     this.backEndUser = process.env.backend;
     this.worker = process.env.worker;
     this.frontEndAdmin = process.env.frontend_admin;
@@ -51,36 +51,41 @@ export class Server {
   }
 
   private initializeMiddlewares(): void {
-    // Parse allowed origins from environment variable — trim each entry to avoid whitespace mismatch
-    const rawAllowed = process.env.ALLOWED_ORIGINS || '';
-    const allowedOrigins = rawAllowed
-      .split(',')
-      .map((o) => o.trim())
-      .filter(Boolean);
 
+    const ALLOWED_ORIGINS = [
+      "https://gsc-admin-fe.abhasbehera.in",
+      "https://gsc-user-fe.abhasbehera.in",
+      "https://gsc-user-be.abhasbehera.in",
+      "https://gsc-ws-user-be.abhasbehera.in",
+      "https://gsc-admin-be.abhasbehera.in",
+      "https://gsc-comp-queue.abhasbehera.in",
+      "https://gsc-agents-be.abhasbehera.in",
+      "https://gsc-blockchain-be.abhasbehera.in",
+      "https://gsc-report-ai.abhasbehera.in",
+      "https://gsc-monitoring.abhasbehera.in",
+      "https://gsc-kuma.abhasbehera.in",
+      "http://localhost:3000",
+      "http://localhost:3001",
+      "http://localhost:3002",
+      "http://localhost:3003",
+      "http://localhost:3004",
+    ];
     // CORS must come BEFORE other middleware
-    const corsOptions: cors.CorsOptions = {
+    const corsOptions = {
+      origin: (origin: string | undefined, callback: Function) => {
+        if (!origin || ALLOWED_ORIGINS.includes(origin)) {
+          callback(null, true);
+        } else {
+          callback(new Error("Not allowed by CORS"));
+        }
+      },
       credentials: true,
       methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
       allowedHeaders: ["Content-Type", "Authorization"],
       optionsSuccessStatus: 200,
     };
-
-    if (allowedOrigins.length > 0) {
-      corsOptions.origin = function (origin, callback) {
-        // Allow requests with no Origin header (e.g. same-origin, curl, server-to-server)
-        if (!origin) return callback(null, true);
-        if (allowedOrigins.includes(origin)) return callback(null, true);
-        console.warn('[CORS] Blocked origin:', origin);
-        return callback(new Error('Not allowed by CORS'));
-      };
-    } else {
-      // No ALLOWED_ORIGINS set — allow all (development fallback)
-      corsOptions.origin = true;
-    }
-
     this.app.use(cors(corsOptions));
-    this.app.options('*', cors(corsOptions));
+    this.app.options('/{*path}', cors(corsOptions));
 
     this.app.use(express.json());
     this.app.use(helmet());
@@ -123,4 +128,3 @@ export class Server {
   }
 
 }
-
