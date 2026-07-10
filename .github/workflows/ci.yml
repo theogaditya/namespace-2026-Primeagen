@@ -1,39 +1,39 @@
 # name: CI – Tests
 
-# on:
-#   push:
-#     branches: [main]
-#   pull_request:
-#     branches: [main]
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
 
-# jobs:
-#   test:
-#     runs-on: ubuntu-latest
-#     env:
-#       MIGRATE_URL: file:./dev.db
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    env:
+      MIGRATE_URL: file:./dev.db
 
-#     steps:
-#       - uses: actions/checkout@v4
+    steps:
+      - uses: actions/checkout@v4
 
-#       - name: Setup Bun
-#         uses: oven-sh/setup-bun@v2
-#         with:
-#           bun-version: latest
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
 
-#       # admin-be
-#       - name: Install dependencies (admin-be)
-#         run: cd packages/admin-be && bun install --ignore-scripts || true
-#       - name: Run tests with coverage (admin-be)
-#         run: cd packages/admin-be && bun run test:coverage
+      # admin-be
+      - name: Install dependencies (admin-be)
+        run: cd packages/admin-be && bun install --ignore-scripts || true
+      - name: Run tests with coverage (admin-be)
+        run: cd packages/admin-be && bun run test:coverage
 
-#       # compQueue
-#       - name: Install dependencies (compQueue)
-#         run: cd packages/compQueue && bun install
-#       - name: Run tests with coverage (compQueue)
-#         run: cd packages/compQueue && bun run test:coverage
+      # compQueue
+      - name: Install dependencies (compQueue)
+        run: cd packages/compQueue && bun install
+      - name: Run tests with coverage (compQueue)
+        run: cd packages/compQueue && bun run test:coverage
 
-#       # user-be
-#       - name: Install dependencies (user-be)
-#         run: cd packages/user-be && bun install
-#       - name: Run tests with coverage (user-be)
-#         run: cd packages/user-be && bun run test:coverage
+      # user-be
+      - name: Install dependencies (user-be)
+        run: cd packages/user-be && bun install
+      - name: Run tests with coverage (user-be)
+        run: cd packages/user-be && bun run test:coverage

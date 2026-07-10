@@ -40,7 +40,7 @@ export class Server {
     this.db = db;
 
     this.frontEndUser = process.env.frontend;
-    this.frontEndUserAlt = process.env.frontend_alt; // Alternative frontend URL (e.g., Vercel)
+    this.frontEndUserAlt = process.env.frontend_alt;
     this.backEndUser = process.env.backend;
     this.worker = process.env.worker;
     this.frontEndAdmin = process.env.frontend_admin;
@@ -50,18 +50,21 @@ export class Server {
     this.initializeRoutes();
   }
 
-    private initializeMiddlewares(): void {
+  private initializeMiddlewares(): void {
+    // Parse allowed origins from environment variable
+    const allowedOrigins = process.env.ALLOWED_ORIGINS
+      ? process.env.ALLOWED_ORIGINS.split(',')
+      : true;
+
     // CORS must come BEFORE other middleware
     const corsOptions = {
-      origin: true,
+      origin: allowedOrigins,
       credentials: true,
       methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
       allowedHeaders: ["Content-Type", "Authorization"],
-      optionsSuccessStatus: 200, // Some legacy browsers choke on 204
+      optionsSuccessStatus: 200,
     };
     this.app.use(cors(corsOptions));
-
-    // Handle preflight requests explicitly (Express 5 requires named wildcard)
     this.app.options('/{*path}', cors(corsOptions));
 
     this.app.use(express.json());
@@ -69,36 +72,36 @@ export class Server {
     this.app.use(compression());
   }
 
-    private initializeRoutes(): void {
-      // Auth middleware      this.app.use('/api/complaints/get', authMiddleware, getComplaintRouter(this.db));
-      const authMiddleware = createAuthMiddleware(this.db);
+  private initializeRoutes(): void {
+    // Auth middleware      this.app.use('/api/complaints/get', authMiddleware, getComplaintRouter(this.db));
+    const authMiddleware = createAuthMiddleware(this.db);
 
-      // Public routes (no auth required)
-      this.app.use('/api',helthPoint(this.db));
-      this.app.use('/api/users', addUserRouter(this.db));
-      this.app.use('/api/users', loginUserRouter(this.db));
-      this.app.use('/api/districts', districtsRouter(this.db));
-      this.app.use('/api/categories', categoriesRouter(this.db));
-      this.app.use('/api/user', createUserProfileRouter(this.db)); // Public user profile route
-      this.app.use('/api/surveys', createSurveysRouter(this.db)); // Public surveys listing
+    // Public routes (no auth required)
+    this.app.use('/api', helthPoint(this.db));
+    this.app.use('/api/users', addUserRouter(this.db));
+    this.app.use('/api/users', loginUserRouter(this.db));
+    this.app.use('/api/districts', districtsRouter(this.db));
+    this.app.use('/api/categories', categoriesRouter(this.db));
+    this.app.use('/api/user', createUserProfileRouter(this.db)); // Public user profile route
+    this.app.use('/api/surveys', createSurveysRouter(this.db)); // Public surveys listing
 
-      // Protected routes (auth required)
-      this.app.use('/api/users', logoutUserRouter(this.db));
-      this.app.use('/api/complaints', authMiddleware, createComplaintRouter(this.db));
-      this.app.use('/api/complaints/get', authMiddleware, getComplaintRouter(this.db));
-      // User chat routes (authenticated)
-      this.app.use('/api/chat', authMiddleware, chatRouter(this.db));
-      // Badge routes (authenticated)
-      this.app.use('/api/badges', authMiddleware, createBadgeRouter());
-      // User stats route (authenticated)
-      this.app.use('/api/users', authMiddleware, createUserStatsRouter(this.db));
-      // Announcements route (authenticated)
-      this.app.use('/api/announcements', authMiddleware, createAnnouncementsRouter(this.db));
-      // Profile update route (authenticated)
-      this.app.use('/api/users', authMiddleware, createUpdateProfileRouter(this.db));
-      // Protected surveys routes (authenticated)
-      this.app.use('/api/surveys', authMiddleware, createProtectedSurveysRouter(this.db));
-    }
+    // Protected routes (auth required)
+    this.app.use('/api/users', logoutUserRouter(this.db));
+    this.app.use('/api/complaints', authMiddleware, createComplaintRouter(this.db));
+    this.app.use('/api/complaints/get', authMiddleware, getComplaintRouter(this.db));
+    // User chat routes (authenticated)
+    this.app.use('/api/chat', authMiddleware, chatRouter(this.db));
+    // Badge routes (authenticated)
+    this.app.use('/api/badges', authMiddleware, createBadgeRouter());
+    // User stats route (authenticated)
+    this.app.use('/api/users', authMiddleware, createUserStatsRouter(this.db));
+    // Announcements route (authenticated)
+    this.app.use('/api/announcements', authMiddleware, createAnnouncementsRouter(this.db));
+    // Profile update route (authenticated)
+    this.app.use('/api/users', authMiddleware, createUpdateProfileRouter(this.db));
+    // Protected surveys routes (authenticated)
+    this.app.use('/api/surveys', authMiddleware, createProtectedSurveysRouter(this.db));
+  }
 
   public getApp(): Express {
     return this.app;

@@ -25,29 +25,31 @@ export function loginUserRouter(db: PrismaClient) {
 
       const { email, password, captchaToken } = validationResult.data;
 
-      // Verify reCAPTCHA token with Google (always run verification; tests mock `fetch`)
-      try {
-        const captchaResponse = await fetch(
-          "https://www.google.com/recaptcha/api/siteverify",
-          {
-            method: "POST",
-            headers: { "Content-Type": "application/x-www-form-urlencoded" },
-            body: `secret=${encodeURIComponent(RECAPTCHA_SECRET_KEY)}&response=${encodeURIComponent(captchaToken)}`,
+      // Verify reCAPTCHA token with Google (unless skipped via env var)
+      if (!SKIP_CAPTCHA) {
+        try {
+          const captchaResponse = await fetch(
+            "https://www.google.com/recaptcha/api/siteverify",
+            {
+              method: "POST",
+              headers: { "Content-Type": "application/x-www-form-urlencoded" },
+              body: `secret=${encodeURIComponent(RECAPTCHA_SECRET_KEY)}&response=${encodeURIComponent(captchaToken)}`,
+            }
+          );
+
+          const captchaData = (await captchaResponse.json()) as { success: boolean };
+
+          if (!captchaData.success) {
+            return res.status(400).json({
+              success: false,
+              message: "CAPTCHA verification failed. Please try again.",
+            });
           }
-        );
-
-        const captchaData = (await captchaResponse.json()) as { success: boolean };
-
-        if (!captchaData.success) {
-          return res.status(400).json({
-            success: false,
-            message: "CAPTCHA verification failed. Please try again.",
-          });
+        } catch (e) {
+          // If the verification request fails (network, etc.), treat as bad request
+          console.error('CAPTCHA verification error:', e);
+          return res.status(400).json({ success: false, message: 'CAPTCHA verification failed. Please try again.' });
         }
-      } catch (e) {
-        // If the verification request fails (network, etc.), treat as bad request
-        console.error('CAPTCHA verification error:', e);
-        return res.status(400).json({ success: false, message: 'CAPTCHA verification failed. Please try again.' });
       }
       const user = await db.user.findUnique({
         where: { email },
