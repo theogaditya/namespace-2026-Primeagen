@@ -228,8 +228,8 @@ export type SurveyQuestionWhereInput = {
   options?: Prisma.StringNullableListFilter<"SurveyQuestion">
   isRequired?: Prisma.BoolFilter<"SurveyQuestion"> | boolean
   order?: Prisma.IntFilter<"SurveyQuestion"> | number
-  survey?: Prisma.XOR<Prisma.SurveyScalarRelationFilter, Prisma.SurveyWhereInput>
   answers?: Prisma.SurveyAnswerListRelationFilter
+  survey?: Prisma.XOR<Prisma.SurveyScalarRelationFilter, Prisma.SurveyWhereInput>
 }
 
 export type SurveyQuestionOrderByWithRelationInput = {
@@ -240,8 +240,8 @@ export type SurveyQuestionOrderByWithRelationInput = {
   options?: Prisma.SortOrder
   isRequired?: Prisma.SortOrder
   order?: Prisma.SortOrder
-  survey?: Prisma.SurveyOrderByWithRelationInput
   answers?: Prisma.SurveyAnswerOrderByRelationAggregateInput
+  survey?: Prisma.SurveyOrderByWithRelationInput
 }
 
 export type SurveyQuestionWhereUniqueInput = Prisma.AtLeast<{
@@ -255,8 +255,8 @@ export type SurveyQuestionWhereUniqueInput = Prisma.AtLeast<{
   options?: Prisma.StringNullableListFilter<"SurveyQuestion">
   isRequired?: Prisma.BoolFilter<"SurveyQuestion"> | boolean
   order?: Prisma.IntFilter<"SurveyQuestion"> | number
-  survey?: Prisma.XOR<Prisma.SurveyScalarRelationFilter, Prisma.SurveyWhereInput>
   answers?: Prisma.SurveyAnswerListRelationFilter
+  survey?: Prisma.XOR<Prisma.SurveyScalarRelationFilter, Prisma.SurveyWhereInput>
 }, "id">
 
 export type SurveyQuestionOrderByWithAggregationInput = {
@@ -294,8 +294,8 @@ export type SurveyQuestionCreateInput = {
   options?: Prisma.SurveyQuestionCreateoptionsInput | string[]
   isRequired?: boolean
   order: number
-  survey: Prisma.SurveyCreateNestedOneWithoutQuestionsInput
   answers?: Prisma.SurveyAnswerCreateNestedManyWithoutQuestionInput
+  survey: Prisma.SurveyCreateNestedOneWithoutQuestionsInput
 }
 
 export type SurveyQuestionUncheckedCreateInput = {
@@ -316,8 +316,8 @@ export type SurveyQuestionUpdateInput = {
   options?: Prisma.SurveyQuestionUpdateoptionsInput | string[]
   isRequired?: Prisma.BoolFieldUpdateOperationsInput | boolean
   order?: Prisma.IntFieldUpdateOperationsInput | number
-  survey?: Prisma.SurveyUpdateOneRequiredWithoutQuestionsNestedInput
   answers?: Prisma.SurveyAnswerUpdateManyWithoutQuestionNestedInput
+  survey?: Prisma.SurveyUpdateOneRequiredWithoutQuestionsNestedInput
 }
 
 export type SurveyQuestionUncheckedUpdateInput = {
@@ -672,8 +672,8 @@ export type SurveyQuestionSelect<ExtArgs extends runtime.Types.Extensions.Intern
   options?: boolean
   isRequired?: boolean
   order?: boolean
-  survey?: boolean | Prisma.SurveyDefaultArgs<ExtArgs>
   answers?: boolean | Prisma.SurveyQuestion$answersArgs<ExtArgs>
+  survey?: boolean | Prisma.SurveyDefaultArgs<ExtArgs>
   _count?: boolean | Prisma.SurveyQuestionCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["surveyQuestion"]>
 
@@ -711,8 +711,8 @@ export type SurveyQuestionSelectScalar = {
 
 export type SurveyQuestionOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "surveyId" | "questionText" | "questionType" | "options" | "isRequired" | "order", ExtArgs["result"]["surveyQuestion"]>
 export type SurveyQuestionInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  survey?: boolean | Prisma.SurveyDefaultArgs<ExtArgs>
   answers?: boolean | Prisma.SurveyQuestion$answersArgs<ExtArgs>
+  survey?: boolean | Prisma.SurveyDefaultArgs<ExtArgs>
   _count?: boolean | Prisma.SurveyQuestionCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type SurveyQuestionIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -725,8 +725,8 @@ export type SurveyQuestionIncludeUpdateManyAndReturn<ExtArgs extends runtime.Typ
 export type $SurveyQuestionPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   name: "SurveyQuestion"
   objects: {
-    survey: Prisma.$SurveyPayload<ExtArgs>
     answers: Prisma.$SurveyAnswerPayload<ExtArgs>[]
+    survey: Prisma.$SurveyPayload<ExtArgs>
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -1130,8 +1130,8 @@ readonly fields: SurveyQuestionFieldRefs;
  */
 export interface Prisma__SurveyQuestionClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
-  survey<T extends Prisma.SurveyDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.SurveyDefaultArgs<ExtArgs>>): Prisma.Prisma__SurveyClient<runtime.Types.Result.GetResult<Prisma.$SurveyPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   answers<T extends Prisma.SurveyQuestion$answersArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.SurveyQuestion$answersArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$SurveyAnswerPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  survey<T extends Prisma.SurveyDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.SurveyDefaultArgs<ExtArgs>>): Prisma.Prisma__SurveyClient<runtime.Types.Result.GetResult<Prisma.$SurveyPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.

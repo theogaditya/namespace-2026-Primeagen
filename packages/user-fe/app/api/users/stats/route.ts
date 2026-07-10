@@ -22,7 +22,7 @@ export async function GET(request: NextRequest) {
       },
     });
 
-    const data = await response.json();
+    const data = await response.json().catch(() => null);
 
     if (!response.ok) {
       return NextResponse.json(

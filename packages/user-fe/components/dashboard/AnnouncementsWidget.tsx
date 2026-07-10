@@ -188,40 +188,61 @@ export default function AnnouncementsWidget() {
   const [announcements, setAnnouncements] = React.useState<Announcement[]>([]);
   const [loading, setLoading] = React.useState(true);
   const [modalOpen, setModalOpen] = React.useState(false);
+  const [filterMode, setFilterMode] = React.useState<"my" | "all" | "other">("my");
+  const [municipalityInput, setMunicipalityInput] = React.useState<string>("");
+
+  // (userMunicipality will be read inside the effect to avoid changing hooks)
+
 
   React.useEffect(() => {
     const loadAnnouncements = async () => {
+      setLoading(true);
       try {
-        const authToken =
-          typeof window !== "undefined" ? localStorage.getItem("authToken") : null;
-        const response = await fetch("/api/announcements", {
-          headers: authToken ? { Authorization: `Bearer ${authToken}` } : undefined,
-        });
+        // decide municipality param according to filterMode
+        let municipalityParam: string | null = null;
+        // derive user's municipality from localStorage for "my" mode
+        let userMunicipality: string | null = null;
+        try {
+          const raw = typeof window !== "undefined" ? localStorage.getItem("userData") : null;
+          if (raw) {
+            const ud = JSON.parse(raw) as any;
+            userMunicipality = ud?.location?.municipality || ud?.location?.municipal || ud?.location?.locality || ud?.location?.city || null;
+          }
+        } catch {}
 
+        if (filterMode === "my") municipalityParam = userMunicipality;
+        else if (filterMode === "other") municipalityParam = municipalityInput || null;
+
+        // prepare headers for proxy route
+        const authToken = typeof window !== "undefined" ? localStorage.getItem("authToken") : null;
+        const extraHeaders: Record<string, string> = {};
+        if (authToken) extraHeaders.Authorization = `Bearer ${authToken}`;
+        if (municipalityParam) extraHeaders["X-Municipality"] = municipalityParam;
+
+        const response = await fetch(`/api/announcements`, {
+          headers: Object.keys(extraHeaders).length ? extraHeaders : undefined,
+        });
         if (!response.ok) return;
         const data = await response.json();
         if (data?.success && Array.isArray(data.data)) {
           const now = Date.now();
           const filtered = data.data.filter((a: any) => {
-            // exclude explicitly inactive announcements
             if (a.isActive === false) return false;
-            // exclude expired
             if (a.expiresAt && new Date(a.expiresAt).getTime() < now) return false;
-            // exclude announcements scheduled for future
             if (a.startsAt && new Date(a.startsAt).getTime() > now) return false;
             return true;
           });
           setAnnouncements(filtered);
         }
-      } catch {
-        // silently fall through – empty state is shown
+      } catch (err) {
+        console.error("Failed loading announcements:", err);
       } finally {
         setLoading(false);
       }
     };
 
     loadAnnouncements();
-  }, []);
+  }, [filterMode, municipalityInput]);
 
   return (
     <>
@@ -229,13 +250,35 @@ export default function AnnouncementsWidget() {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5, delay: 0.35 }}
-        className="bg-[var(--dash-secondary)]/5 p-6 rounded-3xl border border-[var(--dash-secondary)]/10 flex flex-col h-full"
+        className="bg-[var(--dash-secondary)]/5 p-6 rounded-3xl border border-[var(--dash-secondary)]/10 flex flex-col"
       >
         <div className="mb-6">
           <div className="flex items-center justify-between mb-6">
-            <p className="text-[10px] font-black text-[var(--dash-secondary)] uppercase tracking-[0.2em]">
-              Announcements
-            </p>
+            <div className="flex items-center gap-4">
+              <p className="text-[10px] font-black text-[var(--dash-secondary)] uppercase tracking-[0.2em]">
+                Announcements
+              </p>
+              <div className="text-xs text-slate-400">
+                <label className="mr-2">View:</label>
+                <select
+                  value={filterMode}
+                  onChange={(e) => setFilterMode(e.target.value as any)}
+                  className="bg-transparent text-[11px] border border-slate-200 rounded px-2 py-1"
+                >
+                  <option value="my">My municipality</option>
+                  <option value="all">All</option>
+                  <option value="other">Other...</option>
+                </select>
+                {filterMode === "other" && (
+                  <input
+                    value={municipalityInput}
+                    onChange={(e) => setMunicipalityInput(e.target.value)}
+                    placeholder="Municipality"
+                    className="ml-2 text-[11px] px-2 py-1 border border-slate-100 rounded"
+                  />
+                )}
+              </div>
+            </div>
             <Megaphone className="w-4 h-4 text-[var(--dash-secondary)]" />
           </div>
 

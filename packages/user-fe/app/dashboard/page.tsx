@@ -270,7 +270,7 @@ export default function DashboardPage() {
           />
 
           <main className="flex-1 overflow-auto">
-            <div className="min-h-screen flex flex-col">
+            <div className="min-h-0 flex flex-col">
               {activeView === "dashboard" && (
               <div className="pt-8 px-4 lg:px-8 pb-12 max-w-7xl mx-auto w-full">
                 <DashboardAIChatHub
@@ -285,7 +285,7 @@ export default function DashboardPage() {
                 />
 
                 <div className="grid grid-cols-12 gap-6">
-                  <div className="col-span-12 lg:col-span-8 space-y-8">
+                  <div className="col-span-12 lg:col-span-8 space-y-8 min-h-0">
                     <ActiveReportsGrid
                       complaints={myComplaints}
                       onComplaintClick={handleComplaintClick}
