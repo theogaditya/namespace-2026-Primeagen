@@ -17,9 +17,45 @@ import { createMatchRouter } from "./routes/match";
 export function createApp(db: PrismaClient) {
   const app = express();
 
+  const ALLOWED_ORIGINS = [
+    "https://gsc-admin-fe.abhasbehera.in",
+    "https://gsc-user-fe.abhasbehera.in",
+    "https://gsc-user-be.abhasbehera.in",
+    "https://gsc-ws-user-be.abhasbehera.in",
+    "https://gsc-admin-be.abhasbehera.in",
+    "https://gsc-comp-queue.abhasbehera.in",
+    "https://gsc-agents-be.abhasbehera.in",
+    "https://gsc-blockchain-be.abhasbehera.in",
+    "https://gsc-report-ai.abhasbehera.in",
+    "https://gsc-monitoring.abhasbehera.in",
+    "https://gsc-kuma.abhasbehera.in",
+    "http://localhost:3000",
+    "http://localhost:3001",
+    "http://localhost:3002",
+    "http://localhost:3003",
+    "http://localhost:3004",
+    "http://localhost:4000",
+    "http://localhost:8000",
+    "http://localhost:8001",
+  ];
+
+  const corsOptions: cors.CorsOptions = {
+    origin: (origin, callback) => {
+      if (!origin || ALLOWED_ORIGINS.includes(origin)) {
+        callback(null, true);
+      } else {
+        callback(new Error("Not allowed by CORS"));
+      }
+    },
+    credentials: true,
+    methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization"],
+    optionsSuccessStatus: 200,
+  };
+
   // Security & parsing
   app.use(helmet());
-  app.use(cors() as unknown as RequestHandler);
+  app.use(cors(corsOptions) as unknown as RequestHandler);
   app.use(express.json({ limit: "10mb" })); // 10mb for voice audio payloads
 
   // Public routes

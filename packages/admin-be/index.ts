@@ -38,34 +38,41 @@ export class Server {
     this.app.use(express.json());
     this.app.use(cookieParser());
 
-    // Read allowed origins from env (comma-separated). If not set, reflect request origin.
-    const rawAllowed = process.env.ADMIN_ALLOWED_ORIGINS || process.env.ALLOWED_ORIGINS || '';
-    const allowedOrigins = rawAllowed
-      .split(',')
-      .map((s) => s.trim())
-      .filter(Boolean);
+    const ALLOWED_ORIGINS = [
+      "https://gsc-admin-fe.abhasbehera.in",
+      "https://gsc-user-fe.abhasbehera.in",
+      "https://gsc-user-be.abhasbehera.in",
+      "https://gsc-ws-user-be.abhasbehera.in",
+      "https://gsc-admin-be.abhasbehera.in",
+      "https://gsc-comp-queue.abhasbehera.in",
+      "https://gsc-agents-be.abhasbehera.in",
+      "https://gsc-blockchain-be.abhasbehera.in",
+      "https://gsc-report-ai.abhasbehera.in",
+      "https://gsc-monitoring.abhasbehera.in",
+      "https://gsc-kuma.abhasbehera.in",
+      "http://localhost:3000",
+      "http://localhost:3001",
+      "http://localhost:3002",
+      "http://localhost:3003",
+      "http://localhost:3004",
+      "http://localhost:4000",
+      "http://localhost:8000",
+      "http://localhost:8001",
+    ];
 
-    const corsOptions: any = {
+    const corsOptions = {
+      origin: (origin: string | undefined, callback: Function) => {
+        if (!origin || ALLOWED_ORIGINS.includes(origin)) {
+          callback(null, true);
+        } else {
+          callback(new Error("Not allowed by CORS"));
+        }
+      },
       credentials: true,
-      methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
-      allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
-      preflightContinue: false,
+      methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
+      allowedHeaders: ["Content-Type", "Authorization"],
       optionsSuccessStatus: 200,
     };
-
-    if (allowedOrigins.length > 0) {
-      // Strict whitelist: only allow listed origins
-      corsOptions.origin = function (origin: string | undefined, callback: (err: Error | null, allow?: boolean) => void) {
-        // allow requests with no origin (e.g., curl, server-to-server)
-        if (!origin) return callback(null, true);
-        if (allowedOrigins.includes(origin)) return callback(null, true);
-        console.warn('[CORS] Blocked origin:', origin);
-        return callback(new Error('Not allowed by CORS'));
-      };
-    } else {
-      // Fallback: reflect origin back (previous behavior)
-      corsOptions.origin = true;
-    }
 
     this.app.use(cors(corsOptions));
   }

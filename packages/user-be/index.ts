@@ -69,6 +69,9 @@ export class Server {
       "http://localhost:3002",
       "http://localhost:3003",
       "http://localhost:3004",
+      "http://localhost:4000",
+      "http://localhost:8000",
+      "http://localhost:8001",
     ];
     // CORS must come BEFORE other middleware
     const corsOptions = {

@@ -2,12 +2,12 @@ import cors from 'cors';
 import express from 'express';
 import type { Express } from 'express';
 import { PrismaClient } from './prisma/generated/client/client';
-import { 
-  processNextComplaint, 
-  startComplaintPolling, 
-  stopComplaintPolling, 
+import {
+  processNextComplaint,
+  startComplaintPolling,
+  stopComplaintPolling,
   getPollingStatus,
-  getQueueStatus 
+  getQueueStatus,
 } from './services/complaintProcessor';
 
 export class Server {
@@ -23,37 +23,65 @@ export class Server {
   }
 
   private setupMiddleware() {
+    const ALLOWED_ORIGINS = [
+      'https://gsc-admin-fe.abhasbehera.in',
+      'https://gsc-user-fe.abhasbehera.in',
+      'https://gsc-user-be.abhasbehera.in',
+      'https://gsc-ws-user-be.abhasbehera.in',
+      'https://gsc-admin-be.abhasbehera.in',
+      'https://gsc-comp-queue.abhasbehera.in',
+      'https://gsc-agents-be.abhasbehera.in',
+      'https://gsc-blockchain-be.abhasbehera.in',
+      'https://gsc-report-ai.abhasbehera.in',
+      'https://gsc-monitoring.abhasbehera.in',
+      'https://gsc-kuma.abhasbehera.in',
+      'http://localhost:3000',
+      'http://localhost:3001',
+      'http://localhost:3002',
+      'http://localhost:3003',
+      'http://localhost:3004',
+      'http://localhost:4000',
+      'http://localhost:8000',
+      'http://localhost:8001',
+    ];
+
+    const corsOptions: cors.CorsOptions = {
+      origin: (origin, callback) => {
+        if (!origin || ALLOWED_ORIGINS.includes(origin)) {
+          callback(null, true);
+        } else {
+          callback(new Error('Not allowed by CORS'));
+        }
+      },
+      credentials: true,
+      methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+      allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
+      preflightContinue: false,
+      optionsSuccessStatus: 200,
+    };
+
     this.app.use(express.json());
-    this.app.use(
-      cors({
-        origin: true,
-        credentials: true,
-        methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
-        allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
-        preflightContinue: false,
-        optionsSuccessStatus: 200,
-      })
-    );
+    this.app.use(cors(corsOptions));
   }
 
   private setupRoutes() {
     // Health check endpoint
     this.app.get('/health', (req, res) => {
-      res.status(200).json({ 
-        status: 'OK', 
+      res.status(200).json({
+        status: 'OK',
         service: 'comp-queue',
-        timestamp: new Date().toISOString() 
+        timestamp: new Date().toISOString(),
       });
     });
 
     // Manual trigger endpoint - process single complaint
-    this.app.post("/api/processing", async (req, res) => {
+    this.app.post('/api/processing', async (req, res) => {
       const result = await processNextComplaint(this.db);
 
       if (!result.processed && !result.error) {
         return res.status(204).json({
           success: false,
-          message: "No complaints in queue",
+          message: 'No complaints in queue',
         });
       }
 
@@ -66,33 +94,34 @@ export class Server {
 
       return res.status(201).json({
         success: true,
-        message: "Complaint created successfully",
+        message: 'Complaint created successfully',
         data: result.result,
       });
     });
 
     // Start polling endpoint
-    this.app.post("/api/processing/start", (req, res) => {
+    this.app.post('/api/processing/start', (req, res) => {
       startComplaintPolling(this.db);
       return res.status(200).json({
         success: true,
-        message: "Complaint polling started",
+        message: 'Complaint polling started',
       });
     });
 
     // Stop polling endpoint
-    this.app.post("/api/processing/stop", (req, res) => {
+    this.app.post('/api/processing/stop', (req, res) => {
       stopComplaintPolling();
       return res.status(200).json({
         success: true,
-        message: "Complaint polling stopped",
+        message: 'Complaint polling stopped',
       });
     });
 
     // Polling status endpoint
-    this.app.get("/api/processing/status", async (req, res) => {
+    this.app.get('/api/processing/status', async (req, res) => {
       try {
         const queueStatus = await getQueueStatus();
+
         return res.status(200).json({
           success: true,
           isPolling: getPollingStatus(),
