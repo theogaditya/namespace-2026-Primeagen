@@ -51,21 +51,36 @@ export class Server {
   }
 
   private initializeMiddlewares(): void {
-    // Parse allowed origins from environment variable
-    const allowedOrigins = process.env.ALLOWED_ORIGINS
-      ? process.env.ALLOWED_ORIGINS.split(',')
-      : true;
+    // Parse allowed origins from environment variable — trim each entry to avoid whitespace mismatch
+    const rawAllowed = process.env.ALLOWED_ORIGINS || '';
+    const allowedOrigins = rawAllowed
+      .split(',')
+      .map((o) => o.trim())
+      .filter(Boolean);
 
     // CORS must come BEFORE other middleware
-    const corsOptions = {
-      origin: allowedOrigins,
+    const corsOptions: cors.CorsOptions = {
       credentials: true,
       methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
       allowedHeaders: ["Content-Type", "Authorization"],
       optionsSuccessStatus: 200,
     };
+
+    if (allowedOrigins.length > 0) {
+      corsOptions.origin = function (origin, callback) {
+        // Allow requests with no Origin header (e.g. same-origin, curl, server-to-server)
+        if (!origin) return callback(null, true);
+        if (allowedOrigins.includes(origin)) return callback(null, true);
+        console.warn('[CORS] Blocked origin:', origin);
+        return callback(new Error('Not allowed by CORS'));
+      };
+    } else {
+      // No ALLOWED_ORIGINS set — allow all (development fallback)
+      corsOptions.origin = true;
+    }
+
     this.app.use(cors(corsOptions));
-    this.app.options('/{*path}', cors(corsOptions));
+    this.app.options('*', cors(corsOptions));
 
     this.app.use(express.json());
     this.app.use(helmet());
