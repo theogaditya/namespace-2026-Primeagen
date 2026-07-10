@@ -1,6 +1,6 @@
 import { Server } from "./index";
 import dotenv from "dotenv";
-import { getPrisma } from "./lib/prisma";
+import { getPrisma, disconnectPrisma } from "./lib/prisma";
 // GCP initialization disabled to avoid unnecessary external init during local runs
 // import { initializeGCP } from "./lib/gcp/gcp";
 import { redisClient, RedisClientforComplaintQueue } from './lib/redis/redisClient';
@@ -60,10 +60,12 @@ process.on("uncaughtException", (err) => {
 
 process.on("SIGINT", async () => {
   console.log("Received SIGINT. Shutting down gracefully...");
+  await disconnectPrisma();
   process.exit(0);
 });
 
 process.on("SIGTERM", async () => {
   console.log("Received SIGTERM. Shutting down gracefully...");
+  await disconnectPrisma();
   process.exit(0);
 });

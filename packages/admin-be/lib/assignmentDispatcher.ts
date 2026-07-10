@@ -153,8 +153,8 @@ export async function dispatchNewComplaint(
       });
 
       if (fallbackAdmin) {
-        await prisma.$transaction([
-          prisma.complaint.update({
+        await prisma.$transaction(async (tx) => {
+          await tx.complaint.update({
             where: { id: complaintId },
             data: {
               managedByMunicipalAdminId: fallbackAdmin.id,
@@ -162,12 +162,12 @@ export async function dispatchNewComplaint(
               slaDeadline,
               sla: slaString,
             },
-          }),
-          prisma.departmentMunicipalAdmin.update({
+          });
+          await tx.departmentMunicipalAdmin.update({
             where: { id: fallbackAdmin.id },
             data: { currentWorkload: { increment: 1 } },
-          }),
-        ]);
+          });
+        });
         console.log(`[Dispatch] Complaint ${complaintId} (${dept} / ${district}) → fallback municipal admin ${fallbackAdmin.fullName}`);
         return { routed: true, routeTo: 'municipal_admin', municipalAdminId: fallbackAdmin.id, message: `Routed to fallback municipal admin ${fallbackAdmin.fullName}` };
       }
@@ -181,8 +181,8 @@ export async function dispatchNewComplaint(
       return { routed: false, routeTo: 'municipal_admin', message: `No municipal admin for ${dept} in ${district}` };
     }
 
-    await prisma.$transaction([
-      prisma.complaint.update({
+    await prisma.$transaction(async (tx) => {
+      await tx.complaint.update({
         where: { id: complaintId },
         data: {
           managedByMunicipalAdminId: admin.id,
@@ -190,12 +190,12 @@ export async function dispatchNewComplaint(
           slaDeadline,
           sla: slaString,
         },
-      }),
-      prisma.departmentMunicipalAdmin.update({
+      });
+      await tx.departmentMunicipalAdmin.update({
         where: { id: admin.id },
         data: { currentWorkload: { increment: 1 } },
-      }),
-    ]);
+      });
+    });
 
     console.log(`[Dispatch] Complaint ${complaintId} (${dept} / ${district}) → municipal admin ${admin.fullName}`);
     return { routed: true, routeTo: 'municipal_admin', municipalAdminId: admin.id, message: `Routed to municipal admin ${admin.fullName}` };
@@ -259,8 +259,8 @@ export async function drainUnclaimedForAgent(
     const slaDeadline = complaint.slaDeadline ?? computeSlaDeadline(complaint.submissionDate, complaint.urgency);
     const slaString = complaint.sla ?? slaLabel(complaint.urgency);
 
-    await prisma.$transaction([
-      prisma.complaint.update({
+    await prisma.$transaction(async (tx) => {
+      await tx.complaint.update({
         where: { id: complaint.id },
         data: {
           assignedAgentId: agentId,
@@ -268,12 +268,12 @@ export async function drainUnclaimedForAgent(
           slaDeadline,
           sla: slaString,
         },
-      }),
-      prisma.agent.update({
+      });
+      await tx.agent.update({
         where: { id: agentId },
         data: { currentWorkload: { increment: 1 } },
-      }),
-    ]);
+      });
+    });
 
     assigned++;
     freeSlots--;

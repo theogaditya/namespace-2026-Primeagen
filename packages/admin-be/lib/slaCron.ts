@@ -75,24 +75,24 @@ async function slaTick(prisma: PrismaClient) {
       }
 
       try {
-        await prisma.$transaction([
-          prisma.complaint.update({
+        await prisma.$transaction(async (tx) => {
+          await tx.complaint.update({
             where: { id: complaint.id },
             data: {
               status: 'ESCALATED_TO_MUNICIPAL_LEVEL',
               escalationLevel: 'MUNICIPAL_ADMIN',
               managedByMunicipalAdminId: municipalAdmin.id,
             },
-          }),
-          prisma.agent.update({
+          });
+          await tx.agent.update({
             where: { id: complaint.assignedAgentId! },
             data: { currentWorkload: { decrement: 1 } },
-          }),
-          prisma.departmentMunicipalAdmin.update({
+          });
+          await tx.departmentMunicipalAdmin.update({
             where: { id: municipalAdmin.id },
             data: { currentWorkload: { increment: 1 } },
-          }),
-        ]);
+          });
+        });
 
         agentIdsToRefill.add(complaint.assignedAgentId!);
         console.log(
