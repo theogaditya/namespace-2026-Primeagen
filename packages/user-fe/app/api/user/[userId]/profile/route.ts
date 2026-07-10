@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 
-const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:3000";
+import { BACKEND_URL } from "@/lib/backend";
 
 export async function GET(
   request: NextRequest,
@@ -8,7 +8,7 @@ export async function GET(
 ) {
   try {
     const { userId } = await params;
-    
+
     const response = await fetch(`${BACKEND_URL}/api/user/${userId}/profile`, {
       headers: {
         "Content-Type": "application/json",

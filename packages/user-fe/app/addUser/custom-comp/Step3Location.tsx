@@ -7,7 +7,7 @@ import { LoadingPopup } from "./LoadingPopup";
 import { FormField } from "./useSignupForm";
 import { z } from "zod";
 import { MapPin, Building2, Landmark } from "lucide-react";
-const USER_BE_URL = process.env.NEXT_PUBLIC_USER_BE_URL || "http://localhost:3000";
+import { BACKEND_URL as USER_BE_URL } from "@/lib/backend";
 
 interface Step3Props {
   formData: {
@@ -79,14 +79,14 @@ export function Step3Location({
 
   const fetchLocationByPin = async (pin: string) => {
     if (!/^\d{6}$/.test(pin)) return;
-    
+
     setIsLoadingLocation(true);
     setPinError(null);
-    
+
     try {
       const response = await fetch(`${USER_BE_URL}/api/users/location/${pin}`);
       const data = await response.json();
-      
+
       if (data.success) {
         updateField("district", data.data.district);
         updateField("city", data.data.city);
@@ -117,7 +117,7 @@ export function Step3Location({
   const handlePinChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value.replace(/\D/g, '').slice(0, 6);
     updateField("pin", value);
-    
+
     if (value.length === 6) {
       validateField("pin", value, pinSchema);
       fetchLocationByPin(value);

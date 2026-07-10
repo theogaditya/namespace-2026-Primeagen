@@ -17,9 +17,9 @@ import {
   LoadingPopup,
 } from "./custom-comp";
 import { ArrowLeft, ArrowRight, CheckCircle, Loader2, UserPlus } from "lucide-react";
+import { BACKEND_URL as USER_BE_URL, GOOGLE_API_KEY as CONFIG_GOOGLE_API_KEY } from "@/lib/backend";
 
-const GOOGLE_API_KEY = process.env.NEXT_PUBLIC_GOOGLE_API_KEY || "";
-const USER_BE_URL = process.env.NEXT_PUBLIC_USER_BE_URL || "http://localhost:3000";
+const GOOGLE_API_KEY = process.env.NEXT_PUBLIC_GOOGLE_API_KEY || CONFIG_GOOGLE_API_KEY || "";
 
 const steps = [
   { id: 1, label: "Personal", description: "Basic info" },

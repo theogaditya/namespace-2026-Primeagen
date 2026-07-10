@@ -1,7 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-
-// Backend API URL
-const BACKEND_URL = process.env.USER_BE_URL || process.env.NEXT_PUBLIC_USER_BE_URL || "http://localhost:3000";
+import { BACKEND_URL } from "@/lib/backend";
 
 interface SubmitComplaintResponse {
   success: boolean;
@@ -36,7 +34,7 @@ export async function POST(
 
     // Get form data (multipart for file upload)
     const incomingFormData = await request.formData();
-    
+
     // Debug: Log form data entries
     console.log("=== Form Data Received ===");
     for (const [key, value] of incomingFormData.entries()) {
@@ -45,7 +43,7 @@ export async function POST(
 
     // Create new FormData for backend - properly handle file
     const backendFormData = new FormData();
-    
+
     for (const [key, value] of incomingFormData.entries()) {
       if (typeof value === 'object' && value !== null && 'arrayBuffer' in value) {
         // It's a File/Blob - convert to Blob for proper forwarding
@@ -71,7 +69,7 @@ export async function POST(
     });
 
     const data = await response.json();
-    
+
     // Debug: Log backend response
     console.log("=== Backend Response ===");
     console.log("Status:", response.status);

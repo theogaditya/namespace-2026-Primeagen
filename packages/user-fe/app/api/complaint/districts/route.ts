@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 
 // Backend API URL
-const BACKEND_URL = process.env.NEXT_PUBLIC_USER_BE_URL || "http://localhost:3000";
+import { BACKEND_URL } from "@/lib/backend";
 
 export interface OperatingDistrict {
   id: string;
@@ -36,7 +36,7 @@ export async function GET(): Promise<NextResponse<DistrictsAPIResponse>> {
     }
 
     const data = await response.json();
-    
+
     return NextResponse.json({
       success: true,
       data: data.data || data,

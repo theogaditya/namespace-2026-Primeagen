@@ -1,17 +1,16 @@
 import { NextResponse } from "next/server";
 import { cookies, headers } from "next/headers";
-
-const BACKEND_URL = process.env.BACKEND_URL || "http://localhost:3001";
+import { BACKEND_URL } from "@/lib/backend";
 
 export async function POST() {
   try {
     const headersList = await headers();
     const cookieStore = await cookies();
-    
+
     // Get auth token from cookies or headers
     const authToken = cookieStore.get("authToken")?.value ||
                       headersList.get("authorization")?.replace("Bearer ", "");
-    
+
     if (!authToken) {
       return NextResponse.json(
         { success: false, error: "Unauthorized" },

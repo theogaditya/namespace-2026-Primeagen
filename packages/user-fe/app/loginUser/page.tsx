@@ -13,11 +13,7 @@ import { CheckCircle, Loader2, LogIn } from "lucide-react";
 
 const RECAPTCHA_SITE_KEY = process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY || "";
 
-// const USER_BE_URL = typeof window !== "undefined"
-//   ? (process.env.NEXT_PUBLIC_USER_BE_URL?.replace("localhost", window.location.hostname) || `http://${window.location.hostname}:3000`)
-//   : (process.env.NEXT_PUBLIC_USER_BE_URL || "http://localhost:3000");
-
-const USER_BE_URL = process.env.NEXT_PUBLIC_USER_BE_URL || "http://localhost:4000";
+import { BACKEND_URL as USER_BE_URL } from "@/lib/backend";
 
 function LoginUserContent() {
   const router = useRouter();

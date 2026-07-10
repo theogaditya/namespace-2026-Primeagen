@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
+import { WS_URL } from "@/lib/backend";
 
 // Message types matching backend WsMessageType
 export enum WsMessageType {
@@ -49,7 +50,7 @@ export interface UseLikeWebSocketReturn {
   unsubscribe: (topic: string) => void;
 }
 
-const DEFAULT_WS_URL = process.env.NEXT_PUBLIC_WS_URL || "ws://localhost:3001/ws";
+const DEFAULT_WS_URL = WS_URL || process.env.NEXT_PUBLIC_WS_URL || "ws://localhost:3001/ws";
 const RECONNECT_DELAY = 3000;
 const PING_INTERVAL = 30000; // 30 seconds
 const MAX_RECONNECT_ATTEMPTS = 5;

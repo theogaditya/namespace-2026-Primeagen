@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 
+import { BACKEND_URL } from "@/lib/backend";
 // Backend API URL
-const BACKEND_URL = process.env.NEXT_PUBLIC_USER_BE_URL || "http://localhost:3000";
 
 export interface Category {
   id: string;
@@ -54,21 +54,21 @@ export async function GET(): Promise<NextResponse<CategoriesAPIResponse>> {
 
     const data = await response.json();
     console.log("Categories data received:", JSON.stringify(data).slice(0, 200));
-    
+
     // Transform the data to ensure assignedDepartment uses enum format
     const categories = (data.data || data).map((cat: Category) => ({
       ...cat,
       // Convert "Infrastructure" -> "INFRASTRUCTURE" etc
       assignedDepartment: DEPARTMENT_MAP[cat.assignedDepartment] || cat.assignedDepartment.toUpperCase().replace(/ & /g, '_').replace(/ /g, '_'),
     }));
-    
+
     return NextResponse.json({
       success: true,
       data: categories,
     });
   } catch (error) {
     console.error("Categories API error:", error);
-    
+
     // Return hardcoded categories as fallback (should not happen normally)
     const fallbackCategories: Category[] = [
       { id: "cat-infrastructure", name: "Infrastructure", assignedDepartment: "INFRASTRUCTURE", subCategories: [] },

@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useEffect, useMemo, useCallback, useRef } from "react";
+import { BACKEND_URL } from "@/lib/backend";
 import { motion } from "framer-motion";
 import {
   ArrowLeft,
@@ -64,7 +65,7 @@ export default function SurveyAttendPanel({
       setError(null);
       try {
         const encodedId = encodeURIComponent(surveyId);
-        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/surveys/${encodedId}`, {
+        const res = await fetch(`${BACKEND_URL}/api/surveys/${encodedId}`, {
           headers: authToken ? { Authorization: `Bearer ${authToken}` } : {},
         });
         const data = await res.json();
@@ -91,7 +92,7 @@ export default function SurveyAttendPanel({
       }
       try {
         const encodedId = encodeURIComponent(surveyId);
-        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/surveys/${encodedId}/my-response`, {
+        const res = await fetch(`${BACKEND_URL}/api/surveys/${encodedId}/my-response`, {
           headers: { Authorization: `Bearer ${authToken}` },
         });
         const data: MyResponseCheckResponse = await res.json();
@@ -112,7 +113,7 @@ export default function SurveyAttendPanel({
     setResultsLoading(true);
     try {
       const encodedId = encodeURIComponent(surveyId);
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/surveys/${encodedId}/results`, {
+      const res = await fetch(`${BACKEND_URL}/api/surveys/${encodedId}/results`, {
         headers: authToken ? { Authorization: `Bearer ${authToken}` } : {},
       });
       if (!res.ok) {
@@ -230,7 +231,7 @@ export default function SurveyAttendPanel({
 
     try {
       const encodedId = encodeURIComponent(surveyId);
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/surveys/${encodedId}/respond`, {
+      const res = await fetch(`${BACKEND_URL}/api/surveys/${encodedId}/respond`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

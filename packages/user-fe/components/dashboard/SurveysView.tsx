@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useEffect, useCallback } from "react";
+import { BACKEND_URL } from "@/lib/backend";
 import { motion, AnimatePresence } from "framer-motion";
 import type { SurveyListItem, SurveyResponse } from "@/types/survey";
 import SurveyListPanel from "./surveys/SurveyListPanel";
@@ -54,7 +55,7 @@ export default function SurveysView({ authToken }: SurveysViewProps) {
       if (statusFilter === "CLOSED") params.set("status", "CLOSED");
       else if (statusFilter === "OPEN") params.set("status", "OPEN");
 
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/surveys?${params.toString()}`, {
+      const res = await fetch(`${BACKEND_URL}/api/surveys?${params.toString()}`, {
         headers: authToken ? { Authorization: `Bearer ${authToken}` } : {},
       });
       const data = await res.json();
@@ -103,7 +104,7 @@ export default function SurveysView({ authToken }: SurveysViewProps) {
     if (!authToken) return;
 
     try {
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/surveys/my-responses`, {
+      const res = await fetch(`${BACKEND_URL}/api/surveys/my-responses`, {
         headers: { Authorization: `Bearer ${authToken}` },
       });
       const data = await res.json();

@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
+import { BACKEND_URL } from "@/lib/backend";
 
 // Backend API URL
-const BACKEND_URL = process.env.NEXT_PUBLIC_USER_BE_URL || "http://localhost:3000";
 
 /**
  * GET /api/badges - Get all badges with user's earned status

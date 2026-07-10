@@ -1,5 +1,6 @@
 "use client";
 import { useEffect, useState, useRef } from "react";
+import { BACKEND_URL as API_BASE } from "@/lib/backend";
 
 type FormState = { name: string; email: string; message: string; latitude?: number; longitude?: number };
 type Coord = { latitude: number; longitude: number };
@@ -102,7 +103,7 @@ export default function Page() {
   const [showStored, setShowStored] = useState(false);
   const [showOnline, setShowOnline] = useState(false);
   const [queuedCount, setQueuedCount] = useState<number>(0);
-  const base = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:3002';
+  const base = API_BASE ?? process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:3002';
   const initialOnlineRef = useRef(true);
 
   // Ensure any previously-selected coordinate is cleared on page load

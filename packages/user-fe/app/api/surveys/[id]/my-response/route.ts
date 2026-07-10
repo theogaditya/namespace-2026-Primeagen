@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-
-const BACKEND_URL = process.env.NEXT_PUBLIC_USER_BE_URL || "http://localhost:3000";
+import { BACKEND_URL } from "@/lib/backend";
 
 /**
  * GET /api/surveys/[id]/my-response - Check if user already responded
