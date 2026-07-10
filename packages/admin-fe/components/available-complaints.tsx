@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect, useMemo } from "react"
+import { useState, useEffect, useMemo, useRef, useCallback } from "react"
 import 'leaflet/dist/leaflet.css'
 import { MapContainer, Marker, TileLayer } from 'react-leaflet'
 import L from 'leaflet'
@@ -19,7 +19,8 @@ import { Search, MoreHorizontal, Eye, UserPlus, User, FileText, Clock, AlertTria
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Modal } from "@/components/ui/modal"
 
-const AI_API_URL = process.env.NEXT_PUBLIC_API_URL_SELF_MATCH || 'http://localhost:3030/api/match'
+// Use same-origin proxy so client calls avoid CORS with upstream AI service
+const AI_API_URL = '/api/self-match'
 
 interface OverviewStats {
   total: number
@@ -106,6 +107,113 @@ export function AvailableComplaints() {
   const [overviewStats, setOverviewStats] = useState<OverviewStats>({ total: 0, registered: 0, inProgress: 0, resolved: 0, closed: 0, highPriority: 0, assigned: 0 })
   // Random 3-digit number for "Complaints Solved" – generated once per mount
   const [randomSolved] = useState<number>(() => Math.floor(Math.random() * 900) + 100)
+
+  // ── Complaint Verification Modal (image-based, required before marking COMPLETED) ──
+  const [isVerificationModalOpen, setIsVerificationModalOpen] = useState(false)
+  const [verificationFile, setVerificationFile] = useState<File | null>(null)
+  const [verificationPreview, setVerificationPreview] = useState<string | null>(null)
+  const [verificationUrlInput, setVerificationUrlInput] = useState<string>('')
+  const [verificationLoading, setVerificationLoading] = useState(false)
+  const [verificationResult, setVerificationResult] = useState<{ match: boolean; confidence: number; reason: string; description?: string; accuracy?: number } | null>(null)
+  const [verificationError, setVerificationError] = useState<string | null>(null)
+  const [verificationDragging, setVerificationDragging] = useState(false)
+  const verificationFileRef = useRef<HTMLInputElement>(null)
+  // Pending status/endpoint to use after verification passes
+  const [pendingVerificationStatus, setPendingVerificationStatus] = useState<string | null>(null)
+  const [pendingVerificationEndpoint, setPendingVerificationEndpoint] = useState<string | null>(null)
+
+  const handleVerificationFile = (file: File) => {
+    setVerificationFile(file)
+    setVerificationResult(null)
+    setVerificationError(null)
+    const reader = new FileReader()
+    reader.onload = (e) => setVerificationPreview(e.target?.result as string)
+    reader.readAsDataURL(file)
+  }
+
+  const handleVerificationDrop = useCallback((e: React.DragEvent) => {
+    e.preventDefault()
+    setVerificationDragging(false)
+    const file = e.dataTransfer.files?.[0]
+    if (file && file.type.startsWith('image/')) handleVerificationFile(file)
+  }, [])
+
+  const handleVerificationAnalyse = async () => {
+    if (!selectedComplaint?.attachmentUrl || (!verificationFile && !verificationPreview)) return
+    setVerificationLoading(true)
+    setVerificationResult(null)
+    setVerificationError(null)
+    try {
+      let data: any = null
+      if (verificationFile) {
+        const fd = new FormData()
+        fd.append('imageUrl1', selectedComplaint.attachmentUrl)
+        fd.append('image2', verificationFile)
+        const res = await fetch(AI_API_URL, { method: 'POST', body: fd })
+        data = await res.json()
+      } else if (verificationPreview && /^https?:\/\//.test(verificationPreview)) {
+        const res = await fetch(AI_API_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ imageUrl1: selectedComplaint.attachmentUrl, imageUrl2: verificationPreview }),
+        })
+        data = await res.json()
+      } else {
+        throw new Error('Provide a verification image file or a reachable image URL')
+      }
+      if (data.success) {
+        setVerificationResult({
+          match: data.match,
+          confidence: data.confidence,
+          reason: data.reason || data.description || '',
+          accuracy: typeof data.accuracy === 'number' ? data.accuracy : data.confidence,
+          description: data.description || data.reason || '',
+        })
+      } else {
+        setVerificationError(data.error || 'Comparison failed')
+      }
+    } catch (err: any) {
+      setVerificationError(err?.message || 'Network error connecting to verification server')
+    } finally {
+      setVerificationLoading(false)
+    }
+  }
+
+  const handleConfirmVerifiedCompletion = async () => {
+    if (!pendingVerificationEndpoint || !pendingVerificationStatus) return
+    setStatusUpdating(true)
+    try {
+      const token = localStorage.getItem('token')
+      if (!token) throw new Error('Not authenticated')
+      const res = await fetch(pendingVerificationEndpoint, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+        body: JSON.stringify({ status: pendingVerificationStatus }),
+      })
+      const body = await res.json()
+      if (!res.ok) {
+        alert(body.message || 'Unable to update the complaint status at this time')
+      } else {
+        const updated = body.complaint
+        setComplaints((prev) => prev.map((c) => (c.id === updated.id ? { ...c, status: updated.status } : c)))
+        setSelectedComplaint((prev) => prev ? { ...prev, status: updated.status } : prev)
+        alert(body.message || 'Complaint marked as Completed successfully')
+        setIsVerificationModalOpen(false)
+        // reset verification state
+        setVerificationFile(null)
+        setVerificationPreview(null)
+        setVerificationResult(null)
+        setVerificationError(null)
+        setVerificationUrlInput('')
+        setPendingVerificationStatus(null)
+        setPendingVerificationEndpoint(null)
+      }
+    } catch (err: any) {
+      alert(err?.message || 'Unable to update the complaint status')
+    } finally {
+      setStatusUpdating(false)
+    }
+  }
 
   // Comparison modal state
   const [isCompareModalOpen, setIsCompareModalOpen] = useState(false)
@@ -1077,18 +1185,31 @@ export function AvailableComplaints() {
                       disabled={statusUpdating}
                       onClick={async () => {
                         if (!selectedComplaint || !selectedStatus) return alert('Select a status first')
+                        // Determine endpoint
+                        let endpoint = ''
+                        if (adminType === 'AGENT') endpoint = `${API_URL}/api/agent/complaints/${selectedComplaint.id}/status`
+                        else if (adminType === 'MUNICIPAL_ADMIN') endpoint = `${API_URL}/api/municipal-admin/complaints/${selectedComplaint.id}/status`
+                        else if (adminType === 'STATE_ADMIN') endpoint = `${API_URL}/api/state-admin/complaints/${selectedComplaint.id}/status`
+                        else if (adminType === 'SUPER_ADMIN') endpoint = `${API_URL}/api/super-admin/complaints/${selectedComplaint.id}/status`
+                        else endpoint = `${API_URL}/api/agent/complaints/${selectedComplaint.id}/status`
+
+                        // Require image verification before marking as COMPLETED
+                        if (selectedStatus === 'COMPLETED') {
+                          setPendingVerificationStatus(selectedStatus)
+                          setPendingVerificationEndpoint(endpoint)
+                          setVerificationFile(null)
+                          setVerificationPreview(null)
+                          setVerificationResult(null)
+                          setVerificationError(null)
+                          setVerificationUrlInput('')
+                          setIsVerificationModalOpen(true)
+                          return
+                        }
+
                         setStatusUpdating(true)
                         try {
                           const token = localStorage.getItem('token')
                           if (!token) throw new Error('Not authenticated')
-                          // Choose endpoint based on admin type: agents use agent endpoint, admins use municipal/state endpoints
-                          let endpoint = ''
-                          if (adminType === 'AGENT') endpoint = `${API_URL}/api/agent/complaints/${selectedComplaint.id}/status`
-                          else if (adminType === 'MUNICIPAL_ADMIN') endpoint = `${API_URL}/api/municipal-admin/complaints/${selectedComplaint.id}/status`
-                          else if (adminType === 'STATE_ADMIN') endpoint = `${API_URL}/api/state-admin/complaints/${selectedComplaint.id}/status`
-                          else if (adminType === 'SUPER_ADMIN') endpoint = `${API_URL}/api/super-admin/complaints/${selectedComplaint.id}/status`
-                          else endpoint = `${API_URL}/api/agent/complaints/${selectedComplaint.id}/status`
-
                           const res = await fetch(endpoint, {
                             method: 'PUT',
                             headers: {
@@ -1123,6 +1244,256 @@ export function AvailableComplaints() {
                   <p className="text-sm text-amber-600 bg-amber-50 p-3 rounded-md">Only Municipal Admins and Higher, or Assigned Agent, can Update Status.</p>
                 </div>
               )}
+            </div>
+          </Modal>
+
+          {/* ── Complaint Verification Modal ── */}
+          <Modal
+            isOpen={isVerificationModalOpen}
+            onClose={() => {
+              setIsVerificationModalOpen(false)
+              setVerificationFile(null)
+              setVerificationPreview(null)
+              setVerificationResult(null)
+              setVerificationError(null)
+              setVerificationUrlInput('')
+              setPendingVerificationStatus(null)
+              setPendingVerificationEndpoint(null)
+            }}
+          >
+            <div className="space-y-0 w-full">
+              <style>{`@keyframes uav-scan { 0% { top: -60px; } 100% { top: 100%; } }`}</style>
+              {/* ── Header ── */}
+              <div className="flex items-center justify-between p-5 border-b border-slate-100 bg-slate-50 rounded-t-xl">
+                <div>
+                  <p className="text-[10px] font-bold text-indigo-600 uppercase tracking-[0.2em] mb-0.5">Complaint Verification</p>
+                  <h3 className="text-base font-black text-slate-800">Image-Based Completion Verification</h3>
+                  <p className="text-[11px] text-slate-400 mt-0.5">Upload a field verification image. Confidence must exceed 90% to mark this complaint as Completed.</p>
+                </div>
+                <button
+                  onClick={() => setIsVerificationModalOpen(false)}
+                  className="ml-4 p-1.5 rounded-full hover:bg-slate-200 transition-colors"
+                >
+                  <X className="w-4 h-4 text-slate-500" />
+                </button>
+              </div>
+
+              <div className="p-5 space-y-5">
+                {/* ── Complaint reference info ── */}
+                {selectedComplaint && (
+                  <div className="flex items-center gap-3 bg-indigo-50 border border-indigo-100 rounded-xl p-3">
+                    <div className="w-8 h-8 rounded-lg bg-indigo-100 flex items-center justify-center flex-shrink-0">
+                      <CheckCircle className="w-4 h-4 text-indigo-600" />
+                    </div>
+                    <div>
+                      <p className="text-[10px] font-bold text-indigo-400 uppercase tracking-widest">Complaint #{selectedComplaint.seq}</p>
+                      <p className="text-sm font-semibold text-slate-800 line-clamp-1">{selectedComplaint.title}</p>
+                    </div>
+                  </div>
+                )}
+
+                {/* ── Image panels ── */}
+                <div className="grid grid-cols-2 gap-4">
+                  {/* Left: Original complaint image */}
+                  <div className="space-y-1.5">
+                    <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Original Complaint Image</p>
+                    <div className="aspect-video bg-slate-50 rounded-xl overflow-hidden border border-slate-200 relative flex items-center justify-center min-h-[140px]">
+                      {/* scan bar */}
+                      <div
+                        className="absolute left-0 z-10 w-full pointer-events-none"
+                        style={{
+                          height: 60,
+                          background: 'linear-gradient(to bottom, transparent, #4f46e5, transparent)',
+                          opacity: 0.25,
+                          animation: 'uav-scan 3s linear infinite',
+                          top: -60,
+                        }}
+                      />
+                      {selectedComplaint?.attachmentUrl ? (
+                        <img
+                          src={selectedComplaint.attachmentUrl}
+                          alt="Original Complaint"
+                          className="w-full h-full object-cover grayscale opacity-80"
+                          onError={(e) => { (e.target as HTMLImageElement).style.display = 'none' }}
+                        />
+                      ) : (
+                        <div className="flex flex-col items-center gap-2 text-slate-400">
+                          <FileText className="w-8 h-8" />
+                          <span className="text-xs">No image</span>
+                        </div>
+                      )}
+                      <div className="absolute top-2 left-2 bg-slate-900/60 backdrop-blur px-2 py-0.5 rounded text-[8px] font-mono text-white">COMPLAINT SRC</div>
+                    </div>
+                  </div>
+
+                  {/* Right: Upload verification image */}
+                  <div className="space-y-1.5">
+                    <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Field Verification Image</p>
+                    <div
+                      className={`aspect-video rounded-xl overflow-hidden border-2 transition-all duration-200 relative flex items-center justify-center cursor-pointer min-h-[140px]
+                        ${
+                          verificationDragging
+                            ? 'border-indigo-400 bg-indigo-50'
+                            : verificationPreview
+                            ? 'border-slate-200 bg-slate-50'
+                            : 'border-dashed border-slate-300 hover:border-indigo-300 hover:bg-indigo-50/30 bg-slate-50'
+                        }`}
+                      onClick={() => verificationFileRef.current?.click()}
+                      onDragOver={(e) => { e.preventDefault(); setVerificationDragging(true) }}
+                      onDragLeave={() => setVerificationDragging(false)}
+                      onDrop={handleVerificationDrop}
+                    >
+                      {verificationPreview ? (
+                        <>
+                          <img
+                            src={/^https?:\/\//.test(verificationPreview) ? verificationPreview : verificationPreview}
+                            alt="Verification"
+                            className="absolute inset-0 w-full h-full object-cover"
+                          />
+                          <div className="absolute bottom-2 right-2 bg-indigo-600/80 px-2 py-0.5 rounded text-[8px] font-mono text-white z-10">FIELD IMAGE</div>
+                          <button
+                            className="absolute top-2 right-2 bg-white/80 p-1 rounded-full text-slate-500 hover:text-red-500 z-20"
+                            onClick={(e) => { e.stopPropagation(); setVerificationFile(null); setVerificationPreview(null); setVerificationResult(null) }}
+                          >
+                            <X className="w-3 h-3" />
+                          </button>
+                        </>
+                      ) : (
+                        <div className="flex flex-col items-center gap-2 p-3">
+                          <div className="w-10 h-10 rounded-full bg-indigo-50 border border-indigo-100 flex items-center justify-center">
+                            <span className="text-indigo-500 text-lg">↑</span>
+                          </div>
+                          <div className="text-center">
+                            <p className="text-xs font-bold text-slate-700">{verificationDragging ? 'Drop here' : 'Upload Verification Image'}</p>
+                            <p className="text-[10px] text-slate-400">Drag & drop or click · JPG/PNG/WEBP</p>
+                          </div>
+                        </div>
+                      )}
+                      <input
+                        ref={verificationFileRef}
+                        type="file"
+                        accept="image/jpeg,image/jpg,image/png,image/webp"
+                        className="hidden"
+                        onChange={(e) => { const f = e.target.files?.[0]; if (f) handleVerificationFile(f) }}
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                {/* ── URL paste input ── */}
+                <div className="flex gap-2">
+                  <Input
+                    placeholder="Or paste a verification image URL…"
+                    value={verificationUrlInput}
+                    onChange={(e) => setVerificationUrlInput(e.target.value)}
+                    className="flex-1 text-sm"
+                  />
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => {
+                      if (verificationUrlInput.trim()) {
+                        setVerificationFile(null)
+                        setVerificationPreview(verificationUrlInput.trim())
+                        setVerificationResult(null)
+                        setVerificationError(null)
+                        setVerificationUrlInput('')
+                      }
+                    }}
+                  >
+                    Use URL
+                  </Button>
+                </div>
+
+                {/* ── Error ── */}
+                {verificationError && (
+                  <div className="flex items-start gap-2 p-3 bg-red-50 border border-red-200 rounded-xl">
+                    <AlertTriangle className="w-4 h-4 text-red-500 flex-shrink-0 mt-0.5" />
+                    <p className="text-sm text-red-700">{verificationError}</p>
+                  </div>
+                )}
+
+                {/* ── Verification result ── */}
+                {verificationResult && (() => {
+                  const pct = Math.round((verificationResult.confidence ?? verificationResult.accuracy ?? 0) * 100)
+                  const passed = pct >= 90
+                  return (
+                    <div className={`rounded-xl border p-4 space-y-3 ${ passed ? 'bg-emerald-50 border-emerald-200' : 'bg-red-50 border-red-200' }`}>
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-2">
+                          {passed
+                            ? <CheckCircle className="w-5 h-5 text-emerald-600" />
+                            : <AlertTriangle className="w-5 h-5 text-red-500" />}
+                          <span className={`text-sm font-bold ${ passed ? 'text-emerald-700' : 'text-red-700' }`}>
+                            {passed ? 'Verification Passed' : 'Verification Failed'}
+                          </span>
+                        </div>
+                        <span className={`text-2xl font-black ${ passed ? 'text-emerald-700' : 'text-red-700' }`}>{pct}%</span>
+                      </div>
+                      {/* Confidence bar */}
+                      <div className="w-full h-2 bg-white/60 rounded-full overflow-hidden">
+                        <div
+                          className={`h-full rounded-full transition-all duration-700 ${ passed ? 'bg-emerald-500' : 'bg-red-500' }`}
+                          style={{ width: `${pct}%` }}
+                        />
+                      </div>
+                      {verificationResult.description && (
+                        <p className="text-xs text-slate-700 leading-relaxed">{verificationResult.description}</p>
+                      )}
+                      {!passed && (
+                        <p className="text-xs font-semibold text-red-700">
+                          Confidence is below 90%. The complaint cannot be marked as Completed. Upload a clearer field verification image and try again.
+                        </p>
+                      )}
+                    </div>
+                  )
+                })()}
+
+                {/* ── Action buttons ── */}
+                <div className="flex items-center justify-between gap-3 pt-1">
+                  <Button
+                    variant="outline"
+                    onClick={() => {
+                      setIsVerificationModalOpen(false)
+                      setVerificationFile(null)
+                      setVerificationPreview(null)
+                      setVerificationResult(null)
+                      setVerificationError(null)
+                      setVerificationUrlInput('')
+                      setPendingVerificationStatus(null)
+                      setPendingVerificationEndpoint(null)
+                    }}
+                  >
+                    Cancel
+                  </Button>
+
+                  <div className="flex items-center gap-2">
+                    {/* Analyse button */}
+                    <Button
+                      disabled={(!verificationFile && !verificationPreview) || verificationLoading}
+                      onClick={handleVerificationAnalyse}
+                      className="bg-indigo-600 hover:bg-indigo-700 text-white"
+                    >
+                      {verificationLoading ? (
+                        <><Loader2 className="w-4 h-4 mr-2 animate-spin" />Analysing…</>
+                      ) : (
+                        'Analyse Image'
+                      )}
+                    </Button>
+
+                    {/* Confirm completion – only enabled when confidence ≥ 90% */}
+                    {verificationResult && Math.round((verificationResult.confidence ?? verificationResult.accuracy ?? 0) * 100) >= 90 && (
+                      <Button
+                        disabled={statusUpdating}
+                        onClick={handleConfirmVerifiedCompletion}
+                        className="bg-emerald-600 hover:bg-emerald-700 text-white font-bold"
+                      >
+                        {statusUpdating ? <><Loader2 className="w-4 h-4 mr-2 animate-spin" />Updating…</> : '✓ Confirm Completed'}
+                      </Button>
+                    )}
+                  </div>
+                </div>
+              </div>
             </div>
           </Modal>
 

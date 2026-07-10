@@ -212,6 +212,7 @@ export default function AnnouncementsWidget() {
 
         if (filterMode === "my") municipalityParam = userMunicipality;
         else if (filterMode === "other") municipalityParam = municipalityInput || null;
+        else if (filterMode === "all") municipalityParam = "ALL";
 
         // prepare headers for proxy route
         const authToken = typeof window !== "undefined" ? localStorage.getItem("authToken") : null;
@@ -225,14 +226,19 @@ export default function AnnouncementsWidget() {
         if (!response.ok) return;
         const data = await response.json();
         if (data?.success && Array.isArray(data.data)) {
-          const now = Date.now();
-          const filtered = data.data.filter((a: any) => {
-            if (a.isActive === false) return false;
-            if (a.expiresAt && new Date(a.expiresAt).getTime() < now) return false;
-            if (a.startsAt && new Date(a.startsAt).getTime() > now) return false;
-            return true;
-          });
-          setAnnouncements(filtered);
+          // If user selected "All", don't apply active/start/expire filters — show everything.
+          if (filterMode === "all") {
+            setAnnouncements(data.data);
+          } else {
+            const now = Date.now();
+            const filtered = data.data.filter((a: any) => {
+              if (a.isActive === false) return false;
+              if (a.expiresAt && new Date(a.expiresAt).getTime() < now) return false;
+              if (a.startsAt && new Date(a.startsAt).getTime() > now) return false;
+              return true;
+            });
+            setAnnouncements(filtered);
+          }
         }
       } catch (err) {
         console.error("Failed loading announcements:", err);

@@ -18,8 +18,8 @@ interface MatchResult {
   description?: string
 }
 
-const SELF_MATCH_URL =
-  process.env.NEXT_PUBLIC_API_URL_SELF_MATCH || "http://localhost:3030/api/match"
+// Use same-origin proxy to avoid browser CORS issues
+const SELF_MATCH_URL = "/api/self-match"
 
 /** Route external image URLs through the Next.js server proxy to avoid CORP blocks */
 const proxyImg = (url: string | null | undefined) =>

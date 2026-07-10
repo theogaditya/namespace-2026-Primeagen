@@ -1,40 +1,36 @@
 import { NextRequest, NextResponse } from "next/server";
-import { BACKEND_URL } from "@/lib/backend";
+import { Pool } from "pg";
+
+declare global {
+  // allow reuse of the pool in development hot reloads
+  // eslint-disable-next-line no-var
+  var __pgPool: Pool | undefined;
+}
+
+function getPool() {
+  if (global.__pgPool) return global.__pgPool;
+  const connectionString = process.env.DATABASE_URL;
+  if (!connectionString) throw new Error("DATABASE_URL not set");
+  const pool = new Pool({ connectionString });
+  if (process.env.NODE_ENV !== "production") global.__pgPool = pool;
+  return pool;
+}
 
 export async function GET(request: NextRequest) {
   try {
-    const authToken =
-      request.cookies.get("authToken")?.value ||
-      request.headers.get("Authorization")?.replace("Bearer ", "");
+    const pool = getPool();
 
-    const headers: Record<string, string> = {
-      "Content-Type": "application/json",
-    };
+    // Return all announcements without DB-side filtering; frontend will filter.
+    const sql = `SELECT id, title, content, municipality, "isActive", priority, "startsAt", "expiresAt", "createdAt", "updatedAt"
+      FROM announcements
+      ORDER BY "createdAt" DESC`;
 
-    if (authToken) {
-      headers.Authorization = `Bearer ${authToken}`;
-    }
+    const result = await pool.query(sql);
+    const rows = result?.rows || [];
 
-    const response = await fetch(`${BACKEND_URL}/api/announcements`, {
-      method: "GET",
-      headers,
-    });
-
-    const data = await response.json().catch(() => null);
-
-    if (!response.ok) {
-      return NextResponse.json(
-        { success: false, error: data.error || "Failed to fetch announcements" },
-        { status: response.status }
-      );
-    }
-
-    return NextResponse.json(data);
-  } catch (error) {
-    console.error("Error proxying announcements:", error);
-    return NextResponse.json(
-      { success: false, error: "Internal server error" },
-      { status: 500 }
-    );
+    return NextResponse.json({ success: true, data: rows });
+  } catch (err) {
+    console.error("Error fetching announcements from DB via pg:", err);
+    return NextResponse.json({ success: false, error: "Internal server error" }, { status: 500 });
   }
 }
