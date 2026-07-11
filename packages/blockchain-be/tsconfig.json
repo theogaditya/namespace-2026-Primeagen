@@ -1,15 +1,14 @@
 {
   "compilerOptions": {
     "target": "es2020",
-    "module": "esnext",
-    "moduleResolution": "node",
+    "module": "commonjs",
     "strict": true,
     "esModuleInterop": true,
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
     "resolveJsonModule": true,
     "outDir": "dist",
-    "types": ["node", "express", "cors"]
+    "types": ["node"]
   },
-  "include": ["./src", "./backend/src", "./test", "./scripts", "hardhat.config.ts", "typechain-types"]
+  "include": ["./src", "./test", "./scripts", "hardhat.config.ts", "typechain-types"]
 }
