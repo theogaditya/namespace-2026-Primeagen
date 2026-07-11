@@ -109,40 +109,54 @@ export function PlacesAutocomplete({
         searchQuery = `${input}, ${locationBias.state}`;
       }
 
-      // Since we can't call the API directly from the browser due to CORS,
-      // we'll use the Google Maps JavaScript API's AutocompleteService
-      if (typeof window !== "undefined" && window.google?.maps?.places) {
-        const service = new window.google.maps.places.AutocompleteService();
-        service.getPlacePredictions(
-          {
-            input: searchQuery,
-            componentRestrictions: { country: "in" },
-            types: ["geocode"],
-          },
-          (results: Prediction[] | null, status: string) => {
-            setIsLoading(false);
-            if (status === "OK" && results) {
-              // Filter results to only show those matching the location bias
-              const filteredResults = locationBias?.city || locationBias?.state
-                ? results.filter(r => matchesLocationBias(r.description))
-                : results;
-
-              setPredictions(filteredResults);
-              setIsOpen(filteredResults.length > 0);
-            } else {
-              setPredictions([]);
-            }
-          }
-        );
-      } else {
+      if (typeof window === "undefined" || !window.google?.maps?.places) {
         setIsLoading(false);
+        return;
+      }
+
+      // Use the new AutocompleteSuggestion API (required for new API keys post-March 2025)
+      const placesLib = window.google.maps.places as unknown as {
+        AutocompleteSuggestion?: {
+          fetchAutocompleteSuggestions: (req: object) => Promise<{ suggestions: Array<{ placePrediction: { placeId: string; text: { toString: () => string }; mainText: { toString: () => string }; secondaryText: { toString: () => string } } }> }>;
+        };
+        AutocompleteRequest?: new (opts: object) => object;
+      };
+
+      if (placesLib.AutocompleteSuggestion && placesLib.AutocompleteRequest) {
+        const request = new placesLib.AutocompleteRequest({
+          input: searchQuery,
+          componentRestrictions: { country: "in" },
+          types: ["geocode"],
+        });
+        const { suggestions } = await placesLib.AutocompleteSuggestion.fetchAutocompleteSuggestions(request);
+        const results: Prediction[] = suggestions.map((s) => ({
+          place_id: s.placePrediction.placeId,
+          description: s.placePrediction.text.toString(),
+          structured_formatting: {
+            main_text: s.placePrediction.mainText.toString(),
+            secondary_text: s.placePrediction.secondaryText?.toString() ?? "",
+          },
+        }));
+
+        setIsLoading(false);
+        // Filter results to only show those matching the location bias
+        const filteredResults = locationBias?.city || locationBias?.state
+          ? results.filter(r => matchesLocationBias(r.description))
+          : results;
+
+        setPredictions(filteredResults);
+        setIsOpen(filteredResults.length > 0);
+      } else {
+        // New API not available — fail gracefully
+        setIsLoading(false);
+        setPredictions([]);
       }
     } catch (err) {
       console.error("Error fetching predictions:", err);
       setIsLoading(false);
       setPredictions([]);
     }
-  }, [apiKey, locationBias, matchesLocationBias]);
+  }, [locationBias, matchesLocationBias]);
 
   // Sync inputValue with external value changes
   React.useEffect(() => {
@@ -233,7 +247,8 @@ export function PlacesAutocomplete({
       if (!existingScript) {
         const script = document.createElement("script");
         script.id = "google-maps-script";
-        script.src = `https://maps.googleapis.com/maps/api/js?key=${apiKey}&libraries=places&loading=async`;
+        // Use v=weekly to get the latest Places API (AutocompleteSuggestion)
+        script.src = `https://maps.googleapis.com/maps/api/js?key=${apiKey}&v=weekly&libraries=places&loading=async`;
         script.async = true;
         script.defer = true;
         document.head.appendChild(script);

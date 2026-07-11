@@ -34,6 +34,46 @@ interface Prediction {
   };
 }
 
+/** Fetch autocomplete suggestions using the new Places API (required for new API keys post-March 2025) */
+async function fetchAutocompleteSuggestions(
+  input: string,
+  componentRestrictions?: { country: string }
+): Promise<Prediction[]> {
+  if (typeof window === "undefined" || !window.google?.maps?.places) return [];
+
+  const { AutocompleteSuggestion, AutocompleteRequest } =
+    window.google.maps.places as unknown as {
+      AutocompleteSuggestion: {
+        fetchAutocompleteSuggestions: (req: object) => Promise<{ suggestions: Array<{ placePrediction: { placeId: string; text: { toString: () => string }; mainText: { toString: () => string }; secondaryText: { toString: () => string } } }> }>;
+      };
+      AutocompleteRequest: new (opts: object) => object;
+    };
+
+  // Fallback to legacy API if new API is unavailable (should not happen for new keys)
+  if (!AutocompleteSuggestion || !AutocompleteRequest) {
+    return [];
+  }
+
+  try {
+    const request = new AutocompleteRequest({
+      input,
+      ...(componentRestrictions ? { componentRestrictions } : {}),
+    });
+    const { suggestions } = await AutocompleteSuggestion.fetchAutocompleteSuggestions(request);
+    return suggestions.map((s) => ({
+      place_id: s.placePrediction.placeId,
+      description: s.placePrediction.text.toString(),
+      structured_formatting: {
+        main_text: s.placePrediction.mainText.toString(),
+        secondary_text: s.placePrediction.secondaryText?.toString() ?? "",
+      },
+    }));
+  } catch (err) {
+    console.error("[AutocompleteSuggestion] Error:", err);
+    return [];
+  }
+}
+
 const containerVariants: Variants = {
   hidden: { opacity: 0 },
   visible: {
@@ -397,33 +437,20 @@ export function Step3Location({
       setIsLoadingLocality(true);
 
       try {
-        if (typeof window !== "undefined" && window.google?.maps?.places) {
-          const service = new window.google.maps.places.AutocompleteService();
-          // Include district and PIN in search to ensure results are within the area
-          const searchQuery = `${input}, ${formData.pin}, ${formData.district}, India`;
+        // Include district and PIN in search to ensure results are within the area
+        const searchQuery = `${input}, ${formData.pin}, ${formData.district}, India`;
+        const results = await fetchAutocompleteSuggestions(searchQuery, { country: "in" });
 
-          service.getPlacePredictions(
-            {
-              input: searchQuery,
-              componentRestrictions: { country: "in" },
-              // Removed types restriction to allow all place types including landmarks, malls, etc.
-            },
-            (results, status) => {
-              setIsLoadingLocality(false);
-              if (status === "OK" && results) {
-                // Filter to only show results in the selected district
-                const filtered = results.filter((r) =>
-                  r.description.toLowerCase().includes(formData.district.toLowerCase())
-                );
-                setLocalityPredictions(filtered.slice(0, 6)); // Limit to 6 results
-                setShowLocalityDropdown(filtered.length > 0);
-              } else {
-                setLocalityPredictions([]);
-              }
-            }
+        setIsLoadingLocality(false);
+        if (results.length > 0) {
+          // Filter to only show results in the selected district
+          const filtered = results.filter((r) =>
+            r.description.toLowerCase().includes(formData.district.toLowerCase())
           );
+          setLocalityPredictions(filtered.slice(0, 6)); // Limit to 6 results
+          setShowLocalityDropdown(filtered.length > 0);
         } else {
-          setIsLoadingLocality(false);
+          setLocalityPredictions([]);
         }
       } catch (err) {
         console.error("Error fetching locality predictions:", err);

@@ -3,6 +3,13 @@
 # on:
 #   push:
 #     branches: [main]
+#     paths:
+#       - 'packages/user-be/**'
+#       - 'packages/admin-be/**'
+#       - 'packages/compQueue/**'
+#       - 'packages/agents/**'
+#       - 'packages/blockchain-be/**'
+#       - '.github/workflows/ci.yaml'
 
 # env:
 #   USER_BE_IMAGE: ogadityahota/swarajdesk-user-be

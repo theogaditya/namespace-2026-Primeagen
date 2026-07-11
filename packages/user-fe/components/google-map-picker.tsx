@@ -213,8 +213,6 @@ export function GoogleMapPicker({
   // Use unified geolocation hook (works in both browser and Capacitor)
   const { isLoading: isGettingLocation, getCurrentPosition } = useGeolocation();
 
-  const autocompleteServiceRef = useRef<google.maps.places.AutocompleteService | null>(null);
-  const placesServiceRef = useRef<google.maps.places.PlacesService | null>(null);
   const searchTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   // Calculate marker position from lat/lng strings
@@ -236,32 +234,16 @@ export function GoogleMapPicker({
     [disabled, onLocationSelect]
   );
 
-  // Initialize Places services when Google Maps is loaded
-  const initializePlacesServices = useCallback(() => {
-    if (typeof google !== "undefined" && google.maps && google.maps.places) {
-      if (!autocompleteServiceRef.current) {
-        autocompleteServiceRef.current = new google.maps.places.AutocompleteService();
-      }
-      if (!placesServiceRef.current) {
-        // Create a dummy element for PlacesService
-        const dummyElement = document.createElement("div");
-        placesServiceRef.current = new google.maps.places.PlacesService(dummyElement);
-      }
-    }
-  }, []);
-
-  // Fetch predictions
+  // Fetch predictions using the new AutocompleteSuggestion API (required for new keys post-March 2025)
   const fetchPredictions = useCallback(
-    (input: string) => {
+    async (input: string) => {
       if (!input || input.length < 2) {
         setPredictions([]);
         setShowPredictions(false);
         return;
       }
 
-      initializePlacesServices();
-
-      if (!autocompleteServiceRef.current) {
+      if (typeof google === "undefined" || !google.maps?.places) {
         return;
       }
 
@@ -273,23 +255,42 @@ export function GoogleMapPicker({
       if (district) searchInput += `, ${district}`;
       searchInput += ", India";
 
-      autocompleteServiceRef.current.getPlacePredictions(
-        {
+      try {
+        const placesLib = google.maps.places as unknown as {
+          AutocompleteSuggestion?: {
+            fetchAutocompleteSuggestions: (req: object) => Promise<{ suggestions: Array<{ placePrediction: { placeId: string; text: { toString: () => string }; mainText: { toString: () => string }; secondaryText: { toString: () => string } } }> }>;
+          };
+          AutocompleteRequest?: new (opts: object) => object;
+        };
+
+        if (!placesLib.AutocompleteSuggestion || !placesLib.AutocompleteRequest) {
+          setIsSearching(false);
+          return;
+        }
+
+        const request = new placesLib.AutocompleteRequest({
           input: searchInput,
           componentRestrictions: { country: "in" },
-        },
-        (results, status) => {
-          setIsSearching(false);
-          if (status === google.maps.places.PlacesServiceStatus.OK && results) {
-            setPredictions(results.slice(0, 5));
-            setShowPredictions(true);
-          } else {
-            setPredictions([]);
-          }
-        }
-      );
+        });
+        const { suggestions } = await placesLib.AutocompleteSuggestion.fetchAutocompleteSuggestions(request);
+        setIsSearching(false);
+        const results: PlacePrediction[] = suggestions.map((s) => ({
+          place_id: s.placePrediction.placeId,
+          description: s.placePrediction.text.toString(),
+          structured_formatting: {
+            main_text: s.placePrediction.mainText.toString(),
+            secondary_text: s.placePrediction.secondaryText?.toString() ?? "",
+          },
+        }));
+        setPredictions(results.slice(0, 5));
+        setShowPredictions(results.length > 0);
+      } catch (err) {
+        console.error("[AutocompleteSuggestion] fetchPredictions error:", err);
+        setIsSearching(false);
+        setPredictions([]);
+      }
     },
-    [city, district, initializePlacesServices]
+    [city, district]
   );
 
   // Handle search input change
@@ -307,33 +308,38 @@ export function GoogleMapPicker({
     }, 300);
   };
 
-  // Handle prediction selection
-  const handlePredictionSelect = (prediction: PlacePrediction) => {
-    initializePlacesServices();
+  // Handle prediction selection using new Place.fetchFields API
+  const handlePredictionSelect = async (prediction: PlacePrediction) => {
+    if (typeof google === "undefined" || !google.maps?.places) return;
 
-    if (!placesServiceRef.current) return;
+    try {
+      const placesLib = google.maps.places as unknown as {
+        Place?: new (opts: { id: string }) => {
+          fetchFields: (opts: { fields: string[] }) => Promise<{ place: { location?: { lat: () => number; lng: () => number } } }>;
+        };
+      };
 
-    placesServiceRef.current.getDetails(
-      {
-        placeId: prediction.place_id,
-        fields: ["geometry"],
-      },
-      (place, status) => {
-        if (
-          status === google.maps.places.PlacesServiceStatus.OK &&
-          place?.geometry?.location
-        ) {
-          const lat = place.geometry.location.lat();
-          const lng = place.geometry.location.lng();
-          onLocationSelect(lat.toFixed(6), lng.toFixed(6));
-          setZoom(15);
-          setSearchQuery(prediction.structured_formatting?.main_text || "");
-          setShowPredictions(false);
-          setPredictions([]);
-          setLocationError(null);
-        }
+      if (!placesLib.Place) {
+        console.error("[Place] new Place API not available");
+        return;
       }
-    );
+
+      const place = new placesLib.Place({ id: prediction.place_id });
+      const { place: fetchedPlace } = await place.fetchFields({ fields: ["location"] });
+
+      if (fetchedPlace.location) {
+        const lat = fetchedPlace.location.lat();
+        const lng = fetchedPlace.location.lng();
+        onLocationSelect(lat.toFixed(6), lng.toFixed(6));
+        setZoom(15);
+        setSearchQuery(prediction.structured_formatting?.main_text || "");
+        setShowPredictions(false);
+        setPredictions([]);
+        setLocationError(null);
+      }
+    } catch (err) {
+      console.error("[Place.fetchFields] Error:", err);
+    }
   };
 
   // Handle "Use my location" button (uses unified geolocation hook)
@@ -440,7 +446,7 @@ export function GoogleMapPicker({
       <div className="relative">
         <div className="h-[300px] rounded-xl overflow-hidden border-2 border-gray-200 shadow-lg">
           {GOOGLE_API_KEY ? (
-            <Wrapper apiKey={GOOGLE_API_KEY} render={render} libraries={["places"]}>
+            <Wrapper apiKey={GOOGLE_API_KEY} version="weekly" render={render} libraries={["places"]}>
               <MapComponent
                 center={center}
                 zoom={zoom}
