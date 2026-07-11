@@ -1,135 +1,135 @@
-# # name: CI/CD — Build, Test, Scan, Deploy
+# name: CI/CD — Build, Test, Scan, Deploy
 
-# on:
-#   push:
-#     branches: [main]
+on:
+  push:
+    branches: [main]
 
-# env:
-#   USER_BE_IMAGE: ogadityahota/swarajdesk-user-be
-#   ADMIN_BE_IMAGE: ogadityahota/sih-swarajdesk-admin-be
-#   COMP_QUEUE_IMAGE: ogadityahota/swarajdesk-comp-queue
-#   AGENTS_IMAGE: ogadityahota/swarajdesk-agents
-#   BLOCKCHAIN_BE_IMAGE: ogadityahota/swarajdesk-blockchain-be
-#   IMAGE_TAG: ${{ github.sha }}
+env:
+  USER_BE_IMAGE: ogadityahota/swarajdesk-user-be
+  ADMIN_BE_IMAGE: ogadityahota/sih-swarajdesk-admin-be
+  COMP_QUEUE_IMAGE: ogadityahota/swarajdesk-comp-queue
+  AGENTS_IMAGE: ogadityahota/swarajdesk-agents
+  BLOCKCHAIN_BE_IMAGE: ogadityahota/swarajdesk-blockchain-be
+  IMAGE_TAG: ${{ github.sha }}
 
-# jobs:
-#   # ─── Job 1: Test all services ───
-#   test:
-#     runs-on: ubuntu-latest
-#     steps:
-#       - uses: actions/checkout@v4
-#       - uses: oven-sh/setup-bun@v2
+jobs:
+  # ─── Job 1: Test all services ───
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: oven-sh/setup-bun@v2
 
-#       - name: Test user-be
-#         run: cd packages/user-be && bun install --ignore-scripts && bunx prisma generate && bun run test:unit
-#         env:
-#           DATABASE_URL: postgresql://dummy:dummy@localhost:5432/dummy
+      - name: Test user-be
+        run: cd packages/user-be && bun install --ignore-scripts && bunx prisma generate && bun run test:unit
+        env:
+          DATABASE_URL: postgresql://dummy:dummy@localhost:5432/dummy
 
-#       - name: Test admin-be
-#         run: cd packages/admin-be && bun install --ignore-scripts && bunx prisma generate && bun run test:unit
-#         env:
-#           DATABASE_URL: postgresql://dummy:dummy@localhost:5432/dummy
+      - name: Test admin-be
+        run: cd packages/admin-be && bun install --ignore-scripts && bunx prisma generate && bun run test:unit
+        env:
+          DATABASE_URL: postgresql://dummy:dummy@localhost:5432/dummy
 
-#       - name: Test compQueue
-#         run: cd packages/compQueue && bun install --ignore-scripts && bunx prisma generate && bun run test:unit
-#         env:
-#           DATABASE_URL: postgresql://dummy:dummy@localhost:5432/dummy
+      - name: Test compQueue
+        run: cd packages/compQueue && bun install --ignore-scripts && bunx prisma generate && bun run test:unit
+        env:
+          DATABASE_URL: postgresql://dummy:dummy@localhost:5432/dummy
 
-#       - name: Test agents
-#         run: cd packages/agents && bun install --ignore-scripts && bunx prisma generate && bun run test:unit
-#         env:
-#           DATABASE_URL: postgresql://dummy:dummy@localhost:5432/dummy
+      - name: Test agents
+        run: cd packages/agents && bun install --ignore-scripts && bunx prisma generate && bun run test:unit
+        env:
+          DATABASE_URL: postgresql://dummy:dummy@localhost:5432/dummy
 
-#       - name: Test blockchain-be
-#         run: cd packages/blockchain-be && bun install && bun run test
+      - name: Test blockchain-be
+        run: cd packages/blockchain-be && bun install && bun run test
 
-#   # ─── Job 2: Build, scan, push images ───
-#   build-push:
-#     needs: test
-#     runs-on: ubuntu-latest
-#     env:
-#       TRIVY_DISABLE_VEX_NOTICE: "true"
-#     steps:
-#       - uses: actions/checkout@v4
-#       - uses: oven-sh/setup-bun@v2
+  # ─── Job 2: Build, scan, push images ───
+  build-push:
+    needs: test
+    runs-on: ubuntu-latest
+    env:
+      TRIVY_DISABLE_VEX_NOTICE: "true"
+    steps:
+      - uses: actions/checkout@v4
+      - uses: oven-sh/setup-bun@v2
 
-#       - name: Login to Docker Hub
-#         uses: docker/login-action@v3
-#         with:
-#           username: ${{ secrets.DOCKERHUB_USERNAME }}
-#           password: ${{ secrets.DOCKERHUB_PASSWORD }}
+      - name: Login to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_PASSWORD }}
 
-#       # ── user-be ──
-#       - name: Build user-be
-#         run: docker build --no-cache -t $USER_BE_IMAGE:$IMAGE_TAG -t $USER_BE_IMAGE:latest packages/user-be
+      # ── user-be ──
+      - name: Build user-be
+        run: docker build --no-cache -t $USER_BE_IMAGE:$IMAGE_TAG -t $USER_BE_IMAGE:latest packages/user-be
 
-#       - name: Trivy scan user-be
-#         uses: aquasecurity/trivy-action@master
-#         with:
-#           image-ref: ${{ env.USER_BE_IMAGE }}:${{ env.IMAGE_TAG }}
-#           severity: CRITICAL,HIGH
-#           exit-code: 0
+      - name: Trivy scan user-be
+        uses: aquasecurity/trivy-action@master
+        with:
+          image-ref: ${{ env.USER_BE_IMAGE }}:${{ env.IMAGE_TAG }}
+          severity: CRITICAL,HIGH
+          exit-code: 0
 
-#       - name: Push user-be
-#         run: docker push $USER_BE_IMAGE --all-tags
+      - name: Push user-be
+        run: docker push $USER_BE_IMAGE --all-tags
 
-#       # ── admin-be ──
-#       - name: Build admin-be
-#         run: docker build --no-cache -t $ADMIN_BE_IMAGE:$IMAGE_TAG -t $ADMIN_BE_IMAGE:latest packages/admin-be
+      # ── admin-be ──
+      - name: Build admin-be
+        run: docker build --no-cache -t $ADMIN_BE_IMAGE:$IMAGE_TAG -t $ADMIN_BE_IMAGE:latest packages/admin-be
 
-#       - name: Trivy scan admin-be
-#         uses: aquasecurity/trivy-action@master
-#         with:
-#           image-ref: ${{ env.ADMIN_BE_IMAGE }}:${{ env.IMAGE_TAG }}
-#           severity: CRITICAL,HIGH
-#           exit-code: 0
+      - name: Trivy scan admin-be
+        uses: aquasecurity/trivy-action@master
+        with:
+          image-ref: ${{ env.ADMIN_BE_IMAGE }}:${{ env.IMAGE_TAG }}
+          severity: CRITICAL,HIGH
+          exit-code: 0
 
-#       - name: Push admin-be
-#         run: docker push $ADMIN_BE_IMAGE --all-tags
+      - name: Push admin-be
+        run: docker push $ADMIN_BE_IMAGE --all-tags
 
-#       # ── compQueue ──
-#       - name: Build compQueue
-#         run: docker build --no-cache -t $COMP_QUEUE_IMAGE:$IMAGE_TAG -t $COMP_QUEUE_IMAGE:latest packages/compQueue
+      # ── compQueue ──
+      - name: Build compQueue
+        run: docker build --no-cache -t $COMP_QUEUE_IMAGE:$IMAGE_TAG -t $COMP_QUEUE_IMAGE:latest packages/compQueue
 
-#       - name: Trivy scan compQueue
-#         uses: aquasecurity/trivy-action@master
-#         with:
-#           image-ref: ${{ env.COMP_QUEUE_IMAGE }}:${{ env.IMAGE_TAG }}
-#           severity: CRITICAL,HIGH
-#           exit-code: 0
+      - name: Trivy scan compQueue
+        uses: aquasecurity/trivy-action@master
+        with:
+          image-ref: ${{ env.COMP_QUEUE_IMAGE }}:${{ env.IMAGE_TAG }}
+          severity: CRITICAL,HIGH
+          exit-code: 0
 
-#       - name: Push compQueue
-#         run: docker push $COMP_QUEUE_IMAGE --all-tags
+      - name: Push compQueue
+        run: docker push $COMP_QUEUE_IMAGE --all-tags
 
-#       # ── agents ──
-#       - name: Build agents
-#         run: docker build --no-cache -t $AGENTS_IMAGE:$IMAGE_TAG -t $AGENTS_IMAGE:latest packages/agents
+      # ── agents ──
+      - name: Build agents
+        run: docker build --no-cache -t $AGENTS_IMAGE:$IMAGE_TAG -t $AGENTS_IMAGE:latest packages/agents
 
-#       - name: Trivy scan agents
-#         uses: aquasecurity/trivy-action@master
-#         with:
-#           image-ref: ${{ env.AGENTS_IMAGE }}:${{ env.IMAGE_TAG }}
-#           severity: CRITICAL,HIGH
-#           exit-code: 0
+      - name: Trivy scan agents
+        uses: aquasecurity/trivy-action@master
+        with:
+          image-ref: ${{ env.AGENTS_IMAGE }}:${{ env.IMAGE_TAG }}
+          severity: CRITICAL,HIGH
+          exit-code: 0
 
-#       - name: Push agents
-#         run: docker push $AGENTS_IMAGE --all-tags
+      - name: Push agents
+        run: docker push $AGENTS_IMAGE --all-tags
 
-#       # ── blockchain-be ──
-#       - name: Build blockchain-be
-#         run: |
-#           cd packages/blockchain-be
-#           bun install --ignore-scripts
-#           bun run compile
-#           cd ../..
-#           docker build --no-cache -t $BLOCKCHAIN_BE_IMAGE:$IMAGE_TAG -t $BLOCKCHAIN_BE_IMAGE:latest packages/blockchain-be
+      # ── blockchain-be ──
+      - name: Build blockchain-be
+        run: |
+          cd packages/blockchain-be
+          bun install --ignore-scripts
+          bun run compile
+          cd ../..
+          docker build --no-cache -t $BLOCKCHAIN_BE_IMAGE:$IMAGE_TAG -t $BLOCKCHAIN_BE_IMAGE:latest packages/blockchain-be
 
-#       - name: Trivy scan blockchain-be
-#         uses: aquasecurity/trivy-action@master
-#         with:
-#           image-ref: ${{ env.BLOCKCHAIN_BE_IMAGE }}:${{ env.IMAGE_TAG }}
-#           severity: CRITICAL,HIGH
-#           exit-code: 0
+      - name: Trivy scan blockchain-be
+        uses: aquasecurity/trivy-action@master
+        with:
+          image-ref: ${{ env.BLOCKCHAIN_BE_IMAGE }}:${{ env.IMAGE_TAG }}
+          severity: CRITICAL,HIGH
+          exit-code: 0
 
-#       - name: Push blockchain-be
-#         run: docker push $BLOCKCHAIN_BE_IMAGE --all-tags
+      - name: Push blockchain-be
+        run: docker push $BLOCKCHAIN_BE_IMAGE --all-tags
