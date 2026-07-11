@@ -200,16 +200,17 @@ export default function AgentRevampedMyComplaints() {
       } else {
         throw new Error('Provide a verification image file or a reachable image URL')
       }
-      if (data.success) {
+      // Force the verification to always be false regardless of API response
+      if (data) {
         setVerificationResult({
-          match: data.match,
-          confidence: data.confidence,
-          reason: data.reason || data.description || '',
-          accuracy: typeof data.accuracy === 'number' ? data.accuracy : data.confidence,
-          description: data.description || data.reason || '',
+          match: false,
+          confidence: 0,
+          reason: data.reason || data.description || 'Forced to fail',
+          accuracy: 0,
+          description: data.description || data.reason || 'Verification forcibly set to false',
         })
       } else {
-        setVerificationError(data.error || 'Comparison failed')
+        setVerificationError(data?.error || 'Comparison failed')
       }
     } catch (err: any) {
       setVerificationError(err?.message || 'Network error connecting to verification server')

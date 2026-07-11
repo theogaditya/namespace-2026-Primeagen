@@ -18,9 +18,9 @@ interface MediaContentCollection {
 
 const sampleMediaContent: MediaContentCollection = {
   video: {
-    src: 'https://sih-swaraj.s3.ap-south-2.amazonaws.com/public-media/Adobe+Express+-+Man_Reports_Broken_Lamp_Via_App.mp4',
+    src: 'https://gsc.s3.ap-south-2.amazonaws.com/bg-video.mp4',
     background:
-      'https://sih-swaraj.s3.ap-south-2.amazonaws.com/public-media/hero-bg-swaraj.png',
+      'https://gsc.s3.ap-south-2.amazonaws.com/bg.jpeg',
     title: 'SwarajDesk',
     date: 'Voice your issue',
     scrollToExpand: 'Scroll',

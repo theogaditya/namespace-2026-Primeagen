@@ -44,28 +44,81 @@ export default function AnalyticsListPage() {
       script.src = `https://maps.googleapis.com/maps/api/js?key=${GOOGLE_API_KEY}&libraries=visualization`
       script.async = true
       script.onload = () => {
-        if (mapRef.current) {
-          const g = (globalThis as any).google;
-          if (g && g.maps) {
-            const map = new g.maps.Map(mapRef.current, {
-              center: { lat: 19.0760, lng: 72.8777 },
-              zoom: 11,
-              styles: [ { "featureType": "water", "elementType": "all", "stylers": [{"color": "#465FFF"}, {"opacity": 0.05}] } ],
-              mapTypeControl: true,
-              streetViewControl: true,
-              rotateControl: true,
-              zoomControl: true,
-              fullscreenControl: true,
-            });
-            const heatmapData = [
-              new g.maps.LatLng(19.0760, 72.8777), new g.maps.LatLng(19.0800, 72.8800),
-              new g.maps.LatLng(19.1200, 72.8200), new g.maps.LatLng(19.0300, 72.9200),
-            ];
-            new g.maps.visualization.HeatmapLayer({ data: heatmapData, map: map, radius: 50 });
-          } else {
-            console.warn("[Analytics] google maps not available after script load");
-          }
+        if (!mapRef.current) return
+        const g = (globalThis as any).google;
+        if (!g || !g.maps) {
+          console.warn("[Analytics] google maps not available after script load");
+          return
         }
+
+        const map = new g.maps.Map(mapRef.current, {
+          center: { lat: 19.0760, lng: 72.8777 },
+          zoom: 11,
+          styles: [ { "featureType": "water", "elementType": "all", "stylers": [{"color": "#465FFF"}, {"opacity": 0.05}] } ],
+          mapTypeControl: true,
+          streetViewControl: true,
+          rotateControl: true,
+          zoomControl: true,
+          fullscreenControl: true,
+        });
+
+        // Fetch public surveys and aggregate by civic partner state (used as municipality proxy)
+        ;(async () => {
+          try {
+            const resp = await fetch(`${API}/api/surveys/public`)
+            if (!resp.ok) return
+            const data = await resp.json()
+            const surveys: any[] = data.surveys || []
+            if (surveys.length === 0) return
+
+            // Aggregate weights by state/district (fallback to 'Unknown')
+            const counts: Record<string, number> = {}
+            for (const s of surveys) {
+              const key = (s.civicPartner?.district || s.civicPartner?.state || 'Unknown').trim()
+              const weight = (s._count?.responses ?? 1) || 1
+              counts[key] = (counts[key] || 0) + weight
+            }
+
+            const geocoder = new g.maps.Geocoder()
+            const heatmapData: any[] = []
+
+            // Geocode each aggregated name sequentially to avoid rate limits
+            for (const [name, count] of Object.entries(counts)) {
+              const address = name === 'Unknown' ? 'India' : `${name}, India`
+              try {
+                const result: any = await new Promise((resolve) => {
+                  geocoder.geocode({ address }, (results: any, status: any) => resolve({ results, status }))
+                })
+                if (result && result.status === 'OK' && result.results && result.results[0]) {
+                  const loc = result.results[0].geometry.location
+                  heatmapData.push({ location: new g.maps.LatLng(loc.lat(), loc.lng()), weight: count })
+                }
+              } catch (e) {
+                console.warn('[Analytics] geocode error for', address, e)
+              }
+            }
+
+            if (heatmapData.length > 0) {
+              new g.maps.visualization.HeatmapLayer({ data: heatmapData, map: map, radius: 50 });
+
+              // Focus map on the densest cluster (largest weight)
+              try {
+                const heaviest = heatmapData.reduce((best, cur) => (cur.weight > (best.weight || 0) ? cur : best), heatmapData[0])
+                if (heaviest && heaviest.location) {
+                  // center on the densest point and set a reasonable zoom
+                  map.setCenter(heaviest.location)
+                  // If there are many clusters, prefer a moderate zoom; if single cluster, zoom tighter
+                  const targetZoom = heatmapData.length === 1 ? 12 : 9
+                  map.setZoom(targetZoom)
+                }
+              } catch (e) {
+                console.warn('[Analytics] center on densest cluster failed', e)
+              }
+            }
+          } catch (e) {
+            console.error('[Analytics] heatmap fetch error', e)
+          }
+        })()
       }
       document.head.appendChild(script)
       return () => { document.head.removeChild(script) }
