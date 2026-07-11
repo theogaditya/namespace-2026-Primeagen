@@ -58,7 +58,7 @@ export function createAuthMiddleware(db: PrismaClient) {
       const payload: any = decoded as any;
 
       // If this is an admin token, skip DB user lookup and attach payload directly.
-      if (payload && payload.adminType && payload.id) {
+      if (payload && (payload.adminType || payload.accessLevel === "CIVIC_PARTNER") && payload.id) {
         req.userId = String(payload.id);
         req.user = payload;
         return next();

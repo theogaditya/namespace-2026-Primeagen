@@ -1,4 +1,4 @@
-import OpenAI, { toFile } from "openai";
+import OpenAI, { toFile } from "openai/index.mjs";
 
 let _openai: OpenAI | null = null;
 function getOpenAI() {

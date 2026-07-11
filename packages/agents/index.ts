@@ -13,6 +13,7 @@ import { createQualityRouter } from "./routes/quality";
 import { createReportRouter } from "./routes/report";
 import { createImageRouter } from "./routes/image";
 import { createMatchRouter } from "./routes/match";
+import { createSurveyReportRouter } from "./routes/surveyReport";
 
 export function createApp(db: PrismaClient) {
   const app = express();
@@ -78,6 +79,7 @@ export function createApp(db: PrismaClient) {
   app.use("/api/dedup", auth, createDedupRouter(db));
   app.use("/api/quality-score", auth, createQualityRouter());
   app.use("/api/report", auth, createReportRouter(db));
+  app.use("/api/survey-report-generate", auth, createSurveyReportRouter(db));
 
   return app;
 }
