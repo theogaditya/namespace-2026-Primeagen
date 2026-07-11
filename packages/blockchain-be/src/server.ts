@@ -1,7 +1,7 @@
 import express from "express";
 import cors from "cors";
 import publicRouter from "../backend/src/routes/public.js";
-import { requireInternalToken } from "./middleware/internalAuth.js";
+import { requireInternalToken } from "../backend/src/middleware/internalAuth.js";
 import internalSyncRouter from "../backend/src/routes/internalSync.js";
 import { ZodError } from "zod";
 
@@ -26,7 +26,7 @@ app.get("/health", (_req, res) => {
   });
 });
 
-app.use((err: unknown, _req: express.Request, res: express.Response, _next: express.NextFunction) => {
+app.use((err: any, _req: express.Request, res: express.Response, _next: express.NextFunction) => {
   if (err instanceof ZodError) {
     return res.status(400).json({ ok: false, error: "Validation error", details: err.issues });
   }

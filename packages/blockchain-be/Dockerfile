@@ -10,6 +10,7 @@ RUN bun install
 
 COPY artifacts ./artifacts
 COPY src ./src
+COPY backend ./backend
 COPY tsconfig.json ./
 
 RUN test -f artifacts/contracts/GrievanceContract.sol/GrievanceContractOptimized.json || \
