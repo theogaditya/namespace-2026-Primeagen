@@ -1,6 +1,13 @@
 import express from "express";
+import cors from "cors";
+import publicRouter from "../backend/src/routes/public.js";
+
 const app = express();
+app.use(cors());
+app.use(express.json());
 const PORT = process.env.PORT ? parseInt(process.env.PORT, 10) : 3000;
+
+app.use("/api", publicRouter);
 
 app.get("/", (_req, res) => {
   res.send("Worker is running!");
