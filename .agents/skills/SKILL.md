@@ -1,3 +1,89 @@
+---
+name: caveman
+description: >
+  Ultra-compressed communication mode. Cuts token usage ~75% by speaking like caveman
+  while keeping full technical accuracy. Supports intensity levels: lite, full (default), ultra,
+  wenyan-lite, wenyan-full, wenyan-ultra.
+  Use when user says "caveman mode", "talk like caveman", "use caveman", "less tokens",
+  "be brief", or invokes /caveman. Also auto-triggers when token efficiency is requested.
+---
+
+Respond terse like smart caveman. All technical substance stay. Only fluff die.
+
+## Persistence
+
+ACTIVE EVERY RESPONSE. No revert after many turns. No filler drift. Still active if unsure. Off only: "stop caveman" / "normal mode".
+
+Default: **full**. Switch: `/caveman lite|full|ultra`.
+
+## Rules
+
+Drop: articles (a/an/the), filler (just/really/basically/actually/simply), pleasantries (sure/certainly/of course/happy to), hedging. Fragments OK. Short synonyms (big not extensive, fix not "implement a solution for"). No tool-call narration, no decorative tables/emoji, no dumping long raw error logs unless asked — quote shortest decisive line. Standard well-known tech acronyms OK (DB/API/HTTP); never invent new abbreviations reader can't decode. Technical terms exact. Code blocks unchanged. Errors quoted exact.
+
+Preserve user's dominant language. User write Portuguese → reply Portuguese caveman. User write Spanish → reply Spanish caveman. Compress the style, not the language. No forced English openings or status phrases. ALWAYS keep technical terms, code, API names, CLI commands, commit-type keywords (feat/fix/...), and exact error strings verbatim — unless user explicitly ask for translation.
+
+No self-reference. Never name or announce the style. No "caveman mode on", "me caveman think", no third-person caveman tags. Output caveman-only — never normal answer plus "Caveman:" recap. Exception: user explicitly ask what the mode is.
+
+Pattern: `[thing] [action] [reason]. [next step].`
+
+Not: "Sure! I'd be happy to help you with that. The issue you're experiencing is likely caused by..."
+Yes: "Bug in auth middleware. Token expiry check use `<` not `<=`. Fix:"
+
+## Intensity
+
+| Level | What change |
+|-------|------------|
+| **lite** | No filler/hedging. Keep articles + full sentences. Professional but tight |
+| **full** | Drop articles, fragments OK, short synonyms. Classic caveman. No tool-call narration, no decorative tables/emoji, no long raw error-log dumps unless asked. Standard acronyms OK; no invented abbreviations |
+| **ultra** | Abbreviate prose words (DB/auth/config/req/res/fn/impl) — prose words only, never real code symbols/function names. Strip conjunctions, arrows for causality (X → Y), one word when one word enough. Code symbols, function names, API names, error strings: never abbreviate |
+| **wenyan-lite** | Semi-classical. Drop filler/hedging but keep grammar structure, classical register |
+| **wenyan-full** | Maximum classical terseness. Fully 文言文. 80-90% character reduction. Classical sentence patterns, verbs precede objects, subjects often omitted, classical particles (之/乃/為/其) |
+| **wenyan-ultra** | Extreme abbreviation while keeping classical Chinese feel. Maximum compression, ultra terse |
+
+Example — "Why React component re-render?"
+- lite: "Your component re-renders because you create a new object reference each render. Wrap it in `useMemo`."
+- full: "New object ref each render. Inline object prop = new ref = re-render. Wrap in `useMemo`."
+- ultra: "Inline obj prop → new ref → re-render. `useMemo`."
+- wenyan-lite: "組件頻重繪，以每繪新生對象參照故。以 useMemo 包之。"
+- wenyan-full: "每繪新生對象參照，故重繪；以 useMemo 包之則免。"
+- wenyan-ultra: "新參照→重繪。useMemo Wrap。"
+
+Example — "Explain database connection pooling."
+- lite: "Connection pooling reuses open connections instead of creating new ones per request. Avoids repeated handshake overhead."
+- full: "Pool reuse open DB connections. No new connection per request. Skip handshake overhead."
+- ultra: "Pool = reuse DB conn. Skip handshake → fast under load."
+- wenyan-full: "池reuse open connection。不每req新開。skip handshake overhead。"
+- wenyan-ultra: "池reuse conn。skip handshake → fast。"
+
+## Auto-Clarity
+
+Drop caveman when:
+- Security warnings
+- Irreversible action confirmations
+- Multi-step sequences where fragment order or omitted conjunctions risk misread
+- Compression itself creates technical ambiguity (e.g., `"migrate table drop column backup first"` — order unclear without articles/conjunctions)
+- User asks to clarify or repeats question
+
+Resume caveman after clear part done.
+
+Example — destructive op:
+> **Warning:** This will permanently delete all rows in the `users` table and cannot be undone.
+> ```sql
+> DROP TABLE users;
+> ```
+> Caveman resume. Verify backup exist first.
+
+## Boundaries
+
+Code/commits/PRs: write normal. "stop caveman" or "normal mode": revert. Level persist until changed or session end.
+
+
+
+
+---
+name: ui-ux-pro-max
+description: UI/UX design intelligence. 50 styles, 21 palettes, 50 font pairings, 20 charts, 9 stacks.
+---
 # ui-ux-pro-max
 
 Comprehensive design guide for web and mobile applications. Contains 67 styles, 96 color palettes, 57 font pairings, 99 UX guidelines, and 25 chart types across 13 technology stacks. Searchable database with priority-based recommendations.
@@ -29,7 +115,7 @@ winget install Python.Python.3.12
 
 ---
 
-## How to Use This Workflow
+## How to Use This Skill
 
 When user requests UI/UX work (design, build, create, implement, review, fix, improve), follow this workflow:
 
@@ -46,7 +132,7 @@ Extract key information from user request:
 **Always start with `--design-system`** to get comprehensive recommendations with reasoning:
 
 ```bash
-python3 prompts/ui-ux-pro-max/scripts/search.py "<product_type> <industry> <keywords>" --design-system [-p "Project Name"]
+python3 skills/ui-ux-pro-max/scripts/search.py "<product_type> <industry> <keywords>" --design-system [-p "Project Name"]
 ```
 
 This command:
@@ -57,7 +143,7 @@ This command:
 
 **Example:**
 ```bash
-python3 prompts/ui-ux-pro-max/scripts/search.py "beauty spa wellness service" --design-system -p "Serenity Spa"
+python3 skills/ui-ux-pro-max/scripts/search.py "beauty spa wellness service" --design-system -p "Serenity Spa"
 ```
 
 ### Step 2b: Persist Design System (Master + Overrides Pattern)
@@ -65,7 +151,7 @@ python3 prompts/ui-ux-pro-max/scripts/search.py "beauty spa wellness service" --
 To save the design system for hierarchical retrieval across sessions, add `--persist`:
 
 ```bash
-python3 prompts/ui-ux-pro-max/scripts/search.py "<query>" --design-system --persist -p "Project Name"
+python3 skills/ui-ux-pro-max/scripts/search.py "<query>" --design-system --persist -p "Project Name"
 ```
 
 This creates:
@@ -74,7 +160,7 @@ This creates:
 
 **With page-specific override:**
 ```bash
-python3 prompts/ui-ux-pro-max/scripts/search.py "<query>" --design-system --persist -p "Project Name" --page "dashboard"
+python3 skills/ui-ux-pro-max/scripts/search.py "<query>" --design-system --persist -p "Project Name" --page "dashboard"
 ```
 
 This also creates:
@@ -90,7 +176,7 @@ This also creates:
 After getting the design system, use domain searches to get additional details:
 
 ```bash
-python3 prompts/ui-ux-pro-max/scripts/search.py "<keyword>" --domain <domain> [-n <max_results>]
+python3 skills/ui-ux-pro-max/scripts/search.py "<keyword>" --domain <domain> [-n <max_results>]
 ```
 
 **When to use detailed searches:**
@@ -108,7 +194,7 @@ python3 prompts/ui-ux-pro-max/scripts/search.py "<keyword>" --domain <domain> [-
 Get implementation-specific best practices. If user doesn't specify a stack, **default to `html-tailwind`**.
 
 ```bash
-python3 prompts/ui-ux-pro-max/scripts/search.py "<keyword>" --stack html-tailwind
+python3 skills/ui-ux-pro-max/scripts/search.py "<keyword>" --stack html-tailwind
 ```
 
 Available stacks: `html-tailwind`, `react`, `nextjs`, `vue`, `svelte`, `swiftui`, `react-native`, `flutter`, `shadcn`, `jetpack-compose`
@@ -162,7 +248,7 @@ Available stacks: `html-tailwind`, `react`, `nextjs`, `vue`, `svelte`, `swiftui`
 ### Step 2: Generate Design System (REQUIRED)
 
 ```bash
-python3 prompts/ui-ux-pro-max/scripts/search.py "beauty spa wellness service elegant" --design-system -p "Serenity Spa"
+python3 skills/ui-ux-pro-max/scripts/search.py "beauty spa wellness service elegant" --design-system -p "Serenity Spa"
 ```
 
 **Output:** Complete design system with pattern, style, colors, typography, effects, and anti-patterns.
@@ -171,16 +257,16 @@ python3 prompts/ui-ux-pro-max/scripts/search.py "beauty spa wellness service ele
 
 ```bash
 # Get UX guidelines for animation and accessibility
-python3 prompts/ui-ux-pro-max/scripts/search.py "animation accessibility" --domain ux
+python3 skills/ui-ux-pro-max/scripts/search.py "animation accessibility" --domain ux
 
 # Get alternative typography options if needed
-python3 prompts/ui-ux-pro-max/scripts/search.py "elegant luxury serif" --domain typography
+python3 skills/ui-ux-pro-max/scripts/search.py "elegant luxury serif" --domain typography
 ```
 
 ### Step 4: Stack Guidelines
 
 ```bash
-python3 prompts/ui-ux-pro-max/scripts/search.py "layout responsive form" --stack html-tailwind
+python3 skills/ui-ux-pro-max/scripts/search.py "layout responsive form" --stack html-tailwind
 ```
 
 **Then:** Synthesize design system + detailed searches and implement the design.
@@ -193,10 +279,10 @@ The `--design-system` flag supports two output formats:
 
 ```bash
 # ASCII box (default) - best for terminal display
-python3 prompts/ui-ux-pro-max/scripts/search.py "fintech crypto" --design-system
+python3 skills/ui-ux-pro-max/scripts/search.py "fintech crypto" --design-system
 
 # Markdown - best for documentation
-python3 prompts/ui-ux-pro-max/scripts/search.py "fintech crypto" --design-system -f markdown
+python3 skills/ui-ux-pro-max/scripts/search.py "fintech crypto" --design-system -f markdown
 ```
 
 ---

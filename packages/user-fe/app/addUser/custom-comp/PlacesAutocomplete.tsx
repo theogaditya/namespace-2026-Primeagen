@@ -63,8 +63,22 @@ export function PlacesAutocomplete({
   const [locationMismatch, setLocationMismatch] = useState(false);
   const [hasValidSelection, setHasValidSelection] = useState(false);
   const [inputValue, setInputValue] = useState(value); // Track input separately
+  const [placesReady, setPlacesReady] = useState(false);
   const wrapperRef = useRef<HTMLDivElement>(null);
   const debounceRef = useRef<NodeJS.Timeout | null>(null);
+  // Cache the AutocompleteSuggestion class once loaded
+  const autocompleteSuggestionRef = useRef<{
+    fetchAutocompleteSuggestions: (req: object) => Promise<{
+      suggestions: Array<{
+        placePrediction: {
+          placeId: string;
+          text: { toString: () => string };
+          mainText: { toString: () => string };
+          secondaryText: { toString: () => string };
+        };
+      }>;
+    }>;
+  } | null>(null);
 
   const inputId = label.toLowerCase().replace(/\s+/g, "-");
   const showError = touched && error;
@@ -89,7 +103,7 @@ export function PlacesAutocomplete({
     return cityMatch || stateMatch || districtMatch;
   }, [locationBias]);
 
-  // Fetch predictions from Google Places API
+  // Fetch predictions from Google Places API (new AutocompleteSuggestion API)
   const fetchPredictions = useCallback(async (input: string) => {
     if (!input || input.length < 3) {
       setPredictions([]);
@@ -109,27 +123,51 @@ export function PlacesAutocomplete({
         searchQuery = `${input}, ${locationBias.state}`;
       }
 
-      if (typeof window === "undefined" || !window.google?.maps?.places) {
+      // Ensure the Places library is loaded via importLibrary
+      if (typeof window === "undefined" || !window.google?.maps) {
+        console.warn("[PlacesAutocomplete] Google Maps not loaded yet");
         setIsLoading(false);
         return;
       }
 
-      // Use the new AutocompleteSuggestion API (required for new API keys post-March 2025)
-      const placesLib = window.google.maps.places as unknown as {
-        AutocompleteSuggestion?: {
-          fetchAutocompleteSuggestions: (req: object) => Promise<{ suggestions: Array<{ placePrediction: { placeId: string; text: { toString: () => string }; mainText: { toString: () => string }; secondaryText: { toString: () => string } } }> }>;
-        };
-        AutocompleteRequest?: new (opts: object) => object;
+      // Load AutocompleteSuggestion class if not cached
+      if (!autocompleteSuggestionRef.current) {
+        try {
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          const placesLib = await (window.google.maps as any).importLibrary("places");
+          if (placesLib?.AutocompleteSuggestion) {
+            autocompleteSuggestionRef.current = placesLib.AutocompleteSuggestion;
+          } else {
+            console.warn("[PlacesAutocomplete] AutocompleteSuggestion not available in places library");
+            setIsLoading(false);
+            return;
+          }
+        } catch (libErr) {
+          console.error("[PlacesAutocomplete] Failed to import places library:", libErr);
+          setIsLoading(false);
+          return;
+        }
+      }
+
+      // Build the request using only valid new-API properties:
+      // - input (required)
+      // - includedRegionCodes (replaces componentRestrictions)
+      // - includedPrimaryTypes (replaces types; use real Place Types, NOT old autocomplete types like "geocode")
+      const request: Record<string, unknown> = {
+        input: searchQuery,
+        includedRegionCodes: ["in"],
       };
 
-      if (placesLib.AutocompleteSuggestion && placesLib.AutocompleteRequest) {
-        const request = new placesLib.AutocompleteRequest({
-          input: searchQuery,
-          componentRestrictions: { country: "in" },
-          types: ["geocode"],
-        });
-        const { suggestions } = await placesLib.AutocompleteSuggestion.fetchAutocompleteSuggestions(request);
-        const results: Prediction[] = suggestions.map((s) => ({
+      const autocompleteService = autocompleteSuggestionRef.current;
+      if (!autocompleteService) {
+        setIsLoading(false);
+        return;
+      }
+
+      const { suggestions } = await autocompleteService.fetchAutocompleteSuggestions(request);
+      const results: Prediction[] = suggestions
+        .filter((s) => s.placePrediction) // guard against empty entries
+        .map((s) => ({
           place_id: s.placePrediction.placeId,
           description: s.placePrediction.text.toString(),
           structured_formatting: {
@@ -138,21 +176,16 @@ export function PlacesAutocomplete({
           },
         }));
 
-        setIsLoading(false);
-        // Filter results to only show those matching the location bias
-        const filteredResults = locationBias?.city || locationBias?.state
-          ? results.filter(r => matchesLocationBias(r.description))
-          : results;
+      setIsLoading(false);
+      // Filter results to only show those matching the location bias
+      const filteredResults = locationBias?.city || locationBias?.state
+        ? results.filter(r => matchesLocationBias(r.description))
+        : results;
 
-        setPredictions(filteredResults);
-        setIsOpen(filteredResults.length > 0);
-      } else {
-        // New API not available — fail gracefully
-        setIsLoading(false);
-        setPredictions([]);
-      }
+      setPredictions(filteredResults);
+      setIsOpen(filteredResults.length > 0);
     } catch (err) {
-      console.error("Error fetching predictions:", err);
+      console.error("[PlacesAutocomplete] Error fetching predictions:", err);
       setIsLoading(false);
       setPredictions([]);
     }
@@ -240,20 +273,72 @@ export function PlacesAutocomplete({
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  // Load Google Maps script
+  // Load Google Maps core script, then import the Places library
   useEffect(() => {
-    if (typeof window !== "undefined" && !window.google?.maps?.places) {
+    if (typeof window === "undefined") return;
+
+    const loadPlaces = async () => {
+      // If google.maps is already available, import Places
+      if (window.google?.maps) {
+        try {
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          const placesLib = await (window.google.maps as any).importLibrary("places");
+          if (placesLib?.AutocompleteSuggestion) {
+            autocompleteSuggestionRef.current = placesLib.AutocompleteSuggestion;
+            setPlacesReady(true);
+          }
+        } catch (e) {
+          console.error("[PlacesAutocomplete] Failed to import places library:", e);
+        }
+        return;
+      }
+
+      // Load the core Google Maps script if not present
       const existingScript = document.getElementById("google-maps-script");
       if (!existingScript) {
         const script = document.createElement("script");
         script.id = "google-maps-script";
-        // Use v=weekly to get the latest Places API (AutocompleteSuggestion)
-        script.src = `https://maps.googleapis.com/maps/api/js?key=${apiKey}&v=weekly&libraries=places&loading=async`;
+        // Use v=weekly to get the latest Places API with AutocompleteSuggestion
+        // Note: Do NOT include libraries=places when using loading=async + importLibrary
+        script.src = `https://maps.googleapis.com/maps/api/js?key=${apiKey}&v=weekly&loading=async`;
         script.async = true;
         script.defer = true;
+        script.onload = async () => {
+          try {
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            const placesLib = await (window.google.maps as any).importLibrary("places");
+            if (placesLib?.AutocompleteSuggestion) {
+              autocompleteSuggestionRef.current = placesLib.AutocompleteSuggestion;
+              setPlacesReady(true);
+            }
+          } catch (e) {
+            console.error("[PlacesAutocomplete] Failed to import places library:", e);
+          }
+        };
         document.head.appendChild(script);
+      } else {
+        // Script tag exists but google.maps may not be ready yet — poll briefly
+        const interval = setInterval(async () => {
+          if (window.google?.maps) {
+            clearInterval(interval);
+            try {
+              // eslint-disable-next-line @typescript-eslint/no-explicit-any
+              const placesLib = await (window.google.maps as any).importLibrary("places");
+              if (placesLib?.AutocompleteSuggestion) {
+                autocompleteSuggestionRef.current = placesLib.AutocompleteSuggestion;
+                setPlacesReady(true);
+              }
+            } catch (e) {
+              console.error("[PlacesAutocomplete] Failed to import places library:", e);
+            }
+          }
+        }, 200);
+        // Give up after 10 seconds
+        setTimeout(() => clearInterval(interval), 10000);
       }
-    }
+    };
+
+    loadPlaces();
   }, [apiKey]);
 
   // Cleanup

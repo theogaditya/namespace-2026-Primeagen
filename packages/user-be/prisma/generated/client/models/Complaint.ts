@@ -63,20 +63,22 @@ export type ComplaintMinAggregateOutputType = {
   managedBySuperAdminId: string | null
   moderatedByMunicipalAdminId: string | null
   seq: number | null
-  blockchainHash: string | null
-  blockchainBlock: bigint | null
-  ipfsHash: string | null
-  isOnChain: boolean | null
-  blockchainStatus: $Enums.BlockchainStatus | null
-  blockchainUpdatedAt: Date | null
   sla: string | null
   AIabusedFlag: boolean | null
   AIimageVarificationStatus: boolean | null
   AIstandardizedSubCategory: string | null
   lastUpdated: Date | null
   isDuplicate: boolean | null
-  qualityScore: number | null
+  blockchainBlock: bigint | null
+  blockchainHash: string | null
+  blockchainStatus: $Enums.BlockchainStatus | null
+  blockchainUpdatedAt: Date | null
+  ipfsHash: string | null
+  isOnChain: boolean | null
   hasSimilarComplaints: boolean | null
+  qualityScore: number | null
+  slaBreached: boolean | null
+  slaDeadline: Date | null
 }
 
 export type ComplaintMaxAggregateOutputType = {
@@ -102,20 +104,22 @@ export type ComplaintMaxAggregateOutputType = {
   managedBySuperAdminId: string | null
   moderatedByMunicipalAdminId: string | null
   seq: number | null
-  blockchainHash: string | null
-  blockchainBlock: bigint | null
-  ipfsHash: string | null
-  isOnChain: boolean | null
-  blockchainStatus: $Enums.BlockchainStatus | null
-  blockchainUpdatedAt: Date | null
   sla: string | null
   AIabusedFlag: boolean | null
   AIimageVarificationStatus: boolean | null
   AIstandardizedSubCategory: string | null
   lastUpdated: Date | null
   isDuplicate: boolean | null
-  qualityScore: number | null
+  blockchainBlock: bigint | null
+  blockchainHash: string | null
+  blockchainStatus: $Enums.BlockchainStatus | null
+  blockchainUpdatedAt: Date | null
+  ipfsHash: string | null
+  isOnChain: boolean | null
   hasSimilarComplaints: boolean | null
+  qualityScore: number | null
+  slaBreached: boolean | null
+  slaDeadline: Date | null
 }
 
 export type ComplaintCountAggregateOutputType = {
@@ -141,23 +145,25 @@ export type ComplaintCountAggregateOutputType = {
   managedBySuperAdminId: number
   moderatedByMunicipalAdminId: number
   seq: number
-  blockchainHash: number
-  blockchainBlock: number
-  ipfsHash: number
-  isOnChain: number
-  blockchainStatus: number
-  blockchainUpdatedAt: number
   sla: number
   AIabusedFlag: number
   AIimageVarificationStatus: number
   AIstandardizedSubCategory: number
   lastUpdated: number
   isDuplicate: number
-  qualityScore: number
-  qualityBreakdown: number
-  hasSimilarComplaints: number
-  similarComplaintIds: number
+  blockchainBlock: number
+  blockchainHash: number
+  blockchainStatus: number
+  blockchainUpdatedAt: number
+  ipfsHash: number
+  isOnChain: number
   abuseMetadata: number
+  hasSimilarComplaints: number
+  qualityBreakdown: number
+  qualityScore: number
+  similarComplaintIds: number
+  slaBreached: number
+  slaDeadline: number
   _all: number
 }
 
@@ -199,20 +205,22 @@ export type ComplaintMinAggregateInputType = {
   managedBySuperAdminId?: true
   moderatedByMunicipalAdminId?: true
   seq?: true
-  blockchainHash?: true
-  blockchainBlock?: true
-  ipfsHash?: true
-  isOnChain?: true
-  blockchainStatus?: true
-  blockchainUpdatedAt?: true
   sla?: true
   AIabusedFlag?: true
   AIimageVarificationStatus?: true
   AIstandardizedSubCategory?: true
   lastUpdated?: true
   isDuplicate?: true
-  qualityScore?: true
+  blockchainBlock?: true
+  blockchainHash?: true
+  blockchainStatus?: true
+  blockchainUpdatedAt?: true
+  ipfsHash?: true
+  isOnChain?: true
   hasSimilarComplaints?: true
+  qualityScore?: true
+  slaBreached?: true
+  slaDeadline?: true
 }
 
 export type ComplaintMaxAggregateInputType = {
@@ -238,20 +246,22 @@ export type ComplaintMaxAggregateInputType = {
   managedBySuperAdminId?: true
   moderatedByMunicipalAdminId?: true
   seq?: true
-  blockchainHash?: true
-  blockchainBlock?: true
-  ipfsHash?: true
-  isOnChain?: true
-  blockchainStatus?: true
-  blockchainUpdatedAt?: true
   sla?: true
   AIabusedFlag?: true
   AIimageVarificationStatus?: true
   AIstandardizedSubCategory?: true
   lastUpdated?: true
   isDuplicate?: true
-  qualityScore?: true
+  blockchainBlock?: true
+  blockchainHash?: true
+  blockchainStatus?: true
+  blockchainUpdatedAt?: true
+  ipfsHash?: true
+  isOnChain?: true
   hasSimilarComplaints?: true
+  qualityScore?: true
+  slaBreached?: true
+  slaDeadline?: true
 }
 
 export type ComplaintCountAggregateInputType = {
@@ -277,23 +287,25 @@ export type ComplaintCountAggregateInputType = {
   managedBySuperAdminId?: true
   moderatedByMunicipalAdminId?: true
   seq?: true
-  blockchainHash?: true
-  blockchainBlock?: true
-  ipfsHash?: true
-  isOnChain?: true
-  blockchainStatus?: true
-  blockchainUpdatedAt?: true
   sla?: true
   AIabusedFlag?: true
   AIimageVarificationStatus?: true
   AIstandardizedSubCategory?: true
   lastUpdated?: true
   isDuplicate?: true
-  qualityScore?: true
-  qualityBreakdown?: true
-  hasSimilarComplaints?: true
-  similarComplaintIds?: true
+  blockchainBlock?: true
+  blockchainHash?: true
+  blockchainStatus?: true
+  blockchainUpdatedAt?: true
+  ipfsHash?: true
+  isOnChain?: true
   abuseMetadata?: true
+  hasSimilarComplaints?: true
+  qualityBreakdown?: true
+  qualityScore?: true
+  similarComplaintIds?: true
+  slaBreached?: true
+  slaDeadline?: true
   _all?: true
 }
 
@@ -406,23 +418,25 @@ export type ComplaintGroupByOutputType = {
   managedBySuperAdminId: string | null
   moderatedByMunicipalAdminId: string | null
   seq: number
-  blockchainHash: string | null
-  blockchainBlock: bigint | null
-  ipfsHash: string | null
-  isOnChain: boolean
-  blockchainStatus: $Enums.BlockchainStatus
-  blockchainUpdatedAt: Date | null
   sla: string | null
   AIabusedFlag: boolean | null
   AIimageVarificationStatus: boolean | null
   AIstandardizedSubCategory: string | null
   lastUpdated: Date
   isDuplicate: boolean | null
-  qualityScore: number | null
-  qualityBreakdown: runtime.JsonValue | null
-  hasSimilarComplaints: boolean | null
-  similarComplaintIds: string[]
+  blockchainBlock: bigint | null
+  blockchainHash: string | null
+  blockchainStatus: $Enums.BlockchainStatus
+  blockchainUpdatedAt: Date | null
+  ipfsHash: string | null
+  isOnChain: boolean
   abuseMetadata: runtime.JsonValue | null
+  hasSimilarComplaints: boolean | null
+  qualityBreakdown: runtime.JsonValue | null
+  qualityScore: number | null
+  similarComplaintIds: string[]
+  slaBreached: boolean
+  slaDeadline: Date | null
   _count: ComplaintCountAggregateOutputType | null
   _avg: ComplaintAvgAggregateOutputType | null
   _sum: ComplaintSumAggregateOutputType | null
@@ -471,23 +485,25 @@ export type ComplaintWhereInput = {
   managedBySuperAdminId?: Prisma.StringNullableFilter<"Complaint"> | string | null
   moderatedByMunicipalAdminId?: Prisma.StringNullableFilter<"Complaint"> | string | null
   seq?: Prisma.IntFilter<"Complaint"> | number
-  blockchainHash?: Prisma.StringNullableFilter<"Complaint"> | string | null
-  blockchainBlock?: Prisma.BigIntNullableFilter<"Complaint"> | bigint | number | null
-  ipfsHash?: Prisma.StringNullableFilter<"Complaint"> | string | null
-  isOnChain?: Prisma.BoolFilter<"Complaint"> | boolean
-  blockchainStatus?: Prisma.EnumBlockchainStatusFilter<"Complaint"> | $Enums.BlockchainStatus
-  blockchainUpdatedAt?: Prisma.DateTimeNullableFilter<"Complaint"> | Date | string | null
   sla?: Prisma.StringNullableFilter<"Complaint"> | string | null
   AIabusedFlag?: Prisma.BoolNullableFilter<"Complaint"> | boolean | null
   AIimageVarificationStatus?: Prisma.BoolNullableFilter<"Complaint"> | boolean | null
   AIstandardizedSubCategory?: Prisma.StringNullableFilter<"Complaint"> | string | null
   lastUpdated?: Prisma.DateTimeFilter<"Complaint"> | Date | string
   isDuplicate?: Prisma.BoolNullableFilter<"Complaint"> | boolean | null
-  qualityScore?: Prisma.IntNullableFilter<"Complaint"> | number | null
-  qualityBreakdown?: Prisma.JsonNullableFilter<"Complaint">
-  hasSimilarComplaints?: Prisma.BoolNullableFilter<"Complaint"> | boolean | null
-  similarComplaintIds?: Prisma.StringNullableListFilter<"Complaint">
+  blockchainBlock?: Prisma.BigIntNullableFilter<"Complaint"> | bigint | number | null
+  blockchainHash?: Prisma.StringNullableFilter<"Complaint"> | string | null
+  blockchainStatus?: Prisma.EnumBlockchainStatusFilter<"Complaint"> | $Enums.BlockchainStatus
+  blockchainUpdatedAt?: Prisma.DateTimeNullableFilter<"Complaint"> | Date | string | null
+  ipfsHash?: Prisma.StringNullableFilter<"Complaint"> | string | null
+  isOnChain?: Prisma.BoolFilter<"Complaint"> | boolean
   abuseMetadata?: Prisma.JsonNullableFilter<"Complaint">
+  hasSimilarComplaints?: Prisma.BoolNullableFilter<"Complaint"> | boolean | null
+  qualityBreakdown?: Prisma.JsonNullableFilter<"Complaint">
+  qualityScore?: Prisma.IntNullableFilter<"Complaint"> | number | null
+  similarComplaintIds?: Prisma.StringNullableListFilter<"Complaint">
+  slaBreached?: Prisma.BoolFilter<"Complaint"> | boolean
+  slaDeadline?: Prisma.DateTimeNullableFilter<"Complaint"> | Date | string | null
   assignedAgent?: Prisma.XOR<Prisma.AgentNullableScalarRelationFilter, Prisma.AgentWhereInput> | null
   category?: Prisma.XOR<Prisma.CategoryScalarRelationFilter, Prisma.CategoryWhereInput>
   User?: Prisma.XOR<Prisma.UserNullableScalarRelationFilter, Prisma.UserWhereInput> | null
@@ -527,23 +543,25 @@ export type ComplaintOrderByWithRelationInput = {
   managedBySuperAdminId?: Prisma.SortOrderInput | Prisma.SortOrder
   moderatedByMunicipalAdminId?: Prisma.SortOrderInput | Prisma.SortOrder
   seq?: Prisma.SortOrder
-  blockchainHash?: Prisma.SortOrderInput | Prisma.SortOrder
-  blockchainBlock?: Prisma.SortOrderInput | Prisma.SortOrder
-  ipfsHash?: Prisma.SortOrderInput | Prisma.SortOrder
-  isOnChain?: Prisma.SortOrder
-  blockchainStatus?: Prisma.SortOrder
-  blockchainUpdatedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   sla?: Prisma.SortOrderInput | Prisma.SortOrder
   AIabusedFlag?: Prisma.SortOrderInput | Prisma.SortOrder
   AIimageVarificationStatus?: Prisma.SortOrderInput | Prisma.SortOrder
   AIstandardizedSubCategory?: Prisma.SortOrderInput | Prisma.SortOrder
   lastUpdated?: Prisma.SortOrder
   isDuplicate?: Prisma.SortOrderInput | Prisma.SortOrder
-  qualityScore?: Prisma.SortOrderInput | Prisma.SortOrder
-  qualityBreakdown?: Prisma.SortOrderInput | Prisma.SortOrder
-  hasSimilarComplaints?: Prisma.SortOrderInput | Prisma.SortOrder
-  similarComplaintIds?: Prisma.SortOrder
+  blockchainBlock?: Prisma.SortOrderInput | Prisma.SortOrder
+  blockchainHash?: Prisma.SortOrderInput | Prisma.SortOrder
+  blockchainStatus?: Prisma.SortOrder
+  blockchainUpdatedAt?: Prisma.SortOrderInput | Prisma.SortOrder
+  ipfsHash?: Prisma.SortOrderInput | Prisma.SortOrder
+  isOnChain?: Prisma.SortOrder
   abuseMetadata?: Prisma.SortOrderInput | Prisma.SortOrder
+  hasSimilarComplaints?: Prisma.SortOrderInput | Prisma.SortOrder
+  qualityBreakdown?: Prisma.SortOrderInput | Prisma.SortOrder
+  qualityScore?: Prisma.SortOrderInput | Prisma.SortOrder
+  similarComplaintIds?: Prisma.SortOrder
+  slaBreached?: Prisma.SortOrder
+  slaDeadline?: Prisma.SortOrderInput | Prisma.SortOrder
   assignedAgent?: Prisma.AgentOrderByWithRelationInput
   category?: Prisma.CategoryOrderByWithRelationInput
   User?: Prisma.UserOrderByWithRelationInput
@@ -586,23 +604,25 @@ export type ComplaintWhereUniqueInput = Prisma.AtLeast<{
   managedByMunicipalAdminId?: Prisma.StringNullableFilter<"Complaint"> | string | null
   managedBySuperAdminId?: Prisma.StringNullableFilter<"Complaint"> | string | null
   moderatedByMunicipalAdminId?: Prisma.StringNullableFilter<"Complaint"> | string | null
-  blockchainHash?: Prisma.StringNullableFilter<"Complaint"> | string | null
-  blockchainBlock?: Prisma.BigIntNullableFilter<"Complaint"> | bigint | number | null
-  ipfsHash?: Prisma.StringNullableFilter<"Complaint"> | string | null
-  isOnChain?: Prisma.BoolFilter<"Complaint"> | boolean
-  blockchainStatus?: Prisma.EnumBlockchainStatusFilter<"Complaint"> | $Enums.BlockchainStatus
-  blockchainUpdatedAt?: Prisma.DateTimeNullableFilter<"Complaint"> | Date | string | null
   sla?: Prisma.StringNullableFilter<"Complaint"> | string | null
   AIabusedFlag?: Prisma.BoolNullableFilter<"Complaint"> | boolean | null
   AIimageVarificationStatus?: Prisma.BoolNullableFilter<"Complaint"> | boolean | null
   AIstandardizedSubCategory?: Prisma.StringNullableFilter<"Complaint"> | string | null
   lastUpdated?: Prisma.DateTimeFilter<"Complaint"> | Date | string
   isDuplicate?: Prisma.BoolNullableFilter<"Complaint"> | boolean | null
-  qualityScore?: Prisma.IntNullableFilter<"Complaint"> | number | null
-  qualityBreakdown?: Prisma.JsonNullableFilter<"Complaint">
-  hasSimilarComplaints?: Prisma.BoolNullableFilter<"Complaint"> | boolean | null
-  similarComplaintIds?: Prisma.StringNullableListFilter<"Complaint">
+  blockchainBlock?: Prisma.BigIntNullableFilter<"Complaint"> | bigint | number | null
+  blockchainHash?: Prisma.StringNullableFilter<"Complaint"> | string | null
+  blockchainStatus?: Prisma.EnumBlockchainStatusFilter<"Complaint"> | $Enums.BlockchainStatus
+  blockchainUpdatedAt?: Prisma.DateTimeNullableFilter<"Complaint"> | Date | string | null
+  ipfsHash?: Prisma.StringNullableFilter<"Complaint"> | string | null
+  isOnChain?: Prisma.BoolFilter<"Complaint"> | boolean
   abuseMetadata?: Prisma.JsonNullableFilter<"Complaint">
+  hasSimilarComplaints?: Prisma.BoolNullableFilter<"Complaint"> | boolean | null
+  qualityBreakdown?: Prisma.JsonNullableFilter<"Complaint">
+  qualityScore?: Prisma.IntNullableFilter<"Complaint"> | number | null
+  similarComplaintIds?: Prisma.StringNullableListFilter<"Complaint">
+  slaBreached?: Prisma.BoolFilter<"Complaint"> | boolean
+  slaDeadline?: Prisma.DateTimeNullableFilter<"Complaint"> | Date | string | null
   assignedAgent?: Prisma.XOR<Prisma.AgentNullableScalarRelationFilter, Prisma.AgentWhereInput> | null
   category?: Prisma.XOR<Prisma.CategoryScalarRelationFilter, Prisma.CategoryWhereInput>
   User?: Prisma.XOR<Prisma.UserNullableScalarRelationFilter, Prisma.UserWhereInput> | null
@@ -642,23 +662,25 @@ export type ComplaintOrderByWithAggregationInput = {
   managedBySuperAdminId?: Prisma.SortOrderInput | Prisma.SortOrder
   moderatedByMunicipalAdminId?: Prisma.SortOrderInput | Prisma.SortOrder
   seq?: Prisma.SortOrder
-  blockchainHash?: Prisma.SortOrderInput | Prisma.SortOrder
-  blockchainBlock?: Prisma.SortOrderInput | Prisma.SortOrder
-  ipfsHash?: Prisma.SortOrderInput | Prisma.SortOrder
-  isOnChain?: Prisma.SortOrder
-  blockchainStatus?: Prisma.SortOrder
-  blockchainUpdatedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   sla?: Prisma.SortOrderInput | Prisma.SortOrder
   AIabusedFlag?: Prisma.SortOrderInput | Prisma.SortOrder
   AIimageVarificationStatus?: Prisma.SortOrderInput | Prisma.SortOrder
   AIstandardizedSubCategory?: Prisma.SortOrderInput | Prisma.SortOrder
   lastUpdated?: Prisma.SortOrder
   isDuplicate?: Prisma.SortOrderInput | Prisma.SortOrder
-  qualityScore?: Prisma.SortOrderInput | Prisma.SortOrder
-  qualityBreakdown?: Prisma.SortOrderInput | Prisma.SortOrder
-  hasSimilarComplaints?: Prisma.SortOrderInput | Prisma.SortOrder
-  similarComplaintIds?: Prisma.SortOrder
+  blockchainBlock?: Prisma.SortOrderInput | Prisma.SortOrder
+  blockchainHash?: Prisma.SortOrderInput | Prisma.SortOrder
+  blockchainStatus?: Prisma.SortOrder
+  blockchainUpdatedAt?: Prisma.SortOrderInput | Prisma.SortOrder
+  ipfsHash?: Prisma.SortOrderInput | Prisma.SortOrder
+  isOnChain?: Prisma.SortOrder
   abuseMetadata?: Prisma.SortOrderInput | Prisma.SortOrder
+  hasSimilarComplaints?: Prisma.SortOrderInput | Prisma.SortOrder
+  qualityBreakdown?: Prisma.SortOrderInput | Prisma.SortOrder
+  qualityScore?: Prisma.SortOrderInput | Prisma.SortOrder
+  similarComplaintIds?: Prisma.SortOrder
+  slaBreached?: Prisma.SortOrder
+  slaDeadline?: Prisma.SortOrderInput | Prisma.SortOrder
   _count?: Prisma.ComplaintCountOrderByAggregateInput
   _avg?: Prisma.ComplaintAvgOrderByAggregateInput
   _max?: Prisma.ComplaintMaxOrderByAggregateInput
@@ -692,23 +714,25 @@ export type ComplaintScalarWhereWithAggregatesInput = {
   managedBySuperAdminId?: Prisma.StringNullableWithAggregatesFilter<"Complaint"> | string | null
   moderatedByMunicipalAdminId?: Prisma.StringNullableWithAggregatesFilter<"Complaint"> | string | null
   seq?: Prisma.IntWithAggregatesFilter<"Complaint"> | number
-  blockchainHash?: Prisma.StringNullableWithAggregatesFilter<"Complaint"> | string | null
-  blockchainBlock?: Prisma.BigIntNullableWithAggregatesFilter<"Complaint"> | bigint | number | null
-  ipfsHash?: Prisma.StringNullableWithAggregatesFilter<"Complaint"> | string | null
-  isOnChain?: Prisma.BoolWithAggregatesFilter<"Complaint"> | boolean
-  blockchainStatus?: Prisma.EnumBlockchainStatusWithAggregatesFilter<"Complaint"> | $Enums.BlockchainStatus
-  blockchainUpdatedAt?: Prisma.DateTimeNullableWithAggregatesFilter<"Complaint"> | Date | string | null
   sla?: Prisma.StringNullableWithAggregatesFilter<"Complaint"> | string | null
   AIabusedFlag?: Prisma.BoolNullableWithAggregatesFilter<"Complaint"> | boolean | null
   AIimageVarificationStatus?: Prisma.BoolNullableWithAggregatesFilter<"Complaint"> | boolean | null
   AIstandardizedSubCategory?: Prisma.StringNullableWithAggregatesFilter<"Complaint"> | string | null
   lastUpdated?: Prisma.DateTimeWithAggregatesFilter<"Complaint"> | Date | string
   isDuplicate?: Prisma.BoolNullableWithAggregatesFilter<"Complaint"> | boolean | null
-  qualityScore?: Prisma.IntNullableWithAggregatesFilter<"Complaint"> | number | null
-  qualityBreakdown?: Prisma.JsonNullableWithAggregatesFilter<"Complaint">
-  hasSimilarComplaints?: Prisma.BoolNullableWithAggregatesFilter<"Complaint"> | boolean | null
-  similarComplaintIds?: Prisma.StringNullableListFilter<"Complaint">
+  blockchainBlock?: Prisma.BigIntNullableWithAggregatesFilter<"Complaint"> | bigint | number | null
+  blockchainHash?: Prisma.StringNullableWithAggregatesFilter<"Complaint"> | string | null
+  blockchainStatus?: Prisma.EnumBlockchainStatusWithAggregatesFilter<"Complaint"> | $Enums.BlockchainStatus
+  blockchainUpdatedAt?: Prisma.DateTimeNullableWithAggregatesFilter<"Complaint"> | Date | string | null
+  ipfsHash?: Prisma.StringNullableWithAggregatesFilter<"Complaint"> | string | null
+  isOnChain?: Prisma.BoolWithAggregatesFilter<"Complaint"> | boolean
   abuseMetadata?: Prisma.JsonNullableWithAggregatesFilter<"Complaint">
+  hasSimilarComplaints?: Prisma.BoolNullableWithAggregatesFilter<"Complaint"> | boolean | null
+  qualityBreakdown?: Prisma.JsonNullableWithAggregatesFilter<"Complaint">
+  qualityScore?: Prisma.IntNullableWithAggregatesFilter<"Complaint"> | number | null
+  similarComplaintIds?: Prisma.StringNullableListFilter<"Complaint">
+  slaBreached?: Prisma.BoolWithAggregatesFilter<"Complaint"> | boolean
+  slaDeadline?: Prisma.DateTimeNullableWithAggregatesFilter<"Complaint"> | Date | string | null
 }
 
 export type ComplaintCreateInput = {
@@ -725,23 +749,25 @@ export type ComplaintCreateInput = {
   dateOfResolution?: Date | string | null
   escalationLevel?: string | null
   seq?: number
-  blockchainHash?: string | null
-  blockchainBlock?: bigint | number | null
-  ipfsHash?: string | null
-  isOnChain?: boolean
-  blockchainStatus?: $Enums.BlockchainStatus
-  blockchainUpdatedAt?: Date | string | null
   sla?: string | null
   AIabusedFlag?: boolean | null
   AIimageVarificationStatus?: boolean | null
   AIstandardizedSubCategory?: string | null
   lastUpdated?: Date | string
   isDuplicate?: boolean | null
-  qualityScore?: number | null
-  qualityBreakdown?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
-  hasSimilarComplaints?: boolean | null
-  similarComplaintIds?: Prisma.ComplaintCreatesimilarComplaintIdsInput | string[]
+  blockchainBlock?: bigint | number | null
+  blockchainHash?: string | null
+  blockchainStatus?: $Enums.BlockchainStatus
+  blockchainUpdatedAt?: Date | string | null
+  ipfsHash?: string | null
+  isOnChain?: boolean
   abuseMetadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  hasSimilarComplaints?: boolean | null
+  qualityBreakdown?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  qualityScore?: number | null
+  similarComplaintIds?: Prisma.ComplaintCreatesimilarComplaintIdsInput | string[]
+  slaBreached?: boolean
+  slaDeadline?: Date | string | null
   assignedAgent?: Prisma.AgentCreateNestedOneWithoutAssignedComplaintsInput
   category: Prisma.CategoryCreateNestedOneWithoutComplaintsInput
   User?: Prisma.UserCreateNestedOneWithoutComplaintsInput
@@ -781,23 +807,25 @@ export type ComplaintUncheckedCreateInput = {
   managedBySuperAdminId?: string | null
   moderatedByMunicipalAdminId?: string | null
   seq?: number
-  blockchainHash?: string | null
-  blockchainBlock?: bigint | number | null
-  ipfsHash?: string | null
-  isOnChain?: boolean
-  blockchainStatus?: $Enums.BlockchainStatus
-  blockchainUpdatedAt?: Date | string | null
   sla?: string | null
   AIabusedFlag?: boolean | null
   AIimageVarificationStatus?: boolean | null
   AIstandardizedSubCategory?: string | null
   lastUpdated?: Date | string
   isDuplicate?: boolean | null
-  qualityScore?: number | null
-  qualityBreakdown?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
-  hasSimilarComplaints?: boolean | null
-  similarComplaintIds?: Prisma.ComplaintCreatesimilarComplaintIdsInput | string[]
+  blockchainBlock?: bigint | number | null
+  blockchainHash?: string | null
+  blockchainStatus?: $Enums.BlockchainStatus
+  blockchainUpdatedAt?: Date | string | null
+  ipfsHash?: string | null
+  isOnChain?: boolean
   abuseMetadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  hasSimilarComplaints?: boolean | null
+  qualityBreakdown?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  qualityScore?: number | null
+  similarComplaintIds?: Prisma.ComplaintCreatesimilarComplaintIdsInput | string[]
+  slaBreached?: boolean
+  slaDeadline?: Date | string | null
   auditLogs?: Prisma.AuditLogUncheckedCreateNestedManyWithoutComplaintInput
   chats?: Prisma.ChatUncheckedCreateNestedManyWithoutComplaintInput
   location?: Prisma.ComplaintLocationUncheckedCreateNestedOneWithoutComplaintInput
@@ -818,23 +846,25 @@ export type ComplaintUpdateInput = {
   assignedDepartment?: Prisma.StringFieldUpdateOperationsInput | string
   dateOfResolution?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   escalationLevel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  blockchainHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  blockchainBlock?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
-  ipfsHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  isOnChain?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  blockchainStatus?: Prisma.EnumBlockchainStatusFieldUpdateOperationsInput | $Enums.BlockchainStatus
-  blockchainUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   sla?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   AIabusedFlag?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   AIimageVarificationStatus?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   AIstandardizedSubCategory?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   lastUpdated?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   isDuplicate?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
-  qualityScore?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  qualityBreakdown?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
-  hasSimilarComplaints?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
-  similarComplaintIds?: Prisma.ComplaintUpdatesimilarComplaintIdsInput | string[]
+  blockchainBlock?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
+  blockchainHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  blockchainStatus?: Prisma.EnumBlockchainStatusFieldUpdateOperationsInput | $Enums.BlockchainStatus
+  blockchainUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  ipfsHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isOnChain?: Prisma.BoolFieldUpdateOperationsInput | boolean
   abuseMetadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  hasSimilarComplaints?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  qualityBreakdown?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  qualityScore?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  similarComplaintIds?: Prisma.ComplaintUpdatesimilarComplaintIdsInput | string[]
+  slaBreached?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  slaDeadline?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   assignedAgent?: Prisma.AgentUpdateOneWithoutAssignedComplaintsNestedInput
   category?: Prisma.CategoryUpdateOneRequiredWithoutComplaintsNestedInput
   User?: Prisma.UserUpdateOneWithoutComplaintsNestedInput
@@ -874,23 +904,25 @@ export type ComplaintUncheckedUpdateInput = {
   managedBySuperAdminId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   moderatedByMunicipalAdminId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   seq?: Prisma.IntFieldUpdateOperationsInput | number
-  blockchainHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  blockchainBlock?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
-  ipfsHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  isOnChain?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  blockchainStatus?: Prisma.EnumBlockchainStatusFieldUpdateOperationsInput | $Enums.BlockchainStatus
-  blockchainUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   sla?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   AIabusedFlag?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   AIimageVarificationStatus?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   AIstandardizedSubCategory?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   lastUpdated?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   isDuplicate?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
-  qualityScore?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  qualityBreakdown?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
-  hasSimilarComplaints?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
-  similarComplaintIds?: Prisma.ComplaintUpdatesimilarComplaintIdsInput | string[]
+  blockchainBlock?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
+  blockchainHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  blockchainStatus?: Prisma.EnumBlockchainStatusFieldUpdateOperationsInput | $Enums.BlockchainStatus
+  blockchainUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  ipfsHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isOnChain?: Prisma.BoolFieldUpdateOperationsInput | boolean
   abuseMetadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  hasSimilarComplaints?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  qualityBreakdown?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  qualityScore?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  similarComplaintIds?: Prisma.ComplaintUpdatesimilarComplaintIdsInput | string[]
+  slaBreached?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  slaDeadline?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   auditLogs?: Prisma.AuditLogUncheckedUpdateManyWithoutComplaintNestedInput
   chats?: Prisma.ChatUncheckedUpdateManyWithoutComplaintNestedInput
   location?: Prisma.ComplaintLocationUncheckedUpdateOneWithoutComplaintNestedInput
@@ -921,23 +953,25 @@ export type ComplaintCreateManyInput = {
   managedBySuperAdminId?: string | null
   moderatedByMunicipalAdminId?: string | null
   seq?: number
-  blockchainHash?: string | null
-  blockchainBlock?: bigint | number | null
-  ipfsHash?: string | null
-  isOnChain?: boolean
-  blockchainStatus?: $Enums.BlockchainStatus
-  blockchainUpdatedAt?: Date | string | null
   sla?: string | null
   AIabusedFlag?: boolean | null
   AIimageVarificationStatus?: boolean | null
   AIstandardizedSubCategory?: string | null
   lastUpdated?: Date | string
   isDuplicate?: boolean | null
-  qualityScore?: number | null
-  qualityBreakdown?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
-  hasSimilarComplaints?: boolean | null
-  similarComplaintIds?: Prisma.ComplaintCreatesimilarComplaintIdsInput | string[]
+  blockchainBlock?: bigint | number | null
+  blockchainHash?: string | null
+  blockchainStatus?: $Enums.BlockchainStatus
+  blockchainUpdatedAt?: Date | string | null
+  ipfsHash?: string | null
+  isOnChain?: boolean
   abuseMetadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  hasSimilarComplaints?: boolean | null
+  qualityBreakdown?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  qualityScore?: number | null
+  similarComplaintIds?: Prisma.ComplaintCreatesimilarComplaintIdsInput | string[]
+  slaBreached?: boolean
+  slaDeadline?: Date | string | null
 }
 
 export type ComplaintUpdateManyMutationInput = {
@@ -953,23 +987,25 @@ export type ComplaintUpdateManyMutationInput = {
   assignedDepartment?: Prisma.StringFieldUpdateOperationsInput | string
   dateOfResolution?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   escalationLevel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  blockchainHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  blockchainBlock?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
-  ipfsHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  isOnChain?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  blockchainStatus?: Prisma.EnumBlockchainStatusFieldUpdateOperationsInput | $Enums.BlockchainStatus
-  blockchainUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   sla?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   AIabusedFlag?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   AIimageVarificationStatus?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   AIstandardizedSubCategory?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   lastUpdated?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   isDuplicate?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
-  qualityScore?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  qualityBreakdown?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
-  hasSimilarComplaints?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
-  similarComplaintIds?: Prisma.ComplaintUpdatesimilarComplaintIdsInput | string[]
+  blockchainBlock?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
+  blockchainHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  blockchainStatus?: Prisma.EnumBlockchainStatusFieldUpdateOperationsInput | $Enums.BlockchainStatus
+  blockchainUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  ipfsHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isOnChain?: Prisma.BoolFieldUpdateOperationsInput | boolean
   abuseMetadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  hasSimilarComplaints?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  qualityBreakdown?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  qualityScore?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  similarComplaintIds?: Prisma.ComplaintUpdatesimilarComplaintIdsInput | string[]
+  slaBreached?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  slaDeadline?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
 
 export type ComplaintUncheckedUpdateManyInput = {
@@ -995,23 +1031,25 @@ export type ComplaintUncheckedUpdateManyInput = {
   managedBySuperAdminId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   moderatedByMunicipalAdminId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   seq?: Prisma.IntFieldUpdateOperationsInput | number
-  blockchainHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  blockchainBlock?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
-  ipfsHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  isOnChain?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  blockchainStatus?: Prisma.EnumBlockchainStatusFieldUpdateOperationsInput | $Enums.BlockchainStatus
-  blockchainUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   sla?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   AIabusedFlag?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   AIimageVarificationStatus?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   AIstandardizedSubCategory?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   lastUpdated?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   isDuplicate?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
-  qualityScore?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  qualityBreakdown?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
-  hasSimilarComplaints?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
-  similarComplaintIds?: Prisma.ComplaintUpdatesimilarComplaintIdsInput | string[]
+  blockchainBlock?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
+  blockchainHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  blockchainStatus?: Prisma.EnumBlockchainStatusFieldUpdateOperationsInput | $Enums.BlockchainStatus
+  blockchainUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  ipfsHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isOnChain?: Prisma.BoolFieldUpdateOperationsInput | boolean
   abuseMetadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  hasSimilarComplaints?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  qualityBreakdown?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  qualityScore?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  similarComplaintIds?: Prisma.ComplaintUpdatesimilarComplaintIdsInput | string[]
+  slaBreached?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  slaDeadline?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
 
 export type ComplaintListRelationFilter = {
@@ -1047,23 +1085,25 @@ export type ComplaintCountOrderByAggregateInput = {
   managedBySuperAdminId?: Prisma.SortOrder
   moderatedByMunicipalAdminId?: Prisma.SortOrder
   seq?: Prisma.SortOrder
-  blockchainHash?: Prisma.SortOrder
-  blockchainBlock?: Prisma.SortOrder
-  ipfsHash?: Prisma.SortOrder
-  isOnChain?: Prisma.SortOrder
-  blockchainStatus?: Prisma.SortOrder
-  blockchainUpdatedAt?: Prisma.SortOrder
   sla?: Prisma.SortOrder
   AIabusedFlag?: Prisma.SortOrder
   AIimageVarificationStatus?: Prisma.SortOrder
   AIstandardizedSubCategory?: Prisma.SortOrder
   lastUpdated?: Prisma.SortOrder
   isDuplicate?: Prisma.SortOrder
-  qualityScore?: Prisma.SortOrder
-  qualityBreakdown?: Prisma.SortOrder
-  hasSimilarComplaints?: Prisma.SortOrder
-  similarComplaintIds?: Prisma.SortOrder
+  blockchainBlock?: Prisma.SortOrder
+  blockchainHash?: Prisma.SortOrder
+  blockchainStatus?: Prisma.SortOrder
+  blockchainUpdatedAt?: Prisma.SortOrder
+  ipfsHash?: Prisma.SortOrder
+  isOnChain?: Prisma.SortOrder
   abuseMetadata?: Prisma.SortOrder
+  hasSimilarComplaints?: Prisma.SortOrder
+  qualityBreakdown?: Prisma.SortOrder
+  qualityScore?: Prisma.SortOrder
+  similarComplaintIds?: Prisma.SortOrder
+  slaBreached?: Prisma.SortOrder
+  slaDeadline?: Prisma.SortOrder
 }
 
 export type ComplaintAvgOrderByAggregateInput = {
@@ -1096,20 +1136,22 @@ export type ComplaintMaxOrderByAggregateInput = {
   managedBySuperAdminId?: Prisma.SortOrder
   moderatedByMunicipalAdminId?: Prisma.SortOrder
   seq?: Prisma.SortOrder
-  blockchainHash?: Prisma.SortOrder
-  blockchainBlock?: Prisma.SortOrder
-  ipfsHash?: Prisma.SortOrder
-  isOnChain?: Prisma.SortOrder
-  blockchainStatus?: Prisma.SortOrder
-  blockchainUpdatedAt?: Prisma.SortOrder
   sla?: Prisma.SortOrder
   AIabusedFlag?: Prisma.SortOrder
   AIimageVarificationStatus?: Prisma.SortOrder
   AIstandardizedSubCategory?: Prisma.SortOrder
   lastUpdated?: Prisma.SortOrder
   isDuplicate?: Prisma.SortOrder
-  qualityScore?: Prisma.SortOrder
+  blockchainBlock?: Prisma.SortOrder
+  blockchainHash?: Prisma.SortOrder
+  blockchainStatus?: Prisma.SortOrder
+  blockchainUpdatedAt?: Prisma.SortOrder
+  ipfsHash?: Prisma.SortOrder
+  isOnChain?: Prisma.SortOrder
   hasSimilarComplaints?: Prisma.SortOrder
+  qualityScore?: Prisma.SortOrder
+  slaBreached?: Prisma.SortOrder
+  slaDeadline?: Prisma.SortOrder
 }
 
 export type ComplaintMinOrderByAggregateInput = {
@@ -1135,20 +1177,22 @@ export type ComplaintMinOrderByAggregateInput = {
   managedBySuperAdminId?: Prisma.SortOrder
   moderatedByMunicipalAdminId?: Prisma.SortOrder
   seq?: Prisma.SortOrder
-  blockchainHash?: Prisma.SortOrder
-  blockchainBlock?: Prisma.SortOrder
-  ipfsHash?: Prisma.SortOrder
-  isOnChain?: Prisma.SortOrder
-  blockchainStatus?: Prisma.SortOrder
-  blockchainUpdatedAt?: Prisma.SortOrder
   sla?: Prisma.SortOrder
   AIabusedFlag?: Prisma.SortOrder
   AIimageVarificationStatus?: Prisma.SortOrder
   AIstandardizedSubCategory?: Prisma.SortOrder
   lastUpdated?: Prisma.SortOrder
   isDuplicate?: Prisma.SortOrder
-  qualityScore?: Prisma.SortOrder
+  blockchainBlock?: Prisma.SortOrder
+  blockchainHash?: Prisma.SortOrder
+  blockchainStatus?: Prisma.SortOrder
+  blockchainUpdatedAt?: Prisma.SortOrder
+  ipfsHash?: Prisma.SortOrder
+  isOnChain?: Prisma.SortOrder
   hasSimilarComplaints?: Prisma.SortOrder
+  qualityScore?: Prisma.SortOrder
+  slaBreached?: Prisma.SortOrder
+  slaDeadline?: Prisma.SortOrder
 }
 
 export type ComplaintSumOrderByAggregateInput = {
@@ -1596,6 +1640,10 @@ export type EnumComplaintStatusFieldUpdateOperationsInput = {
   set?: $Enums.ComplaintStatus
 }
 
+export type NullableBoolFieldUpdateOperationsInput = {
+  set?: boolean | null
+}
+
 export type NullableBigIntFieldUpdateOperationsInput = {
   set?: bigint | number | null
   increment?: bigint | number
@@ -1606,10 +1654,6 @@ export type NullableBigIntFieldUpdateOperationsInput = {
 
 export type EnumBlockchainStatusFieldUpdateOperationsInput = {
   set?: $Enums.BlockchainStatus
-}
-
-export type NullableBoolFieldUpdateOperationsInput = {
-  set?: boolean | null
 }
 
 export type NullableIntFieldUpdateOperationsInput = {
@@ -1697,23 +1741,25 @@ export type ComplaintCreateWithoutUserInput = {
   dateOfResolution?: Date | string | null
   escalationLevel?: string | null
   seq?: number
-  blockchainHash?: string | null
-  blockchainBlock?: bigint | number | null
-  ipfsHash?: string | null
-  isOnChain?: boolean
-  blockchainStatus?: $Enums.BlockchainStatus
-  blockchainUpdatedAt?: Date | string | null
   sla?: string | null
   AIabusedFlag?: boolean | null
   AIimageVarificationStatus?: boolean | null
   AIstandardizedSubCategory?: string | null
   lastUpdated?: Date | string
   isDuplicate?: boolean | null
-  qualityScore?: number | null
-  qualityBreakdown?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
-  hasSimilarComplaints?: boolean | null
-  similarComplaintIds?: Prisma.ComplaintCreatesimilarComplaintIdsInput | string[]
+  blockchainBlock?: bigint | number | null
+  blockchainHash?: string | null
+  blockchainStatus?: $Enums.BlockchainStatus
+  blockchainUpdatedAt?: Date | string | null
+  ipfsHash?: string | null
+  isOnChain?: boolean
   abuseMetadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  hasSimilarComplaints?: boolean | null
+  qualityBreakdown?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  qualityScore?: number | null
+  similarComplaintIds?: Prisma.ComplaintCreatesimilarComplaintIdsInput | string[]
+  slaBreached?: boolean
+  slaDeadline?: Date | string | null
   assignedAgent?: Prisma.AgentCreateNestedOneWithoutAssignedComplaintsInput
   category: Prisma.CategoryCreateNestedOneWithoutComplaintsInput
   crossDeptIssueSuperMunicipal?: Prisma.SuperMunicipalAdminCreateNestedOneWithoutCrossDepartmentIssuesInput
@@ -1751,23 +1797,25 @@ export type ComplaintUncheckedCreateWithoutUserInput = {
   managedBySuperAdminId?: string | null
   moderatedByMunicipalAdminId?: string | null
   seq?: number
-  blockchainHash?: string | null
-  blockchainBlock?: bigint | number | null
-  ipfsHash?: string | null
-  isOnChain?: boolean
-  blockchainStatus?: $Enums.BlockchainStatus
-  blockchainUpdatedAt?: Date | string | null
   sla?: string | null
   AIabusedFlag?: boolean | null
   AIimageVarificationStatus?: boolean | null
   AIstandardizedSubCategory?: string | null
   lastUpdated?: Date | string
   isDuplicate?: boolean | null
-  qualityScore?: number | null
-  qualityBreakdown?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
-  hasSimilarComplaints?: boolean | null
-  similarComplaintIds?: Prisma.ComplaintCreatesimilarComplaintIdsInput | string[]
+  blockchainBlock?: bigint | number | null
+  blockchainHash?: string | null
+  blockchainStatus?: $Enums.BlockchainStatus
+  blockchainUpdatedAt?: Date | string | null
+  ipfsHash?: string | null
+  isOnChain?: boolean
   abuseMetadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  hasSimilarComplaints?: boolean | null
+  qualityBreakdown?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  qualityScore?: number | null
+  similarComplaintIds?: Prisma.ComplaintCreatesimilarComplaintIdsInput | string[]
+  slaBreached?: boolean
+  slaDeadline?: Date | string | null
   auditLogs?: Prisma.AuditLogUncheckedCreateNestedManyWithoutComplaintInput
   chats?: Prisma.ChatUncheckedCreateNestedManyWithoutComplaintInput
   location?: Prisma.ComplaintLocationUncheckedCreateNestedOneWithoutComplaintInput
@@ -1827,23 +1875,25 @@ export type ComplaintScalarWhereInput = {
   managedBySuperAdminId?: Prisma.StringNullableFilter<"Complaint"> | string | null
   moderatedByMunicipalAdminId?: Prisma.StringNullableFilter<"Complaint"> | string | null
   seq?: Prisma.IntFilter<"Complaint"> | number
-  blockchainHash?: Prisma.StringNullableFilter<"Complaint"> | string | null
-  blockchainBlock?: Prisma.BigIntNullableFilter<"Complaint"> | bigint | number | null
-  ipfsHash?: Prisma.StringNullableFilter<"Complaint"> | string | null
-  isOnChain?: Prisma.BoolFilter<"Complaint"> | boolean
-  blockchainStatus?: Prisma.EnumBlockchainStatusFilter<"Complaint"> | $Enums.BlockchainStatus
-  blockchainUpdatedAt?: Prisma.DateTimeNullableFilter<"Complaint"> | Date | string | null
   sla?: Prisma.StringNullableFilter<"Complaint"> | string | null
   AIabusedFlag?: Prisma.BoolNullableFilter<"Complaint"> | boolean | null
   AIimageVarificationStatus?: Prisma.BoolNullableFilter<"Complaint"> | boolean | null
   AIstandardizedSubCategory?: Prisma.StringNullableFilter<"Complaint"> | string | null
   lastUpdated?: Prisma.DateTimeFilter<"Complaint"> | Date | string
   isDuplicate?: Prisma.BoolNullableFilter<"Complaint"> | boolean | null
-  qualityScore?: Prisma.IntNullableFilter<"Complaint"> | number | null
-  qualityBreakdown?: Prisma.JsonNullableFilter<"Complaint">
-  hasSimilarComplaints?: Prisma.BoolNullableFilter<"Complaint"> | boolean | null
-  similarComplaintIds?: Prisma.StringNullableListFilter<"Complaint">
+  blockchainBlock?: Prisma.BigIntNullableFilter<"Complaint"> | bigint | number | null
+  blockchainHash?: Prisma.StringNullableFilter<"Complaint"> | string | null
+  blockchainStatus?: Prisma.EnumBlockchainStatusFilter<"Complaint"> | $Enums.BlockchainStatus
+  blockchainUpdatedAt?: Prisma.DateTimeNullableFilter<"Complaint"> | Date | string | null
+  ipfsHash?: Prisma.StringNullableFilter<"Complaint"> | string | null
+  isOnChain?: Prisma.BoolFilter<"Complaint"> | boolean
   abuseMetadata?: Prisma.JsonNullableFilter<"Complaint">
+  hasSimilarComplaints?: Prisma.BoolNullableFilter<"Complaint"> | boolean | null
+  qualityBreakdown?: Prisma.JsonNullableFilter<"Complaint">
+  qualityScore?: Prisma.IntNullableFilter<"Complaint"> | number | null
+  similarComplaintIds?: Prisma.StringNullableListFilter<"Complaint">
+  slaBreached?: Prisma.BoolFilter<"Complaint"> | boolean
+  slaDeadline?: Prisma.DateTimeNullableFilter<"Complaint"> | Date | string | null
 }
 
 export type ComplaintCreateWithoutAssignedAgentInput = {
@@ -1860,23 +1910,25 @@ export type ComplaintCreateWithoutAssignedAgentInput = {
   dateOfResolution?: Date | string | null
   escalationLevel?: string | null
   seq?: number
-  blockchainHash?: string | null
-  blockchainBlock?: bigint | number | null
-  ipfsHash?: string | null
-  isOnChain?: boolean
-  blockchainStatus?: $Enums.BlockchainStatus
-  blockchainUpdatedAt?: Date | string | null
   sla?: string | null
   AIabusedFlag?: boolean | null
   AIimageVarificationStatus?: boolean | null
   AIstandardizedSubCategory?: string | null
   lastUpdated?: Date | string
   isDuplicate?: boolean | null
-  qualityScore?: number | null
-  qualityBreakdown?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
-  hasSimilarComplaints?: boolean | null
-  similarComplaintIds?: Prisma.ComplaintCreatesimilarComplaintIdsInput | string[]
+  blockchainBlock?: bigint | number | null
+  blockchainHash?: string | null
+  blockchainStatus?: $Enums.BlockchainStatus
+  blockchainUpdatedAt?: Date | string | null
+  ipfsHash?: string | null
+  isOnChain?: boolean
   abuseMetadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  hasSimilarComplaints?: boolean | null
+  qualityBreakdown?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  qualityScore?: number | null
+  similarComplaintIds?: Prisma.ComplaintCreatesimilarComplaintIdsInput | string[]
+  slaBreached?: boolean
+  slaDeadline?: Date | string | null
   category: Prisma.CategoryCreateNestedOneWithoutComplaintsInput
   User?: Prisma.UserCreateNestedOneWithoutComplaintsInput
   crossDeptIssueSuperMunicipal?: Prisma.SuperMunicipalAdminCreateNestedOneWithoutCrossDepartmentIssuesInput
@@ -1914,23 +1966,25 @@ export type ComplaintUncheckedCreateWithoutAssignedAgentInput = {
   managedBySuperAdminId?: string | null
   moderatedByMunicipalAdminId?: string | null
   seq?: number
-  blockchainHash?: string | null
-  blockchainBlock?: bigint | number | null
-  ipfsHash?: string | null
-  isOnChain?: boolean
-  blockchainStatus?: $Enums.BlockchainStatus
-  blockchainUpdatedAt?: Date | string | null
   sla?: string | null
   AIabusedFlag?: boolean | null
   AIimageVarificationStatus?: boolean | null
   AIstandardizedSubCategory?: string | null
   lastUpdated?: Date | string
   isDuplicate?: boolean | null
-  qualityScore?: number | null
-  qualityBreakdown?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
-  hasSimilarComplaints?: boolean | null
-  similarComplaintIds?: Prisma.ComplaintCreatesimilarComplaintIdsInput | string[]
+  blockchainBlock?: bigint | number | null
+  blockchainHash?: string | null
+  blockchainStatus?: $Enums.BlockchainStatus
+  blockchainUpdatedAt?: Date | string | null
+  ipfsHash?: string | null
+  isOnChain?: boolean
   abuseMetadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  hasSimilarComplaints?: boolean | null
+  qualityBreakdown?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  qualityScore?: number | null
+  similarComplaintIds?: Prisma.ComplaintCreatesimilarComplaintIdsInput | string[]
+  slaBreached?: boolean
+  slaDeadline?: Date | string | null
   auditLogs?: Prisma.AuditLogUncheckedCreateNestedManyWithoutComplaintInput
   chats?: Prisma.ChatUncheckedCreateNestedManyWithoutComplaintInput
   location?: Prisma.ComplaintLocationUncheckedCreateNestedOneWithoutComplaintInput
@@ -1962,23 +2016,25 @@ export type ComplaintCreateWithoutCoAssignedAgentsInput = {
   dateOfResolution?: Date | string | null
   escalationLevel?: string | null
   seq?: number
-  blockchainHash?: string | null
-  blockchainBlock?: bigint | number | null
-  ipfsHash?: string | null
-  isOnChain?: boolean
-  blockchainStatus?: $Enums.BlockchainStatus
-  blockchainUpdatedAt?: Date | string | null
   sla?: string | null
   AIabusedFlag?: boolean | null
   AIimageVarificationStatus?: boolean | null
   AIstandardizedSubCategory?: string | null
   lastUpdated?: Date | string
   isDuplicate?: boolean | null
-  qualityScore?: number | null
-  qualityBreakdown?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
-  hasSimilarComplaints?: boolean | null
-  similarComplaintIds?: Prisma.ComplaintCreatesimilarComplaintIdsInput | string[]
+  blockchainBlock?: bigint | number | null
+  blockchainHash?: string | null
+  blockchainStatus?: $Enums.BlockchainStatus
+  blockchainUpdatedAt?: Date | string | null
+  ipfsHash?: string | null
+  isOnChain?: boolean
   abuseMetadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  hasSimilarComplaints?: boolean | null
+  qualityBreakdown?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  qualityScore?: number | null
+  similarComplaintIds?: Prisma.ComplaintCreatesimilarComplaintIdsInput | string[]
+  slaBreached?: boolean
+  slaDeadline?: Date | string | null
   assignedAgent?: Prisma.AgentCreateNestedOneWithoutAssignedComplaintsInput
   category: Prisma.CategoryCreateNestedOneWithoutComplaintsInput
   User?: Prisma.UserCreateNestedOneWithoutComplaintsInput
@@ -2017,23 +2073,25 @@ export type ComplaintUncheckedCreateWithoutCoAssignedAgentsInput = {
   managedBySuperAdminId?: string | null
   moderatedByMunicipalAdminId?: string | null
   seq?: number
-  blockchainHash?: string | null
-  blockchainBlock?: bigint | number | null
-  ipfsHash?: string | null
-  isOnChain?: boolean
-  blockchainStatus?: $Enums.BlockchainStatus
-  blockchainUpdatedAt?: Date | string | null
   sla?: string | null
   AIabusedFlag?: boolean | null
   AIimageVarificationStatus?: boolean | null
   AIstandardizedSubCategory?: string | null
   lastUpdated?: Date | string
   isDuplicate?: boolean | null
-  qualityScore?: number | null
-  qualityBreakdown?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
-  hasSimilarComplaints?: boolean | null
-  similarComplaintIds?: Prisma.ComplaintCreatesimilarComplaintIdsInput | string[]
+  blockchainBlock?: bigint | number | null
+  blockchainHash?: string | null
+  blockchainStatus?: $Enums.BlockchainStatus
+  blockchainUpdatedAt?: Date | string | null
+  ipfsHash?: string | null
+  isOnChain?: boolean
   abuseMetadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  hasSimilarComplaints?: boolean | null
+  qualityBreakdown?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  qualityScore?: number | null
+  similarComplaintIds?: Prisma.ComplaintCreatesimilarComplaintIdsInput | string[]
+  slaBreached?: boolean
+  slaDeadline?: Date | string | null
   auditLogs?: Prisma.AuditLogUncheckedCreateNestedManyWithoutComplaintInput
   chats?: Prisma.ChatUncheckedCreateNestedManyWithoutComplaintInput
   location?: Prisma.ComplaintLocationUncheckedCreateNestedOneWithoutComplaintInput
@@ -2091,23 +2149,25 @@ export type ComplaintCreateWithoutManagedByMunicipalAdminInput = {
   dateOfResolution?: Date | string | null
   escalationLevel?: string | null
   seq?: number
-  blockchainHash?: string | null
-  blockchainBlock?: bigint | number | null
-  ipfsHash?: string | null
-  isOnChain?: boolean
-  blockchainStatus?: $Enums.BlockchainStatus
-  blockchainUpdatedAt?: Date | string | null
   sla?: string | null
   AIabusedFlag?: boolean | null
   AIimageVarificationStatus?: boolean | null
   AIstandardizedSubCategory?: string | null
   lastUpdated?: Date | string
   isDuplicate?: boolean | null
-  qualityScore?: number | null
-  qualityBreakdown?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
-  hasSimilarComplaints?: boolean | null
-  similarComplaintIds?: Prisma.ComplaintCreatesimilarComplaintIdsInput | string[]
+  blockchainBlock?: bigint | number | null
+  blockchainHash?: string | null
+  blockchainStatus?: $Enums.BlockchainStatus
+  blockchainUpdatedAt?: Date | string | null
+  ipfsHash?: string | null
+  isOnChain?: boolean
   abuseMetadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  hasSimilarComplaints?: boolean | null
+  qualityBreakdown?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  qualityScore?: number | null
+  similarComplaintIds?: Prisma.ComplaintCreatesimilarComplaintIdsInput | string[]
+  slaBreached?: boolean
+  slaDeadline?: Date | string | null
   assignedAgent?: Prisma.AgentCreateNestedOneWithoutAssignedComplaintsInput
   category: Prisma.CategoryCreateNestedOneWithoutComplaintsInput
   User?: Prisma.UserCreateNestedOneWithoutComplaintsInput
@@ -2145,23 +2205,25 @@ export type ComplaintUncheckedCreateWithoutManagedByMunicipalAdminInput = {
   managedBySuperAdminId?: string | null
   moderatedByMunicipalAdminId?: string | null
   seq?: number
-  blockchainHash?: string | null
-  blockchainBlock?: bigint | number | null
-  ipfsHash?: string | null
-  isOnChain?: boolean
-  blockchainStatus?: $Enums.BlockchainStatus
-  blockchainUpdatedAt?: Date | string | null
   sla?: string | null
   AIabusedFlag?: boolean | null
   AIimageVarificationStatus?: boolean | null
   AIstandardizedSubCategory?: string | null
   lastUpdated?: Date | string
   isDuplicate?: boolean | null
-  qualityScore?: number | null
-  qualityBreakdown?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
-  hasSimilarComplaints?: boolean | null
-  similarComplaintIds?: Prisma.ComplaintCreatesimilarComplaintIdsInput | string[]
+  blockchainBlock?: bigint | number | null
+  blockchainHash?: string | null
+  blockchainStatus?: $Enums.BlockchainStatus
+  blockchainUpdatedAt?: Date | string | null
+  ipfsHash?: string | null
+  isOnChain?: boolean
   abuseMetadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  hasSimilarComplaints?: boolean | null
+  qualityBreakdown?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  qualityScore?: number | null
+  similarComplaintIds?: Prisma.ComplaintCreatesimilarComplaintIdsInput | string[]
+  slaBreached?: boolean
+  slaDeadline?: Date | string | null
   auditLogs?: Prisma.AuditLogUncheckedCreateNestedManyWithoutComplaintInput
   chats?: Prisma.ChatUncheckedCreateNestedManyWithoutComplaintInput
   location?: Prisma.ComplaintLocationUncheckedCreateNestedOneWithoutComplaintInput
@@ -2193,23 +2255,25 @@ export type ComplaintCreateWithoutModeratedByMunicipalAdminInput = {
   dateOfResolution?: Date | string | null
   escalationLevel?: string | null
   seq?: number
-  blockchainHash?: string | null
-  blockchainBlock?: bigint | number | null
-  ipfsHash?: string | null
-  isOnChain?: boolean
-  blockchainStatus?: $Enums.BlockchainStatus
-  blockchainUpdatedAt?: Date | string | null
   sla?: string | null
   AIabusedFlag?: boolean | null
   AIimageVarificationStatus?: boolean | null
   AIstandardizedSubCategory?: string | null
   lastUpdated?: Date | string
   isDuplicate?: boolean | null
-  qualityScore?: number | null
-  qualityBreakdown?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
-  hasSimilarComplaints?: boolean | null
-  similarComplaintIds?: Prisma.ComplaintCreatesimilarComplaintIdsInput | string[]
+  blockchainBlock?: bigint | number | null
+  blockchainHash?: string | null
+  blockchainStatus?: $Enums.BlockchainStatus
+  blockchainUpdatedAt?: Date | string | null
+  ipfsHash?: string | null
+  isOnChain?: boolean
   abuseMetadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  hasSimilarComplaints?: boolean | null
+  qualityBreakdown?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  qualityScore?: number | null
+  similarComplaintIds?: Prisma.ComplaintCreatesimilarComplaintIdsInput | string[]
+  slaBreached?: boolean
+  slaDeadline?: Date | string | null
   assignedAgent?: Prisma.AgentCreateNestedOneWithoutAssignedComplaintsInput
   category: Prisma.CategoryCreateNestedOneWithoutComplaintsInput
   User?: Prisma.UserCreateNestedOneWithoutComplaintsInput
@@ -2247,23 +2311,25 @@ export type ComplaintUncheckedCreateWithoutModeratedByMunicipalAdminInput = {
   managedByMunicipalAdminId?: string | null
   managedBySuperAdminId?: string | null
   seq?: number
-  blockchainHash?: string | null
-  blockchainBlock?: bigint | number | null
-  ipfsHash?: string | null
-  isOnChain?: boolean
-  blockchainStatus?: $Enums.BlockchainStatus
-  blockchainUpdatedAt?: Date | string | null
   sla?: string | null
   AIabusedFlag?: boolean | null
   AIimageVarificationStatus?: boolean | null
   AIstandardizedSubCategory?: string | null
   lastUpdated?: Date | string
   isDuplicate?: boolean | null
-  qualityScore?: number | null
-  qualityBreakdown?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
-  hasSimilarComplaints?: boolean | null
-  similarComplaintIds?: Prisma.ComplaintCreatesimilarComplaintIdsInput | string[]
+  blockchainBlock?: bigint | number | null
+  blockchainHash?: string | null
+  blockchainStatus?: $Enums.BlockchainStatus
+  blockchainUpdatedAt?: Date | string | null
+  ipfsHash?: string | null
+  isOnChain?: boolean
   abuseMetadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  hasSimilarComplaints?: boolean | null
+  qualityBreakdown?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  qualityScore?: number | null
+  similarComplaintIds?: Prisma.ComplaintCreatesimilarComplaintIdsInput | string[]
+  slaBreached?: boolean
+  slaDeadline?: Date | string | null
   auditLogs?: Prisma.AuditLogUncheckedCreateNestedManyWithoutComplaintInput
   chats?: Prisma.ChatUncheckedCreateNestedManyWithoutComplaintInput
   location?: Prisma.ComplaintLocationUncheckedCreateNestedOneWithoutComplaintInput
@@ -2327,23 +2393,25 @@ export type ComplaintCreateWithoutCrossDeptIssueSuperMunicipalInput = {
   dateOfResolution?: Date | string | null
   escalationLevel?: string | null
   seq?: number
-  blockchainHash?: string | null
-  blockchainBlock?: bigint | number | null
-  ipfsHash?: string | null
-  isOnChain?: boolean
-  blockchainStatus?: $Enums.BlockchainStatus
-  blockchainUpdatedAt?: Date | string | null
   sla?: string | null
   AIabusedFlag?: boolean | null
   AIimageVarificationStatus?: boolean | null
   AIstandardizedSubCategory?: string | null
   lastUpdated?: Date | string
   isDuplicate?: boolean | null
-  qualityScore?: number | null
-  qualityBreakdown?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
-  hasSimilarComplaints?: boolean | null
-  similarComplaintIds?: Prisma.ComplaintCreatesimilarComplaintIdsInput | string[]
+  blockchainBlock?: bigint | number | null
+  blockchainHash?: string | null
+  blockchainStatus?: $Enums.BlockchainStatus
+  blockchainUpdatedAt?: Date | string | null
+  ipfsHash?: string | null
+  isOnChain?: boolean
   abuseMetadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  hasSimilarComplaints?: boolean | null
+  qualityBreakdown?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  qualityScore?: number | null
+  similarComplaintIds?: Prisma.ComplaintCreatesimilarComplaintIdsInput | string[]
+  slaBreached?: boolean
+  slaDeadline?: Date | string | null
   assignedAgent?: Prisma.AgentCreateNestedOneWithoutAssignedComplaintsInput
   category: Prisma.CategoryCreateNestedOneWithoutComplaintsInput
   User?: Prisma.UserCreateNestedOneWithoutComplaintsInput
@@ -2381,23 +2449,25 @@ export type ComplaintUncheckedCreateWithoutCrossDeptIssueSuperMunicipalInput = {
   managedBySuperAdminId?: string | null
   moderatedByMunicipalAdminId?: string | null
   seq?: number
-  blockchainHash?: string | null
-  blockchainBlock?: bigint | number | null
-  ipfsHash?: string | null
-  isOnChain?: boolean
-  blockchainStatus?: $Enums.BlockchainStatus
-  blockchainUpdatedAt?: Date | string | null
   sla?: string | null
   AIabusedFlag?: boolean | null
   AIimageVarificationStatus?: boolean | null
   AIstandardizedSubCategory?: string | null
   lastUpdated?: Date | string
   isDuplicate?: boolean | null
-  qualityScore?: number | null
-  qualityBreakdown?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
-  hasSimilarComplaints?: boolean | null
-  similarComplaintIds?: Prisma.ComplaintCreatesimilarComplaintIdsInput | string[]
+  blockchainBlock?: bigint | number | null
+  blockchainHash?: string | null
+  blockchainStatus?: $Enums.BlockchainStatus
+  blockchainUpdatedAt?: Date | string | null
+  ipfsHash?: string | null
+  isOnChain?: boolean
   abuseMetadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  hasSimilarComplaints?: boolean | null
+  qualityBreakdown?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  qualityScore?: number | null
+  similarComplaintIds?: Prisma.ComplaintCreatesimilarComplaintIdsInput | string[]
+  slaBreached?: boolean
+  slaDeadline?: Date | string | null
   auditLogs?: Prisma.AuditLogUncheckedCreateNestedManyWithoutComplaintInput
   chats?: Prisma.ChatUncheckedCreateNestedManyWithoutComplaintInput
   location?: Prisma.ComplaintLocationUncheckedCreateNestedOneWithoutComplaintInput
@@ -2445,23 +2515,25 @@ export type ComplaintCreateWithoutEscalatedToStateAdminInput = {
   dateOfResolution?: Date | string | null
   escalationLevel?: string | null
   seq?: number
-  blockchainHash?: string | null
-  blockchainBlock?: bigint | number | null
-  ipfsHash?: string | null
-  isOnChain?: boolean
-  blockchainStatus?: $Enums.BlockchainStatus
-  blockchainUpdatedAt?: Date | string | null
   sla?: string | null
   AIabusedFlag?: boolean | null
   AIimageVarificationStatus?: boolean | null
   AIstandardizedSubCategory?: string | null
   lastUpdated?: Date | string
   isDuplicate?: boolean | null
-  qualityScore?: number | null
-  qualityBreakdown?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
-  hasSimilarComplaints?: boolean | null
-  similarComplaintIds?: Prisma.ComplaintCreatesimilarComplaintIdsInput | string[]
+  blockchainBlock?: bigint | number | null
+  blockchainHash?: string | null
+  blockchainStatus?: $Enums.BlockchainStatus
+  blockchainUpdatedAt?: Date | string | null
+  ipfsHash?: string | null
+  isOnChain?: boolean
   abuseMetadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  hasSimilarComplaints?: boolean | null
+  qualityBreakdown?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  qualityScore?: number | null
+  similarComplaintIds?: Prisma.ComplaintCreatesimilarComplaintIdsInput | string[]
+  slaBreached?: boolean
+  slaDeadline?: Date | string | null
   assignedAgent?: Prisma.AgentCreateNestedOneWithoutAssignedComplaintsInput
   category: Prisma.CategoryCreateNestedOneWithoutComplaintsInput
   User?: Prisma.UserCreateNestedOneWithoutComplaintsInput
@@ -2499,23 +2571,25 @@ export type ComplaintUncheckedCreateWithoutEscalatedToStateAdminInput = {
   managedBySuperAdminId?: string | null
   moderatedByMunicipalAdminId?: string | null
   seq?: number
-  blockchainHash?: string | null
-  blockchainBlock?: bigint | number | null
-  ipfsHash?: string | null
-  isOnChain?: boolean
-  blockchainStatus?: $Enums.BlockchainStatus
-  blockchainUpdatedAt?: Date | string | null
   sla?: string | null
   AIabusedFlag?: boolean | null
   AIimageVarificationStatus?: boolean | null
   AIstandardizedSubCategory?: string | null
   lastUpdated?: Date | string
   isDuplicate?: boolean | null
-  qualityScore?: number | null
-  qualityBreakdown?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
-  hasSimilarComplaints?: boolean | null
-  similarComplaintIds?: Prisma.ComplaintCreatesimilarComplaintIdsInput | string[]
+  blockchainBlock?: bigint | number | null
+  blockchainHash?: string | null
+  blockchainStatus?: $Enums.BlockchainStatus
+  blockchainUpdatedAt?: Date | string | null
+  ipfsHash?: string | null
+  isOnChain?: boolean
   abuseMetadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  hasSimilarComplaints?: boolean | null
+  qualityBreakdown?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  qualityScore?: number | null
+  similarComplaintIds?: Prisma.ComplaintCreatesimilarComplaintIdsInput | string[]
+  slaBreached?: boolean
+  slaDeadline?: Date | string | null
   auditLogs?: Prisma.AuditLogUncheckedCreateNestedManyWithoutComplaintInput
   chats?: Prisma.ChatUncheckedCreateNestedManyWithoutComplaintInput
   location?: Prisma.ComplaintLocationUncheckedCreateNestedOneWithoutComplaintInput
@@ -2563,23 +2637,25 @@ export type ComplaintCreateWithoutEscalatedToSuperStateAdminInput = {
   dateOfResolution?: Date | string | null
   escalationLevel?: string | null
   seq?: number
-  blockchainHash?: string | null
-  blockchainBlock?: bigint | number | null
-  ipfsHash?: string | null
-  isOnChain?: boolean
-  blockchainStatus?: $Enums.BlockchainStatus
-  blockchainUpdatedAt?: Date | string | null
   sla?: string | null
   AIabusedFlag?: boolean | null
   AIimageVarificationStatus?: boolean | null
   AIstandardizedSubCategory?: string | null
   lastUpdated?: Date | string
   isDuplicate?: boolean | null
-  qualityScore?: number | null
-  qualityBreakdown?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
-  hasSimilarComplaints?: boolean | null
-  similarComplaintIds?: Prisma.ComplaintCreatesimilarComplaintIdsInput | string[]
+  blockchainBlock?: bigint | number | null
+  blockchainHash?: string | null
+  blockchainStatus?: $Enums.BlockchainStatus
+  blockchainUpdatedAt?: Date | string | null
+  ipfsHash?: string | null
+  isOnChain?: boolean
   abuseMetadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  hasSimilarComplaints?: boolean | null
+  qualityBreakdown?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  qualityScore?: number | null
+  similarComplaintIds?: Prisma.ComplaintCreatesimilarComplaintIdsInput | string[]
+  slaBreached?: boolean
+  slaDeadline?: Date | string | null
   assignedAgent?: Prisma.AgentCreateNestedOneWithoutAssignedComplaintsInput
   category: Prisma.CategoryCreateNestedOneWithoutComplaintsInput
   User?: Prisma.UserCreateNestedOneWithoutComplaintsInput
@@ -2617,23 +2693,25 @@ export type ComplaintUncheckedCreateWithoutEscalatedToSuperStateAdminInput = {
   managedBySuperAdminId?: string | null
   moderatedByMunicipalAdminId?: string | null
   seq?: number
-  blockchainHash?: string | null
-  blockchainBlock?: bigint | number | null
-  ipfsHash?: string | null
-  isOnChain?: boolean
-  blockchainStatus?: $Enums.BlockchainStatus
-  blockchainUpdatedAt?: Date | string | null
   sla?: string | null
   AIabusedFlag?: boolean | null
   AIimageVarificationStatus?: boolean | null
   AIstandardizedSubCategory?: string | null
   lastUpdated?: Date | string
   isDuplicate?: boolean | null
-  qualityScore?: number | null
-  qualityBreakdown?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
-  hasSimilarComplaints?: boolean | null
-  similarComplaintIds?: Prisma.ComplaintCreatesimilarComplaintIdsInput | string[]
+  blockchainBlock?: bigint | number | null
+  blockchainHash?: string | null
+  blockchainStatus?: $Enums.BlockchainStatus
+  blockchainUpdatedAt?: Date | string | null
+  ipfsHash?: string | null
+  isOnChain?: boolean
   abuseMetadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  hasSimilarComplaints?: boolean | null
+  qualityBreakdown?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  qualityScore?: number | null
+  similarComplaintIds?: Prisma.ComplaintCreatesimilarComplaintIdsInput | string[]
+  slaBreached?: boolean
+  slaDeadline?: Date | string | null
   auditLogs?: Prisma.AuditLogUncheckedCreateNestedManyWithoutComplaintInput
   chats?: Prisma.ChatUncheckedCreateNestedManyWithoutComplaintInput
   location?: Prisma.ComplaintLocationUncheckedCreateNestedOneWithoutComplaintInput
@@ -2681,23 +2759,25 @@ export type ComplaintCreateWithoutManagedBySuperAdminInput = {
   dateOfResolution?: Date | string | null
   escalationLevel?: string | null
   seq?: number
-  blockchainHash?: string | null
-  blockchainBlock?: bigint | number | null
-  ipfsHash?: string | null
-  isOnChain?: boolean
-  blockchainStatus?: $Enums.BlockchainStatus
-  blockchainUpdatedAt?: Date | string | null
   sla?: string | null
   AIabusedFlag?: boolean | null
   AIimageVarificationStatus?: boolean | null
   AIstandardizedSubCategory?: string | null
   lastUpdated?: Date | string
   isDuplicate?: boolean | null
-  qualityScore?: number | null
-  qualityBreakdown?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
-  hasSimilarComplaints?: boolean | null
-  similarComplaintIds?: Prisma.ComplaintCreatesimilarComplaintIdsInput | string[]
+  blockchainBlock?: bigint | number | null
+  blockchainHash?: string | null
+  blockchainStatus?: $Enums.BlockchainStatus
+  blockchainUpdatedAt?: Date | string | null
+  ipfsHash?: string | null
+  isOnChain?: boolean
   abuseMetadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  hasSimilarComplaints?: boolean | null
+  qualityBreakdown?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  qualityScore?: number | null
+  similarComplaintIds?: Prisma.ComplaintCreatesimilarComplaintIdsInput | string[]
+  slaBreached?: boolean
+  slaDeadline?: Date | string | null
   assignedAgent?: Prisma.AgentCreateNestedOneWithoutAssignedComplaintsInput
   category: Prisma.CategoryCreateNestedOneWithoutComplaintsInput
   User?: Prisma.UserCreateNestedOneWithoutComplaintsInput
@@ -2735,23 +2815,25 @@ export type ComplaintUncheckedCreateWithoutManagedBySuperAdminInput = {
   managedByMunicipalAdminId?: string | null
   moderatedByMunicipalAdminId?: string | null
   seq?: number
-  blockchainHash?: string | null
-  blockchainBlock?: bigint | number | null
-  ipfsHash?: string | null
-  isOnChain?: boolean
-  blockchainStatus?: $Enums.BlockchainStatus
-  blockchainUpdatedAt?: Date | string | null
   sla?: string | null
   AIabusedFlag?: boolean | null
   AIimageVarificationStatus?: boolean | null
   AIstandardizedSubCategory?: string | null
   lastUpdated?: Date | string
   isDuplicate?: boolean | null
-  qualityScore?: number | null
-  qualityBreakdown?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
-  hasSimilarComplaints?: boolean | null
-  similarComplaintIds?: Prisma.ComplaintCreatesimilarComplaintIdsInput | string[]
+  blockchainBlock?: bigint | number | null
+  blockchainHash?: string | null
+  blockchainStatus?: $Enums.BlockchainStatus
+  blockchainUpdatedAt?: Date | string | null
+  ipfsHash?: string | null
+  isOnChain?: boolean
   abuseMetadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  hasSimilarComplaints?: boolean | null
+  qualityBreakdown?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  qualityScore?: number | null
+  similarComplaintIds?: Prisma.ComplaintCreatesimilarComplaintIdsInput | string[]
+  slaBreached?: boolean
+  slaDeadline?: Date | string | null
   auditLogs?: Prisma.AuditLogUncheckedCreateNestedManyWithoutComplaintInput
   chats?: Prisma.ChatUncheckedCreateNestedManyWithoutComplaintInput
   location?: Prisma.ComplaintLocationUncheckedCreateNestedOneWithoutComplaintInput
@@ -2799,23 +2881,25 @@ export type ComplaintCreateWithoutCategoryInput = {
   dateOfResolution?: Date | string | null
   escalationLevel?: string | null
   seq?: number
-  blockchainHash?: string | null
-  blockchainBlock?: bigint | number | null
-  ipfsHash?: string | null
-  isOnChain?: boolean
-  blockchainStatus?: $Enums.BlockchainStatus
-  blockchainUpdatedAt?: Date | string | null
   sla?: string | null
   AIabusedFlag?: boolean | null
   AIimageVarificationStatus?: boolean | null
   AIstandardizedSubCategory?: string | null
   lastUpdated?: Date | string
   isDuplicate?: boolean | null
-  qualityScore?: number | null
-  qualityBreakdown?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
-  hasSimilarComplaints?: boolean | null
-  similarComplaintIds?: Prisma.ComplaintCreatesimilarComplaintIdsInput | string[]
+  blockchainBlock?: bigint | number | null
+  blockchainHash?: string | null
+  blockchainStatus?: $Enums.BlockchainStatus
+  blockchainUpdatedAt?: Date | string | null
+  ipfsHash?: string | null
+  isOnChain?: boolean
   abuseMetadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  hasSimilarComplaints?: boolean | null
+  qualityBreakdown?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  qualityScore?: number | null
+  similarComplaintIds?: Prisma.ComplaintCreatesimilarComplaintIdsInput | string[]
+  slaBreached?: boolean
+  slaDeadline?: Date | string | null
   assignedAgent?: Prisma.AgentCreateNestedOneWithoutAssignedComplaintsInput
   User?: Prisma.UserCreateNestedOneWithoutComplaintsInput
   crossDeptIssueSuperMunicipal?: Prisma.SuperMunicipalAdminCreateNestedOneWithoutCrossDepartmentIssuesInput
@@ -2853,23 +2937,25 @@ export type ComplaintUncheckedCreateWithoutCategoryInput = {
   managedBySuperAdminId?: string | null
   moderatedByMunicipalAdminId?: string | null
   seq?: number
-  blockchainHash?: string | null
-  blockchainBlock?: bigint | number | null
-  ipfsHash?: string | null
-  isOnChain?: boolean
-  blockchainStatus?: $Enums.BlockchainStatus
-  blockchainUpdatedAt?: Date | string | null
   sla?: string | null
   AIabusedFlag?: boolean | null
   AIimageVarificationStatus?: boolean | null
   AIstandardizedSubCategory?: string | null
   lastUpdated?: Date | string
   isDuplicate?: boolean | null
-  qualityScore?: number | null
-  qualityBreakdown?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
-  hasSimilarComplaints?: boolean | null
-  similarComplaintIds?: Prisma.ComplaintCreatesimilarComplaintIdsInput | string[]
+  blockchainBlock?: bigint | number | null
+  blockchainHash?: string | null
+  blockchainStatus?: $Enums.BlockchainStatus
+  blockchainUpdatedAt?: Date | string | null
+  ipfsHash?: string | null
+  isOnChain?: boolean
   abuseMetadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  hasSimilarComplaints?: boolean | null
+  qualityBreakdown?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  qualityScore?: number | null
+  similarComplaintIds?: Prisma.ComplaintCreatesimilarComplaintIdsInput | string[]
+  slaBreached?: boolean
+  slaDeadline?: Date | string | null
   auditLogs?: Prisma.AuditLogUncheckedCreateNestedManyWithoutComplaintInput
   chats?: Prisma.ChatUncheckedCreateNestedManyWithoutComplaintInput
   location?: Prisma.ComplaintLocationUncheckedCreateNestedOneWithoutComplaintInput
@@ -2917,23 +3003,25 @@ export type ComplaintCreateWithoutLocationInput = {
   dateOfResolution?: Date | string | null
   escalationLevel?: string | null
   seq?: number
-  blockchainHash?: string | null
-  blockchainBlock?: bigint | number | null
-  ipfsHash?: string | null
-  isOnChain?: boolean
-  blockchainStatus?: $Enums.BlockchainStatus
-  blockchainUpdatedAt?: Date | string | null
   sla?: string | null
   AIabusedFlag?: boolean | null
   AIimageVarificationStatus?: boolean | null
   AIstandardizedSubCategory?: string | null
   lastUpdated?: Date | string
   isDuplicate?: boolean | null
-  qualityScore?: number | null
-  qualityBreakdown?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
-  hasSimilarComplaints?: boolean | null
-  similarComplaintIds?: Prisma.ComplaintCreatesimilarComplaintIdsInput | string[]
+  blockchainBlock?: bigint | number | null
+  blockchainHash?: string | null
+  blockchainStatus?: $Enums.BlockchainStatus
+  blockchainUpdatedAt?: Date | string | null
+  ipfsHash?: string | null
+  isOnChain?: boolean
   abuseMetadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  hasSimilarComplaints?: boolean | null
+  qualityBreakdown?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  qualityScore?: number | null
+  similarComplaintIds?: Prisma.ComplaintCreatesimilarComplaintIdsInput | string[]
+  slaBreached?: boolean
+  slaDeadline?: Date | string | null
   assignedAgent?: Prisma.AgentCreateNestedOneWithoutAssignedComplaintsInput
   category: Prisma.CategoryCreateNestedOneWithoutComplaintsInput
   User?: Prisma.UserCreateNestedOneWithoutComplaintsInput
@@ -2972,23 +3060,25 @@ export type ComplaintUncheckedCreateWithoutLocationInput = {
   managedBySuperAdminId?: string | null
   moderatedByMunicipalAdminId?: string | null
   seq?: number
-  blockchainHash?: string | null
-  blockchainBlock?: bigint | number | null
-  ipfsHash?: string | null
-  isOnChain?: boolean
-  blockchainStatus?: $Enums.BlockchainStatus
-  blockchainUpdatedAt?: Date | string | null
   sla?: string | null
   AIabusedFlag?: boolean | null
   AIimageVarificationStatus?: boolean | null
   AIstandardizedSubCategory?: string | null
   lastUpdated?: Date | string
   isDuplicate?: boolean | null
-  qualityScore?: number | null
-  qualityBreakdown?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
-  hasSimilarComplaints?: boolean | null
-  similarComplaintIds?: Prisma.ComplaintCreatesimilarComplaintIdsInput | string[]
+  blockchainBlock?: bigint | number | null
+  blockchainHash?: string | null
+  blockchainStatus?: $Enums.BlockchainStatus
+  blockchainUpdatedAt?: Date | string | null
+  ipfsHash?: string | null
+  isOnChain?: boolean
   abuseMetadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  hasSimilarComplaints?: boolean | null
+  qualityBreakdown?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  qualityScore?: number | null
+  similarComplaintIds?: Prisma.ComplaintCreatesimilarComplaintIdsInput | string[]
+  slaBreached?: boolean
+  slaDeadline?: Date | string | null
   auditLogs?: Prisma.AuditLogUncheckedCreateNestedManyWithoutComplaintInput
   chats?: Prisma.ChatUncheckedCreateNestedManyWithoutComplaintInput
   upvotes?: Prisma.UpvoteUncheckedCreateNestedManyWithoutComplaintInput
@@ -3024,23 +3114,25 @@ export type ComplaintUpdateWithoutLocationInput = {
   assignedDepartment?: Prisma.StringFieldUpdateOperationsInput | string
   dateOfResolution?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   escalationLevel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  blockchainHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  blockchainBlock?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
-  ipfsHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  isOnChain?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  blockchainStatus?: Prisma.EnumBlockchainStatusFieldUpdateOperationsInput | $Enums.BlockchainStatus
-  blockchainUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   sla?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   AIabusedFlag?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   AIimageVarificationStatus?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   AIstandardizedSubCategory?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   lastUpdated?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   isDuplicate?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
-  qualityScore?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  qualityBreakdown?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
-  hasSimilarComplaints?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
-  similarComplaintIds?: Prisma.ComplaintUpdatesimilarComplaintIdsInput | string[]
+  blockchainBlock?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
+  blockchainHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  blockchainStatus?: Prisma.EnumBlockchainStatusFieldUpdateOperationsInput | $Enums.BlockchainStatus
+  blockchainUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  ipfsHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isOnChain?: Prisma.BoolFieldUpdateOperationsInput | boolean
   abuseMetadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  hasSimilarComplaints?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  qualityBreakdown?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  qualityScore?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  similarComplaintIds?: Prisma.ComplaintUpdatesimilarComplaintIdsInput | string[]
+  slaBreached?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  slaDeadline?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   assignedAgent?: Prisma.AgentUpdateOneWithoutAssignedComplaintsNestedInput
   category?: Prisma.CategoryUpdateOneRequiredWithoutComplaintsNestedInput
   User?: Prisma.UserUpdateOneWithoutComplaintsNestedInput
@@ -3079,23 +3171,25 @@ export type ComplaintUncheckedUpdateWithoutLocationInput = {
   managedBySuperAdminId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   moderatedByMunicipalAdminId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   seq?: Prisma.IntFieldUpdateOperationsInput | number
-  blockchainHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  blockchainBlock?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
-  ipfsHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  isOnChain?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  blockchainStatus?: Prisma.EnumBlockchainStatusFieldUpdateOperationsInput | $Enums.BlockchainStatus
-  blockchainUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   sla?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   AIabusedFlag?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   AIimageVarificationStatus?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   AIstandardizedSubCategory?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   lastUpdated?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   isDuplicate?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
-  qualityScore?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  qualityBreakdown?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
-  hasSimilarComplaints?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
-  similarComplaintIds?: Prisma.ComplaintUpdatesimilarComplaintIdsInput | string[]
+  blockchainBlock?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
+  blockchainHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  blockchainStatus?: Prisma.EnumBlockchainStatusFieldUpdateOperationsInput | $Enums.BlockchainStatus
+  blockchainUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  ipfsHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isOnChain?: Prisma.BoolFieldUpdateOperationsInput | boolean
   abuseMetadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  hasSimilarComplaints?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  qualityBreakdown?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  qualityScore?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  similarComplaintIds?: Prisma.ComplaintUpdatesimilarComplaintIdsInput | string[]
+  slaBreached?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  slaDeadline?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   auditLogs?: Prisma.AuditLogUncheckedUpdateManyWithoutComplaintNestedInput
   chats?: Prisma.ChatUncheckedUpdateManyWithoutComplaintNestedInput
   upvotes?: Prisma.UpvoteUncheckedUpdateManyWithoutComplaintNestedInput
@@ -3116,23 +3210,25 @@ export type ComplaintCreateWithoutUpvotesInput = {
   dateOfResolution?: Date | string | null
   escalationLevel?: string | null
   seq?: number
-  blockchainHash?: string | null
-  blockchainBlock?: bigint | number | null
-  ipfsHash?: string | null
-  isOnChain?: boolean
-  blockchainStatus?: $Enums.BlockchainStatus
-  blockchainUpdatedAt?: Date | string | null
   sla?: string | null
   AIabusedFlag?: boolean | null
   AIimageVarificationStatus?: boolean | null
   AIstandardizedSubCategory?: string | null
   lastUpdated?: Date | string
   isDuplicate?: boolean | null
-  qualityScore?: number | null
-  qualityBreakdown?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
-  hasSimilarComplaints?: boolean | null
-  similarComplaintIds?: Prisma.ComplaintCreatesimilarComplaintIdsInput | string[]
+  blockchainBlock?: bigint | number | null
+  blockchainHash?: string | null
+  blockchainStatus?: $Enums.BlockchainStatus
+  blockchainUpdatedAt?: Date | string | null
+  ipfsHash?: string | null
+  isOnChain?: boolean
   abuseMetadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  hasSimilarComplaints?: boolean | null
+  qualityBreakdown?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  qualityScore?: number | null
+  similarComplaintIds?: Prisma.ComplaintCreatesimilarComplaintIdsInput | string[]
+  slaBreached?: boolean
+  slaDeadline?: Date | string | null
   assignedAgent?: Prisma.AgentCreateNestedOneWithoutAssignedComplaintsInput
   category: Prisma.CategoryCreateNestedOneWithoutComplaintsInput
   User?: Prisma.UserCreateNestedOneWithoutComplaintsInput
@@ -3171,23 +3267,25 @@ export type ComplaintUncheckedCreateWithoutUpvotesInput = {
   managedBySuperAdminId?: string | null
   moderatedByMunicipalAdminId?: string | null
   seq?: number
-  blockchainHash?: string | null
-  blockchainBlock?: bigint | number | null
-  ipfsHash?: string | null
-  isOnChain?: boolean
-  blockchainStatus?: $Enums.BlockchainStatus
-  blockchainUpdatedAt?: Date | string | null
   sla?: string | null
   AIabusedFlag?: boolean | null
   AIimageVarificationStatus?: boolean | null
   AIstandardizedSubCategory?: string | null
   lastUpdated?: Date | string
   isDuplicate?: boolean | null
-  qualityScore?: number | null
-  qualityBreakdown?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
-  hasSimilarComplaints?: boolean | null
-  similarComplaintIds?: Prisma.ComplaintCreatesimilarComplaintIdsInput | string[]
+  blockchainBlock?: bigint | number | null
+  blockchainHash?: string | null
+  blockchainStatus?: $Enums.BlockchainStatus
+  blockchainUpdatedAt?: Date | string | null
+  ipfsHash?: string | null
+  isOnChain?: boolean
   abuseMetadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  hasSimilarComplaints?: boolean | null
+  qualityBreakdown?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  qualityScore?: number | null
+  similarComplaintIds?: Prisma.ComplaintCreatesimilarComplaintIdsInput | string[]
+  slaBreached?: boolean
+  slaDeadline?: Date | string | null
   auditLogs?: Prisma.AuditLogUncheckedCreateNestedManyWithoutComplaintInput
   chats?: Prisma.ChatUncheckedCreateNestedManyWithoutComplaintInput
   location?: Prisma.ComplaintLocationUncheckedCreateNestedOneWithoutComplaintInput
@@ -3223,23 +3321,25 @@ export type ComplaintUpdateWithoutUpvotesInput = {
   assignedDepartment?: Prisma.StringFieldUpdateOperationsInput | string
   dateOfResolution?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   escalationLevel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  blockchainHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  blockchainBlock?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
-  ipfsHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  isOnChain?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  blockchainStatus?: Prisma.EnumBlockchainStatusFieldUpdateOperationsInput | $Enums.BlockchainStatus
-  blockchainUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   sla?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   AIabusedFlag?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   AIimageVarificationStatus?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   AIstandardizedSubCategory?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   lastUpdated?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   isDuplicate?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
-  qualityScore?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  qualityBreakdown?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
-  hasSimilarComplaints?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
-  similarComplaintIds?: Prisma.ComplaintUpdatesimilarComplaintIdsInput | string[]
+  blockchainBlock?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
+  blockchainHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  blockchainStatus?: Prisma.EnumBlockchainStatusFieldUpdateOperationsInput | $Enums.BlockchainStatus
+  blockchainUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  ipfsHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isOnChain?: Prisma.BoolFieldUpdateOperationsInput | boolean
   abuseMetadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  hasSimilarComplaints?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  qualityBreakdown?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  qualityScore?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  similarComplaintIds?: Prisma.ComplaintUpdatesimilarComplaintIdsInput | string[]
+  slaBreached?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  slaDeadline?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   assignedAgent?: Prisma.AgentUpdateOneWithoutAssignedComplaintsNestedInput
   category?: Prisma.CategoryUpdateOneRequiredWithoutComplaintsNestedInput
   User?: Prisma.UserUpdateOneWithoutComplaintsNestedInput
@@ -3278,23 +3378,25 @@ export type ComplaintUncheckedUpdateWithoutUpvotesInput = {
   managedBySuperAdminId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   moderatedByMunicipalAdminId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   seq?: Prisma.IntFieldUpdateOperationsInput | number
-  blockchainHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  blockchainBlock?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
-  ipfsHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  isOnChain?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  blockchainStatus?: Prisma.EnumBlockchainStatusFieldUpdateOperationsInput | $Enums.BlockchainStatus
-  blockchainUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   sla?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   AIabusedFlag?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   AIimageVarificationStatus?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   AIstandardizedSubCategory?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   lastUpdated?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   isDuplicate?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
-  qualityScore?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  qualityBreakdown?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
-  hasSimilarComplaints?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
-  similarComplaintIds?: Prisma.ComplaintUpdatesimilarComplaintIdsInput | string[]
+  blockchainBlock?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
+  blockchainHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  blockchainStatus?: Prisma.EnumBlockchainStatusFieldUpdateOperationsInput | $Enums.BlockchainStatus
+  blockchainUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  ipfsHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isOnChain?: Prisma.BoolFieldUpdateOperationsInput | boolean
   abuseMetadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  hasSimilarComplaints?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  qualityBreakdown?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  qualityScore?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  similarComplaintIds?: Prisma.ComplaintUpdatesimilarComplaintIdsInput | string[]
+  slaBreached?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  slaDeadline?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   auditLogs?: Prisma.AuditLogUncheckedUpdateManyWithoutComplaintNestedInput
   chats?: Prisma.ChatUncheckedUpdateManyWithoutComplaintNestedInput
   location?: Prisma.ComplaintLocationUncheckedUpdateOneWithoutComplaintNestedInput
@@ -3315,23 +3417,25 @@ export type ComplaintCreateWithoutAuditLogsInput = {
   dateOfResolution?: Date | string | null
   escalationLevel?: string | null
   seq?: number
-  blockchainHash?: string | null
-  blockchainBlock?: bigint | number | null
-  ipfsHash?: string | null
-  isOnChain?: boolean
-  blockchainStatus?: $Enums.BlockchainStatus
-  blockchainUpdatedAt?: Date | string | null
   sla?: string | null
   AIabusedFlag?: boolean | null
   AIimageVarificationStatus?: boolean | null
   AIstandardizedSubCategory?: string | null
   lastUpdated?: Date | string
   isDuplicate?: boolean | null
-  qualityScore?: number | null
-  qualityBreakdown?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
-  hasSimilarComplaints?: boolean | null
-  similarComplaintIds?: Prisma.ComplaintCreatesimilarComplaintIdsInput | string[]
+  blockchainBlock?: bigint | number | null
+  blockchainHash?: string | null
+  blockchainStatus?: $Enums.BlockchainStatus
+  blockchainUpdatedAt?: Date | string | null
+  ipfsHash?: string | null
+  isOnChain?: boolean
   abuseMetadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  hasSimilarComplaints?: boolean | null
+  qualityBreakdown?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  qualityScore?: number | null
+  similarComplaintIds?: Prisma.ComplaintCreatesimilarComplaintIdsInput | string[]
+  slaBreached?: boolean
+  slaDeadline?: Date | string | null
   assignedAgent?: Prisma.AgentCreateNestedOneWithoutAssignedComplaintsInput
   category: Prisma.CategoryCreateNestedOneWithoutComplaintsInput
   User?: Prisma.UserCreateNestedOneWithoutComplaintsInput
@@ -3370,23 +3474,25 @@ export type ComplaintUncheckedCreateWithoutAuditLogsInput = {
   managedBySuperAdminId?: string | null
   moderatedByMunicipalAdminId?: string | null
   seq?: number
-  blockchainHash?: string | null
-  blockchainBlock?: bigint | number | null
-  ipfsHash?: string | null
-  isOnChain?: boolean
-  blockchainStatus?: $Enums.BlockchainStatus
-  blockchainUpdatedAt?: Date | string | null
   sla?: string | null
   AIabusedFlag?: boolean | null
   AIimageVarificationStatus?: boolean | null
   AIstandardizedSubCategory?: string | null
   lastUpdated?: Date | string
   isDuplicate?: boolean | null
-  qualityScore?: number | null
-  qualityBreakdown?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
-  hasSimilarComplaints?: boolean | null
-  similarComplaintIds?: Prisma.ComplaintCreatesimilarComplaintIdsInput | string[]
+  blockchainBlock?: bigint | number | null
+  blockchainHash?: string | null
+  blockchainStatus?: $Enums.BlockchainStatus
+  blockchainUpdatedAt?: Date | string | null
+  ipfsHash?: string | null
+  isOnChain?: boolean
   abuseMetadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  hasSimilarComplaints?: boolean | null
+  qualityBreakdown?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  qualityScore?: number | null
+  similarComplaintIds?: Prisma.ComplaintCreatesimilarComplaintIdsInput | string[]
+  slaBreached?: boolean
+  slaDeadline?: Date | string | null
   chats?: Prisma.ChatUncheckedCreateNestedManyWithoutComplaintInput
   location?: Prisma.ComplaintLocationUncheckedCreateNestedOneWithoutComplaintInput
   upvotes?: Prisma.UpvoteUncheckedCreateNestedManyWithoutComplaintInput
@@ -3422,23 +3528,25 @@ export type ComplaintUpdateWithoutAuditLogsInput = {
   assignedDepartment?: Prisma.StringFieldUpdateOperationsInput | string
   dateOfResolution?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   escalationLevel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  blockchainHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  blockchainBlock?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
-  ipfsHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  isOnChain?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  blockchainStatus?: Prisma.EnumBlockchainStatusFieldUpdateOperationsInput | $Enums.BlockchainStatus
-  blockchainUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   sla?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   AIabusedFlag?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   AIimageVarificationStatus?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   AIstandardizedSubCategory?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   lastUpdated?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   isDuplicate?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
-  qualityScore?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  qualityBreakdown?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
-  hasSimilarComplaints?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
-  similarComplaintIds?: Prisma.ComplaintUpdatesimilarComplaintIdsInput | string[]
+  blockchainBlock?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
+  blockchainHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  blockchainStatus?: Prisma.EnumBlockchainStatusFieldUpdateOperationsInput | $Enums.BlockchainStatus
+  blockchainUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  ipfsHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isOnChain?: Prisma.BoolFieldUpdateOperationsInput | boolean
   abuseMetadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  hasSimilarComplaints?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  qualityBreakdown?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  qualityScore?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  similarComplaintIds?: Prisma.ComplaintUpdatesimilarComplaintIdsInput | string[]
+  slaBreached?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  slaDeadline?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   assignedAgent?: Prisma.AgentUpdateOneWithoutAssignedComplaintsNestedInput
   category?: Prisma.CategoryUpdateOneRequiredWithoutComplaintsNestedInput
   User?: Prisma.UserUpdateOneWithoutComplaintsNestedInput
@@ -3477,23 +3585,25 @@ export type ComplaintUncheckedUpdateWithoutAuditLogsInput = {
   managedBySuperAdminId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   moderatedByMunicipalAdminId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   seq?: Prisma.IntFieldUpdateOperationsInput | number
-  blockchainHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  blockchainBlock?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
-  ipfsHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  isOnChain?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  blockchainStatus?: Prisma.EnumBlockchainStatusFieldUpdateOperationsInput | $Enums.BlockchainStatus
-  blockchainUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   sla?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   AIabusedFlag?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   AIimageVarificationStatus?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   AIstandardizedSubCategory?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   lastUpdated?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   isDuplicate?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
-  qualityScore?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  qualityBreakdown?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
-  hasSimilarComplaints?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
-  similarComplaintIds?: Prisma.ComplaintUpdatesimilarComplaintIdsInput | string[]
+  blockchainBlock?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
+  blockchainHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  blockchainStatus?: Prisma.EnumBlockchainStatusFieldUpdateOperationsInput | $Enums.BlockchainStatus
+  blockchainUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  ipfsHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isOnChain?: Prisma.BoolFieldUpdateOperationsInput | boolean
   abuseMetadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  hasSimilarComplaints?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  qualityBreakdown?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  qualityScore?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  similarComplaintIds?: Prisma.ComplaintUpdatesimilarComplaintIdsInput | string[]
+  slaBreached?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  slaDeadline?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   chats?: Prisma.ChatUncheckedUpdateManyWithoutComplaintNestedInput
   location?: Prisma.ComplaintLocationUncheckedUpdateOneWithoutComplaintNestedInput
   upvotes?: Prisma.UpvoteUncheckedUpdateManyWithoutComplaintNestedInput
@@ -3514,23 +3624,25 @@ export type ComplaintCreateWithoutChatsInput = {
   dateOfResolution?: Date | string | null
   escalationLevel?: string | null
   seq?: number
-  blockchainHash?: string | null
-  blockchainBlock?: bigint | number | null
-  ipfsHash?: string | null
-  isOnChain?: boolean
-  blockchainStatus?: $Enums.BlockchainStatus
-  blockchainUpdatedAt?: Date | string | null
   sla?: string | null
   AIabusedFlag?: boolean | null
   AIimageVarificationStatus?: boolean | null
   AIstandardizedSubCategory?: string | null
   lastUpdated?: Date | string
   isDuplicate?: boolean | null
-  qualityScore?: number | null
-  qualityBreakdown?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
-  hasSimilarComplaints?: boolean | null
-  similarComplaintIds?: Prisma.ComplaintCreatesimilarComplaintIdsInput | string[]
+  blockchainBlock?: bigint | number | null
+  blockchainHash?: string | null
+  blockchainStatus?: $Enums.BlockchainStatus
+  blockchainUpdatedAt?: Date | string | null
+  ipfsHash?: string | null
+  isOnChain?: boolean
   abuseMetadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  hasSimilarComplaints?: boolean | null
+  qualityBreakdown?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  qualityScore?: number | null
+  similarComplaintIds?: Prisma.ComplaintCreatesimilarComplaintIdsInput | string[]
+  slaBreached?: boolean
+  slaDeadline?: Date | string | null
   assignedAgent?: Prisma.AgentCreateNestedOneWithoutAssignedComplaintsInput
   category: Prisma.CategoryCreateNestedOneWithoutComplaintsInput
   User?: Prisma.UserCreateNestedOneWithoutComplaintsInput
@@ -3569,23 +3681,25 @@ export type ComplaintUncheckedCreateWithoutChatsInput = {
   managedBySuperAdminId?: string | null
   moderatedByMunicipalAdminId?: string | null
   seq?: number
-  blockchainHash?: string | null
-  blockchainBlock?: bigint | number | null
-  ipfsHash?: string | null
-  isOnChain?: boolean
-  blockchainStatus?: $Enums.BlockchainStatus
-  blockchainUpdatedAt?: Date | string | null
   sla?: string | null
   AIabusedFlag?: boolean | null
   AIimageVarificationStatus?: boolean | null
   AIstandardizedSubCategory?: string | null
   lastUpdated?: Date | string
   isDuplicate?: boolean | null
-  qualityScore?: number | null
-  qualityBreakdown?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
-  hasSimilarComplaints?: boolean | null
-  similarComplaintIds?: Prisma.ComplaintCreatesimilarComplaintIdsInput | string[]
+  blockchainBlock?: bigint | number | null
+  blockchainHash?: string | null
+  blockchainStatus?: $Enums.BlockchainStatus
+  blockchainUpdatedAt?: Date | string | null
+  ipfsHash?: string | null
+  isOnChain?: boolean
   abuseMetadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  hasSimilarComplaints?: boolean | null
+  qualityBreakdown?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  qualityScore?: number | null
+  similarComplaintIds?: Prisma.ComplaintCreatesimilarComplaintIdsInput | string[]
+  slaBreached?: boolean
+  slaDeadline?: Date | string | null
   auditLogs?: Prisma.AuditLogUncheckedCreateNestedManyWithoutComplaintInput
   location?: Prisma.ComplaintLocationUncheckedCreateNestedOneWithoutComplaintInput
   upvotes?: Prisma.UpvoteUncheckedCreateNestedManyWithoutComplaintInput
@@ -3621,23 +3735,25 @@ export type ComplaintUpdateWithoutChatsInput = {
   assignedDepartment?: Prisma.StringFieldUpdateOperationsInput | string
   dateOfResolution?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   escalationLevel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  blockchainHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  blockchainBlock?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
-  ipfsHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  isOnChain?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  blockchainStatus?: Prisma.EnumBlockchainStatusFieldUpdateOperationsInput | $Enums.BlockchainStatus
-  blockchainUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   sla?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   AIabusedFlag?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   AIimageVarificationStatus?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   AIstandardizedSubCategory?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   lastUpdated?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   isDuplicate?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
-  qualityScore?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  qualityBreakdown?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
-  hasSimilarComplaints?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
-  similarComplaintIds?: Prisma.ComplaintUpdatesimilarComplaintIdsInput | string[]
+  blockchainBlock?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
+  blockchainHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  blockchainStatus?: Prisma.EnumBlockchainStatusFieldUpdateOperationsInput | $Enums.BlockchainStatus
+  blockchainUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  ipfsHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isOnChain?: Prisma.BoolFieldUpdateOperationsInput | boolean
   abuseMetadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  hasSimilarComplaints?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  qualityBreakdown?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  qualityScore?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  similarComplaintIds?: Prisma.ComplaintUpdatesimilarComplaintIdsInput | string[]
+  slaBreached?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  slaDeadline?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   assignedAgent?: Prisma.AgentUpdateOneWithoutAssignedComplaintsNestedInput
   category?: Prisma.CategoryUpdateOneRequiredWithoutComplaintsNestedInput
   User?: Prisma.UserUpdateOneWithoutComplaintsNestedInput
@@ -3676,23 +3792,25 @@ export type ComplaintUncheckedUpdateWithoutChatsInput = {
   managedBySuperAdminId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   moderatedByMunicipalAdminId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   seq?: Prisma.IntFieldUpdateOperationsInput | number
-  blockchainHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  blockchainBlock?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
-  ipfsHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  isOnChain?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  blockchainStatus?: Prisma.EnumBlockchainStatusFieldUpdateOperationsInput | $Enums.BlockchainStatus
-  blockchainUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   sla?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   AIabusedFlag?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   AIimageVarificationStatus?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   AIstandardizedSubCategory?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   lastUpdated?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   isDuplicate?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
-  qualityScore?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  qualityBreakdown?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
-  hasSimilarComplaints?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
-  similarComplaintIds?: Prisma.ComplaintUpdatesimilarComplaintIdsInput | string[]
+  blockchainBlock?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
+  blockchainHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  blockchainStatus?: Prisma.EnumBlockchainStatusFieldUpdateOperationsInput | $Enums.BlockchainStatus
+  blockchainUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  ipfsHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isOnChain?: Prisma.BoolFieldUpdateOperationsInput | boolean
   abuseMetadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  hasSimilarComplaints?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  qualityBreakdown?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  qualityScore?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  similarComplaintIds?: Prisma.ComplaintUpdatesimilarComplaintIdsInput | string[]
+  slaBreached?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  slaDeadline?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   auditLogs?: Prisma.AuditLogUncheckedUpdateManyWithoutComplaintNestedInput
   location?: Prisma.ComplaintLocationUncheckedUpdateOneWithoutComplaintNestedInput
   upvotes?: Prisma.UpvoteUncheckedUpdateManyWithoutComplaintNestedInput
@@ -3721,23 +3839,25 @@ export type ComplaintCreateManyUserInput = {
   managedBySuperAdminId?: string | null
   moderatedByMunicipalAdminId?: string | null
   seq?: number
-  blockchainHash?: string | null
-  blockchainBlock?: bigint | number | null
-  ipfsHash?: string | null
-  isOnChain?: boolean
-  blockchainStatus?: $Enums.BlockchainStatus
-  blockchainUpdatedAt?: Date | string | null
   sla?: string | null
   AIabusedFlag?: boolean | null
   AIimageVarificationStatus?: boolean | null
   AIstandardizedSubCategory?: string | null
   lastUpdated?: Date | string
   isDuplicate?: boolean | null
-  qualityScore?: number | null
-  qualityBreakdown?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
-  hasSimilarComplaints?: boolean | null
-  similarComplaintIds?: Prisma.ComplaintCreatesimilarComplaintIdsInput | string[]
+  blockchainBlock?: bigint | number | null
+  blockchainHash?: string | null
+  blockchainStatus?: $Enums.BlockchainStatus
+  blockchainUpdatedAt?: Date | string | null
+  ipfsHash?: string | null
+  isOnChain?: boolean
   abuseMetadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  hasSimilarComplaints?: boolean | null
+  qualityBreakdown?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  qualityScore?: number | null
+  similarComplaintIds?: Prisma.ComplaintCreatesimilarComplaintIdsInput | string[]
+  slaBreached?: boolean
+  slaDeadline?: Date | string | null
 }
 
 export type ComplaintUpdateWithoutUserInput = {
@@ -3753,23 +3873,25 @@ export type ComplaintUpdateWithoutUserInput = {
   assignedDepartment?: Prisma.StringFieldUpdateOperationsInput | string
   dateOfResolution?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   escalationLevel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  blockchainHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  blockchainBlock?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
-  ipfsHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  isOnChain?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  blockchainStatus?: Prisma.EnumBlockchainStatusFieldUpdateOperationsInput | $Enums.BlockchainStatus
-  blockchainUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   sla?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   AIabusedFlag?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   AIimageVarificationStatus?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   AIstandardizedSubCategory?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   lastUpdated?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   isDuplicate?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
-  qualityScore?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  qualityBreakdown?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
-  hasSimilarComplaints?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
-  similarComplaintIds?: Prisma.ComplaintUpdatesimilarComplaintIdsInput | string[]
+  blockchainBlock?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
+  blockchainHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  blockchainStatus?: Prisma.EnumBlockchainStatusFieldUpdateOperationsInput | $Enums.BlockchainStatus
+  blockchainUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  ipfsHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isOnChain?: Prisma.BoolFieldUpdateOperationsInput | boolean
   abuseMetadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  hasSimilarComplaints?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  qualityBreakdown?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  qualityScore?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  similarComplaintIds?: Prisma.ComplaintUpdatesimilarComplaintIdsInput | string[]
+  slaBreached?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  slaDeadline?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   assignedAgent?: Prisma.AgentUpdateOneWithoutAssignedComplaintsNestedInput
   category?: Prisma.CategoryUpdateOneRequiredWithoutComplaintsNestedInput
   crossDeptIssueSuperMunicipal?: Prisma.SuperMunicipalAdminUpdateOneWithoutCrossDepartmentIssuesNestedInput
@@ -3807,23 +3929,25 @@ export type ComplaintUncheckedUpdateWithoutUserInput = {
   managedBySuperAdminId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   moderatedByMunicipalAdminId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   seq?: Prisma.IntFieldUpdateOperationsInput | number
-  blockchainHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  blockchainBlock?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
-  ipfsHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  isOnChain?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  blockchainStatus?: Prisma.EnumBlockchainStatusFieldUpdateOperationsInput | $Enums.BlockchainStatus
-  blockchainUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   sla?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   AIabusedFlag?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   AIimageVarificationStatus?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   AIstandardizedSubCategory?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   lastUpdated?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   isDuplicate?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
-  qualityScore?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  qualityBreakdown?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
-  hasSimilarComplaints?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
-  similarComplaintIds?: Prisma.ComplaintUpdatesimilarComplaintIdsInput | string[]
+  blockchainBlock?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
+  blockchainHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  blockchainStatus?: Prisma.EnumBlockchainStatusFieldUpdateOperationsInput | $Enums.BlockchainStatus
+  blockchainUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  ipfsHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isOnChain?: Prisma.BoolFieldUpdateOperationsInput | boolean
   abuseMetadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  hasSimilarComplaints?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  qualityBreakdown?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  qualityScore?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  similarComplaintIds?: Prisma.ComplaintUpdatesimilarComplaintIdsInput | string[]
+  slaBreached?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  slaDeadline?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   auditLogs?: Prisma.AuditLogUncheckedUpdateManyWithoutComplaintNestedInput
   chats?: Prisma.ChatUncheckedUpdateManyWithoutComplaintNestedInput
   location?: Prisma.ComplaintLocationUncheckedUpdateOneWithoutComplaintNestedInput
@@ -3853,23 +3977,25 @@ export type ComplaintUncheckedUpdateManyWithoutUserInput = {
   managedBySuperAdminId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   moderatedByMunicipalAdminId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   seq?: Prisma.IntFieldUpdateOperationsInput | number
-  blockchainHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  blockchainBlock?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
-  ipfsHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  isOnChain?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  blockchainStatus?: Prisma.EnumBlockchainStatusFieldUpdateOperationsInput | $Enums.BlockchainStatus
-  blockchainUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   sla?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   AIabusedFlag?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   AIimageVarificationStatus?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   AIstandardizedSubCategory?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   lastUpdated?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   isDuplicate?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
-  qualityScore?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  qualityBreakdown?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
-  hasSimilarComplaints?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
-  similarComplaintIds?: Prisma.ComplaintUpdatesimilarComplaintIdsInput | string[]
+  blockchainBlock?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
+  blockchainHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  blockchainStatus?: Prisma.EnumBlockchainStatusFieldUpdateOperationsInput | $Enums.BlockchainStatus
+  blockchainUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  ipfsHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isOnChain?: Prisma.BoolFieldUpdateOperationsInput | boolean
   abuseMetadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  hasSimilarComplaints?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  qualityBreakdown?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  qualityScore?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  similarComplaintIds?: Prisma.ComplaintUpdatesimilarComplaintIdsInput | string[]
+  slaBreached?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  slaDeadline?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
 
 export type ComplaintCreateManyAssignedAgentInput = {
@@ -3894,23 +4020,25 @@ export type ComplaintCreateManyAssignedAgentInput = {
   managedBySuperAdminId?: string | null
   moderatedByMunicipalAdminId?: string | null
   seq?: number
-  blockchainHash?: string | null
-  blockchainBlock?: bigint | number | null
-  ipfsHash?: string | null
-  isOnChain?: boolean
-  blockchainStatus?: $Enums.BlockchainStatus
-  blockchainUpdatedAt?: Date | string | null
   sla?: string | null
   AIabusedFlag?: boolean | null
   AIimageVarificationStatus?: boolean | null
   AIstandardizedSubCategory?: string | null
   lastUpdated?: Date | string
   isDuplicate?: boolean | null
-  qualityScore?: number | null
-  qualityBreakdown?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
-  hasSimilarComplaints?: boolean | null
-  similarComplaintIds?: Prisma.ComplaintCreatesimilarComplaintIdsInput | string[]
+  blockchainBlock?: bigint | number | null
+  blockchainHash?: string | null
+  blockchainStatus?: $Enums.BlockchainStatus
+  blockchainUpdatedAt?: Date | string | null
+  ipfsHash?: string | null
+  isOnChain?: boolean
   abuseMetadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  hasSimilarComplaints?: boolean | null
+  qualityBreakdown?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  qualityScore?: number | null
+  similarComplaintIds?: Prisma.ComplaintCreatesimilarComplaintIdsInput | string[]
+  slaBreached?: boolean
+  slaDeadline?: Date | string | null
 }
 
 export type ComplaintUpdateWithoutAssignedAgentInput = {
@@ -3926,23 +4054,25 @@ export type ComplaintUpdateWithoutAssignedAgentInput = {
   assignedDepartment?: Prisma.StringFieldUpdateOperationsInput | string
   dateOfResolution?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   escalationLevel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  blockchainHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  blockchainBlock?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
-  ipfsHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  isOnChain?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  blockchainStatus?: Prisma.EnumBlockchainStatusFieldUpdateOperationsInput | $Enums.BlockchainStatus
-  blockchainUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   sla?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   AIabusedFlag?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   AIimageVarificationStatus?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   AIstandardizedSubCategory?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   lastUpdated?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   isDuplicate?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
-  qualityScore?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  qualityBreakdown?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
-  hasSimilarComplaints?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
-  similarComplaintIds?: Prisma.ComplaintUpdatesimilarComplaintIdsInput | string[]
+  blockchainBlock?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
+  blockchainHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  blockchainStatus?: Prisma.EnumBlockchainStatusFieldUpdateOperationsInput | $Enums.BlockchainStatus
+  blockchainUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  ipfsHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isOnChain?: Prisma.BoolFieldUpdateOperationsInput | boolean
   abuseMetadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  hasSimilarComplaints?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  qualityBreakdown?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  qualityScore?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  similarComplaintIds?: Prisma.ComplaintUpdatesimilarComplaintIdsInput | string[]
+  slaBreached?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  slaDeadline?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   category?: Prisma.CategoryUpdateOneRequiredWithoutComplaintsNestedInput
   User?: Prisma.UserUpdateOneWithoutComplaintsNestedInput
   crossDeptIssueSuperMunicipal?: Prisma.SuperMunicipalAdminUpdateOneWithoutCrossDepartmentIssuesNestedInput
@@ -3980,23 +4110,25 @@ export type ComplaintUncheckedUpdateWithoutAssignedAgentInput = {
   managedBySuperAdminId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   moderatedByMunicipalAdminId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   seq?: Prisma.IntFieldUpdateOperationsInput | number
-  blockchainHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  blockchainBlock?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
-  ipfsHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  isOnChain?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  blockchainStatus?: Prisma.EnumBlockchainStatusFieldUpdateOperationsInput | $Enums.BlockchainStatus
-  blockchainUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   sla?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   AIabusedFlag?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   AIimageVarificationStatus?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   AIstandardizedSubCategory?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   lastUpdated?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   isDuplicate?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
-  qualityScore?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  qualityBreakdown?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
-  hasSimilarComplaints?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
-  similarComplaintIds?: Prisma.ComplaintUpdatesimilarComplaintIdsInput | string[]
+  blockchainBlock?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
+  blockchainHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  blockchainStatus?: Prisma.EnumBlockchainStatusFieldUpdateOperationsInput | $Enums.BlockchainStatus
+  blockchainUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  ipfsHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isOnChain?: Prisma.BoolFieldUpdateOperationsInput | boolean
   abuseMetadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  hasSimilarComplaints?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  qualityBreakdown?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  qualityScore?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  similarComplaintIds?: Prisma.ComplaintUpdatesimilarComplaintIdsInput | string[]
+  slaBreached?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  slaDeadline?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   auditLogs?: Prisma.AuditLogUncheckedUpdateManyWithoutComplaintNestedInput
   chats?: Prisma.ChatUncheckedUpdateManyWithoutComplaintNestedInput
   location?: Prisma.ComplaintLocationUncheckedUpdateOneWithoutComplaintNestedInput
@@ -4026,23 +4158,25 @@ export type ComplaintUncheckedUpdateManyWithoutAssignedAgentInput = {
   managedBySuperAdminId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   moderatedByMunicipalAdminId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   seq?: Prisma.IntFieldUpdateOperationsInput | number
-  blockchainHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  blockchainBlock?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
-  ipfsHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  isOnChain?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  blockchainStatus?: Prisma.EnumBlockchainStatusFieldUpdateOperationsInput | $Enums.BlockchainStatus
-  blockchainUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   sla?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   AIabusedFlag?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   AIimageVarificationStatus?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   AIstandardizedSubCategory?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   lastUpdated?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   isDuplicate?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
-  qualityScore?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  qualityBreakdown?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
-  hasSimilarComplaints?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
-  similarComplaintIds?: Prisma.ComplaintUpdatesimilarComplaintIdsInput | string[]
+  blockchainBlock?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
+  blockchainHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  blockchainStatus?: Prisma.EnumBlockchainStatusFieldUpdateOperationsInput | $Enums.BlockchainStatus
+  blockchainUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  ipfsHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isOnChain?: Prisma.BoolFieldUpdateOperationsInput | boolean
   abuseMetadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  hasSimilarComplaints?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  qualityBreakdown?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  qualityScore?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  similarComplaintIds?: Prisma.ComplaintUpdatesimilarComplaintIdsInput | string[]
+  slaBreached?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  slaDeadline?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
 
 export type ComplaintUpdateWithoutCoAssignedAgentsInput = {
@@ -4058,23 +4192,25 @@ export type ComplaintUpdateWithoutCoAssignedAgentsInput = {
   assignedDepartment?: Prisma.StringFieldUpdateOperationsInput | string
   dateOfResolution?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   escalationLevel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  blockchainHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  blockchainBlock?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
-  ipfsHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  isOnChain?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  blockchainStatus?: Prisma.EnumBlockchainStatusFieldUpdateOperationsInput | $Enums.BlockchainStatus
-  blockchainUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   sla?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   AIabusedFlag?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   AIimageVarificationStatus?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   AIstandardizedSubCategory?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   lastUpdated?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   isDuplicate?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
-  qualityScore?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  qualityBreakdown?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
-  hasSimilarComplaints?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
-  similarComplaintIds?: Prisma.ComplaintUpdatesimilarComplaintIdsInput | string[]
+  blockchainBlock?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
+  blockchainHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  blockchainStatus?: Prisma.EnumBlockchainStatusFieldUpdateOperationsInput | $Enums.BlockchainStatus
+  blockchainUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  ipfsHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isOnChain?: Prisma.BoolFieldUpdateOperationsInput | boolean
   abuseMetadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  hasSimilarComplaints?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  qualityBreakdown?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  qualityScore?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  similarComplaintIds?: Prisma.ComplaintUpdatesimilarComplaintIdsInput | string[]
+  slaBreached?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  slaDeadline?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   assignedAgent?: Prisma.AgentUpdateOneWithoutAssignedComplaintsNestedInput
   category?: Prisma.CategoryUpdateOneRequiredWithoutComplaintsNestedInput
   User?: Prisma.UserUpdateOneWithoutComplaintsNestedInput
@@ -4113,23 +4249,25 @@ export type ComplaintUncheckedUpdateWithoutCoAssignedAgentsInput = {
   managedBySuperAdminId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   moderatedByMunicipalAdminId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   seq?: Prisma.IntFieldUpdateOperationsInput | number
-  blockchainHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  blockchainBlock?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
-  ipfsHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  isOnChain?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  blockchainStatus?: Prisma.EnumBlockchainStatusFieldUpdateOperationsInput | $Enums.BlockchainStatus
-  blockchainUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   sla?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   AIabusedFlag?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   AIimageVarificationStatus?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   AIstandardizedSubCategory?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   lastUpdated?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   isDuplicate?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
-  qualityScore?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  qualityBreakdown?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
-  hasSimilarComplaints?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
-  similarComplaintIds?: Prisma.ComplaintUpdatesimilarComplaintIdsInput | string[]
+  blockchainBlock?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
+  blockchainHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  blockchainStatus?: Prisma.EnumBlockchainStatusFieldUpdateOperationsInput | $Enums.BlockchainStatus
+  blockchainUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  ipfsHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isOnChain?: Prisma.BoolFieldUpdateOperationsInput | boolean
   abuseMetadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  hasSimilarComplaints?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  qualityBreakdown?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  qualityScore?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  similarComplaintIds?: Prisma.ComplaintUpdatesimilarComplaintIdsInput | string[]
+  slaBreached?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  slaDeadline?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   auditLogs?: Prisma.AuditLogUncheckedUpdateManyWithoutComplaintNestedInput
   chats?: Prisma.ChatUncheckedUpdateManyWithoutComplaintNestedInput
   location?: Prisma.ComplaintLocationUncheckedUpdateOneWithoutComplaintNestedInput
@@ -4159,23 +4297,25 @@ export type ComplaintUncheckedUpdateManyWithoutCoAssignedAgentsInput = {
   managedBySuperAdminId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   moderatedByMunicipalAdminId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   seq?: Prisma.IntFieldUpdateOperationsInput | number
-  blockchainHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  blockchainBlock?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
-  ipfsHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  isOnChain?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  blockchainStatus?: Prisma.EnumBlockchainStatusFieldUpdateOperationsInput | $Enums.BlockchainStatus
-  blockchainUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   sla?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   AIabusedFlag?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   AIimageVarificationStatus?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   AIstandardizedSubCategory?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   lastUpdated?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   isDuplicate?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
-  qualityScore?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  qualityBreakdown?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
-  hasSimilarComplaints?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
-  similarComplaintIds?: Prisma.ComplaintUpdatesimilarComplaintIdsInput | string[]
+  blockchainBlock?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
+  blockchainHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  blockchainStatus?: Prisma.EnumBlockchainStatusFieldUpdateOperationsInput | $Enums.BlockchainStatus
+  blockchainUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  ipfsHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isOnChain?: Prisma.BoolFieldUpdateOperationsInput | boolean
   abuseMetadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  hasSimilarComplaints?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  qualityBreakdown?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  qualityScore?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  similarComplaintIds?: Prisma.ComplaintUpdatesimilarComplaintIdsInput | string[]
+  slaBreached?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  slaDeadline?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
 
 export type ComplaintCreateManyManagedByMunicipalAdminInput = {
@@ -4200,23 +4340,25 @@ export type ComplaintCreateManyManagedByMunicipalAdminInput = {
   managedBySuperAdminId?: string | null
   moderatedByMunicipalAdminId?: string | null
   seq?: number
-  blockchainHash?: string | null
-  blockchainBlock?: bigint | number | null
-  ipfsHash?: string | null
-  isOnChain?: boolean
-  blockchainStatus?: $Enums.BlockchainStatus
-  blockchainUpdatedAt?: Date | string | null
   sla?: string | null
   AIabusedFlag?: boolean | null
   AIimageVarificationStatus?: boolean | null
   AIstandardizedSubCategory?: string | null
   lastUpdated?: Date | string
   isDuplicate?: boolean | null
-  qualityScore?: number | null
-  qualityBreakdown?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
-  hasSimilarComplaints?: boolean | null
-  similarComplaintIds?: Prisma.ComplaintCreatesimilarComplaintIdsInput | string[]
+  blockchainBlock?: bigint | number | null
+  blockchainHash?: string | null
+  blockchainStatus?: $Enums.BlockchainStatus
+  blockchainUpdatedAt?: Date | string | null
+  ipfsHash?: string | null
+  isOnChain?: boolean
   abuseMetadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  hasSimilarComplaints?: boolean | null
+  qualityBreakdown?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  qualityScore?: number | null
+  similarComplaintIds?: Prisma.ComplaintCreatesimilarComplaintIdsInput | string[]
+  slaBreached?: boolean
+  slaDeadline?: Date | string | null
 }
 
 export type ComplaintCreateManyModeratedByMunicipalAdminInput = {
@@ -4241,23 +4383,25 @@ export type ComplaintCreateManyModeratedByMunicipalAdminInput = {
   managedByMunicipalAdminId?: string | null
   managedBySuperAdminId?: string | null
   seq?: number
-  blockchainHash?: string | null
-  blockchainBlock?: bigint | number | null
-  ipfsHash?: string | null
-  isOnChain?: boolean
-  blockchainStatus?: $Enums.BlockchainStatus
-  blockchainUpdatedAt?: Date | string | null
   sla?: string | null
   AIabusedFlag?: boolean | null
   AIimageVarificationStatus?: boolean | null
   AIstandardizedSubCategory?: string | null
   lastUpdated?: Date | string
   isDuplicate?: boolean | null
-  qualityScore?: number | null
-  qualityBreakdown?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
-  hasSimilarComplaints?: boolean | null
-  similarComplaintIds?: Prisma.ComplaintCreatesimilarComplaintIdsInput | string[]
+  blockchainBlock?: bigint | number | null
+  blockchainHash?: string | null
+  blockchainStatus?: $Enums.BlockchainStatus
+  blockchainUpdatedAt?: Date | string | null
+  ipfsHash?: string | null
+  isOnChain?: boolean
   abuseMetadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  hasSimilarComplaints?: boolean | null
+  qualityBreakdown?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  qualityScore?: number | null
+  similarComplaintIds?: Prisma.ComplaintCreatesimilarComplaintIdsInput | string[]
+  slaBreached?: boolean
+  slaDeadline?: Date | string | null
 }
 
 export type ComplaintUpdateWithoutManagedByMunicipalAdminInput = {
@@ -4273,23 +4417,25 @@ export type ComplaintUpdateWithoutManagedByMunicipalAdminInput = {
   assignedDepartment?: Prisma.StringFieldUpdateOperationsInput | string
   dateOfResolution?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   escalationLevel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  blockchainHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  blockchainBlock?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
-  ipfsHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  isOnChain?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  blockchainStatus?: Prisma.EnumBlockchainStatusFieldUpdateOperationsInput | $Enums.BlockchainStatus
-  blockchainUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   sla?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   AIabusedFlag?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   AIimageVarificationStatus?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   AIstandardizedSubCategory?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   lastUpdated?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   isDuplicate?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
-  qualityScore?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  qualityBreakdown?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
-  hasSimilarComplaints?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
-  similarComplaintIds?: Prisma.ComplaintUpdatesimilarComplaintIdsInput | string[]
+  blockchainBlock?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
+  blockchainHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  blockchainStatus?: Prisma.EnumBlockchainStatusFieldUpdateOperationsInput | $Enums.BlockchainStatus
+  blockchainUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  ipfsHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isOnChain?: Prisma.BoolFieldUpdateOperationsInput | boolean
   abuseMetadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  hasSimilarComplaints?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  qualityBreakdown?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  qualityScore?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  similarComplaintIds?: Prisma.ComplaintUpdatesimilarComplaintIdsInput | string[]
+  slaBreached?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  slaDeadline?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   assignedAgent?: Prisma.AgentUpdateOneWithoutAssignedComplaintsNestedInput
   category?: Prisma.CategoryUpdateOneRequiredWithoutComplaintsNestedInput
   User?: Prisma.UserUpdateOneWithoutComplaintsNestedInput
@@ -4327,23 +4473,25 @@ export type ComplaintUncheckedUpdateWithoutManagedByMunicipalAdminInput = {
   managedBySuperAdminId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   moderatedByMunicipalAdminId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   seq?: Prisma.IntFieldUpdateOperationsInput | number
-  blockchainHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  blockchainBlock?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
-  ipfsHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  isOnChain?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  blockchainStatus?: Prisma.EnumBlockchainStatusFieldUpdateOperationsInput | $Enums.BlockchainStatus
-  blockchainUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   sla?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   AIabusedFlag?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   AIimageVarificationStatus?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   AIstandardizedSubCategory?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   lastUpdated?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   isDuplicate?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
-  qualityScore?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  qualityBreakdown?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
-  hasSimilarComplaints?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
-  similarComplaintIds?: Prisma.ComplaintUpdatesimilarComplaintIdsInput | string[]
+  blockchainBlock?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
+  blockchainHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  blockchainStatus?: Prisma.EnumBlockchainStatusFieldUpdateOperationsInput | $Enums.BlockchainStatus
+  blockchainUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  ipfsHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isOnChain?: Prisma.BoolFieldUpdateOperationsInput | boolean
   abuseMetadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  hasSimilarComplaints?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  qualityBreakdown?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  qualityScore?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  similarComplaintIds?: Prisma.ComplaintUpdatesimilarComplaintIdsInput | string[]
+  slaBreached?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  slaDeadline?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   auditLogs?: Prisma.AuditLogUncheckedUpdateManyWithoutComplaintNestedInput
   chats?: Prisma.ChatUncheckedUpdateManyWithoutComplaintNestedInput
   location?: Prisma.ComplaintLocationUncheckedUpdateOneWithoutComplaintNestedInput
@@ -4373,23 +4521,25 @@ export type ComplaintUncheckedUpdateManyWithoutManagedByMunicipalAdminInput = {
   managedBySuperAdminId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   moderatedByMunicipalAdminId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   seq?: Prisma.IntFieldUpdateOperationsInput | number
-  blockchainHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  blockchainBlock?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
-  ipfsHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  isOnChain?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  blockchainStatus?: Prisma.EnumBlockchainStatusFieldUpdateOperationsInput | $Enums.BlockchainStatus
-  blockchainUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   sla?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   AIabusedFlag?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   AIimageVarificationStatus?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   AIstandardizedSubCategory?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   lastUpdated?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   isDuplicate?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
-  qualityScore?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  qualityBreakdown?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
-  hasSimilarComplaints?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
-  similarComplaintIds?: Prisma.ComplaintUpdatesimilarComplaintIdsInput | string[]
+  blockchainBlock?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
+  blockchainHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  blockchainStatus?: Prisma.EnumBlockchainStatusFieldUpdateOperationsInput | $Enums.BlockchainStatus
+  blockchainUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  ipfsHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isOnChain?: Prisma.BoolFieldUpdateOperationsInput | boolean
   abuseMetadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  hasSimilarComplaints?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  qualityBreakdown?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  qualityScore?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  similarComplaintIds?: Prisma.ComplaintUpdatesimilarComplaintIdsInput | string[]
+  slaBreached?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  slaDeadline?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
 
 export type ComplaintUpdateWithoutModeratedByMunicipalAdminInput = {
@@ -4405,23 +4555,25 @@ export type ComplaintUpdateWithoutModeratedByMunicipalAdminInput = {
   assignedDepartment?: Prisma.StringFieldUpdateOperationsInput | string
   dateOfResolution?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   escalationLevel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  blockchainHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  blockchainBlock?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
-  ipfsHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  isOnChain?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  blockchainStatus?: Prisma.EnumBlockchainStatusFieldUpdateOperationsInput | $Enums.BlockchainStatus
-  blockchainUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   sla?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   AIabusedFlag?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   AIimageVarificationStatus?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   AIstandardizedSubCategory?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   lastUpdated?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   isDuplicate?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
-  qualityScore?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  qualityBreakdown?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
-  hasSimilarComplaints?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
-  similarComplaintIds?: Prisma.ComplaintUpdatesimilarComplaintIdsInput | string[]
+  blockchainBlock?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
+  blockchainHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  blockchainStatus?: Prisma.EnumBlockchainStatusFieldUpdateOperationsInput | $Enums.BlockchainStatus
+  blockchainUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  ipfsHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isOnChain?: Prisma.BoolFieldUpdateOperationsInput | boolean
   abuseMetadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  hasSimilarComplaints?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  qualityBreakdown?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  qualityScore?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  similarComplaintIds?: Prisma.ComplaintUpdatesimilarComplaintIdsInput | string[]
+  slaBreached?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  slaDeadline?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   assignedAgent?: Prisma.AgentUpdateOneWithoutAssignedComplaintsNestedInput
   category?: Prisma.CategoryUpdateOneRequiredWithoutComplaintsNestedInput
   User?: Prisma.UserUpdateOneWithoutComplaintsNestedInput
@@ -4459,23 +4611,25 @@ export type ComplaintUncheckedUpdateWithoutModeratedByMunicipalAdminInput = {
   managedByMunicipalAdminId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   managedBySuperAdminId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   seq?: Prisma.IntFieldUpdateOperationsInput | number
-  blockchainHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  blockchainBlock?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
-  ipfsHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  isOnChain?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  blockchainStatus?: Prisma.EnumBlockchainStatusFieldUpdateOperationsInput | $Enums.BlockchainStatus
-  blockchainUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   sla?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   AIabusedFlag?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   AIimageVarificationStatus?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   AIstandardizedSubCategory?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   lastUpdated?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   isDuplicate?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
-  qualityScore?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  qualityBreakdown?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
-  hasSimilarComplaints?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
-  similarComplaintIds?: Prisma.ComplaintUpdatesimilarComplaintIdsInput | string[]
+  blockchainBlock?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
+  blockchainHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  blockchainStatus?: Prisma.EnumBlockchainStatusFieldUpdateOperationsInput | $Enums.BlockchainStatus
+  blockchainUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  ipfsHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isOnChain?: Prisma.BoolFieldUpdateOperationsInput | boolean
   abuseMetadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  hasSimilarComplaints?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  qualityBreakdown?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  qualityScore?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  similarComplaintIds?: Prisma.ComplaintUpdatesimilarComplaintIdsInput | string[]
+  slaBreached?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  slaDeadline?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   auditLogs?: Prisma.AuditLogUncheckedUpdateManyWithoutComplaintNestedInput
   chats?: Prisma.ChatUncheckedUpdateManyWithoutComplaintNestedInput
   location?: Prisma.ComplaintLocationUncheckedUpdateOneWithoutComplaintNestedInput
@@ -4505,23 +4659,25 @@ export type ComplaintUncheckedUpdateManyWithoutModeratedByMunicipalAdminInput = 
   managedByMunicipalAdminId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   managedBySuperAdminId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   seq?: Prisma.IntFieldUpdateOperationsInput | number
-  blockchainHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  blockchainBlock?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
-  ipfsHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  isOnChain?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  blockchainStatus?: Prisma.EnumBlockchainStatusFieldUpdateOperationsInput | $Enums.BlockchainStatus
-  blockchainUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   sla?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   AIabusedFlag?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   AIimageVarificationStatus?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   AIstandardizedSubCategory?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   lastUpdated?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   isDuplicate?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
-  qualityScore?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  qualityBreakdown?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
-  hasSimilarComplaints?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
-  similarComplaintIds?: Prisma.ComplaintUpdatesimilarComplaintIdsInput | string[]
+  blockchainBlock?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
+  blockchainHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  blockchainStatus?: Prisma.EnumBlockchainStatusFieldUpdateOperationsInput | $Enums.BlockchainStatus
+  blockchainUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  ipfsHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isOnChain?: Prisma.BoolFieldUpdateOperationsInput | boolean
   abuseMetadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  hasSimilarComplaints?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  qualityBreakdown?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  qualityScore?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  similarComplaintIds?: Prisma.ComplaintUpdatesimilarComplaintIdsInput | string[]
+  slaBreached?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  slaDeadline?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
 
 export type ComplaintCreateManyCrossDeptIssueSuperMunicipalInput = {
@@ -4546,23 +4702,25 @@ export type ComplaintCreateManyCrossDeptIssueSuperMunicipalInput = {
   managedBySuperAdminId?: string | null
   moderatedByMunicipalAdminId?: string | null
   seq?: number
-  blockchainHash?: string | null
-  blockchainBlock?: bigint | number | null
-  ipfsHash?: string | null
-  isOnChain?: boolean
-  blockchainStatus?: $Enums.BlockchainStatus
-  blockchainUpdatedAt?: Date | string | null
   sla?: string | null
   AIabusedFlag?: boolean | null
   AIimageVarificationStatus?: boolean | null
   AIstandardizedSubCategory?: string | null
   lastUpdated?: Date | string
   isDuplicate?: boolean | null
-  qualityScore?: number | null
-  qualityBreakdown?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
-  hasSimilarComplaints?: boolean | null
-  similarComplaintIds?: Prisma.ComplaintCreatesimilarComplaintIdsInput | string[]
+  blockchainBlock?: bigint | number | null
+  blockchainHash?: string | null
+  blockchainStatus?: $Enums.BlockchainStatus
+  blockchainUpdatedAt?: Date | string | null
+  ipfsHash?: string | null
+  isOnChain?: boolean
   abuseMetadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  hasSimilarComplaints?: boolean | null
+  qualityBreakdown?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  qualityScore?: number | null
+  similarComplaintIds?: Prisma.ComplaintCreatesimilarComplaintIdsInput | string[]
+  slaBreached?: boolean
+  slaDeadline?: Date | string | null
 }
 
 export type ComplaintUpdateWithoutCrossDeptIssueSuperMunicipalInput = {
@@ -4578,23 +4736,25 @@ export type ComplaintUpdateWithoutCrossDeptIssueSuperMunicipalInput = {
   assignedDepartment?: Prisma.StringFieldUpdateOperationsInput | string
   dateOfResolution?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   escalationLevel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  blockchainHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  blockchainBlock?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
-  ipfsHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  isOnChain?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  blockchainStatus?: Prisma.EnumBlockchainStatusFieldUpdateOperationsInput | $Enums.BlockchainStatus
-  blockchainUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   sla?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   AIabusedFlag?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   AIimageVarificationStatus?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   AIstandardizedSubCategory?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   lastUpdated?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   isDuplicate?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
-  qualityScore?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  qualityBreakdown?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
-  hasSimilarComplaints?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
-  similarComplaintIds?: Prisma.ComplaintUpdatesimilarComplaintIdsInput | string[]
+  blockchainBlock?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
+  blockchainHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  blockchainStatus?: Prisma.EnumBlockchainStatusFieldUpdateOperationsInput | $Enums.BlockchainStatus
+  blockchainUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  ipfsHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isOnChain?: Prisma.BoolFieldUpdateOperationsInput | boolean
   abuseMetadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  hasSimilarComplaints?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  qualityBreakdown?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  qualityScore?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  similarComplaintIds?: Prisma.ComplaintUpdatesimilarComplaintIdsInput | string[]
+  slaBreached?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  slaDeadline?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   assignedAgent?: Prisma.AgentUpdateOneWithoutAssignedComplaintsNestedInput
   category?: Prisma.CategoryUpdateOneRequiredWithoutComplaintsNestedInput
   User?: Prisma.UserUpdateOneWithoutComplaintsNestedInput
@@ -4632,23 +4792,25 @@ export type ComplaintUncheckedUpdateWithoutCrossDeptIssueSuperMunicipalInput = {
   managedBySuperAdminId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   moderatedByMunicipalAdminId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   seq?: Prisma.IntFieldUpdateOperationsInput | number
-  blockchainHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  blockchainBlock?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
-  ipfsHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  isOnChain?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  blockchainStatus?: Prisma.EnumBlockchainStatusFieldUpdateOperationsInput | $Enums.BlockchainStatus
-  blockchainUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   sla?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   AIabusedFlag?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   AIimageVarificationStatus?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   AIstandardizedSubCategory?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   lastUpdated?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   isDuplicate?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
-  qualityScore?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  qualityBreakdown?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
-  hasSimilarComplaints?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
-  similarComplaintIds?: Prisma.ComplaintUpdatesimilarComplaintIdsInput | string[]
+  blockchainBlock?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
+  blockchainHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  blockchainStatus?: Prisma.EnumBlockchainStatusFieldUpdateOperationsInput | $Enums.BlockchainStatus
+  blockchainUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  ipfsHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isOnChain?: Prisma.BoolFieldUpdateOperationsInput | boolean
   abuseMetadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  hasSimilarComplaints?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  qualityBreakdown?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  qualityScore?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  similarComplaintIds?: Prisma.ComplaintUpdatesimilarComplaintIdsInput | string[]
+  slaBreached?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  slaDeadline?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   auditLogs?: Prisma.AuditLogUncheckedUpdateManyWithoutComplaintNestedInput
   chats?: Prisma.ChatUncheckedUpdateManyWithoutComplaintNestedInput
   location?: Prisma.ComplaintLocationUncheckedUpdateOneWithoutComplaintNestedInput
@@ -4678,23 +4840,25 @@ export type ComplaintUncheckedUpdateManyWithoutCrossDeptIssueSuperMunicipalInput
   managedBySuperAdminId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   moderatedByMunicipalAdminId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   seq?: Prisma.IntFieldUpdateOperationsInput | number
-  blockchainHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  blockchainBlock?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
-  ipfsHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  isOnChain?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  blockchainStatus?: Prisma.EnumBlockchainStatusFieldUpdateOperationsInput | $Enums.BlockchainStatus
-  blockchainUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   sla?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   AIabusedFlag?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   AIimageVarificationStatus?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   AIstandardizedSubCategory?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   lastUpdated?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   isDuplicate?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
-  qualityScore?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  qualityBreakdown?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
-  hasSimilarComplaints?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
-  similarComplaintIds?: Prisma.ComplaintUpdatesimilarComplaintIdsInput | string[]
+  blockchainBlock?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
+  blockchainHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  blockchainStatus?: Prisma.EnumBlockchainStatusFieldUpdateOperationsInput | $Enums.BlockchainStatus
+  blockchainUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  ipfsHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isOnChain?: Prisma.BoolFieldUpdateOperationsInput | boolean
   abuseMetadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  hasSimilarComplaints?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  qualityBreakdown?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  qualityScore?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  similarComplaintIds?: Prisma.ComplaintUpdatesimilarComplaintIdsInput | string[]
+  slaBreached?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  slaDeadline?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
 
 export type ComplaintCreateManyEscalatedToStateAdminInput = {
@@ -4719,23 +4883,25 @@ export type ComplaintCreateManyEscalatedToStateAdminInput = {
   managedBySuperAdminId?: string | null
   moderatedByMunicipalAdminId?: string | null
   seq?: number
-  blockchainHash?: string | null
-  blockchainBlock?: bigint | number | null
-  ipfsHash?: string | null
-  isOnChain?: boolean
-  blockchainStatus?: $Enums.BlockchainStatus
-  blockchainUpdatedAt?: Date | string | null
   sla?: string | null
   AIabusedFlag?: boolean | null
   AIimageVarificationStatus?: boolean | null
   AIstandardizedSubCategory?: string | null
   lastUpdated?: Date | string
   isDuplicate?: boolean | null
-  qualityScore?: number | null
-  qualityBreakdown?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
-  hasSimilarComplaints?: boolean | null
-  similarComplaintIds?: Prisma.ComplaintCreatesimilarComplaintIdsInput | string[]
+  blockchainBlock?: bigint | number | null
+  blockchainHash?: string | null
+  blockchainStatus?: $Enums.BlockchainStatus
+  blockchainUpdatedAt?: Date | string | null
+  ipfsHash?: string | null
+  isOnChain?: boolean
   abuseMetadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  hasSimilarComplaints?: boolean | null
+  qualityBreakdown?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  qualityScore?: number | null
+  similarComplaintIds?: Prisma.ComplaintCreatesimilarComplaintIdsInput | string[]
+  slaBreached?: boolean
+  slaDeadline?: Date | string | null
 }
 
 export type ComplaintUpdateWithoutEscalatedToStateAdminInput = {
@@ -4751,23 +4917,25 @@ export type ComplaintUpdateWithoutEscalatedToStateAdminInput = {
   assignedDepartment?: Prisma.StringFieldUpdateOperationsInput | string
   dateOfResolution?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   escalationLevel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  blockchainHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  blockchainBlock?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
-  ipfsHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  isOnChain?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  blockchainStatus?: Prisma.EnumBlockchainStatusFieldUpdateOperationsInput | $Enums.BlockchainStatus
-  blockchainUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   sla?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   AIabusedFlag?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   AIimageVarificationStatus?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   AIstandardizedSubCategory?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   lastUpdated?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   isDuplicate?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
-  qualityScore?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  qualityBreakdown?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
-  hasSimilarComplaints?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
-  similarComplaintIds?: Prisma.ComplaintUpdatesimilarComplaintIdsInput | string[]
+  blockchainBlock?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
+  blockchainHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  blockchainStatus?: Prisma.EnumBlockchainStatusFieldUpdateOperationsInput | $Enums.BlockchainStatus
+  blockchainUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  ipfsHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isOnChain?: Prisma.BoolFieldUpdateOperationsInput | boolean
   abuseMetadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  hasSimilarComplaints?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  qualityBreakdown?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  qualityScore?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  similarComplaintIds?: Prisma.ComplaintUpdatesimilarComplaintIdsInput | string[]
+  slaBreached?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  slaDeadline?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   assignedAgent?: Prisma.AgentUpdateOneWithoutAssignedComplaintsNestedInput
   category?: Prisma.CategoryUpdateOneRequiredWithoutComplaintsNestedInput
   User?: Prisma.UserUpdateOneWithoutComplaintsNestedInput
@@ -4805,23 +4973,25 @@ export type ComplaintUncheckedUpdateWithoutEscalatedToStateAdminInput = {
   managedBySuperAdminId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   moderatedByMunicipalAdminId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   seq?: Prisma.IntFieldUpdateOperationsInput | number
-  blockchainHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  blockchainBlock?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
-  ipfsHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  isOnChain?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  blockchainStatus?: Prisma.EnumBlockchainStatusFieldUpdateOperationsInput | $Enums.BlockchainStatus
-  blockchainUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   sla?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   AIabusedFlag?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   AIimageVarificationStatus?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   AIstandardizedSubCategory?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   lastUpdated?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   isDuplicate?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
-  qualityScore?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  qualityBreakdown?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
-  hasSimilarComplaints?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
-  similarComplaintIds?: Prisma.ComplaintUpdatesimilarComplaintIdsInput | string[]
+  blockchainBlock?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
+  blockchainHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  blockchainStatus?: Prisma.EnumBlockchainStatusFieldUpdateOperationsInput | $Enums.BlockchainStatus
+  blockchainUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  ipfsHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isOnChain?: Prisma.BoolFieldUpdateOperationsInput | boolean
   abuseMetadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  hasSimilarComplaints?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  qualityBreakdown?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  qualityScore?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  similarComplaintIds?: Prisma.ComplaintUpdatesimilarComplaintIdsInput | string[]
+  slaBreached?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  slaDeadline?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   auditLogs?: Prisma.AuditLogUncheckedUpdateManyWithoutComplaintNestedInput
   chats?: Prisma.ChatUncheckedUpdateManyWithoutComplaintNestedInput
   location?: Prisma.ComplaintLocationUncheckedUpdateOneWithoutComplaintNestedInput
@@ -4851,23 +5021,25 @@ export type ComplaintUncheckedUpdateManyWithoutEscalatedToStateAdminInput = {
   managedBySuperAdminId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   moderatedByMunicipalAdminId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   seq?: Prisma.IntFieldUpdateOperationsInput | number
-  blockchainHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  blockchainBlock?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
-  ipfsHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  isOnChain?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  blockchainStatus?: Prisma.EnumBlockchainStatusFieldUpdateOperationsInput | $Enums.BlockchainStatus
-  blockchainUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   sla?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   AIabusedFlag?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   AIimageVarificationStatus?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   AIstandardizedSubCategory?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   lastUpdated?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   isDuplicate?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
-  qualityScore?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  qualityBreakdown?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
-  hasSimilarComplaints?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
-  similarComplaintIds?: Prisma.ComplaintUpdatesimilarComplaintIdsInput | string[]
+  blockchainBlock?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
+  blockchainHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  blockchainStatus?: Prisma.EnumBlockchainStatusFieldUpdateOperationsInput | $Enums.BlockchainStatus
+  blockchainUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  ipfsHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isOnChain?: Prisma.BoolFieldUpdateOperationsInput | boolean
   abuseMetadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  hasSimilarComplaints?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  qualityBreakdown?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  qualityScore?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  similarComplaintIds?: Prisma.ComplaintUpdatesimilarComplaintIdsInput | string[]
+  slaBreached?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  slaDeadline?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
 
 export type ComplaintCreateManyEscalatedToSuperStateAdminInput = {
@@ -4892,23 +5064,25 @@ export type ComplaintCreateManyEscalatedToSuperStateAdminInput = {
   managedBySuperAdminId?: string | null
   moderatedByMunicipalAdminId?: string | null
   seq?: number
-  blockchainHash?: string | null
-  blockchainBlock?: bigint | number | null
-  ipfsHash?: string | null
-  isOnChain?: boolean
-  blockchainStatus?: $Enums.BlockchainStatus
-  blockchainUpdatedAt?: Date | string | null
   sla?: string | null
   AIabusedFlag?: boolean | null
   AIimageVarificationStatus?: boolean | null
   AIstandardizedSubCategory?: string | null
   lastUpdated?: Date | string
   isDuplicate?: boolean | null
-  qualityScore?: number | null
-  qualityBreakdown?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
-  hasSimilarComplaints?: boolean | null
-  similarComplaintIds?: Prisma.ComplaintCreatesimilarComplaintIdsInput | string[]
+  blockchainBlock?: bigint | number | null
+  blockchainHash?: string | null
+  blockchainStatus?: $Enums.BlockchainStatus
+  blockchainUpdatedAt?: Date | string | null
+  ipfsHash?: string | null
+  isOnChain?: boolean
   abuseMetadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  hasSimilarComplaints?: boolean | null
+  qualityBreakdown?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  qualityScore?: number | null
+  similarComplaintIds?: Prisma.ComplaintCreatesimilarComplaintIdsInput | string[]
+  slaBreached?: boolean
+  slaDeadline?: Date | string | null
 }
 
 export type ComplaintUpdateWithoutEscalatedToSuperStateAdminInput = {
@@ -4924,23 +5098,25 @@ export type ComplaintUpdateWithoutEscalatedToSuperStateAdminInput = {
   assignedDepartment?: Prisma.StringFieldUpdateOperationsInput | string
   dateOfResolution?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   escalationLevel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  blockchainHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  blockchainBlock?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
-  ipfsHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  isOnChain?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  blockchainStatus?: Prisma.EnumBlockchainStatusFieldUpdateOperationsInput | $Enums.BlockchainStatus
-  blockchainUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   sla?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   AIabusedFlag?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   AIimageVarificationStatus?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   AIstandardizedSubCategory?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   lastUpdated?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   isDuplicate?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
-  qualityScore?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  qualityBreakdown?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
-  hasSimilarComplaints?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
-  similarComplaintIds?: Prisma.ComplaintUpdatesimilarComplaintIdsInput | string[]
+  blockchainBlock?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
+  blockchainHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  blockchainStatus?: Prisma.EnumBlockchainStatusFieldUpdateOperationsInput | $Enums.BlockchainStatus
+  blockchainUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  ipfsHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isOnChain?: Prisma.BoolFieldUpdateOperationsInput | boolean
   abuseMetadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  hasSimilarComplaints?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  qualityBreakdown?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  qualityScore?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  similarComplaintIds?: Prisma.ComplaintUpdatesimilarComplaintIdsInput | string[]
+  slaBreached?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  slaDeadline?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   assignedAgent?: Prisma.AgentUpdateOneWithoutAssignedComplaintsNestedInput
   category?: Prisma.CategoryUpdateOneRequiredWithoutComplaintsNestedInput
   User?: Prisma.UserUpdateOneWithoutComplaintsNestedInput
@@ -4978,23 +5154,25 @@ export type ComplaintUncheckedUpdateWithoutEscalatedToSuperStateAdminInput = {
   managedBySuperAdminId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   moderatedByMunicipalAdminId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   seq?: Prisma.IntFieldUpdateOperationsInput | number
-  blockchainHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  blockchainBlock?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
-  ipfsHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  isOnChain?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  blockchainStatus?: Prisma.EnumBlockchainStatusFieldUpdateOperationsInput | $Enums.BlockchainStatus
-  blockchainUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   sla?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   AIabusedFlag?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   AIimageVarificationStatus?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   AIstandardizedSubCategory?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   lastUpdated?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   isDuplicate?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
-  qualityScore?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  qualityBreakdown?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
-  hasSimilarComplaints?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
-  similarComplaintIds?: Prisma.ComplaintUpdatesimilarComplaintIdsInput | string[]
+  blockchainBlock?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
+  blockchainHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  blockchainStatus?: Prisma.EnumBlockchainStatusFieldUpdateOperationsInput | $Enums.BlockchainStatus
+  blockchainUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  ipfsHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isOnChain?: Prisma.BoolFieldUpdateOperationsInput | boolean
   abuseMetadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  hasSimilarComplaints?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  qualityBreakdown?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  qualityScore?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  similarComplaintIds?: Prisma.ComplaintUpdatesimilarComplaintIdsInput | string[]
+  slaBreached?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  slaDeadline?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   auditLogs?: Prisma.AuditLogUncheckedUpdateManyWithoutComplaintNestedInput
   chats?: Prisma.ChatUncheckedUpdateManyWithoutComplaintNestedInput
   location?: Prisma.ComplaintLocationUncheckedUpdateOneWithoutComplaintNestedInput
@@ -5024,23 +5202,25 @@ export type ComplaintUncheckedUpdateManyWithoutEscalatedToSuperStateAdminInput =
   managedBySuperAdminId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   moderatedByMunicipalAdminId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   seq?: Prisma.IntFieldUpdateOperationsInput | number
-  blockchainHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  blockchainBlock?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
-  ipfsHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  isOnChain?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  blockchainStatus?: Prisma.EnumBlockchainStatusFieldUpdateOperationsInput | $Enums.BlockchainStatus
-  blockchainUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   sla?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   AIabusedFlag?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   AIimageVarificationStatus?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   AIstandardizedSubCategory?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   lastUpdated?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   isDuplicate?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
-  qualityScore?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  qualityBreakdown?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
-  hasSimilarComplaints?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
-  similarComplaintIds?: Prisma.ComplaintUpdatesimilarComplaintIdsInput | string[]
+  blockchainBlock?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
+  blockchainHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  blockchainStatus?: Prisma.EnumBlockchainStatusFieldUpdateOperationsInput | $Enums.BlockchainStatus
+  blockchainUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  ipfsHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isOnChain?: Prisma.BoolFieldUpdateOperationsInput | boolean
   abuseMetadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  hasSimilarComplaints?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  qualityBreakdown?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  qualityScore?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  similarComplaintIds?: Prisma.ComplaintUpdatesimilarComplaintIdsInput | string[]
+  slaBreached?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  slaDeadline?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
 
 export type ComplaintCreateManyManagedBySuperAdminInput = {
@@ -5065,23 +5245,25 @@ export type ComplaintCreateManyManagedBySuperAdminInput = {
   managedByMunicipalAdminId?: string | null
   moderatedByMunicipalAdminId?: string | null
   seq?: number
-  blockchainHash?: string | null
-  blockchainBlock?: bigint | number | null
-  ipfsHash?: string | null
-  isOnChain?: boolean
-  blockchainStatus?: $Enums.BlockchainStatus
-  blockchainUpdatedAt?: Date | string | null
   sla?: string | null
   AIabusedFlag?: boolean | null
   AIimageVarificationStatus?: boolean | null
   AIstandardizedSubCategory?: string | null
   lastUpdated?: Date | string
   isDuplicate?: boolean | null
-  qualityScore?: number | null
-  qualityBreakdown?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
-  hasSimilarComplaints?: boolean | null
-  similarComplaintIds?: Prisma.ComplaintCreatesimilarComplaintIdsInput | string[]
+  blockchainBlock?: bigint | number | null
+  blockchainHash?: string | null
+  blockchainStatus?: $Enums.BlockchainStatus
+  blockchainUpdatedAt?: Date | string | null
+  ipfsHash?: string | null
+  isOnChain?: boolean
   abuseMetadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  hasSimilarComplaints?: boolean | null
+  qualityBreakdown?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  qualityScore?: number | null
+  similarComplaintIds?: Prisma.ComplaintCreatesimilarComplaintIdsInput | string[]
+  slaBreached?: boolean
+  slaDeadline?: Date | string | null
 }
 
 export type ComplaintUpdateWithoutManagedBySuperAdminInput = {
@@ -5097,23 +5279,25 @@ export type ComplaintUpdateWithoutManagedBySuperAdminInput = {
   assignedDepartment?: Prisma.StringFieldUpdateOperationsInput | string
   dateOfResolution?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   escalationLevel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  blockchainHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  blockchainBlock?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
-  ipfsHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  isOnChain?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  blockchainStatus?: Prisma.EnumBlockchainStatusFieldUpdateOperationsInput | $Enums.BlockchainStatus
-  blockchainUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   sla?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   AIabusedFlag?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   AIimageVarificationStatus?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   AIstandardizedSubCategory?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   lastUpdated?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   isDuplicate?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
-  qualityScore?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  qualityBreakdown?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
-  hasSimilarComplaints?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
-  similarComplaintIds?: Prisma.ComplaintUpdatesimilarComplaintIdsInput | string[]
+  blockchainBlock?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
+  blockchainHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  blockchainStatus?: Prisma.EnumBlockchainStatusFieldUpdateOperationsInput | $Enums.BlockchainStatus
+  blockchainUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  ipfsHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isOnChain?: Prisma.BoolFieldUpdateOperationsInput | boolean
   abuseMetadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  hasSimilarComplaints?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  qualityBreakdown?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  qualityScore?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  similarComplaintIds?: Prisma.ComplaintUpdatesimilarComplaintIdsInput | string[]
+  slaBreached?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  slaDeadline?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   assignedAgent?: Prisma.AgentUpdateOneWithoutAssignedComplaintsNestedInput
   category?: Prisma.CategoryUpdateOneRequiredWithoutComplaintsNestedInput
   User?: Prisma.UserUpdateOneWithoutComplaintsNestedInput
@@ -5151,23 +5335,25 @@ export type ComplaintUncheckedUpdateWithoutManagedBySuperAdminInput = {
   managedByMunicipalAdminId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   moderatedByMunicipalAdminId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   seq?: Prisma.IntFieldUpdateOperationsInput | number
-  blockchainHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  blockchainBlock?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
-  ipfsHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  isOnChain?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  blockchainStatus?: Prisma.EnumBlockchainStatusFieldUpdateOperationsInput | $Enums.BlockchainStatus
-  blockchainUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   sla?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   AIabusedFlag?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   AIimageVarificationStatus?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   AIstandardizedSubCategory?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   lastUpdated?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   isDuplicate?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
-  qualityScore?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  qualityBreakdown?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
-  hasSimilarComplaints?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
-  similarComplaintIds?: Prisma.ComplaintUpdatesimilarComplaintIdsInput | string[]
+  blockchainBlock?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
+  blockchainHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  blockchainStatus?: Prisma.EnumBlockchainStatusFieldUpdateOperationsInput | $Enums.BlockchainStatus
+  blockchainUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  ipfsHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isOnChain?: Prisma.BoolFieldUpdateOperationsInput | boolean
   abuseMetadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  hasSimilarComplaints?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  qualityBreakdown?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  qualityScore?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  similarComplaintIds?: Prisma.ComplaintUpdatesimilarComplaintIdsInput | string[]
+  slaBreached?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  slaDeadline?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   auditLogs?: Prisma.AuditLogUncheckedUpdateManyWithoutComplaintNestedInput
   chats?: Prisma.ChatUncheckedUpdateManyWithoutComplaintNestedInput
   location?: Prisma.ComplaintLocationUncheckedUpdateOneWithoutComplaintNestedInput
@@ -5197,23 +5383,25 @@ export type ComplaintUncheckedUpdateManyWithoutManagedBySuperAdminInput = {
   managedByMunicipalAdminId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   moderatedByMunicipalAdminId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   seq?: Prisma.IntFieldUpdateOperationsInput | number
-  blockchainHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  blockchainBlock?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
-  ipfsHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  isOnChain?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  blockchainStatus?: Prisma.EnumBlockchainStatusFieldUpdateOperationsInput | $Enums.BlockchainStatus
-  blockchainUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   sla?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   AIabusedFlag?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   AIimageVarificationStatus?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   AIstandardizedSubCategory?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   lastUpdated?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   isDuplicate?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
-  qualityScore?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  qualityBreakdown?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
-  hasSimilarComplaints?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
-  similarComplaintIds?: Prisma.ComplaintUpdatesimilarComplaintIdsInput | string[]
+  blockchainBlock?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
+  blockchainHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  blockchainStatus?: Prisma.EnumBlockchainStatusFieldUpdateOperationsInput | $Enums.BlockchainStatus
+  blockchainUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  ipfsHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isOnChain?: Prisma.BoolFieldUpdateOperationsInput | boolean
   abuseMetadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  hasSimilarComplaints?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  qualityBreakdown?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  qualityScore?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  similarComplaintIds?: Prisma.ComplaintUpdatesimilarComplaintIdsInput | string[]
+  slaBreached?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  slaDeadline?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
 
 export type ComplaintCreateManyCategoryInput = {
@@ -5238,23 +5426,25 @@ export type ComplaintCreateManyCategoryInput = {
   managedBySuperAdminId?: string | null
   moderatedByMunicipalAdminId?: string | null
   seq?: number
-  blockchainHash?: string | null
-  blockchainBlock?: bigint | number | null
-  ipfsHash?: string | null
-  isOnChain?: boolean
-  blockchainStatus?: $Enums.BlockchainStatus
-  blockchainUpdatedAt?: Date | string | null
   sla?: string | null
   AIabusedFlag?: boolean | null
   AIimageVarificationStatus?: boolean | null
   AIstandardizedSubCategory?: string | null
   lastUpdated?: Date | string
   isDuplicate?: boolean | null
-  qualityScore?: number | null
-  qualityBreakdown?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
-  hasSimilarComplaints?: boolean | null
-  similarComplaintIds?: Prisma.ComplaintCreatesimilarComplaintIdsInput | string[]
+  blockchainBlock?: bigint | number | null
+  blockchainHash?: string | null
+  blockchainStatus?: $Enums.BlockchainStatus
+  blockchainUpdatedAt?: Date | string | null
+  ipfsHash?: string | null
+  isOnChain?: boolean
   abuseMetadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  hasSimilarComplaints?: boolean | null
+  qualityBreakdown?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  qualityScore?: number | null
+  similarComplaintIds?: Prisma.ComplaintCreatesimilarComplaintIdsInput | string[]
+  slaBreached?: boolean
+  slaDeadline?: Date | string | null
 }
 
 export type ComplaintUpdateWithoutCategoryInput = {
@@ -5270,23 +5460,25 @@ export type ComplaintUpdateWithoutCategoryInput = {
   assignedDepartment?: Prisma.StringFieldUpdateOperationsInput | string
   dateOfResolution?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   escalationLevel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  blockchainHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  blockchainBlock?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
-  ipfsHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  isOnChain?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  blockchainStatus?: Prisma.EnumBlockchainStatusFieldUpdateOperationsInput | $Enums.BlockchainStatus
-  blockchainUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   sla?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   AIabusedFlag?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   AIimageVarificationStatus?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   AIstandardizedSubCategory?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   lastUpdated?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   isDuplicate?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
-  qualityScore?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  qualityBreakdown?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
-  hasSimilarComplaints?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
-  similarComplaintIds?: Prisma.ComplaintUpdatesimilarComplaintIdsInput | string[]
+  blockchainBlock?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
+  blockchainHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  blockchainStatus?: Prisma.EnumBlockchainStatusFieldUpdateOperationsInput | $Enums.BlockchainStatus
+  blockchainUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  ipfsHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isOnChain?: Prisma.BoolFieldUpdateOperationsInput | boolean
   abuseMetadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  hasSimilarComplaints?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  qualityBreakdown?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  qualityScore?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  similarComplaintIds?: Prisma.ComplaintUpdatesimilarComplaintIdsInput | string[]
+  slaBreached?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  slaDeadline?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   assignedAgent?: Prisma.AgentUpdateOneWithoutAssignedComplaintsNestedInput
   User?: Prisma.UserUpdateOneWithoutComplaintsNestedInput
   crossDeptIssueSuperMunicipal?: Prisma.SuperMunicipalAdminUpdateOneWithoutCrossDepartmentIssuesNestedInput
@@ -5324,23 +5516,25 @@ export type ComplaintUncheckedUpdateWithoutCategoryInput = {
   managedBySuperAdminId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   moderatedByMunicipalAdminId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   seq?: Prisma.IntFieldUpdateOperationsInput | number
-  blockchainHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  blockchainBlock?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
-  ipfsHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  isOnChain?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  blockchainStatus?: Prisma.EnumBlockchainStatusFieldUpdateOperationsInput | $Enums.BlockchainStatus
-  blockchainUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   sla?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   AIabusedFlag?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   AIimageVarificationStatus?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   AIstandardizedSubCategory?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   lastUpdated?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   isDuplicate?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
-  qualityScore?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  qualityBreakdown?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
-  hasSimilarComplaints?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
-  similarComplaintIds?: Prisma.ComplaintUpdatesimilarComplaintIdsInput | string[]
+  blockchainBlock?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
+  blockchainHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  blockchainStatus?: Prisma.EnumBlockchainStatusFieldUpdateOperationsInput | $Enums.BlockchainStatus
+  blockchainUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  ipfsHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isOnChain?: Prisma.BoolFieldUpdateOperationsInput | boolean
   abuseMetadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  hasSimilarComplaints?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  qualityBreakdown?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  qualityScore?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  similarComplaintIds?: Prisma.ComplaintUpdatesimilarComplaintIdsInput | string[]
+  slaBreached?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  slaDeadline?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   auditLogs?: Prisma.AuditLogUncheckedUpdateManyWithoutComplaintNestedInput
   chats?: Prisma.ChatUncheckedUpdateManyWithoutComplaintNestedInput
   location?: Prisma.ComplaintLocationUncheckedUpdateOneWithoutComplaintNestedInput
@@ -5370,23 +5564,25 @@ export type ComplaintUncheckedUpdateManyWithoutCategoryInput = {
   managedBySuperAdminId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   moderatedByMunicipalAdminId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   seq?: Prisma.IntFieldUpdateOperationsInput | number
-  blockchainHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  blockchainBlock?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
-  ipfsHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  isOnChain?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  blockchainStatus?: Prisma.EnumBlockchainStatusFieldUpdateOperationsInput | $Enums.BlockchainStatus
-  blockchainUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   sla?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   AIabusedFlag?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   AIimageVarificationStatus?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   AIstandardizedSubCategory?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   lastUpdated?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   isDuplicate?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
-  qualityScore?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  qualityBreakdown?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
-  hasSimilarComplaints?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
-  similarComplaintIds?: Prisma.ComplaintUpdatesimilarComplaintIdsInput | string[]
+  blockchainBlock?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
+  blockchainHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  blockchainStatus?: Prisma.EnumBlockchainStatusFieldUpdateOperationsInput | $Enums.BlockchainStatus
+  blockchainUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  ipfsHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isOnChain?: Prisma.BoolFieldUpdateOperationsInput | boolean
   abuseMetadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  hasSimilarComplaints?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  qualityBreakdown?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  qualityScore?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  similarComplaintIds?: Prisma.ComplaintUpdatesimilarComplaintIdsInput | string[]
+  slaBreached?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  slaDeadline?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
 
 
@@ -5470,23 +5666,25 @@ export type ComplaintSelect<ExtArgs extends runtime.Types.Extensions.InternalArg
   managedBySuperAdminId?: boolean
   moderatedByMunicipalAdminId?: boolean
   seq?: boolean
-  blockchainHash?: boolean
-  blockchainBlock?: boolean
-  ipfsHash?: boolean
-  isOnChain?: boolean
-  blockchainStatus?: boolean
-  blockchainUpdatedAt?: boolean
   sla?: boolean
   AIabusedFlag?: boolean
   AIimageVarificationStatus?: boolean
   AIstandardizedSubCategory?: boolean
   lastUpdated?: boolean
   isDuplicate?: boolean
-  qualityScore?: boolean
-  qualityBreakdown?: boolean
-  hasSimilarComplaints?: boolean
-  similarComplaintIds?: boolean
+  blockchainBlock?: boolean
+  blockchainHash?: boolean
+  blockchainStatus?: boolean
+  blockchainUpdatedAt?: boolean
+  ipfsHash?: boolean
+  isOnChain?: boolean
   abuseMetadata?: boolean
+  hasSimilarComplaints?: boolean
+  qualityBreakdown?: boolean
+  qualityScore?: boolean
+  similarComplaintIds?: boolean
+  slaBreached?: boolean
+  slaDeadline?: boolean
   assignedAgent?: boolean | Prisma.Complaint$assignedAgentArgs<ExtArgs>
   category?: boolean | Prisma.CategoryDefaultArgs<ExtArgs>
   User?: boolean | Prisma.Complaint$UserArgs<ExtArgs>
@@ -5527,23 +5725,25 @@ export type ComplaintSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Ext
   managedBySuperAdminId?: boolean
   moderatedByMunicipalAdminId?: boolean
   seq?: boolean
-  blockchainHash?: boolean
-  blockchainBlock?: boolean
-  ipfsHash?: boolean
-  isOnChain?: boolean
-  blockchainStatus?: boolean
-  blockchainUpdatedAt?: boolean
   sla?: boolean
   AIabusedFlag?: boolean
   AIimageVarificationStatus?: boolean
   AIstandardizedSubCategory?: boolean
   lastUpdated?: boolean
   isDuplicate?: boolean
-  qualityScore?: boolean
-  qualityBreakdown?: boolean
-  hasSimilarComplaints?: boolean
-  similarComplaintIds?: boolean
+  blockchainBlock?: boolean
+  blockchainHash?: boolean
+  blockchainStatus?: boolean
+  blockchainUpdatedAt?: boolean
+  ipfsHash?: boolean
+  isOnChain?: boolean
   abuseMetadata?: boolean
+  hasSimilarComplaints?: boolean
+  qualityBreakdown?: boolean
+  qualityScore?: boolean
+  similarComplaintIds?: boolean
+  slaBreached?: boolean
+  slaDeadline?: boolean
   assignedAgent?: boolean | Prisma.Complaint$assignedAgentArgs<ExtArgs>
   category?: boolean | Prisma.CategoryDefaultArgs<ExtArgs>
   User?: boolean | Prisma.Complaint$UserArgs<ExtArgs>
@@ -5578,23 +5778,25 @@ export type ComplaintSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Ext
   managedBySuperAdminId?: boolean
   moderatedByMunicipalAdminId?: boolean
   seq?: boolean
-  blockchainHash?: boolean
-  blockchainBlock?: boolean
-  ipfsHash?: boolean
-  isOnChain?: boolean
-  blockchainStatus?: boolean
-  blockchainUpdatedAt?: boolean
   sla?: boolean
   AIabusedFlag?: boolean
   AIimageVarificationStatus?: boolean
   AIstandardizedSubCategory?: boolean
   lastUpdated?: boolean
   isDuplicate?: boolean
-  qualityScore?: boolean
-  qualityBreakdown?: boolean
-  hasSimilarComplaints?: boolean
-  similarComplaintIds?: boolean
+  blockchainBlock?: boolean
+  blockchainHash?: boolean
+  blockchainStatus?: boolean
+  blockchainUpdatedAt?: boolean
+  ipfsHash?: boolean
+  isOnChain?: boolean
   abuseMetadata?: boolean
+  hasSimilarComplaints?: boolean
+  qualityBreakdown?: boolean
+  qualityScore?: boolean
+  similarComplaintIds?: boolean
+  slaBreached?: boolean
+  slaDeadline?: boolean
   assignedAgent?: boolean | Prisma.Complaint$assignedAgentArgs<ExtArgs>
   category?: boolean | Prisma.CategoryDefaultArgs<ExtArgs>
   User?: boolean | Prisma.Complaint$UserArgs<ExtArgs>
@@ -5629,26 +5831,28 @@ export type ComplaintSelectScalar = {
   managedBySuperAdminId?: boolean
   moderatedByMunicipalAdminId?: boolean
   seq?: boolean
-  blockchainHash?: boolean
-  blockchainBlock?: boolean
-  ipfsHash?: boolean
-  isOnChain?: boolean
-  blockchainStatus?: boolean
-  blockchainUpdatedAt?: boolean
   sla?: boolean
   AIabusedFlag?: boolean
   AIimageVarificationStatus?: boolean
   AIstandardizedSubCategory?: boolean
   lastUpdated?: boolean
   isDuplicate?: boolean
-  qualityScore?: boolean
-  qualityBreakdown?: boolean
-  hasSimilarComplaints?: boolean
-  similarComplaintIds?: boolean
+  blockchainBlock?: boolean
+  blockchainHash?: boolean
+  blockchainStatus?: boolean
+  blockchainUpdatedAt?: boolean
+  ipfsHash?: boolean
+  isOnChain?: boolean
   abuseMetadata?: boolean
+  hasSimilarComplaints?: boolean
+  qualityBreakdown?: boolean
+  qualityScore?: boolean
+  similarComplaintIds?: boolean
+  slaBreached?: boolean
+  slaDeadline?: boolean
 }
 
-export type ComplaintOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "submissionDate" | "complainantId" | "subCategory" | "description" | "urgency" | "attachmentUrl" | "status" | "upvoteCount" | "isPublic" | "assignedAgentId" | "assignedDepartment" | "categoryId" | "crossDeptIssueSuperMunicipalId" | "dateOfResolution" | "escalatedToStateAdminId" | "escalatedToSuperStateAdminId" | "escalationLevel" | "managedByMunicipalAdminId" | "managedBySuperAdminId" | "moderatedByMunicipalAdminId" | "seq" | "blockchainHash" | "blockchainBlock" | "ipfsHash" | "isOnChain" | "blockchainStatus" | "blockchainUpdatedAt" | "sla" | "AIabusedFlag" | "AIimageVarificationStatus" | "AIstandardizedSubCategory" | "lastUpdated" | "isDuplicate" | "qualityScore" | "qualityBreakdown" | "hasSimilarComplaints" | "similarComplaintIds" | "abuseMetadata", ExtArgs["result"]["complaint"]>
+export type ComplaintOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "submissionDate" | "complainantId" | "subCategory" | "description" | "urgency" | "attachmentUrl" | "status" | "upvoteCount" | "isPublic" | "assignedAgentId" | "assignedDepartment" | "categoryId" | "crossDeptIssueSuperMunicipalId" | "dateOfResolution" | "escalatedToStateAdminId" | "escalatedToSuperStateAdminId" | "escalationLevel" | "managedByMunicipalAdminId" | "managedBySuperAdminId" | "moderatedByMunicipalAdminId" | "seq" | "sla" | "AIabusedFlag" | "AIimageVarificationStatus" | "AIstandardizedSubCategory" | "lastUpdated" | "isDuplicate" | "blockchainBlock" | "blockchainHash" | "blockchainStatus" | "blockchainUpdatedAt" | "ipfsHash" | "isOnChain" | "abuseMetadata" | "hasSimilarComplaints" | "qualityBreakdown" | "qualityScore" | "similarComplaintIds" | "slaBreached" | "slaDeadline", ExtArgs["result"]["complaint"]>
 export type ComplaintInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   assignedAgent?: boolean | Prisma.Complaint$assignedAgentArgs<ExtArgs>
   category?: boolean | Prisma.CategoryDefaultArgs<ExtArgs>
@@ -5730,23 +5934,25 @@ export type $ComplaintPayload<ExtArgs extends runtime.Types.Extensions.InternalA
     managedBySuperAdminId: string | null
     moderatedByMunicipalAdminId: string | null
     seq: number
-    blockchainHash: string | null
-    blockchainBlock: bigint | null
-    ipfsHash: string | null
-    isOnChain: boolean
-    blockchainStatus: $Enums.BlockchainStatus
-    blockchainUpdatedAt: Date | null
     sla: string | null
     AIabusedFlag: boolean | null
     AIimageVarificationStatus: boolean | null
     AIstandardizedSubCategory: string | null
     lastUpdated: Date
     isDuplicate: boolean | null
-    qualityScore: number | null
-    qualityBreakdown: runtime.JsonValue | null
-    hasSimilarComplaints: boolean | null
-    similarComplaintIds: string[]
+    blockchainBlock: bigint | null
+    blockchainHash: string | null
+    blockchainStatus: $Enums.BlockchainStatus
+    blockchainUpdatedAt: Date | null
+    ipfsHash: string | null
+    isOnChain: boolean
     abuseMetadata: runtime.JsonValue | null
+    hasSimilarComplaints: boolean | null
+    qualityBreakdown: runtime.JsonValue | null
+    qualityScore: number | null
+    similarComplaintIds: string[]
+    slaBreached: boolean
+    slaDeadline: Date | null
   }, ExtArgs["result"]["complaint"]>
   composites: {}
 }
@@ -6206,23 +6412,25 @@ export interface ComplaintFieldRefs {
   readonly managedBySuperAdminId: Prisma.FieldRef<"Complaint", 'String'>
   readonly moderatedByMunicipalAdminId: Prisma.FieldRef<"Complaint", 'String'>
   readonly seq: Prisma.FieldRef<"Complaint", 'Int'>
-  readonly blockchainHash: Prisma.FieldRef<"Complaint", 'String'>
-  readonly blockchainBlock: Prisma.FieldRef<"Complaint", 'BigInt'>
-  readonly ipfsHash: Prisma.FieldRef<"Complaint", 'String'>
-  readonly isOnChain: Prisma.FieldRef<"Complaint", 'Boolean'>
-  readonly blockchainStatus: Prisma.FieldRef<"Complaint", 'BlockchainStatus'>
-  readonly blockchainUpdatedAt: Prisma.FieldRef<"Complaint", 'DateTime'>
   readonly sla: Prisma.FieldRef<"Complaint", 'String'>
   readonly AIabusedFlag: Prisma.FieldRef<"Complaint", 'Boolean'>
   readonly AIimageVarificationStatus: Prisma.FieldRef<"Complaint", 'Boolean'>
   readonly AIstandardizedSubCategory: Prisma.FieldRef<"Complaint", 'String'>
   readonly lastUpdated: Prisma.FieldRef<"Complaint", 'DateTime'>
   readonly isDuplicate: Prisma.FieldRef<"Complaint", 'Boolean'>
-  readonly qualityScore: Prisma.FieldRef<"Complaint", 'Int'>
-  readonly qualityBreakdown: Prisma.FieldRef<"Complaint", 'Json'>
-  readonly hasSimilarComplaints: Prisma.FieldRef<"Complaint", 'Boolean'>
-  readonly similarComplaintIds: Prisma.FieldRef<"Complaint", 'String[]'>
+  readonly blockchainBlock: Prisma.FieldRef<"Complaint", 'BigInt'>
+  readonly blockchainHash: Prisma.FieldRef<"Complaint", 'String'>
+  readonly blockchainStatus: Prisma.FieldRef<"Complaint", 'BlockchainStatus'>
+  readonly blockchainUpdatedAt: Prisma.FieldRef<"Complaint", 'DateTime'>
+  readonly ipfsHash: Prisma.FieldRef<"Complaint", 'String'>
+  readonly isOnChain: Prisma.FieldRef<"Complaint", 'Boolean'>
   readonly abuseMetadata: Prisma.FieldRef<"Complaint", 'Json'>
+  readonly hasSimilarComplaints: Prisma.FieldRef<"Complaint", 'Boolean'>
+  readonly qualityBreakdown: Prisma.FieldRef<"Complaint", 'Json'>
+  readonly qualityScore: Prisma.FieldRef<"Complaint", 'Int'>
+  readonly similarComplaintIds: Prisma.FieldRef<"Complaint", 'String[]'>
+  readonly slaBreached: Prisma.FieldRef<"Complaint", 'Boolean'>
+  readonly slaDeadline: Prisma.FieldRef<"Complaint", 'DateTime'>
 }
     
 

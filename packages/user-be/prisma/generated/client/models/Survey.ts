@@ -254,9 +254,9 @@ export type SurveyWhereInput = {
   endsAt?: Prisma.DateTimeNullableFilter<"Survey"> | Date | string | null
   createdAt?: Prisma.DateTimeFilter<"Survey"> | Date | string
   lastUpdated?: Prisma.DateTimeFilter<"Survey"> | Date | string
-  civicPartner?: Prisma.XOR<Prisma.CivicPartnerScalarRelationFilter, Prisma.CivicPartnerWhereInput>
   questions?: Prisma.SurveyQuestionListRelationFilter
   responses?: Prisma.SurveyResponseListRelationFilter
+  civicPartner?: Prisma.XOR<Prisma.CivicPartnerScalarRelationFilter, Prisma.CivicPartnerWhereInput>
 }
 
 export type SurveyOrderByWithRelationInput = {
@@ -274,9 +274,9 @@ export type SurveyOrderByWithRelationInput = {
   endsAt?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   lastUpdated?: Prisma.SortOrder
-  civicPartner?: Prisma.CivicPartnerOrderByWithRelationInput
   questions?: Prisma.SurveyQuestionOrderByRelationAggregateInput
   responses?: Prisma.SurveyResponseOrderByRelationAggregateInput
+  civicPartner?: Prisma.CivicPartnerOrderByWithRelationInput
 }
 
 export type SurveyWhereUniqueInput = Prisma.AtLeast<{
@@ -297,9 +297,9 @@ export type SurveyWhereUniqueInput = Prisma.AtLeast<{
   endsAt?: Prisma.DateTimeNullableFilter<"Survey"> | Date | string | null
   createdAt?: Prisma.DateTimeFilter<"Survey"> | Date | string
   lastUpdated?: Prisma.DateTimeFilter<"Survey"> | Date | string
-  civicPartner?: Prisma.XOR<Prisma.CivicPartnerScalarRelationFilter, Prisma.CivicPartnerWhereInput>
   questions?: Prisma.SurveyQuestionListRelationFilter
   responses?: Prisma.SurveyResponseListRelationFilter
+  civicPartner?: Prisma.XOR<Prisma.CivicPartnerScalarRelationFilter, Prisma.CivicPartnerWhereInput>
 }, "id">
 
 export type SurveyOrderByWithAggregationInput = {
@@ -356,9 +356,9 @@ export type SurveyCreateInput = {
   endsAt?: Date | string | null
   createdAt?: Date | string
   lastUpdated?: Date | string
-  civicPartner: Prisma.CivicPartnerCreateNestedOneWithoutSurveysInput
   questions?: Prisma.SurveyQuestionCreateNestedManyWithoutSurveyInput
   responses?: Prisma.SurveyResponseCreateNestedManyWithoutSurveyInput
+  civicPartner: Prisma.CivicPartnerCreateNestedOneWithoutSurveysInput
 }
 
 export type SurveyUncheckedCreateInput = {
@@ -394,9 +394,9 @@ export type SurveyUpdateInput = {
   endsAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   lastUpdated?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  civicPartner?: Prisma.CivicPartnerUpdateOneRequiredWithoutSurveysNestedInput
   questions?: Prisma.SurveyQuestionUpdateManyWithoutSurveyNestedInput
   responses?: Prisma.SurveyResponseUpdateManyWithoutSurveyNestedInput
+  civicPartner?: Prisma.CivicPartnerUpdateOneRequiredWithoutSurveysNestedInput
 }
 
 export type SurveyUncheckedUpdateInput = {
@@ -708,8 +708,8 @@ export type SurveyCreateWithoutQuestionsInput = {
   endsAt?: Date | string | null
   createdAt?: Date | string
   lastUpdated?: Date | string
-  civicPartner: Prisma.CivicPartnerCreateNestedOneWithoutSurveysInput
   responses?: Prisma.SurveyResponseCreateNestedManyWithoutSurveyInput
+  civicPartner: Prisma.CivicPartnerCreateNestedOneWithoutSurveysInput
 }
 
 export type SurveyUncheckedCreateWithoutQuestionsInput = {
@@ -760,8 +760,8 @@ export type SurveyUpdateWithoutQuestionsInput = {
   endsAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   lastUpdated?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  civicPartner?: Prisma.CivicPartnerUpdateOneRequiredWithoutSurveysNestedInput
   responses?: Prisma.SurveyResponseUpdateManyWithoutSurveyNestedInput
+  civicPartner?: Prisma.CivicPartnerUpdateOneRequiredWithoutSurveysNestedInput
 }
 
 export type SurveyUncheckedUpdateWithoutQuestionsInput = {
@@ -796,8 +796,8 @@ export type SurveyCreateWithoutResponsesInput = {
   endsAt?: Date | string | null
   createdAt?: Date | string
   lastUpdated?: Date | string
-  civicPartner: Prisma.CivicPartnerCreateNestedOneWithoutSurveysInput
   questions?: Prisma.SurveyQuestionCreateNestedManyWithoutSurveyInput
+  civicPartner: Prisma.CivicPartnerCreateNestedOneWithoutSurveysInput
 }
 
 export type SurveyUncheckedCreateWithoutResponsesInput = {
@@ -848,8 +848,8 @@ export type SurveyUpdateWithoutResponsesInput = {
   endsAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   lastUpdated?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  civicPartner?: Prisma.CivicPartnerUpdateOneRequiredWithoutSurveysNestedInput
   questions?: Prisma.SurveyQuestionUpdateManyWithoutSurveyNestedInput
+  civicPartner?: Prisma.CivicPartnerUpdateOneRequiredWithoutSurveysNestedInput
 }
 
 export type SurveyUncheckedUpdateWithoutResponsesInput = {
@@ -993,9 +993,9 @@ export type SurveySelect<ExtArgs extends runtime.Types.Extensions.InternalArgs =
   endsAt?: boolean
   createdAt?: boolean
   lastUpdated?: boolean
-  civicPartner?: boolean | Prisma.CivicPartnerDefaultArgs<ExtArgs>
   questions?: boolean | Prisma.Survey$questionsArgs<ExtArgs>
   responses?: boolean | Prisma.Survey$responsesArgs<ExtArgs>
+  civicPartner?: boolean | Prisma.CivicPartnerDefaultArgs<ExtArgs>
   _count?: boolean | Prisma.SurveyCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["survey"]>
 
@@ -1054,9 +1054,9 @@ export type SurveySelectScalar = {
 
 export type SurveyOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "civicPartnerId" | "title" | "description" | "sourceType" | "category" | "content" | "sourceUrl" | "status" | "isPublic" | "startsAt" | "endsAt" | "createdAt" | "lastUpdated", ExtArgs["result"]["survey"]>
 export type SurveyInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  civicPartner?: boolean | Prisma.CivicPartnerDefaultArgs<ExtArgs>
   questions?: boolean | Prisma.Survey$questionsArgs<ExtArgs>
   responses?: boolean | Prisma.Survey$responsesArgs<ExtArgs>
+  civicPartner?: boolean | Prisma.CivicPartnerDefaultArgs<ExtArgs>
   _count?: boolean | Prisma.SurveyCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type SurveyIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -1069,9 +1069,9 @@ export type SurveyIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Exten
 export type $SurveyPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   name: "Survey"
   objects: {
-    civicPartner: Prisma.$CivicPartnerPayload<ExtArgs>
     questions: Prisma.$SurveyQuestionPayload<ExtArgs>[]
     responses: Prisma.$SurveyResponsePayload<ExtArgs>[]
+    civicPartner: Prisma.$CivicPartnerPayload<ExtArgs>
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -1482,9 +1482,9 @@ readonly fields: SurveyFieldRefs;
  */
 export interface Prisma__SurveyClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
-  civicPartner<T extends Prisma.CivicPartnerDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.CivicPartnerDefaultArgs<ExtArgs>>): Prisma.Prisma__CivicPartnerClient<runtime.Types.Result.GetResult<Prisma.$CivicPartnerPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   questions<T extends Prisma.Survey$questionsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Survey$questionsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$SurveyQuestionPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   responses<T extends Prisma.Survey$responsesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Survey$responsesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$SurveyResponsePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  civicPartner<T extends Prisma.CivicPartnerDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.CivicPartnerDefaultArgs<ExtArgs>>): Prisma.Prisma__CivicPartnerClient<runtime.Types.Result.GetResult<Prisma.$CivicPartnerPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
