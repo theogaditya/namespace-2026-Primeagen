@@ -7,16 +7,14 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
  * We mock the LLM provider so no real API calls are made.
  */
 
-// Shared spy so we can track calls across getChatModel() invocations
 const mockInvoke = vi.fn().mockResolvedValue({ content: "SAFE" });
 
-vi.mock("../../lib/models/provider", () => ({
-  getChatModel: () => ({
-    invoke: mockInvoke,
-  }),
-}));
+import * as provider from "../../lib/models/provider";
+vi.spyOn(provider, "getChatModel").mockImplementation(() => ({
+  invoke: mockInvoke,
+} as any));
 
-const { sanitizeInput } = await import("../../lib/guardrails/inputSanitizer");
+import { sanitizeInput } from "../../lib/guardrails/inputSanitizer";
 
 describe("sanitizeInput", () => {
   describe("length limits", () => {

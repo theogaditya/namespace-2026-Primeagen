@@ -1,4 +1,4 @@
-import { defineConfig } from "vitest/config.js";
+import { defineConfig } from "vitest/config";
 
 export default defineConfig({
   test: {
@@ -6,5 +6,10 @@ export default defineConfig({
     environment: "node",
     include: ["test/**/*.test.ts"],
     testTimeout: 10_000,
+    server: {
+      deps: {
+        inline: ["zod"]
+      }
+    }
   },
 });

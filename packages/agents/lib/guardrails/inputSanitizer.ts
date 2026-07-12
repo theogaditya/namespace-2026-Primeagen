@@ -120,7 +120,7 @@ export async function sanitizeInput(message: string): Promise<SanitizationResult
     return await llmClassify(message);
   } catch (error) {
     // If LLM check fails, allow through (fail-open for availability)
-    console.warn("[inputSanitizer] LLM classification failed, allowing through:", error);
+    console.error("[inputSanitizer] LLM classification failed, allowing through:", error);
     return { safe: true, originalMessage: message };
   }
 }

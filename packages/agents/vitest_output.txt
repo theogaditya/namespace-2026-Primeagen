@@ -1,0 +1,219 @@
+
+ RUN  v2.1.9 /home/abhas/node/Projects/iit-test/packages/agents
+
+stdout | test/guardrails/inputSanitizer.test.ts > sanitizeInput > LLM skip logic -normal civic complaints > DOES call LLM for messages with suspicious chars (braces, pipes)
+DEBUG: getChatModel returned ChatOpenAI {
+  lc_serializable: true,
+  lc_kwargs: {
+    callbacks: undefined,
+    modelName: 'gpt-4o-mini',
+    temperature: 0.1,
+    maxTokens: 2048,
+    openAIApiKey: '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'
+  },
+  lc_runnable: true,
+  name: undefined,
+  verbose: false,
+  callbacks: undefined,
+  tags: [],
+  metadata: {},
+  caller: AsyncCaller {
+    maxConcurrency: Infinity,
+    maxRetries: 6,
+    onFailedAttempt: [Function: defaultFailedAttemptHandler],
+    queue: PQueue {
+      _events: Object <Complex prototype> {},
+      _eventsCount: 0,
+      _intervalCount: 0,
+      _intervalEnd: 0,
+      _pendingCount: 0,
+      _resolveEmpty: [Function: empty],
+      _resolveIdle: [Function: empty],
+      _carryoverConcurrencyCount: false,
+      _isIntervalIgnored: true,
+      _intervalCap: Infinity,
+      _interval: 0,
+      _queue: [PriorityQueue],
+      _queueClass: [class PriorityQueue],
+      _concurrency: Infinity,
+      _intervalId: undefined,
+      _timeout: undefined,
+      _throwOnTimeout: false,
+      _isPaused: false
+    }
+  },
+  cache: undefined,
+  _encoding: undefined,
+  lc_namespace: [ 'langchain', 'chat_models', 'openai' ],
+  disableStreaming: false,
+  temperature: 0.1,
+  topP: 1,
+  frequencyPenalty: 0,
+  presencePenalty: 0,
+  n: 1,
+  logitBias: undefined,
+  modelName: 'gpt-4o-mini',
+  model: 'gpt-4o-mini',
+  modelKwargs: {},
+  stop: undefined,
+  stopSequences: undefined,
+  user: undefined,
+  timeout: undefined,
+  streaming: false,
+  streamUsage: true,
+  maxTokens: 2048,
+  logprobs: undefined,
+  topLogprobs: undefined,
+  openAIApiKey: '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',
+  apiKey: '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',
+  azureOpenAIApiVersion: undefined,
+  azureOpenAIApiKey: undefined,
+  azureADTokenProvider: undefined,
+  azureOpenAIApiInstanceName: undefined,
+  azureOpenAIApiDeploymentName: undefined,
+  azureOpenAIBasePath: undefined,
+  azureOpenAIEndpoint: undefined,
+  organization: undefined,
+  __includeRawResponse: undefined,
+  client: undefined,
+  clientConfig: {
+    apiKey: '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',
+    organization: undefined,
+    baseURL: undefined,
+    dangerouslyAllowBrowser: true,
+    defaultHeaders: undefined,
+    defaultQuery: undefined
+  },
+  supportsStrictToolCalling: undefined,
+  audio: undefined,
+  modalities: undefined,
+  reasoningEffort: undefined
+}
+
+stdout | test/guardrails/inputSanitizer.test.ts > sanitizeInput > LLM skip logic -normal civic complaints > DOES call LLM for long messages (>=200 chars)
+DEBUG: getChatModel returned ChatOpenAI {
+  lc_serializable: true,
+  lc_kwargs: {
+    callbacks: undefined,
+    modelName: 'gpt-4o-mini',
+    temperature: 0.1,
+    maxTokens: 2048,
+    openAIApiKey: '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'
+  },
+  lc_runnable: true,
+  name: undefined,
+  verbose: false,
+  callbacks: undefined,
+  tags: [],
+  metadata: {},
+  caller: AsyncCaller {
+    maxConcurrency: Infinity,
+    maxRetries: 6,
+    onFailedAttempt: [Function: defaultFailedAttemptHandler],
+    queue: PQueue {
+      _events: Object <Complex prototype> {},
+      _eventsCount: 0,
+      _intervalCount: 0,
+      _intervalEnd: 0,
+      _pendingCount: 0,
+      _resolveEmpty: [Function: empty],
+      _resolveIdle: [Function: empty],
+      _carryoverConcurrencyCount: false,
+      _isIntervalIgnored: true,
+      _intervalCap: Infinity,
+      _interval: 0,
+      _queue: [PriorityQueue],
+      _queueClass: [class PriorityQueue],
+      _concurrency: Infinity,
+      _intervalId: undefined,
+      _timeout: undefined,
+      _throwOnTimeout: false,
+      _isPaused: false
+    }
+  },
+  cache: undefined,
+  _encoding: undefined,
+  lc_namespace: [ 'langchain', 'chat_models', 'openai' ],
+  disableStreaming: false,
+  temperature: 0.1,
+  topP: 1,
+  frequencyPenalty: 0,
+  presencePenalty: 0,
+  n: 1,
+  logitBias: undefined,
+  modelName: 'gpt-4o-mini',
+  model: 'gpt-4o-mini',
+  modelKwargs: {},
+  stop: undefined,
+  stopSequences: undefined,
+  user: undefined,
+  timeout: undefined,
+  streaming: false,
+  streamUsage: true,
+  maxTokens: 2048,
+  logprobs: undefined,
+  topLogprobs: undefined,
+  openAIApiKey: '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',
+  apiKey: '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',
+  azureOpenAIApiVersion: undefined,
+  azureOpenAIApiKey: undefined,
+  azureADTokenProvider: undefined,
+  azureOpenAIApiInstanceName: undefined,
+  azureOpenAIApiDeploymentName: undefined,
+  azureOpenAIBasePath: undefined,
+  azureOpenAIEndpoint: undefined,
+  organization: undefined,
+  __includeRawResponse: undefined,
+  client: undefined,
+  clientConfig: {
+    apiKey: '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',
+    organization: undefined,
+    baseURL: undefined,
+    dangerouslyAllowBrowser: true,
+    defaultHeaders: undefined,
+    defaultQuery: undefined
+  },
+  supportsStrictToolCalling: undefined,
+  audio: undefined,
+  modalities: undefined,
+  reasoningEffort: undefined
+}
+
+ ❯ test/guardrails/inputSanitizer.test.ts (12 tests | 2 failed) 2507ms
+   × sanitizeInput > LLM skip logic -normal civic complaints > DOES call LLM for messages with suspicious chars (braces, pipes) 1610ms
+     → expected "spy" to be called at least once
+   × sanitizeInput > LLM skip logic -normal civic complaints > DOES call LLM for long messages (>=200 chars) 891ms
+     → expected "spy" to be called at least once
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 2 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  test/guardrails/inputSanitizer.test.ts > sanitizeInput > LLM skip logic -normal civic complaints > DOES call LLM for messages with suspicious chars (braces, pipes)
+AssertionError: expected "spy" to be called at least once
+ ❯ test/guardrails/inputSanitizer.test.ts:95:26
+     93|       await sanitizeInput("Something about {test} and [brackets] maybe…
+     94|       // Has special chars → should reach LLM
+     95|       expect(mockInvoke).toHaveBeenCalled();
+       |                          ^
+     96|     });
+     97| 
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/2]⎯
+
+ FAIL  test/guardrails/inputSanitizer.test.ts > sanitizeInput > LLM skip logic -normal civic complaints > DOES call LLM for long messages (>=200 chars)
+AssertionError: expected "spy" to be called at least once
+ ❯ test/guardrails/inputSanitizer.test.ts:105:26
+    103| 
+    104|       await sanitizeInput(longNormal);
+    105|       expect(mockInvoke).toHaveBeenCalled();
+       |                          ^
+    106|     });
+    107|   });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/2]⎯
+
+ Test Files  1 failed (1)
+      Tests  2 failed | 10 passed (12)
+   Start at  13:10:27
+   Duration  2.86s (transform 55ms, setup 0ms, collect 147ms, tests 2.51s, environment 0ms, prepare 55ms)
+
+error: "vitest" exited with code 1
