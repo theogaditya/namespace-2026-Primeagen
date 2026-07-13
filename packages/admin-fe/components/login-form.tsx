@@ -174,6 +174,7 @@ export function LoginForm({ adminType: controlledAdminType, onAdminTypeChange, d
         // Store partner info for the frontend.
         localStorage.setItem("civicPartner", JSON.stringify(data.partner))
         localStorage.setItem("adminType", "CIVIC_PARTNER")
+        if (data.token) localStorage.setItem("token", data.token)
         router.push(adminTypeRoutes.CIVIC_PARTNER)
       } else if (data.success && data.token) {
         localStorage.setItem("token", data.token)

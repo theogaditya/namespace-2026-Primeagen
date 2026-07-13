@@ -53,7 +53,7 @@ async function ensureCivicPartnerForMunicipality(municipality: string) {
 
 async function seedAnnouncementsForMunicipality(municipality: string, createdById: string) {
   const now = new Date();
-  const later = new Date(now.getTime() + 1000 * 60 * 60 * 24 * 7); // +7 days
+  const later = new Date(now.getTime() + 1000 * 60 * 60 * 24 * 30); // +7 days
 
   const templates = [
     {
@@ -104,7 +104,7 @@ async function seedAnnouncementsForMunicipality(municipality: string, createdByI
 
 async function seedSurveysForMunicipality(municipality: string, civicPartnerId: string) {
   const now = new Date();
-  const ends = new Date(now.getTime() + 1000 * 60 * 60 * 24 * 14); // 2 weeks
+  const ends = new Date('2026-06-26T23:59:59.999Z'); // 26-06-2026
 
   const surveys = [
     {

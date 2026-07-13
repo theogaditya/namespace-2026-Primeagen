@@ -3,88 +3,76 @@ import { randomUUID } from "crypto";
 
 const prisma = getPrisma();
 
+const OPERATING_DATA = [
+  {
+    state: "Jharkhand",
+    districts: ["Ranchi", "Jamshedpur", "Dhanbad"],
+  },
+  {
+    state: "Odisha",
+    districts: ["Khorda", "Puri", "Cuttack"],
+  },
+  {
+    state: "West Bengal",
+    districts: ["Kolkata", "Darjeeling", "Hooghly", "Murshidabad"],
+  },
+  {
+    state: "Bihar",
+    districts: ["Patna", "Gaya", "Bhagalpur", "Muzaffarpur"],
+  },
+  {
+    state: "Uttar Pradesh",
+    districts: ["Lucknow", "Kanpur", "Varanasi", "Agra"],
+  },
+];
+
 async function main() {
-  let jharkhand = await prisma.operating_states.findFirst({ where: { name: 'Jharkhand' } });
-  if (!jharkhand) {
-    jharkhand = await prisma.operating_states.create({
-      data: {
-        id: randomUUID(),
-        name: 'Jharkhand'
-      }
-    });
-    console.log('Created state:', jharkhand.name);
-  } else {
-    console.log('State already exists:', jharkhand.name);
-  }
-
-  const districts = ['Ranchi', 'Jamshedpur', 'Dhanbad'];
-
-  for (const districtName of districts) {
-    const existing = await prisma.operating_districts.findFirst({
-      where: { name: districtName, stateId: jharkhand.id },
+  for (const group of OPERATING_DATA) {
+    let stateRecord = await prisma.operating_states.findFirst({
+      where: { name: group.state },
     });
 
-    if (existing) {
-      console.log('District already exists:', existing.name);
-      continue;
+    if (!stateRecord) {
+      stateRecord = await prisma.operating_states.create({
+        data: {
+          id: randomUUID(),
+          name: group.state,
+        },
+      });
+      console.log(`Created state: ${stateRecord.name}`);
+    } else {
+      console.log(`State already exists: ${stateRecord.name}`);
     }
 
-    const created = await prisma.operating_districts.create({
-      data: {
-        id: randomUUID(),
-        name: districtName,
-        state: jharkhand.name,
-        stateId: jharkhand.id,
-      },
-    });
+    for (const districtName of group.districts) {
+      const existing = await prisma.operating_districts.findFirst({
+        where: { name: districtName, stateId: stateRecord.id },
+      });
 
-    console.log('Created district:', created.name);
-  }
-
-  // --- Odisha ---
-  let odisha = await prisma.operating_states.findFirst({ where: { name: 'Odisha' } });
-  if (!odisha) {
-    odisha = await prisma.operating_states.create({
-      data: {
-        id: randomUUID(),
-        name: 'Odisha'
+      if (existing) {
+        console.log(`District already exists: ${existing.name}`);
+        continue;
       }
-    });
-    console.log('Created state:', odisha.name);
-  } else {
-    console.log('State already exists:', odisha.name);
-  }
 
-  const odishaDistricts = ['Khorda', 'Puri'];
+      const created = await prisma.operating_districts.create({
+        data: {
+          id: randomUUID(),
+          name: districtName,
+          state: stateRecord.name,
+          stateId: stateRecord.id,
+        },
+      });
 
-  for (const districtName of odishaDistricts) {
-    const existing = await prisma.operating_districts.findFirst({
-      where: { name: districtName, stateId: odisha.id },
-    });
-
-    if (existing) {
-      console.log('District already exists:', existing.name);
-      continue;
+      console.log(`Created district: ${created.name}`);
     }
-
-    const created = await prisma.operating_districts.create({
-      data: {
-        id: randomUUID(),
-        name: districtName,
-        state: odisha.name,
-        stateId: odisha.id,
-      },
-    });
-
-    console.log('Created district:', created.name);
   }
 
-  console.log('Operational seed completed successfully!');
+  console.log("Operational seed completed successfully!");
 }
 
 main()
   .catch((e) => {
-    console.error('Seed failed:', e);
+    console.error("Seed failed:", e);
     process.exit(1);
   })
   .finally(async () => {

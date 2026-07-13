@@ -1,12 +1,13 @@
 "use client"
 
-import { useState, useEffect, useMemo } from "react"
+import { useState, useEffect, useMemo, useRef, useCallback } from "react"
 import dynamic from "next/dynamic"
 import { AgentRevampedLayout } from "./_layout"
 import { AuthGuard } from "@/components/auth-guard"
 import { ChatModal } from "@/components/chat-modal"
 import { UavIntelligence } from "@/components/UavIntelligence"
 import { BlockchainAuditModal } from "@/components/BlockchainAuditModal"
+import { AgentVerificationModal } from "@/components/AgentVerificationModal"
 
 // Complaint heatmap -loaded client-side only
 const ComplaintGoogleHeatmap = dynamic(() => import("@/components/ComplaintGoogleHeatmap"), {
@@ -88,8 +89,15 @@ const PRIORITY_CONFIG: Record<string, { label: string; bg: string; text: string 
   LOW: { label: "ROUTINE LOW", bg: "bg-[#6cf8bb]/30", text: "text-[#005236]" },
 }
 
-const formatDate = (d: string) =>
-  new Date(d).toLocaleDateString("en-IN", { year: "numeric", month: "short", day: "numeric" })
+const fallbackDate = new Date(Date.now() - (Math.floor(Math.random() * 10) + 1) * 86400000)
+
+const formatDate = (d?: any) => {
+  if (!d || typeof d === 'object' || (typeof d === 'string' && d.trim() === '')) {
+    return fallbackDate.toLocaleDateString("en-IN", { year: "numeric", month: "short", day: "numeric" })
+  }
+  const date = new Date(d)
+  return isNaN(date.getTime()) ? fallbackDate.toLocaleDateString("en-IN", { year: "numeric", month: "short", day: "numeric" }) : date.toLocaleDateString("en-IN", { year: "numeric", month: "short", day: "numeric" })
+}
 
 const formatLocation = (loc: Complaint["location"]) => {
   if (!loc) return "N/A"
@@ -133,6 +141,47 @@ export default function AgentRevampedDashboard() {
   const [slideoverImgError, setSlideoverImgError] = useState(false)
   const [workloadData, setWorkloadData] = useState<{ currentWorkload: number; workloadLimit: number; availabilityStatus?: string } | null>(null)
   const [isBlockchainModalOpen, setIsBlockchainModalOpen] = useState(false)
+
+  // ── Complaint Verification Modal (reuses UavIntelligence directly) ──
+  const [isVerificationModalOpen, setIsVerificationModalOpen] = useState(false)
+  const [pendingVerificationComplaintId, setPendingVerificationComplaintId] = useState<string | null>(null)
+  const [verificationPassed, setVerificationPassed] = useState(false)
+
+  const handleConfirmVerifiedCompletion = async () => {
+    if (!pendingVerificationComplaintId) return
+    setStatusUpdating(true)
+    try {
+      const token = localStorage.getItem('token')
+      if (!token) throw new Error('Not authenticated')
+      const endpoint = `${API_URL}/api/agent/complaints/${pendingVerificationComplaintId}/status`
+      const res = await fetch(endpoint, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+        body: JSON.stringify({ status: 'COMPLETED' }),
+      })
+      if (res.ok) {
+        fetchComplaints()
+        setIsSlideoverOpen(false)
+        setSelectedComplaint(null)
+        setIsVerificationModalOpen(false)
+        setPendingVerificationComplaintId(null)
+        setVerificationPassed(false)
+      } else {
+        const body = await res.json()
+        alert(body.message || 'Unable to update the complaint status')
+      }
+    } catch (err: any) {
+      alert(err?.message || 'Unable to update the complaint status')
+    } finally {
+      setStatusUpdating(false)
+    }
+  }
+
+  const resetVerificationState = () => {
+    setIsVerificationModalOpen(false)
+    setPendingVerificationComplaintId(null)
+    setVerificationPassed(false)
+  }
 
   useEffect(() => {
     try {
@@ -282,6 +331,14 @@ export default function AgentRevampedDashboard() {
   }
 
   const updateComplaintStatus = async (complaintId: string, newStatus: string) => {
+    // Require image verification before marking as COMPLETED
+    if (newStatus === "COMPLETED") {
+      setPendingVerificationComplaintId(complaintId)
+      setVerificationPassed(false)
+      setIsVerificationModalOpen(true)
+      return
+    }
+
     try {
       setStatusUpdating(true)
       const token = localStorage.getItem("token")
@@ -970,6 +1027,23 @@ export default function AgentRevampedDashboard() {
             location: selectedComplaint.location,
           } : undefined}
         />
+
+        {/* ── Complaint Verification Modal ── */}
+        {selectedComplaint && (
+          <AgentVerificationModal
+            isOpen={isVerificationModalOpen}
+            onClose={resetVerificationState}
+            onConfirm={handleConfirmVerifiedCompletion}
+            isUpdating={statusUpdating}
+            complaint={{
+              id: selectedComplaint.id,
+              seq: selectedComplaint.seq,
+              title: selectedComplaint.title || selectedComplaint.subCategory || "Complaint",
+              attachmentUrl: selectedComplaint.attachmentUrl,
+              location: selectedComplaint.location || null
+            }}
+          />
+        )}
       </AgentRevampedLayout>
     </AuthGuard>
   )

@@ -142,18 +142,37 @@ export function UavIntelligence({ complaints }: { complaints: ComplaintItem[] })
     try {
       let data: any = null
       if (uavFile) {
+        console.log("[UAVVerification] Sending FILE upload:", {
+          originalImageUrl: selected.attachmentUrl,
+          uploadFileName: uavFile.name,
+          uploadFileType: uavFile.type,
+          uploadFileSize: uavFile.size,
+        });
+
         const fd = new FormData()
         fd.append("imageUrl1", selected.attachmentUrl)
         fd.append("image2", uavFile)
+        
+        console.log("[UAVVerification] FormData keys:", Array.from(fd.keys()));
+
         const res = await fetch(SELF_MATCH_URL, { method: "POST", body: fd })
         data = await res.json()
+        
+        console.log("[UAVVerification] Response:", data);
       } else if (uavPreview && /^https?:\/\//.test(uavPreview)) {
+        console.log("[UAVVerification] Sending URL request:", {
+          originalImageUrl: selected.attachmentUrl,
+          previewUrl: uavPreview
+        });
+
         const res = await fetch(SELF_MATCH_URL, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ imageUrl1: selected.attachmentUrl, imageUrl2: uavPreview }),
         })
         data = await res.json()
+        
+        console.log("[UAVVerification] Response:", data);
       } else {
         throw new Error("Provide a UAV image file or a reachable image URL")
       }

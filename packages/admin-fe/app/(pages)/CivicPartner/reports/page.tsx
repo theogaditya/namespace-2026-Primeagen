@@ -188,17 +188,7 @@ export default function CivicPartnerReportsPage() {
     setMetricsLoading(true)
     try {
       try {
-        const res = await fetch(`${SURVEY_API}/metrics`)
-        if (res.ok) {
-          const data = await res.json()
-          setHealth(data)
-        }
-      } catch {
-        // ignore
-      }
-
-      try {
-        const res2 = await fetch(`${SURVEY_API}/health`)
+        const res2 = await fetch(`${SURVEY_API}/api/health`)
         if (res2.ok) {
           const data2 = await res2.json()
           setServiceHealth(data2)
@@ -426,7 +416,7 @@ export default function CivicPartnerReportsPage() {
               <div>
                 <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Pipeline Status</p>
                 <h4 className="text-2xl font-black text-black">
-                  {healthLoading ? "..." : serviceHealth?.status === "healthy" ? (
+                  {healthLoading ? "..." : serviceHealth?.status === "ok" ? (
                     <span className="flex items-center gap-2">
                       Live <span className="text-xs text-emerald-500 font-medium">● Healthy</span>
                     </span>

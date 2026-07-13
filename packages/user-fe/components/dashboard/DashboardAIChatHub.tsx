@@ -296,6 +296,40 @@ export default function DashboardAIChatHub({
           }
         }
 
+        if (text.includes("::AB") && imageFile) {
+          try {
+            const formData = new FormData();
+            formData.append("image", imageFile);
+
+            const apiUrl = process.env.NEXT_PUBLIC_IMAGE_ANALYSIS_API_URL || "http://localhost:3040/api/image";
+            const analysisRes = await fetch(apiUrl, {
+              method: "POST",
+              body: formData,
+            });
+
+            if (!analysisRes.ok) {
+              throw new Error("Failed to process image with auto-fill AI");
+            }
+
+            const analysisData = await analysisRes.json();
+            if (analysisData.success && analysisData.category && analysisData.complaint) {
+              const draft = {
+                category: analysisData.category,
+                subCategory: analysisData.subCategory || analysisData.category,
+                description: analysisData.complaint,
+                urgency: analysisData.urgency || "MEDIUM",
+              };
+              localStorage.setItem("complaintDraft", JSON.stringify(draft));
+              setTimeout(() => router.push("/regComplaint"), 500);
+              setIsLoading(false);
+              return;
+            }
+          } catch (e: any) {
+            console.error("Auto-fill AI Error:", e);
+            throw new Error(e.message || "Failed to trigger auto-fill AI");
+          }
+        }
+
         const token = localStorage.getItem("authToken");
         const res = await fetch("/api/agents/chat", {
           method: "POST",

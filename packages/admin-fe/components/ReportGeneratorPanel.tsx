@@ -109,6 +109,15 @@ export default function ReportGeneratorPanel({ onReportComplete }: ReportGenerat
   const elapsedRef = useRef<ReturnType<typeof setInterval> | null>(null)
   const outputRef = useRef<HTMLDivElement>(null)
   const [scrollLocked, setScrollLocked] = useState(false)
+  
+  const VALID_CATEGORIES = [
+    "Infrastructure", "Water Supply & Sanitation", "Health", "Education",
+    "Environment", "Electricity & Power", "Municipal Services", "Transportation",
+    "Police Services", "Housing & Urban Development", "Social Welfare",
+    "Public Grievances", "Revenue", "Agriculture", "Fire & Emergency",
+    "Sports & Youth Affairs", "Tourism & Culture"
+  ]
+  const [selectedCategory, setSelectedCategory] = useState(VALID_CATEGORIES[0])
 
   // Modal state
   const [showFullReport, setShowFullReport] = useState(false)
@@ -269,12 +278,13 @@ export default function ReportGeneratorPanel({ onReportComplete }: ReportGenerat
     const token = localStorage.getItem("token")
 
     try {
-      const response = await fetch("/api/report/generate", {
+      const response = await fetch("/api/survey-report/generate", {
         method: "POST",
         headers: {
           Authorization: `Bearer ${token}`,
           "Content-Type": "application/json",
         },
+        body: JSON.stringify({ category: selectedCategory }),
       })
 
       if (!response.ok || !response.body) {
@@ -467,6 +477,14 @@ export default function ReportGeneratorPanel({ onReportComplete }: ReportGenerat
                 >
                   <span className="material-symbols-outlined text-sm">history</span>
                 </button>
+                <select 
+                  value={selectedCategory} 
+                  onChange={(e) => setSelectedCategory(e.target.value)}
+                  className="px-3 py-2.5 rounded-lg border border-[#e7e8e9] text-sm bg-white font-semibold outline-none focus:border-[#115cb9]"
+                  disabled={reportStatus === "generating"}
+                >
+                  {VALID_CATEGORIES.map(c => <option key={c} value={c}>{c}</option>)}
+                </select>
                 <button
                   onClick={generateReport}
                   disabled={reportStatus === "generating"}
@@ -552,13 +570,22 @@ export default function ReportGeneratorPanel({ onReportComplete }: ReportGenerat
                   </div>
                 ))}
               </div>
-              <button
-                onClick={generateReport}
-                className="flex items-center gap-2 px-6 py-3 bg-[#115cb9] text-white rounded-lg text-sm font-black hover:bg-[#004493] active:scale-[0.98] transition-all shadow-lg shadow-[#115cb9]/20"
-              >
-                <span className="material-symbols-outlined text-sm">auto_awesome</span>
-                Generate Report
-              </button>
+              <div className="flex items-center gap-3">
+                <select 
+                  value={selectedCategory} 
+                  onChange={(e) => setSelectedCategory(e.target.value)}
+                  className="px-4 py-3 rounded-lg border border-[#e7e8e9] text-sm bg-white font-semibold outline-none focus:border-[#115cb9]"
+                >
+                  {VALID_CATEGORIES.map(c => <option key={c} value={c}>{c}</option>)}
+                </select>
+                <button
+                  onClick={generateReport}
+                  className="flex items-center gap-2 px-6 py-3 bg-[#115cb9] text-white rounded-lg text-sm font-black hover:bg-[#004493] active:scale-[0.98] transition-all shadow-lg shadow-[#115cb9]/20"
+                >
+                  <span className="material-symbols-outlined text-sm">auto_awesome</span>
+                  Generate Report
+                </button>
+              </div>
             </div>
           )}
 

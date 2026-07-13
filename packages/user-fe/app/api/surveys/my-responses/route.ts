@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { BACKEND_URL } from "@/lib/backend";
 
+export const dynamic = "force-dynamic";
+
 /**
  * GET /api/surveys/my-responses - Get user's past survey submissions
  * Auth required
@@ -25,6 +27,7 @@ export async function GET(request: NextRequest) {
         Authorization: `Bearer ${authToken}`,
         "Content-Type": "application/json",
       },
+      cache: "no-store",
     });
 
     const data = await response.json();

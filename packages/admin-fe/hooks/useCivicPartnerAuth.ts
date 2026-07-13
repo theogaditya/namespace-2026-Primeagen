@@ -40,15 +40,19 @@ export function useCivicPartnerAuth(): UseCivicPartnerAuthReturn {
 
   const logout = useCallback(async () => {
     try {
-      await fetch(`/api/civic-partner/logout`, {
+      const token = localStorage.getItem("token")
+      await fetch(`${API_URL}/api/civic-partner/auth/logout`, {
         method: "POST",
-        credentials: "include",
+        headers: {
+          ...(token ? { Authorization: `Bearer ${token}` } : {})
+        },
       })
     } catch {
       // silent
     }
     localStorage.removeItem("civicPartner")
     localStorage.removeItem("adminType")
+    localStorage.removeItem("token")
     try {
       window.location.replace("/")
     } catch {
@@ -71,10 +75,11 @@ export function useCivicPartnerAuth(): UseCivicPartnerAuthReturn {
 
     const verify = async () => {
       try {
-        // CivicPartner auth uses httpOnly cookies. Use the local proxy so
-        // cookies are forwarded server-side: `/api/civic-partner/me`.
-        const res = await fetch(`/api/civic-partner/me`, {
-          credentials: "include",
+        const token = localStorage.getItem("token")
+        const res = await fetch(`${API_URL}/api/civic-partner/auth/me`, {
+          headers: {
+            ...(token ? { Authorization: `Bearer ${token}` } : {})
+          },
         })
 
         if (!res.ok) {
@@ -99,6 +104,7 @@ export function useCivicPartnerAuth(): UseCivicPartnerAuthReturn {
         if (!hadCached) {
           localStorage.removeItem("civicPartner")
           localStorage.removeItem("adminType")
+          localStorage.removeItem("token")
           router.push("/")
         }
       } finally {

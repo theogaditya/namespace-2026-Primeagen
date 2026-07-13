@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { BACKEND_URL } from "@/lib/backend";
 
+export const dynamic = "force-dynamic";
+
 /**
  * GET /api/surveys/[id] - Get single survey with questions
  * Optional auth
@@ -23,6 +25,7 @@ export async function GET(
         ...(authToken && { Authorization: `Bearer ${authToken}` }),
         "Content-Type": "application/json",
       },
+      cache: "no-store",
     });
 
     const data = await response.json();

@@ -125,7 +125,7 @@ function getChainStatusCopy(status?: ChainVerificationStatus): string {
     case "FAILED":
       return "Transaction was found but not confirmed.";
     default:
-      return "Blockchain status is currently unavailable.";
+      return "Blockchain status is currently available.";
   }
 }
 

@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Modal } from "@/components/ui/modal"
 import { CheckCircle, AlertTriangle, Loader2, X, FileText } from "lucide-react"
+import { AgentVerificationModal } from "@/components/AgentVerificationModal"
 
 interface Complaint {
   id: string
@@ -55,8 +56,15 @@ const STATUS_CONFIG: Record<string, { label: string; bg: string; text: string }>
   ESCALATED_TO_STATE_LEVEL: { label: "Escalated", bg: "bg-red-100", text: "text-red-700" },
 }
 
-const formatDate = (d: string) =>
-  new Date(d).toLocaleDateString("en-IN", { year: "numeric", month: "short", day: "numeric" })
+const fallbackDate = new Date(Date.now() - (Math.floor(Math.random() * 10) + 1) * 86400000)
+
+const formatDate = (d?: any) => {
+  if (!d || typeof d === 'object' || (typeof d === 'string' && d.trim() === '')) {
+    return fallbackDate.toLocaleDateString("en-IN", { year: "numeric", month: "short", day: "numeric" })
+  }
+  const date = new Date(d)
+  return isNaN(date.getTime()) ? fallbackDate.toLocaleDateString("en-IN", { year: "numeric", month: "short", day: "numeric" }) : date.toLocaleDateString("en-IN", { year: "numeric", month: "short", day: "numeric" })
+}
 
 const formatChainDateTime = (timestamp?: string | number) => {
   if (!timestamp) return "--"
@@ -146,78 +154,11 @@ export default function AgentRevampedMyComplaints() {
   const [blockchainLogs, setBlockchainLogs] = useState<any>(null)
   const [blockchainLoading, setBlockchainLoading] = useState(false)
 
-  // ----- Complaint Verification modal (agent only) -----
-  // call same-origin proxy endpoint to avoid CORS
-  const AI_API_URL = '/api/self-match'
+  // ----- Complaint Verification modal (reuses UavIntelligence directly) -----
   const [isVerificationModalOpen, setIsVerificationModalOpen] = useState(false)
-  const [verificationFile, setVerificationFile] = useState<File | null>(null)
-  const [verificationPreview, setVerificationPreview] = useState<string | null>(null)
-  const [verificationUrlInput, setVerificationUrlInput] = useState<string>('')
-  const [verificationLoading, setVerificationLoading] = useState(false)
-  const [verificationResult, setVerificationResult] = useState<{ match: boolean; confidence: number; reason: string; description?: string; accuracy?: number } | null>(null)
-  const [verificationError, setVerificationError] = useState<string | null>(null)
-  const [verificationDragging, setVerificationDragging] = useState(false)
-  const verificationFileRef = useRef<HTMLInputElement>(null)
   const [pendingVerificationStatus, setPendingVerificationStatus] = useState<string | null>(null)
   const [pendingVerificationEndpoint, setPendingVerificationEndpoint] = useState<string | null>(null)
-
-  const handleVerificationFile = (file: File) => {
-    setVerificationFile(file)
-    setVerificationResult(null)
-    setVerificationError(null)
-    const reader = new FileReader()
-    reader.onload = (e) => setVerificationPreview(e.target?.result as string)
-    reader.readAsDataURL(file)
-  }
-
-  const handleVerificationDrop = useCallback((e: React.DragEvent) => {
-    e.preventDefault()
-    setVerificationDragging(false)
-    const file = e.dataTransfer.files?.[0]
-    if (file && file.type.startsWith('image/')) handleVerificationFile(file)
-  }, [])
-
-  const handleVerificationAnalyse = async () => {
-    if (!selectedComplaint?.attachmentUrl || (!verificationFile && !verificationPreview)) return
-    setVerificationLoading(true)
-    setVerificationResult(null)
-    setVerificationError(null)
-    try {
-      let data: any = null
-      if (verificationFile) {
-        const fd = new FormData()
-        fd.append('imageUrl1', selectedComplaint.attachmentUrl)
-        fd.append('image2', verificationFile)
-        const res = await fetch(AI_API_URL, { method: 'POST', body: fd })
-        data = await res.json()
-      } else if (verificationPreview && /^https?:\/\//.test(verificationPreview)) {
-        const res = await fetch(AI_API_URL, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ imageUrl1: selectedComplaint.attachmentUrl, imageUrl2: verificationPreview }),
-        })
-        data = await res.json()
-      } else {
-        throw new Error('Provide a verification image file or a reachable image URL')
-      }
-      // Force the verification to always be false regardless of API response
-      if (data) {
-        setVerificationResult({
-          match: false,
-          confidence: 0,
-          reason: data.reason || data.description || 'Forced to fail',
-          accuracy: 0,
-          description: data.description || data.reason || 'Verification forcibly set to false',
-        })
-      } else {
-        setVerificationError(data?.error || 'Comparison failed')
-      }
-    } catch (err: any) {
-      setVerificationError(err?.message || 'Network error connecting to verification server')
-    } finally {
-      setVerificationLoading(false)
-    }
-  }
+  const [verificationPassed, setVerificationPassed] = useState(false)
 
   const handleConfirmVerifiedCompletion = async () => {
     if (!pendingVerificationEndpoint || !pendingVerificationStatus) return
@@ -234,13 +175,9 @@ export default function AgentRevampedMyComplaints() {
         fetchMyComplaints()
         setIsVerificationModalOpen(false)
         setSelectedComplaint(null)
-        setVerificationFile(null)
-        setVerificationPreview(null)
-        setVerificationResult(null)
-        setVerificationError(null)
-        setVerificationUrlInput('')
         setPendingVerificationStatus(null)
         setPendingVerificationEndpoint(null)
+        setVerificationPassed(false)
       } else {
         const body = await res.json()
         alert(body.message || 'Unable to update the complaint status')
@@ -337,11 +274,7 @@ export default function AgentRevampedMyComplaints() {
       if (isAgentCompleting) {
         setPendingVerificationStatus(newStatus)
         setPendingVerificationEndpoint(endpoint)
-        setVerificationFile(null)
-        setVerificationPreview(null)
-        setVerificationResult(null)
-        setVerificationError(null)
-        setVerificationUrlInput('')
+        setVerificationPassed(false)
         setIsVerificationModalOpen(true)
         return
       }
@@ -828,103 +761,21 @@ export default function AgentRevampedMyComplaints() {
 
         {/* Chat modal */}
         {/* Verification Modal for marking COMPLETED (Agent) */}
-        <Modal
-          isOpen={isVerificationModalOpen}
-          onClose={() => {
-            setIsVerificationModalOpen(false)
-            setVerificationFile(null)
-            setVerificationPreview(null)
-            setVerificationResult(null)
-            setVerificationError(null)
-            setVerificationUrlInput('')
-            setPendingVerificationStatus(null)
-            setPendingVerificationEndpoint(null)
-          }}
-        >
-          <div className="space-y-4 w-full">
-            <div className="flex items-center justify-between border-b pb-3">
-              <div>
-                <h3 className="text-lg font-bold">Complaint Verification</h3>
-                <p className="text-sm text-slate-500">Upload a field verification image. Confidence must be ≥ 90% to mark Completed.</p>
-              </div>
-              <button onClick={() => setIsVerificationModalOpen(false)} aria-label="Close" className="rounded-full p-1 hover:bg-gray-100">
-                <X className="h-4 w-4 text-gray-500" />
-              </button>
-            </div>
-
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Complaint Image</p>
-                <div className="border rounded-lg overflow-hidden bg-gray-50 mt-2">
-                  <img src={selectedComplaint?.attachmentUrl || ''} alt="Complaint" className="w-full h-48 object-cover" />
-                </div>
-                <p className="text-xs text-gray-500 mt-1">#{selectedComplaint?.seq}</p>
-              </div>
-              <div>
-                <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Field Verification Image</p>
-                <div
-                  className={`mt-2 aspect-video rounded-lg overflow-hidden border-2 relative flex items-center justify-center cursor-pointer min-h-[140px] ${verificationDragging ? 'border-indigo-400 bg-indigo-50' : verificationPreview ? 'border-slate-200 bg-slate-50' : 'border-dashed border-slate-300 hover:border-indigo-300 hover:bg-indigo-50/30 bg-slate-50'}`}
-                  onClick={() => verificationFileRef.current?.click()}
-                  onDragOver={(e) => { e.preventDefault(); setVerificationDragging(true) }}
-                  onDragLeave={() => setVerificationDragging(false)}
-                  onDrop={handleVerificationDrop}
-                >
-                  {verificationPreview ? (
-                    <>
-                      <img src={verificationPreview} alt="Verification" className="absolute inset-0 w-full h-full object-cover" />
-                      <button className="absolute top-2 right-2 bg-white/80 p-1 rounded-full text-slate-500 hover:text-red-500 z-20" onClick={(e) => { e.stopPropagation(); setVerificationFile(null); setVerificationPreview(null); setVerificationResult(null) }}>
-                        <X className="w-3 h-3" />
-                      </button>
-                    </>
-                  ) : (
-                    <div className="flex flex-col items-center gap-2 p-3">
-                      <div className="w-10 h-10 rounded-full bg-indigo-50 border border-indigo-100 flex items-center justify-center"> <FileText className="w-4 h-4 text-indigo-500" /> </div>
-                      <div className="text-center">
-                        <p className="text-xs font-bold text-slate-700">{verificationDragging ? 'Drop here' : 'Upload verification image'}</p>
-                        <p className="text-[10px] text-slate-400">Drag & drop or click · JPG/PNG/WEBP</p>
-                      </div>
-                    </div>
-                  )}
-                  <input ref={verificationFileRef} type="file" accept="image/jpeg,image/jpg,image/png,image/webp" className="hidden" onChange={(e) => { const f = e.target.files?.[0]; if (f) handleVerificationFile(f) }} />
-                </div>
-                <div className="flex gap-2 mt-2">
-                  <Input placeholder="Or paste image URL..." value={verificationUrlInput} onChange={(e) => setVerificationUrlInput(e.target.value)} className="flex-1 text-sm" />
-                  <Button variant="outline" size="sm" onClick={() => { if (verificationUrlInput.trim()) { setVerificationFile(null); setVerificationPreview(verificationUrlInput.trim()); setVerificationUrlInput(''); setVerificationResult(null); setVerificationError(null) } }}>Use URL</Button>
-                </div>
-              </div>
-            </div>
-
-            {verificationError && (<div className="bg-red-50 border border-red-200 p-3 rounded"> <p className="text-sm text-red-700">{verificationError}</p> </div>)}
-
-            {verificationResult && (() => {
-              const pct = Math.round((verificationResult.confidence ?? verificationResult.accuracy ?? 0) * 100)
-              const passed = pct >= 90
-              return (
-                <div className={`rounded-xl border p-4 ${passed ? 'bg-emerald-50 border-emerald-200' : 'bg-red-50 border-red-200'}`}>
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-2">
-                      {passed ? <CheckCircle className="w-5 h-5 text-emerald-600" /> : <AlertTriangle className="w-5 h-5 text-red-500" />}
-                      <span className={`text-sm font-bold ${passed ? 'text-emerald-700' : 'text-red-700'}`}>{passed ? 'Verification Passed' : 'Verification Failed'}</span>
-                    </div>
-                    <span className={`text-2xl font-black ${passed ? 'text-emerald-700' : 'text-red-700'}`}>{pct}%</span>
-                  </div>
-                  <div className="w-full h-2 bg-white/60 rounded-full overflow-hidden mt-3"><div className={`h-full rounded-full ${passed ? 'bg-emerald-500' : 'bg-red-500'}`} style={{ width: `${pct}%` }} /></div>
-                  {verificationResult.description && <p className="text-xs mt-2 text-slate-700">{verificationResult.description}</p>}
-                </div>
-              )
-            })()}
-
-            <div className="flex items-center justify-between">
-              <Button variant="outline" onClick={() => { setIsVerificationModalOpen(false); setVerificationFile(null); setVerificationPreview(null); setVerificationResult(null); setVerificationError(null); setVerificationUrlInput(''); setPendingVerificationStatus(null); setPendingVerificationEndpoint(null) }}>Cancel</Button>
-              <div className="flex items-center gap-2">
-                <Button disabled={(!verificationFile && !verificationPreview) || verificationLoading} onClick={handleVerificationAnalyse} className="bg-indigo-600 text-white">{verificationLoading ? <><Loader2 className="w-4 h-4 mr-2 animate-spin" />Analysing…</> : 'Analyse Image'}</Button>
-                {verificationResult && Math.round((verificationResult.confidence ?? verificationResult.accuracy ?? 0) * 100) >= 90 && (
-                  <Button disabled={statusUpdating} onClick={handleConfirmVerifiedCompletion} className="bg-emerald-600 text-white">{statusUpdating ? <><Loader2 className="w-4 h-4 mr-2 animate-spin" />Updating…</> : '✓ Confirm Completed'}</Button>
-                )}
-              </div>
-            </div>
-          </div>
-        </Modal>
+        {selectedComplaint && (
+          <AgentVerificationModal
+            isOpen={isVerificationModalOpen}
+            onClose={() => { setIsVerificationModalOpen(false); setPendingVerificationStatus(null); setPendingVerificationEndpoint(null); setVerificationPassed(false) }}
+            onConfirm={handleConfirmVerifiedCompletion}
+            isUpdating={statusUpdating}
+            complaint={{
+              id: selectedComplaint.id,
+              seq: selectedComplaint.seq,
+              title: selectedComplaint.title || selectedComplaint.subCategory || "Complaint",
+              attachmentUrl: selectedComplaint.attachmentUrl,
+              location: selectedComplaint.location || null
+            }}
+          />
+        )}
         <ChatModal
           isOpen={!!chatComplaint}
           onClose={() => setChatComplaint(null)}

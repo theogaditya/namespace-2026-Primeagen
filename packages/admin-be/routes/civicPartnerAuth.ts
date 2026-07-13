@@ -134,6 +134,7 @@ export default function (prisma: PrismaClient) {
         success: true,
         message: 'Login successful',
         isVerified: partner.isVerified,
+        token: token,
         partner: {
           id: partner.id,
           orgId: partner.orgId,

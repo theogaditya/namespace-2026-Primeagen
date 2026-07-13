@@ -2,7 +2,7 @@
 
 import { useState, useCallback, useRef } from "react"
 
-const SURVEY_API = process.env.NEXT_PUBLIC_SURVEY_REPORT || "http://localhost:8000"
+const SURVEY_API = process.env.NEXT_PUBLIC_SURVEY_REPORT || "http://localhost:3040"
 
 /* ─── Types ─── */
 export interface PipelineStep {
@@ -159,9 +159,13 @@ export function useReportStream() {
     addLog(`Starting survey report generation for "${category}"...`)
 
     try {
-      const res = await fetch(`${SURVEY_API}/survey-report/stream`, {
+      const token = localStorage.getItem("token")
+      const res = await fetch(`/api/survey-report/generate`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          ...(token ? { Authorization: `Bearer ${token}` } : {})
+        },
         body: JSON.stringify({ category }),
         signal: controller.signal,
       })
@@ -278,7 +282,11 @@ export function useReportStream() {
     addLog("Starting global analysis report...")
 
     try {
+      const token = localStorage.getItem("token")
       const res = await fetch(`${SURVEY_API}/analyze-report/stream`, {
+        headers: {
+          ...(token ? { Authorization: `Bearer ${token}` } : {})
+        },
         signal: controller.signal,
       })
 
