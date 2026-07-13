@@ -14,6 +14,7 @@ import { createReportRouter } from "./routes/report";
 import { createImageRouter } from "./routes/image";
 import { createMatchRouter } from "./routes/match";
 import { createSurveyReportRouter } from "./routes/surveyReport";
+import { createCategorizeRouter } from "./routes/categorize";
 
 export function createApp(db: PrismaClient) {
   const app = express();
@@ -64,6 +65,7 @@ export function createApp(db: PrismaClient) {
 
   // Service-to-service routes (internal API key auth, not user JWT)
   app.use("/api/moderate", createModerateRouter());
+  app.use("/api/categorize", createCategorizeRouter());
 
   // Public test endpoint for abuse moderation (no auth, rate-limited)
   app.use("/api/moderate/test", createModerateTestRouter());

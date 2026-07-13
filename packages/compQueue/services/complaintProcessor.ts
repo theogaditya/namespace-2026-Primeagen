@@ -3,6 +3,7 @@ import { processedComplaintQueueService } from "../lib/redis/processedComplaintQ
 import { PrismaClient } from "../prisma/generated/client/client";
 import { complaintProcessingSchema } from "../lib/schemas/validation.complaint.processing";
 import { standardizeSubCategory } from "../lib/gcp/gcp";
+import { categorizeViaAgentsSafe } from "../lib/categorization/categorizationClient";
 import { moderateTextSafe } from "../lib/moderation/moderationClient";
 import { getBadgeService } from "../lib/badges/badgeService";
 import dotenv from "dotenv";
@@ -57,11 +58,21 @@ export async function processNextComplaint(db: PrismaClient): Promise<{ processe
       return { processed: false, error: "Invalid categoryId removed from queue" };
     }
 
-    // Placeholder for AI standardized sub-category  
-    // const AIstandardizedSubCategory = "dev";
-
-    // AI standardized sub-category (stub for now)
-    const AIstandardizedSubCategory = await standardizeSubCategory(complaintData.subCategory);
+    // AI standardized sub-category — primary: agents service, fallback: Vertex AI
+    let AIstandardizedSubCategory: string;
+    try {
+      AIstandardizedSubCategory = await categorizeViaAgentsSafe(complaintData.subCategory);
+      // If agents service returned the original text unchanged, try Vertex AI as fallback
+      if (AIstandardizedSubCategory === complaintData.subCategory) {
+        const vertexResult = await standardizeSubCategory(complaintData.subCategory);
+        if (vertexResult && vertexResult !== complaintData.subCategory && vertexResult !== "uncategorized description") {
+          AIstandardizedSubCategory = vertexResult;
+        }
+      }
+    } catch {
+      // Both failed — use original
+      AIstandardizedSubCategory = complaintData.subCategory;
+    }
 
     // Prefer review-step abuse data when abuse was detected there, otherwise fall back
     // to server-side moderation before persisting the complaint.
