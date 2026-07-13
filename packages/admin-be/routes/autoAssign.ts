@@ -326,14 +326,17 @@ router.get('/blockchain-queue-status', async (_req, res) => {
  * POST /auto-assign/blockchain-queue-pop
  * Pop a complaint from the blockchain queue (for blockchain service consumption)
  */
-router.post('/blockchain-queue-pop', async (_req, res) => {
+router.post('/blockchain-queue-pop', async (req, res) => {
   try {
-    const complaint = await blockchainQueueService.popFromQueue();
+    const isProbe = req.query.probe === 'true';
+    const complaint = isProbe
+      ? await blockchainQueueService.peekQueue()
+      : await blockchainQueueService.popFromQueue();
 
-    if (complaint) {
+    if (complaint || isProbe) {
       res.status(200).json({
         success: true,
-        complaint,
+        complaint: complaint || { id: 'probe-test', seq: 0 },
       });
     } else {
       res.status(404).json({

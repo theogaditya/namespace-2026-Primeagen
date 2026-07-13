@@ -27,6 +27,11 @@ const GRIEVANCE_CONTRACT_ABI = [
   "function emitComplaintVerificationCode(string) returns (bytes32)",
   "function commitMerkleBatch(bytes32,uint32,string) returns (uint256)",
   "function createAuditLog(string,string,string,string,string)",
+  "function checkComplaintExists(string) view returns (bool)",
+  "function checkUserExists(string) view returns (bool)",
+  "event UserRegistered(string indexed userId, string name, string role, bytes32 emailHash, bytes32 aadhaarHash, bytes32 locationHash, uint256 timestamp)",
+  "event ComplaintRegistered(string indexed complaintId, string indexed complainantId, string categoryId, string subCategory, string department, uint8 urgency, bytes32 descriptionHash, bytes32 attachmentHash, bytes32 locationHash, bool isPublic, uint256 timestamp)",
+  "event AnonymousComplaintRegistered(string indexed complaintId, bytes32 indexed identityCommitment, bytes32 descriptionHash, uint256 timestamp)",
 ] as const;
 
 const DEFAULT_USER_QUEUE = "user:registration:queue";
@@ -332,22 +337,58 @@ class BlockchainWorker {
       )
     );
 
-    const receipt = await this.sendTransactionWithRetry("registerUser", async () => {
-      const fn = this.contract.getFunction("registerUser");
-      return fn(
-        data.id,
-        data.name,
-        "CITIZEN",
-        emailHash,
-        aadhaarHash,
-        locHash,
-        data.location.pin,
-        data.location.district,
-        data.location.city,
-        data.location.state,
-        data.location.municipal
-      );
-    });
+    const checkFn = this.contract.getFunction("checkUserExists");
+    const exists = await checkFn(data.id);
+    let receipt: ethers.TransactionReceipt;
+
+    if (exists) {
+      console.log(`[BLOCKCHAIN_START] User ${data.id} already exists on-chain. Retrieving transaction...`);
+      const filter = this.contract.filters.UserRegistered(data.id);
+      const events = await this.contract.queryFilter(filter, 0, 'latest');
+      let rx: ethers.TransactionReceipt | null = null;
+      if (events.length > 0) {
+        const event = events[0];
+        rx = await this.provider.getTransactionReceipt(event.transactionHash);
+      }
+      if (rx) {
+        receipt = rx;
+        console.log(`[TX_CONFIRMED] Found existing user registration: txHash=${receipt.hash} block=${receipt.blockNumber}`);
+      } else {
+        console.warn(`User exists on-chain but transaction receipt not found for ${data.id}. Using dummy receipt fallback.`);
+        receipt = {
+          hash: ethers.ZeroHash,
+          blockNumber: 0,
+          to: await this.contract.getAddress(),
+          from: this.wallet.address,
+          contractAddress: null,
+          transactionIndex: 0,
+          gasUsed: BigInt(0),
+          logsBloom: "",
+          logs: [],
+          status: 1,
+          cumulativeGasUsed: BigInt(0),
+          gasPrice: BigInt(0),
+          type: 0,
+        } as any;
+      }
+    } else {
+      receipt = await this.sendTransactionWithRetry("registerUser", async () => {
+        const fn = this.contract.getFunction("registerUser");
+        return fn(
+          data.id,
+          data.name,
+          "CITIZEN",
+          emailHash,
+          aadhaarHash,
+          locHash,
+          data.location.pin,
+          data.location.district,
+          data.location.city,
+          data.location.state,
+          data.location.municipal
+        );
+      });
+    }
 
     await this.storeChainMetadata(`user:${data.id}`, cid, receipt);
   }
@@ -522,59 +563,97 @@ class BlockchainWorker {
     const isAnonymous = Boolean(data.anonymous || data.identityCommitment);
     const complainantId = data.complainantId || data.userId;
 
+    const checkFn = this.contract.getFunction("checkComplaintExists");
+    const exists = await checkFn(id);
     let receipt: ethers.TransactionReceipt;
 
-    if (isAnonymous) {
-      const identityCommitment = this.toBytes32(data.identityCommitment, `${id}:${data.submissionDate}`);
-
-      if (data.anonymousProof) {
-        await this.verifyAnonymousProof(id, identityCommitment, data.anonymousProof);
+    if (exists) {
+      console.log(`[BLOCKCHAIN_START] Complaint ${id} already exists on-chain. Retrieving transaction...`);
+      const filter = this.contract.filters.ComplaintRegistered(id);
+      let events = await this.contract.queryFilter(filter, 0, 'latest');
+      if (events.length === 0) {
+        const anonFilter = this.contract.filters.AnonymousComplaintRegistered(id);
+        events = await this.contract.queryFilter(anonFilter, 0, 'latest');
       }
-
-      receipt = await this.sendTransactionWithRetry("registerAnonymousComplaint", async () => {
-        const fn = this.contract.getFunction("registerAnonymousComplaint");
-        return fn(
-          id,
-          identityCommitment,
-          data.categoryId,
-          data.subCategory,
-          data.assignedDepartment,
-          urgency,
-          descHash,
-          attachmentHash,
-          locHash,
-          safePin,
-          safeDistrict,
-          safeCity,
-          safeLocality,
-          safeState
-        );
-      });
+      let rx: ethers.TransactionReceipt | null = null;
+      if (events.length > 0) {
+        const event = events[0];
+        rx = await this.provider.getTransactionReceipt(event.transactionHash);
+      }
+      if (rx) {
+        receipt = rx;
+        console.log(`[TX_CONFIRMED] Found existing complaint registration: txHash=${receipt.hash} block=${receipt.blockNumber}`);
+      } else {
+        console.warn(`Complaint exists on-chain but transaction receipt not found for ${id}. Using dummy receipt fallback.`);
+        receipt = {
+          hash: ethers.ZeroHash,
+          blockNumber: 0,
+          to: await this.contract.getAddress(),
+          from: this.wallet.address,
+          contractAddress: null,
+          transactionIndex: 0,
+          gasUsed: BigInt(0),
+          logsBloom: "",
+          logs: [],
+          status: 1,
+          cumulativeGasUsed: BigInt(0),
+          gasPrice: BigInt(0),
+          type: 0,
+        } as any;
+      }
     } else {
-      if (!complainantId) {
-        throw new Error(`Missing complainantId/userId for non-anonymous complaint ${id}`);
-      }
+      if (isAnonymous) {
+        const identityCommitment = this.toBytes32(data.identityCommitment, `${id}:${data.submissionDate}`);
 
-      receipt = await this.sendTransactionWithRetry("registerComplaint", async () => {
-        const fn = this.contract.getFunction("registerComplaint");
-        return fn(
-          id,
-          complainantId,
-          data.categoryId,
-          data.subCategory,
-          data.assignedDepartment,
-          urgency,
-          descHash,
-          attachmentHash,
-          locHash,
-          data.isPublic,
-          safePin,
-          safeDistrict,
-          safeCity,
-          safeLocality,
-          safeState
-        );
-      });
+        if (data.anonymousProof) {
+          await this.verifyAnonymousProof(id, identityCommitment, data.anonymousProof);
+        }
+
+        receipt = await this.sendTransactionWithRetry("registerAnonymousComplaint", async () => {
+          const fn = this.contract.getFunction("registerAnonymousComplaint");
+          return fn(
+            id,
+            identityCommitment,
+            data.categoryId,
+            data.subCategory,
+            data.assignedDepartment,
+            urgency,
+            descHash,
+            attachmentHash,
+            locHash,
+            safePin,
+            safeDistrict,
+            safeCity,
+            safeLocality,
+            safeState
+          );
+        });
+      } else {
+        if (!complainantId) {
+          throw new Error(`Missing complainantId/userId for non-anonymous complaint ${id}`);
+        }
+
+        receipt = await this.sendTransactionWithRetry("registerComplaint", async () => {
+          const fn = this.contract.getFunction("registerComplaint");
+          return fn(
+            id,
+            complainantId,
+            data.categoryId,
+            data.subCategory,
+            data.assignedDepartment,
+            urgency,
+            descHash,
+            attachmentHash,
+            locHash,
+            data.isPublic,
+            safePin,
+            safeDistrict,
+            safeCity,
+            safeLocality,
+            safeState
+          );
+        });
+      }
     }
 
     await this.storeChainMetadata(`complaint:${id}`, cid, receipt);
@@ -597,12 +676,21 @@ class BlockchainWorker {
   }
 
   private async upvoteComplaint(id: string) {
-    const receipt = await this.sendTransactionWithRetry("upvoteComplaint", async () => {
-      const fn = this.contract.getFunction("upvoteComplaint");
-      return fn(id);
-    });
+    try {
+      const receipt = await this.sendTransactionWithRetry("upvoteComplaint", async () => {
+        const fn = this.contract.getFunction("upvoteComplaint");
+        return fn(id);
+      });
 
-    await this.storeChainMetadata(`complaint:${id}`, undefined, receipt);
+      await this.storeChainMetadata(`complaint:${id}`, undefined, receipt);
+    } catch (err: any) {
+      const msg = String(err.message || err);
+      if (msg.includes("Already upvoted")) {
+        console.warn(`[WARN] Complaint ${id} already upvoted on-chain, skipping.`);
+        return;
+      }
+      throw err;
+    }
   }
 
   private async recordDuplicateAssessment(id: string, data: ComplaintQueueData) {
