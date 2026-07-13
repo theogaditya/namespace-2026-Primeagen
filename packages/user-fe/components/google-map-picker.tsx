@@ -66,7 +66,7 @@ function MapComponent({
 }) {
   const mapRef = useRef<HTMLDivElement>(null);
   const googleMapRef = useRef<google.maps.Map | null>(null);
-  const markerRef = useRef<google.maps.Marker | null>(null);
+  const markerRef = useRef<google.maps.marker.AdvancedMarkerElement | null>(null);
 
   // Initialize map
   useEffect(() => {
@@ -75,18 +75,12 @@ function MapComponent({
     const map = new google.maps.Map(mapRef.current, {
       center,
       zoom,
+      mapId: "DEMO_MAP_ID",
       disableDefaultUI: true,
       zoomControl: false,
       mapTypeControl: false,
       streetViewControl: false,
       fullscreenControl: false,
-      styles: [
-        {
-          featureType: "poi",
-          elementType: "labels",
-          stylers: [{ visibility: "off" }],
-        },
-      ],
     });
 
     googleMapRef.current = map;
@@ -108,7 +102,7 @@ function MapComponent({
 
     return () => {
       if (markerRef.current) {
-        markerRef.current.setMap(null);
+        markerRef.current.map = null;
       }
     };
   }, []);
@@ -133,24 +127,28 @@ function MapComponent({
 
     if (markerPosition) {
       if (markerRef.current) {
-        markerRef.current.setPosition(markerPosition);
+        // Update existing marker position
+        markerRef.current.position = markerPosition;
       } else {
-        markerRef.current = new google.maps.Marker({
+        // Create a styled pin element
+        const pinDot = document.createElement("div");
+        pinDot.style.cssText = [
+          "width: 22px",
+          "height: 22px",
+          "background: #10b981",
+          "border: 3px solid #ffffff",
+          "border-radius: 50%",
+          "box-shadow: 0 2px 8px rgba(0,0,0,0.35)",
+        ].join(";");
+
+        markerRef.current = new google.maps.marker.AdvancedMarkerElement({
           position: markerPosition,
           map: googleMapRef.current,
-          animation: google.maps.Animation.DROP,
-          icon: {
-            path: google.maps.SymbolPath.CIRCLE,
-            scale: 10,
-            fillColor: "#10b981",
-            fillOpacity: 1,
-            strokeColor: "#ffffff",
-            strokeWeight: 3,
-          },
+          content: pinDot,
         });
       }
     } else if (markerRef.current) {
-      markerRef.current.setMap(null);
+      markerRef.current.map = null;
       markerRef.current = null;
     }
   }, [markerPosition]);
@@ -446,7 +444,7 @@ export function GoogleMapPicker({
       <div className="relative">
         <div className="h-[300px] rounded-xl overflow-hidden border-2 border-gray-200 shadow-lg">
           {GOOGLE_API_KEY ? (
-            <Wrapper apiKey={GOOGLE_API_KEY} version="weekly" render={render} libraries={["places"]}>
+            <Wrapper apiKey={GOOGLE_API_KEY} version="weekly" render={render} libraries={["places", "marker"]}>
               <MapComponent
                 center={center}
                 zoom={zoom}
