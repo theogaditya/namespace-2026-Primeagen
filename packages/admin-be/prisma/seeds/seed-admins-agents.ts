@@ -81,8 +81,8 @@ async function upsertAgents() {
 }
 
 async function upsertMunicipalAdmins() {
-  const emails = ['sourab@gmail.com', 'muni@gmail.com', 'roshan@gmail.com'];
-  const municipalities = ['Puri', 'Khordha', 'Cuttack'];
+  const emails = ['sourab@gmail.com', 'muni@gmail.com', 'roshan@gmail.com', 'bhubaneswar@gmail.com', 'rourkela@gmail.com', 'berhampur@gmail.com'];
+  const municipalities = ['Puri', 'Khordha', 'Cuttack', 'Bhubaneswar', 'Rourkela', 'Berhampur'];
   let phone = 9000000101;
 
   for (let i = 0; i < emails.length; i++) {
